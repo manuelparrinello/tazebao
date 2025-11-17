@@ -9,3 +9,8 @@
     height: auto;
     padding: 1rem;
 }
+
+.nav-link {
+    margin-left: 15px;
+    margin-right: 15px;
+}

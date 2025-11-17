@@ -21,6 +21,8 @@ class Cliente(db.Model):
     email = db.Column(db.String(100), nullable=False)
     telefono = db.Column(db.String(20), nullable=False)
     lavori = db.relationship('Lavoro', backref='cliente', lazy=True)
+    note = db.Column(db.Text, nullable=True)
+    colore = db.Column(db.String(20), nullable=True)
     
     def __repr__(self):
         return f"<Cliente {self.name}>"

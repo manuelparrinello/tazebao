@@ -6,12 +6,13 @@
 <h1>Aggiungi Nuovo Cliente</h1>
 <p>Compila il modulo sottostante per aggiungere un nuovo cliente.</p>
 
-<div class="container p-0" id="cliente">
+<div class="container p-0 mt-5" id="cliente">
 
 
     <div class="row">
+        <!-- FORM INPUTS ------------------------------>
         <div class="col-8">
-            <div class="row mt-5">
+            <div class="row">
 
                 <div class="col-md-4">
                     <label class="form-label" for="nomeCliente">Nominativo</label>
@@ -22,30 +23,75 @@
                     <input name="ragioneSociale" type="text" v-model="ragioneSociale" class="form-control"
                         placeholder="Ragione Sociale (opzionale)">
                 </div>
+            </div>
+
+
+            <div class="row mt-3">
                 <div class="col-md-4">
                     <label class="form-label" for="email">Email</label>
                     <input name="email" type="email" v-model="email" class="form-control" placeholder="Email">
                 </div>
-
+                <div class="col-md-4">
+                    <label class="form-label" for="telefono">Telefono</label>
+                    <input name="telefono" type="tel" v-model="telefono" class="form-control" placeholder="Telefono">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="colore">Colore</label>
+                    <input name="colore" type="color" v-model="colore" class="form-control form-control-color"
+                        placeholder="Colore">
+                </div>
             </div>
+
+            <div class="row mt-3">
+                <div class="col-md-8">
+                    <label class="form-label" for="telefono">Note</label>
+                    <textarea name="note" v-model="note" class="form-control" placeholder="Note"></textarea>
+                </div>
+            </div>
+
         </div>
 
+
+        <!-- PREVIEW CARD -------------------------------->
         <div class="col-4">
             <div class="card">
                 <div class="card-body p-4">
                     <h5 class="card-title">Anteprima</h5>
-                    <p class="card-text">Così verrà visualizzato il cliente nel sistema:</p>
+                    <p class="card-text mb-4">Così verrà visualizzato il cliente nel sistema:</p>
                     <!-- Nome Cliente -->
-                    <div class="d-flex align-items-center mb-2">
-                        <h6 class="mb-0 text-capitalize">[[ nomeCliente ? nomeCliente : 'Nominativo' ]]</h6>
+                    <div class="mt-3">
+                        <h6>Nome</h6>
+                        <h6 class="mb-0 text-capitalize fw-light">[[ nomeCliente ? nomeCliente : '-' ]]</h6>
                     </div>
                     <!-- Ragione Sociale -->
-                    <div class="d-flex align-items-center mb-2">
-                        <h6 class="mb-0 text-capitalize">[[ ragioneSociale ? ragioneSociale : 'Ragione Sociale' ]]</h6>
+                    <div class="mt-3">
+                        <h6>Ragione Sociale</h6>
+                        <h6 class="mb-0 text-capitalize fw-light">[[ ragioneSociale ? ragioneSociale : '-' ]]</h6>
                     </div>
                     <!-- Email -->
-                    <div class="d-flex align-items-center mb-2">
-                        <h6 class="mb-0">[[ email ? email : 'Email' ]]</h6>
+                    <div class="mt-3">
+                        <h6>Email</h6>
+                        <h6 class="mb-0 fw-light">[[ email ? email : '-' ]]</h6>
+                    </div>
+                    <!-- Telefono -->
+                    <div class="mt-3">
+                        <h6>Telefono</h6>
+                        <h6 class="mb-0 fw-light">[[ telefono ? telefono : '-' ]]</h6>
+                    </div>
+                    <!-- Note -->
+                    <div class="mt-3">
+                        <h6>Note</h6>
+                        <h6 class="mb-0 fw-light">[[ note ? note : '-' ]]</h6>
+                    </div>
+                    <!-- Colore -->
+                    <div class="mt-3">
+                        <h6>Colore</h6>
+                        <h6 class="mb-0 fw-light">
+                            <span v-if="colore" :style="{ color: colore, fontWeight: 'bold' }">
+                                {{ colore }}
+                            </span>
+                            <span v-else>-</span>
+                        </h6>
                     </div>
                 </div>
             </div>

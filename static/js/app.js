@@ -3,9 +3,10 @@ const app = Vue.createApp({
     return {
       nomeCliente: "",
       ragioneSociale: "",
-      telefonoCliente: "",
+      telefono: "",
       email: "",
       color: "",
+      note: "",
     };
   },
   methods: {
@@ -14,9 +15,10 @@ const app = Vue.createApp({
       const formData = new FormData("#formCliente");
       formData.append("nomeCliente", this.nomeCliente);
       formData.append("ragioneSociale", this.ragioneSociale);
-      formData.append("telefonoCliente", this.telefonoCliente);
-      formData.append("emailCliente", this.emailCliente);
+      formData.append("telefono", this.telefono);
+      formData.append("email", this.email);
       formData.append("color", this.color);
+      formData.append("note", this.note);
 
       // Invio della richiesta POST al server
       fetch("/cliente/new", {

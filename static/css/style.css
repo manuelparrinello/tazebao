@@ -45,3 +45,8 @@
     height: 10px;
 
 }
+
+.prio-pill {
+    text-align: center !important;
+    width:100%;
+}

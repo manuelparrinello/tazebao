@@ -122,6 +122,12 @@ def lavori():
     lavori_list = Lavoro.query.all()
     return render_template('lavori.html', lavori=lavori_list)
 
+# Cliente page route
+@app.route('/clienti/<int:cliente_id>')
+def cliente_page(cliente_id):
+    cliente = Cliente.query.get_or_404(cliente_id)
+    return render_template('cliente.html', cliente=cliente) 
+
 # testing route
 @app.route('/test')
 def test():

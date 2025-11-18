@@ -21,8 +21,7 @@
             {% for cliente in clienti %}
             <tr>
                 <th scope="row">{{ cliente.id }}</th>
-                <td><span class="cliente-bullet" style="background-color: {{ cliente.colore }} !important;"></span>{{
-                    cliente.name }}</td>
+                <td><a href="{{ url_for('cliente_page', cliente_id=cliente.id) }}"><span class="cliente-bullet" style="background-color: {{ cliente.colore }} !important;"></span>{{ cliente.name }}</a></td>
                 <td>{{ cliente.email }}</td>
                 <td>{{ cliente.telefono }}</td>
                 <td>{{ cliente.note }}</td>

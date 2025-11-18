@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Tutti i lavori{% endblock %}
+
+{% block content %}
+<h1>{{ cliente.name }}</h1>
+<p class="mb-4">Elenco di tutti i lavori del cliente {{ cliente.name }}
+</p>
+
+<div class="container p-0 mt-5">
+    <table class="table table-striped" id="tabellaLavori">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Descrizione</th>
+                <th scope="col">Preventivato</th>
+                <th scope="col">Priorità</th>
+                <th scope="col">Stato</th>
+                <th scope="col">Data inizio</th>
+                <th scope="col">Data fine</th>
+                <th scope="col">Data pagamento</th>
+                <th scope="col">Note</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% if cliente.lavori %}
+                {% for lavoro in cliente.lavori %}
+                <tr>
+                    <th scope="row">{{ lavoro.id }}</th>
+                    <td>{{ lavoro.descrizione }}</td>
+                    <td>{{ lavoro.preventivato }}</td>
+                    <td class="text-center"><span class="prio-pill">{{ lavoro.priorita }}</span></td>
+                    <td>{{ lavoro.stato if lavoro.stato else '-' }}</td>
+                    <td>{{ lavoro.data_inizio if lavoro.data_inizio else '-' }}</td>
+                    <td>{{ lavoro.data_fine if lavoro.data_fine else "-" }}</td>
+                    <td>{{ lavoro.data_pagamento  if lavoro.data_pagamento else "-" }}</td>
+                    <td>{{ lavoro.note if lavoro.note else "-" }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="9" class="text-center">Nessun lavoro trovato per questo cliente.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+
+{% endblock %}

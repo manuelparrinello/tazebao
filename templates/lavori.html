@@ -28,17 +28,17 @@
             {% for lavoro in lavori %}
             <tr>
                 <th scope="row">{{ lavoro.id }}</th>
-                <td class="fw-bold">{{ lavoro.descrizione }}</td>
+                <td>{{ lavoro.descrizione }}</td>
                 <td><span class="cliente-bullet"
                         style="background-color: {{ lavoro.cliente.colore }} !important;"></span>{{ lavoro.cliente.name
                     }}</td>
                 <td>{{ lavoro.preventivato }}</td>
-                <td>{{ lavoro.priorita }}</td>
-                <td><span>{{ lavoro.stato if lavoro.stato else '-' }}</span></td>
+                <td class="text-center"><span class="prio-pill">{{ lavoro.priorita }}</span></td>
+                <td>{{ lavoro.stato if lavoro.stato else '-' }}</td>
                 <td>{{ lavoro.data_inizio if lavoro.data_inizio else '' }}</td>
                 <td>{{ lavoro.data_fine if lavoro.data_fine else "" }}</td>
-                <td>{{ lavoro.data_pagamento }}</td>
-                <td>{{ lavoro.note }}</td>
+                <td>{{ lavoro.data_pagamento  if lavoro.data_pagamento else "-" }}</td>
+                <td>{{ lavoro.note if lavoro.note else "-" }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -46,31 +46,21 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const lowPrio = 'border-radius: 20px; background-color: trd; color: #0f5132; padding: 5px 10px;';
-        const medPrio = 'border-radius: 20px; background-color: #fff3cd; color: #664d03; padding: 5px 10px;';
-        const highPrio = 'border-radius: 20px; background-color: #f8d7da; color: #842029; padding: 5px 10px;';
+        const lowPrio = 'font-size: 0.8rem; font-weight: bold; border-radius: 10px; background-color: #9be5a0; color: #0f5132; padding: 2px 10px 5px 10px;';
+        const medPrio = 'font-size: 0.8rem; font-weight: bold;border-radius: 10px; background-color: #ffdc6e; color: #664d03; padding: 2px 10px 5px 10px;';
+        const highPrio = 'font-size: 0.8rem; font-weight: bold;border-radius: 10px; background-color: #ffaeb6; color: #842029; padding: 2px 10px 5px 10px;';
 
-        const rows = document.querySelectorAll('#tabellaLavori tbody tr span');
-        rows.forEach(row => {
-            // L'indice della colonna priorità è 4 (contando da 0)
-            const prioCell = row.cells[4];
-            const prioValue = prioCell.textContent.trim();
-
-            let styleToApply = '';
-
-            if (prioValue === 'Bassa') {
-                styleToApply = lowPrio;
-            } else if (prioValue === 'Media') {
-                styleToApply = medPrio;
-            } else if (prioValue === 'Alta') {
-                styleToApply = highPrio;
+        const prioPill = document.querySelectorAll('.prio-pill');
+        console.log(prioPill);
+        prioPill.forEach(function(pill) {
+            if (pill.textContent === 'Bassa') {
+                pill.style = lowPrio;
+            } else if (pill.textContent === 'Media') {
+                pill.style = medPrio;
+            } else if (pill.textContent === 'Alta') {
+                pill.style = highPrio;
             }
-
-            // Applica lo stile
-            if (styleToApply) {
-                prioCell.setAttribute('style', styleToApply);
-            }
-        });
+        })
     });
 </script>
 {% endblock %}

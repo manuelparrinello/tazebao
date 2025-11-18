@@ -21,6 +21,7 @@
                 <th scope="col">Data fine</th>
                 <th scope="col">Data pagamento</th>
                 <th scope="col">Note</th>
+                <th scope="col"></th>
 
             </tr>
         </thead>
@@ -37,8 +38,12 @@
                 <td>{{ lavoro.stato if lavoro.stato else '-' }}</td>
                 <td>{{ lavoro.data_inizio if lavoro.data_inizio else '' }}</td>
                 <td>{{ lavoro.data_fine if lavoro.data_fine else "" }}</td>
-                <td>{{ lavoro.data_pagamento  if lavoro.data_pagamento else "-" }}</td>
+                <td>{{ lavoro.data_pagamento if lavoro.data_pagamento else "-" }}</td>
                 <td>{{ lavoro.note if lavoro.note else "-" }}</td>
+                <td>
+                    <span class="action-icon edit-icon"><i class="bi bi-pencil text-success"></i></span>
+                    <span class="action-icon delete-icon"><i class="bi bi-trash3 text-danger"></i></span>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -52,7 +57,7 @@
 
         const prioPill = document.querySelectorAll('.prio-pill');
         console.log(prioPill);
-        prioPill.forEach(function(pill) {
+        prioPill.forEach(function (pill) {
             if (pill.textContent === 'Bassa') {
                 pill.style = lowPrio;
             } else if (pill.textContent === 'Media') {

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, flash
+from flask import Flask, jsonify, render_template, request, flash, redirect
 from flask_cors import CORS
 import os
 from flask_sqlalchemy import SQLAlchemy
@@ -19,7 +19,7 @@ class Cliente(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False)
     telefono = db.Column(db.String(20), nullable=False)
-    lavori = db.relationship('Lavoro', backref='cliente', lazy=True)
+    lavori = db.relationship('Lavoro', backref='cliente', lazy=True, cascade="all, delete")
     note = db.Column(db.Text, nullable=True)
     colore = db.Column(db.String(20), nullable=True)
     
@@ -76,12 +76,6 @@ def nuovo_cliente():
     if request.method == 'GET':
         return render_template('cliente_new.html')
 
-# Clienti route
-@app.route('/clienti')
-def clienti():
-    clienti_list = Cliente.query.all()
-    return render_template('clienti.html', clienti=clienti_list)
-
 # Nuovo lavoro route
 @app.route('/lavoro/new', methods=['GET', 'POST'])
 def nuovo_lavoro():
@@ -116,19 +110,38 @@ def nuovo_lavoro():
         clienti_list = Cliente.query.all()
         return render_template('lavoro_new.html', clienti=clienti_list)
     
-# Lavori route
+# Lavori LISTA
 @app.route('/lavori')
 def lavori():
     lavori_list = Lavoro.query.all()
     return render_template('lavori.html', lavori=lavori_list)
 
-# Cliente page route
+# Clienti LISTA
+@app.route('/clienti')
+def clienti():
+    clienti_list = Cliente.query.all()
+    return render_template('clienti.html', clienti=clienti_list)
+
+# Cliente SINGLE PAGE
 @app.route('/clienti/<int:cliente_id>')
 def cliente_page(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     return render_template('cliente.html', cliente=cliente) 
 
-# testing route
+# Cliente DELETE
+@app.route('/clienti/delete/<int:cliente_id>')
+def cliente_delete(cliente_id):
+    Cliente.query.filter_by(id=cliente_id).delete()
+    db.session.commit()
+    return jsonify('Cliente eliminato')
+
+# Cliente EDIT
+@app.route('/clienti/edit/<int:cliente_id>')
+def cliente_edit(cliente_id):
+    cliente = Cliente.query.get_or_404(id=cliente_id)
+    return redirect('/cliente/new')
+
+# TESTING
 @app.route('/test')
 def test():
     return render_template('base.html')

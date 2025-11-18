@@ -15,18 +15,39 @@
                 <th scope="col">Email</th>
                 <th scope="col">Telefono</th>
                 <th scope="col">Note</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
             {% for cliente in clienti %}
             <tr>
                 <th scope="row">{{ cliente.id }}</th>
-                <td><a href="{{ url_for('cliente_page', cliente_id=cliente.id) }}"><span class="cliente-bullet" style="background-color: {{ cliente.colore }} !important;"></span>{{ cliente.name }}</a></td>
+                <td><a href="{{ url_for('cliente_page', cliente_id=cliente.id) }}"><span class="cliente-bullet"
+                            style="background-color: {{ cliente.colore }} !important;"></span>{{ cliente.name }}</a>
+                </td>
                 <td>{{ cliente.email }}</td>
                 <td>{{ cliente.telefono }}</td>
                 <td>{{ cliente.note }}</td>
+                <td>
+                    <span class="action-icon edit-icon"><i class="bi bi-pencil text-success"></i></span>
+                    <a href="#" onclick="eliminaCliente({{cliente.id}})"><span class="action-icon delete-icon"><i
+                                class="bi bi-trash3 text-danger"></i></span></a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
 </div>
+
+<script>
+    function eliminaCliente(cliente_id) {
+        if (!confirm('Sei sicuro di voler eliminare questo cliente?')) return;
+        fetch(`/clienti/delete/${cliente_id}`)
+            .then(response => response.json())
+            .then(msg => {
+                alert(msg);
+                window.location.href = '/clienti'
+            })
+    };
+</script>
+
 {% endblock %}

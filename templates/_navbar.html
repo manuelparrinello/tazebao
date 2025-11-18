@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary d-none d-lg-flex">
     <div class="container">
         <a class="navbar-brand" href="">
-            <img class="mobile-nav-logo" src="{{ url_for('static', filename='img/logo_light.png')}}" alt="">
+            <img class="mobile-nav-logo px-0" src="{{ url_for('static', filename='img/logo_light.png')}}" alt="">
         </a>
 
         <div class="collapse navbar-collapse">
@@ -14,11 +14,13 @@
                 <li class="nav-item"><a class="nav-link text-light fw-medium" href="{{ url_for('nuovo_lavoro') }}">
                         <i class="bi bi-plus-square"></i></i>&nbsp;Nuovo lavoro</a></li>
 
-                <li class="nav-item"><a class="nav-link text-light fw-medium" href="{{ url_for('lavori') }}">
-                        <i class="bi bi-list-task"></i>&nbsp;Tutti i lavori</a></li>
-
                 <li class="nav-item"><a class="nav-link text-light fw-medium" href="{{ url_for('nuovo_cliente') }}">
                         <i class="bi bi-person-add"></i>&nbsp;Nuovo Cliente</a></li>
+
+                <li class="nav-item nav-link text-light fw-medium">|</li>
+
+                <li class="nav-item"><a class="nav-link text-light fw-medium" href="{{ url_for('lavori') }}">
+                        <i class="bi bi-list-task"></i>&nbsp;Tutti i lavori</a></li>
 
                 <li class="nav-item"><a class="nav-link text-light fw-medium" href="{{ url_for('clienti') }}">
                         <i class="bi bi-people-fill"></i>&nbsp;Tutti i clienti</a></li>

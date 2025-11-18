@@ -1,15 +1,19 @@
 {% extends "base.html" %}
-    
+
 {% block title %}Tutti i lavori{% endblock %}
 
 {% block content %}
+
+<h1>Tutti i lavori</h1>
+<p class="mb-4">Elenco di tutti i lavori presenti nel sistema.</p>
+
 <div class="container p-0 mt-5">
-    <table class="table table-striped">
+    <table class="table table-striped" id="tabellaLavori">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">Cliente</th>
                 <th scope="col">Descrizione</th>
+                <th scope="col">Cliente</th>
                 <th scope="col">Preventivato</th>
                 <th scope="col">Priorità</th>
                 <th scope="col">Stato</th>
@@ -24,17 +28,49 @@
             {% for lavoro in lavori %}
             <tr>
                 <th scope="row">{{ lavoro.id }}</th>
-                <td><span class="cliente-bullet" style="background-color: {{ lavoro.cliente.colore }} !important;"></span>{{ lavoro.cliente.name }}</td>
-                <td>{{ lavoro.descrizione }}</td>
+                <td class="fw-bold">{{ lavoro.descrizione }}</td>
+                <td><span class="cliente-bullet"
+                        style="background-color: {{ lavoro.cliente.colore }} !important;"></span>{{ lavoro.cliente.name
+                    }}</td>
                 <td>{{ lavoro.preventivato }}</td>
                 <td>{{ lavoro.priorita }}</td>
-                <td>{{ lavoro.stato }}</td>
-                <td>{{ lavoro.data_inizio }}</td>
-                <td>{{ lavoro.data_fine }}</td>
+                <td><span>{{ lavoro.stato if lavoro.stato else '-' }}</span></td>
+                <td>{{ lavoro.data_inizio if lavoro.data_inizio else '' }}</td>
+                <td>{{ lavoro.data_fine if lavoro.data_fine else "" }}</td>
                 <td>{{ lavoro.data_pagamento }}</td>
                 <td>{{ lavoro.note }}</td>
             </tr>
             {% endfor %}
         </tbody>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const lowPrio = 'border-radius: 20px; background-color: trd; color: #0f5132; padding: 5px 10px;';
+        const medPrio = 'border-radius: 20px; background-color: #fff3cd; color: #664d03; padding: 5px 10px;';
+        const highPrio = 'border-radius: 20px; background-color: #f8d7da; color: #842029; padding: 5px 10px;';
+
+        const rows = document.querySelectorAll('#tabellaLavori tbody tr span');
+        rows.forEach(row => {
+            // L'indice della colonna priorità è 4 (contando da 0)
+            const prioCell = row.cells[4];
+            const prioValue = prioCell.textContent.trim();
+
+            let styleToApply = '';
+
+            if (prioValue === 'Bassa') {
+                styleToApply = lowPrio;
+            } else if (prioValue === 'Media') {
+                styleToApply = medPrio;
+            } else if (prioValue === 'Alta') {
+                styleToApply = highPrio;
+            }
+
+            // Applica lo stile
+            if (styleToApply) {
+                prioCell.setAttribute('style', styleToApply);
+            }
+        });
+    });
+</script>
 {% endblock %}

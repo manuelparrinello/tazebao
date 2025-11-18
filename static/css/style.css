@@ -1,10 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400..700;1,400..700&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap');
 
 * {
-    font-family: 'Space Grotesk', sans-serif !important;
+    font-family: 'Hanken Grotesk', sans-serif !important;
 }
 
-.desktop-nav-logo, .mobile-nav-logo {
+.bg-primary {
+    background-color: #198754  !important;
+}
+
+.btn-primary {
+    background-color: #198754  !important;
+    border-color: #198754  !important;
+}
+
+.circle-propic {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    background-color: #ced4da;
+    border-radius: 100%;
+    margin-bottom: 1rem;
+    color: white;
+    font-size: 3rem;
+    line-height: 80px;
+}
+
+.desktop-nav-logo,
+.mobile-nav-logo {
     max-width: 160px;
     height: auto;
     padding: 1rem;
@@ -13,4 +35,13 @@
 .nav-link {
     margin-left: 15px;
     margin-right: 15px;
+}
+
+.cliente-bullet {
+    display: inline-block;
+    width: 10px;
+    margin-right: 10px;
+    border-radius: 100%;
+    height: 10px;
+
 }

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+    
+{% block title %}Tutti i lavori{% endblock %}
+
+{% block content %}
+<div class="container p-0 mt-5">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Descrizione</th>
+                <th scope="col">Preventivato</th>
+                <th scope="col">Priorità</th>
+                <th scope="col">Stato</th>
+                <th scope="col">Data inizio</th>
+                <th scope="col">Data fine</th>
+                <th scope="col">Data pagamento</th>
+                <th scope="col">Note</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for lavoro in lavori %}
+            <tr>
+                <th scope="row">{{ lavoro.id }}</th>
+                <td><span class="cliente-bullet" style="background-color: {{ lavoro.cliente.colore }} !important;"></span>{{ lavoro.cliente.name }}</td>
+                <td>{{ lavoro.descrizione }}</td>
+                <td>{{ lavoro.preventivato }}</td>
+                <td>{{ lavoro.priorita }}</td>
+                <td>{{ lavoro.stato }}</td>
+                <td>{{ lavoro.data_inizio }}</td>
+                <td>{{ lavoro.data_fine }}</td>
+                <td>{{ lavoro.data_pagamento }}</td>
+                <td>{{ lavoro.note }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+</div>
+{% endblock %}

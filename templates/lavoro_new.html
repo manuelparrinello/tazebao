@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Nuovo lavoro{% endblock %}
+
+{% block content %}
+<h1>Nuovo lavoro</h1>
+<p class="mb-4">Compila il modulo sottostante per aggiungere un nuovo lavoro.</p>
+
+<form id="nuovoLavoro">
+
+    <div class="container p-0 mt-5" id="formLavoro">
+        <div class="mb-3">
+            <label for="descrizione" class="form-label">Descrizione</label>
+            <input type="text" class="form-control" id="descrizione" name="descrizione" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="cliente_id" class="form-label">Cliente</label>
+            <select class="form-control" id="cliente_id" name="cliente_id" required>
+                {% for cliente in clienti %}
+                <option value="{{ cliente.id }}">{{ cliente.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="preventivato" class="form-label">Preventivo</label>
+            <input type="number" step="0.01" class="form-control" id="preventivato" name="preventivato">
+        </div>
+
+        <div class="mb-3">
+            <label for="priorita" class="form-label">Priorità</label>
+            <select name="priorita" id="">
+                <option value="Bassa">Bassa</option>
+                <option value="Media">Media</option>
+                <option value="Alta">Alta</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="stato" class="form-label">Stato</label>
+            <select name="stato" id="">
+                <option value="Da iniziare">Da iniziare</option>
+                <option value="In attesa">In attesa</option>
+                <option value="In corso">In corso</option>
+                <option value="Completato">Completato</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="note" class="form-label">Note</label>
+            <textarea class="form-control" id="note" name="note" rows="4"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Aggiungi Lavoro</button>
+</form>
+{% endblock %}

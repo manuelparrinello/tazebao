@@ -19,6 +19,7 @@
             </tr>
         </thead>
         <tbody>
+            {% if clienti %}
             {% for cliente in clienti %}
             <tr>
                 <th scope="row">{{ cliente.id }}</th>
@@ -35,6 +36,11 @@
                 </td>
             </tr>
             {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center">Nessun cliente trovato.</td>
+            </tr>
+            {% endif %}
         </tbody>
 </div>
 

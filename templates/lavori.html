@@ -26,6 +26,7 @@
             </tr>
         </thead>
         <tbody>
+            {% if lavori %}
             {% for lavoro in lavori %}
             <tr>
                 <th scope="row">{{ lavoro.id }}</th>
@@ -33,7 +34,7 @@
                 <td><span class="cliente-bullet"
                         style="background-color: {{ lavoro.cliente.colore }} !important;"></span>{{ lavoro.cliente.name
                     }}</td>
-                <td>{{ lavoro.preventivato }}</td>
+                <td>{{ "%.2f€"|format(lavoro.preventivato) }}</td>
                 <td class="text-center"><span class="prio-pill">{{ lavoro.priorita }}</span></td>
                 <td>{{ lavoro.stato if lavoro.stato else '-' }}</td>
                 <td>{{ lavoro.data_inizio if lavoro.data_inizio else '' }}</td>
@@ -46,6 +47,11 @@
                 </td>
             </tr>
             {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="11" class="text-center">Nessun lavoro trovato.</td>
+            </tr>
+            {% endif %}
         </tbody>
 </div>
 

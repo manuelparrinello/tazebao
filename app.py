@@ -19,7 +19,7 @@ class Cliente(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False)
     telefono = db.Column(db.String(20), nullable=False)
-    lavori = db.relationship('Lavoro', backref='cliente', lazy=True, cascade="all, delete")
+    lavori = db.relationship('Lavoro', backref='cliente', lazy=True, cascade="all, delete, delete-orphan")
     note = db.Column(db.Text, nullable=True)
     colore = db.Column(db.String(20), nullable=True)
     
@@ -131,7 +131,8 @@ def cliente_page(cliente_id):
 # Cliente DELETE
 @app.route('/clienti/delete/<int:cliente_id>')
 def cliente_delete(cliente_id):
-    Cliente.query.filter_by(id=cliente_id).delete()
+    cliente = Cliente.query.get_or_404(cliente_id)
+    db.session.delete(cliente)
     db.session.commit()
     return jsonify('Cliente eliminato')
 

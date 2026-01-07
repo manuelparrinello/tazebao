@@ -4,14 +4,21 @@
 
 {% block content %}
 
-<h1>Tutti i lavori</h1>
-<p class="mb-4">Elenco di tutti i lavori presenti nel sistema.</p>
+<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+    <div class="col-4">
+        <h1>Tutti i lavori</h1>
+        <p class="mb-4">Elenco di tutti i lavori nel sistema.</p>
+    </div>
+    <div class="col-8 d-inline-flex justify-content-end px-0">
+        <a href="{{ url_for('nuovo_lavoro') }}"><button class="btn btn-primary"><span><i class="bi bi-journal-plus"></i></span>&nbsp;Nuovo lavoro</button></a>
+    </div>
+</div>
 
-<div class="container p-0 mt-5">
+
+<div class="container p-0 mt-0">
     <table class="table table-striped" id="tabellaLavori">
         <thead>
             <tr>
-                <th scope="col">#</th>
                 <th scope="col">Descrizione</th>
                 <th scope="col">Cliente</th>
                 <th scope="col">Preventivato</th>
@@ -29,12 +36,10 @@
             {% if lavori %}
             {% for lavoro in lavori %}
             <tr>
-                <th scope="row">{{ lavoro.id }}</th>
-                <td>{{ lavoro.descrizione }}</td>
+                <td><span class="fw-bold">{{ lavoro.descrizione }}</span></td>
                 <td><span class="cliente-bullet"
-                        style="background-color: {{ lavoro.cliente.colore }} !important;"></span>{{ lavoro.cliente.name
-                    }}</td>
-                <td>{{ "%.2f€"|format(lavoro.preventivato) }}</td>
+                        style="background-color: {{ lavoro.cliente.colore }} !important;"></span><a href="/clienti/{{lavoro.cliente.id}}" class="fw-bold text-decoration-none">{{ lavoro.cliente.name}}</a></td>
+                <td>{{ lavoro.preventivato | euro }}</td>
                 <td class="text-center"><span class="prio-pill">{{ lavoro.priorita }}</span></td>
                 <td>{{ lavoro.stato if lavoro.stato else '-' }}</td>
                 <td>{{ lavoro.data_inizio if lavoro.data_inizio else '' }}</td>

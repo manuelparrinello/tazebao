@@ -8,6 +8,7 @@
 </p>
 
 <div class="container p-0 mt-5">
+    <h4 class="fw-bold">Lavori associati</h4>
     <table class="table table-striped" id="tabellaLavori">
         <thead>
             <tr>
@@ -29,7 +30,7 @@
                 <tr>
                     <th scope="row">{{ lavoro.id }}</th>
                     <td>{{ lavoro.descrizione }}</td>
-                    <td>{{ lavoro.preventivato }}</td>
+                    <td>{{ lavoro.preventivato | euro }}</td>
                     <td class="text-center"><span class="prio-pill">{{ lavoro.priorita }}</span></td>
                     <td>{{ lavoro.stato if lavoro.stato else '-' }}</td>
                     <td>{{ lavoro.data_inizio if lavoro.data_inizio else '-' }}</td>

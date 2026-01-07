@@ -1,80 +1,89 @@
-@import url('https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400..700;1,400..700&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400..700;1,400..700&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap");
 
 * {
-    font-family: 'Hanken Grotesk', sans-serif !important;
+  font-family: "Hanken Grotesk", sans-serif !important;
 }
 
-body {
-    opacity: 0;
-    transition: opacity .3s ease-in;
-}
+/*body {
+  opacity: 0;
+  transition: opacity 0.1s ease-in;
+}*/
 
 body.loaded {
-    opacity: 1;
+  opacity: 1;
 }
 
 .bg-primary {
-    background-color: #198754 !important;
+  background-color: #198754 !important;
 }
 
 .btn-primary {
-    background-color: #198754 !important;
-    border-color: #198754 !important;
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  font-weight: bold;
+}
+
+.btn-primary:hover {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+.btn {
+  border-radius: 12px!important;
 }
 
 .action-icon {
-    border: solid 1px grey;
-    display: inline-flex;
-    justify-content: center;
-    align-items: start;
-    padding: 1px 5px 0px 5px;
-    border-radius: 5px;
+  border: solid 1px grey;
+  display: inline-flex;
+  justify-content: center;
+  align-items: start;
+  padding: 1px 5px 0px 5px;
+  border-radius: 5px;
 }
 
 .action-icon.edit-icon {
-    border-color: #555;
-    background-color: #ffffff;
+  border-color: #555;
+  background-color: #ffffff;
 }
 
 .action-icon.delete-icon {
-    border-color: #555;
-    background-color: #ffffff;
+  border-color: #555;
+  background-color: #ffffff;
 }
 
 .circle-propic {
-    display: inline-block;
-    width: 80px;
-    height: 80px;
-    background-color: #ced4da;
-    border-radius: 100%;
-    margin-bottom: 1rem;
-    color: white;
-    font-size: 3rem;
-    line-height: 80px;
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+  background-color: #ced4da;
+  border-radius: 100%;
+  margin-bottom: 1rem;
+  color: white;
+  font-size: 3rem;
+  line-height: 80px;
 }
 
 .desktop-nav-logo,
 .mobile-nav-logo {
-    max-width: 160px;
-    height: auto;
-    padding: 1rem;
+  max-width: 160px;
+  height: auto;
+  padding: 1rem;
 }
 
 .nav-link {
-    margin-left: 15px;
-    margin-right: 15px;
+  margin-left: 15px;
+  margin-right: 15px;
 }
 
 .cliente-bullet {
-    display: inline-block;
-    width: 10px;
-    margin-right: 10px;
-    border-radius: 100%;
-    height: 10px;
-
+  display: inline-block;
+  width: 10px;
+  margin-right: 10px;
+  border-radius: 100%;
+  height: 10px;
 }
 
 .prio-pill {
-    text-align: center !important;
-    width: 100%;
+  text-align: center !important;
+  width: 100%;
 }

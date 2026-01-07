@@ -33,14 +33,14 @@ const nuovoClienteApp = Vue.createApp({
       formData.append("note", this.note);
 
       // Invio della richiesta POST al server
-      fetch("/cliente/new", {
+      fetch("/clienti/new", {
         method: "POST",
         body: formData,
       }).then((response) => {
         if (response.ok) {
           // Reindirizzamento alla pagina dei clienti dopo il successo
           window.alert("Cliente creato con successo!");
-          window.location.href = "/clienti";
+          //window.location.href = "/clienti";
         } else {
           console.error("Errore durante la creazione del cliente.");
         }
@@ -79,7 +79,7 @@ const nuovoLavoroApp = Vue.createApp({
       formData.append("priorita", this.priorita);
       formData.append("preventivato", this.preventivato);
       formData.append("cliente", this.cliente);
-      fetch("/lavoro/new", {
+      fetch("/lavori/new", {
         method: "POST",
         body: formData,
       }).then((response) => {
@@ -93,3 +93,15 @@ const nuovoLavoroApp = Vue.createApp({
     },
   },
 }).mount("#formLavoro");
+
+
+/*--------------------*/
+/*  MODIFICA CLIENTE  */
+/*--------------------*/
+const modificaCliente = Vue.createApp({
+  data() {
+    return {
+    }
+  },
+  methods : {}
+})

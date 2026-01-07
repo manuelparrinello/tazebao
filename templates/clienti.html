@@ -3,10 +3,17 @@
 {% block title %}Tutti i clienti{% endblock %}
 
 {% block content %}
-<h1>Tutti i clienti</h1>
-<p class="mb-4">Elenco di tutti i clienti presenti nel sistema.</p>
+<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+    <div class="col-4">
+        <h1>Tutti i clienti</h1>
+        <p class="mb-4">Elenco di tutti i clienti presenti nel sistema.</p>
+    </div>
+    <div class="col-8 d-inline-flex justify-content-end px-0">
+        <a href="{{ url_for('nuovo_cliente') }}"><button class="btn btn-primary"><span><i class="bi bi-person-plus-fill"></i></span>&nbsp;Nuovo cliente</button></a>
+    </div>
+</div>
 
-<div class="container p-0 mt-5">
+<div class="container p-0">
     <table class="table table-striped">
         <thead>
             <tr>
@@ -15,25 +22,20 @@
                 <th scope="col">Email</th>
                 <th scope="col">Telefono</th>
                 <th scope="col">Note</th>
-                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
             {% if clienti %}
             {% for cliente in clienti %}
-            <tr>
+            <tr id="clienteRow" class="display: inline-flex; align-items: center;">
                 <th scope="row">{{ cliente.id }}</th>
-                <td><a href="{{ url_for('cliente_page', cliente_id=cliente.id) }}"><span class="cliente-bullet"
+                <td><a href="{{ url_for('cliente_page', cliente_id=cliente.id) }}"
+                        class="fw-bold text-decoration-none"><span class="cliente-bullet"
                             style="background-color: {{ cliente.colore }} !important;"></span>{{ cliente.name }}</a>
                 </td>
                 <td>{{ cliente.email }}</td>
                 <td>{{ cliente.telefono }}</td>
                 <td>{{ cliente.note }}</td>
-                <td>
-                    <span class="action-icon edit-icon"><i class="bi bi-pencil text-success"></i></span>
-                    <a href="#" onclick="eliminaCliente({{cliente.id}})"><span class="action-icon delete-icon"><i
-                                class="bi bi-trash3 text-danger"></i></span></a>
-                </td>
             </tr>
             {% endfor %}
             {% else %}
@@ -54,6 +56,8 @@
                 window.location.href = '/clienti'
             })
     };
+
+
 </script>
 
 {% endblock %}

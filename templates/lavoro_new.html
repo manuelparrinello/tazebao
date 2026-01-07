@@ -15,10 +15,14 @@
             <div class="col-2">
                 <div class="mb-3">
                     <label for="cliente_id" class="form-label">Cliente</label>
-                    <select class="form-control" id="cliente_id" name="cliente_id" required>
+                    <select class="form-control form-select" id="cliente_id" name="cliente_id" required>
+                        {% if clienti %}
                         {% for cliente in clienti %}
                         <option value="{{ cliente.id }}">{{ cliente.name }}</option>
                         {% endfor %}
+                        {% else %}
+                        <option value="noclient" disabled>Nessun cliente trovato</option>
+                        {% endif %}
                     </select>
                 </div>
             </div>
@@ -37,10 +41,10 @@
                 </div>
             </div>
 
-            <div class="col-1">
+            <div class="col-2">
                 <div class="mb-3">
                     <label for="priorita" class="form-label">Priorità</label>
-                    <select class="form-control" name="priorita" id="">
+                    <select class="form-control form-select" name="priorita" id="">
                         <option value="Bassa">Bassa</option>
                         <option value="Media">Media</option>
                         <option value="Alta">Alta</option>
@@ -48,10 +52,10 @@
                 </div>
             </div>
 
-            <div class="col-3">
+            <div class="col-2">
                 <div class="mb-3">
                     <label for="stato" class="form-label">Stato</label>
-                    <select class="form-control" name="stato" id="">
+                    <select class="form-control form-select" name="stato" id="">
                         <option value="Da iniziare">Da iniziare</option>
                         <option value="In attesa">In attesa</option>
                         <option value="In corso">In corso</option>

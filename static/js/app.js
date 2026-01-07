@@ -40,7 +40,7 @@ const nuovoClienteApp = Vue.createApp({
         if (response.ok) {
           // Reindirizzamento alla pagina dei clienti dopo il successo
           window.alert("Cliente creato con successo!");
-          //window.location.href = "/clienti";
+          window.location.href = "/clienti";
         } else {
           console.error("Errore durante la creazione del cliente.");
         }
@@ -94,14 +94,40 @@ const nuovoLavoroApp = Vue.createApp({
   },
 }).mount("#formLavoro");
 
+/*--------------------*/
+/*  CANCELLA CLIENTE  */
+/*--------------------*/
+function deleteCliente(id) {
+  return fetch(`/clienti/${id}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+}
 
-/*--------------------*/
-/*  MODIFICA CLIENTE  */
-/*--------------------*/
-const modificaCliente = Vue.createApp({
-  data() {
-    return {
+async function clickForDeleteCliente(event, idCliente) {
+  event.preventDefault();
+  const utenteConferma = confirm("Sei sicuro di voler cancellare il cliente?");
+
+  if (utenteConferma === false) {
+    return
+  }
+
+  try {
+    const response = await deleteCliente(idCliente);
+    console.log("DELETE status:", response.status);
+
+    if (response.ok === false) {
+      const corpoRispostaComeTesto = await response.text();
+      console.error("Errore response:", corpoRispostaComeTesto);
+      throw new Error(`Errore durante l'eliminazione (HTTP ${response.status})`);
     }
-  },
-  methods : {}
-})
+
+    alert("Cliente eliminato con successo!");
+    window.location.href = "/clienti";
+  } catch (errore) {
+    alert(errore.message);
+    console.error(errore);
+  }
+}

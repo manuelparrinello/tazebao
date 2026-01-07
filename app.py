@@ -75,6 +75,7 @@ def index():
     )
 
 
+## AGGIUNGERE NUOVI RECORD ##
 # Nuovo cliente route
 @app.route("/clienti/new", methods=["GET", "POST"])
 def nuovo_cliente():
@@ -90,17 +91,21 @@ def nuovo_cliente():
         )
         db.session.add(nuovo_cliente)
         db.session.commit()
-        return jsonify({
+        return (
+            jsonify(
+                {
                     "message": "Cliente aggiunto con successo!",
                     "data": {
                         "nome": nomeCliente,
-                        "telefono" : telefono,
-                        "email" : email,
-                        "note" : note,
-                        "colore" : colore
+                        "telefono": telefono,
+                        "email": email,
+                        "note": note,
+                        "colore": colore,
                     },
-                }), 201
-        
+                }
+            ),
+            201,
+        )
 
     if request.method == "GET":
         return render_template("cliente_new.html")
@@ -134,24 +139,33 @@ def nuovo_lavoro():
         )
         db.session.add(nuovo_lavoro)
         db.session.commit()
-        return jsonify({"message": "Lavoro aggiunto con successo!",
-                        "data" : {
-                            "descrizione" : descrizione,
-                            "data_inizio" : data_inizio,
-                            "data_fine" : data_fine,
-                            "data_pagamento" : data_pagamento,
-                            "cliente_id" : cliente_id,
-                            "priorita" : priorita,
-                            "stato" : stato,
-                            "preventivato" : preventivato,
-                            "note" : note
-                        }}), 201
+        return (
+            jsonify(
+                {
+                    "message": "Lavoro aggiunto con successo!",
+                    "data": {
+                        "descrizione": descrizione,
+                        "data_inizio": data_inizio,
+                        "data_fine": data_fine,
+                        "data_pagamento": data_pagamento,
+                        "cliente_id": cliente_id,
+                        "priorita": priorita,
+                        "stato": stato,
+                        "preventivato": preventivato,
+                        "note": note,
+                    },
+                }
+            ),
+            201,
+        )
 
     if request.method == "GET":
         clienti_list = Cliente.query.all()
+        print(clienti_list)
         return render_template("lavoro_new.html", clienti=clienti_list)
 
 
+## RENDERING PAGES ##
 # Lavori LISTA
 @app.route("/lavori")
 def lavori():
@@ -173,13 +187,50 @@ def cliente_page(cliente_id):
     return render_template("cliente.html", cliente=cliente)
 
 
+## ACTIONS ##
 # Cliente DELETE
-@app.route("/clienti/delete/<int:cliente_id>")
+@app.delete("/clienti/<int:cliente_id>")
 def cliente_delete(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     db.session.delete(cliente)
     db.session.commit()
-    return jsonify("Cliente eliminato")
+    return "", 204
+
+
+## APIS ##
+# Get ALL clienti
+@app.get("/clienti/getall")
+def get_clienti():
+    fetched_clienti = Cliente.query.all()
+    print(fetched_clienti)
+    return jsonify(
+        [
+            {
+                "id": c.id,
+                "nome": c.name,
+                "telefono": c.telefono,
+                "email": c.email,
+                "note": c.note,
+                "colore": c.colore,
+            }
+            for c in fetched_clienti
+        ]
+    )
+
+# Get SINGLE client by ID
+@app.get("/clienti/get/<int:cliente_id>")
+def get_cliente_byID(cliente_id):
+    c = Cliente.query.get_or_404(cliente_id)
+    return jsonify(
+        {
+            "id": c.id,
+            "nome": c.name,
+            "telefono": c.telefono,
+            "email": c.email,
+            "note": c.note,
+            "colore": c.colore,
+        }
+    )
 
 
 # TESTING

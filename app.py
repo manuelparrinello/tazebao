@@ -66,17 +66,9 @@ with app.app_context():
     db.create_all()
 
 
-# DEFINE ROUTES HERE --------------------------------------
-# Home route
-@app.route("/")
-def index():
-    return render_template(
-        "index.html", title="Home", description="Welcome to the Home Page", path=db_path
-    )
 
-
-## AGGIUNGERE NUOVI RECORD ##
-# Nuovo cliente route
+######################## ADD DB RECORDS ########################
+# DB - NUOVO CLIENTE
 @app.route("/clienti/new", methods=["GET", "POST"])
 def nuovo_cliente():
     if request.method == "POST":
@@ -110,8 +102,7 @@ def nuovo_cliente():
     if request.method == "GET":
         return render_template("cliente_new.html")
 
-
-# Nuovo lavoro route
+# DB - NUOVO LAVORO
 @app.route("/lavori/new", methods=["GET", "POST"])
 def nuovo_lavoro():
     if request.method == "POST":
@@ -165,29 +156,38 @@ def nuovo_lavoro():
         return render_template("lavoro_new.html", clienti=clienti_list)
 
 
-## RENDERING PAGES ##
-# Lavori LISTA
+
+######################## HTML PAGES ########################
+
+# HOMEPAGE
+@app.route("/")
+def index():
+    return render_template(
+        "index.html", title="Home", description="Welcome to the Home Page", path=db_path
+    )
+
+# LAVORI 
 @app.route("/lavori")
 def lavori():
     lavori_list = Lavoro.query.all()
     return render_template("lavori.html", lavori=lavori_list)
 
-
-# Clienti LISTA
+# CLIENTI
 @app.route("/clienti")
 def clienti():
     clienti_list = Cliente.query.all()
     return render_template("clienti.html", clienti=clienti_list)
 
-
-# Cliente SINGLE PAGE
+# CLIENTE SINGLE PAGE
 @app.route("/clienti/<int:cliente_id>")
 def cliente_page(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     return render_template("cliente.html", cliente=cliente)
 
-## ACTIONS ##
-# Cliente DELETE
+
+
+######################## AZIONI ########################
+# CLIENTE DELETE
 @app.delete("/clienti/<int:cliente_id>")
 def cliente_delete(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
@@ -195,10 +195,19 @@ def cliente_delete(cliente_id):
     db.session.commit()
     return "", 204
 
+# LAVORO DELETE 
+@app.delete("/lavori/<int:lavoro_id>")
+def lavoro_delete(lavoro_id):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    db.session.delete(lavoro)
+    db.session.commit()
+    return "", 204
 
-## APIS ##
-# Get ALL clienti
-@app.get("/clienti/getall")
+
+
+######################## APIs ########################
+# API - CLIENTI ALL
+@app.get("/api/clienti/getall")
 def get_clienti():
     fetched_clienti = Cliente.query.all()
     return jsonify(
@@ -215,8 +224,8 @@ def get_clienti():
         ]
     )
 
-# Get SINGLE client by ID
-@app.get("/clienti/get/<int:cliente_id>")
+# API - CLIENTE per ID
+@app.get("/api/clienti/get/<int:cliente_id>")
 def get_cliente_byID(cliente_id):
     c = Cliente.query.get_or_404(cliente_id)
     countLavori = Lavoro.query.filter_by(cliente_id = cliente_id).count()
@@ -232,16 +241,9 @@ def get_cliente_byID(cliente_id):
         }
     )
 
-# Lavoro DELETE #
-@app.delete("/lavori/<int:lavoro_id>")
-def lavoro_delete(lavoro_id):
-    lavoro = Lavoro.query.get_or_404(lavoro_id)
-    db.session.delete(lavoro)
-    db.session.commit()
-    return "", 204
 
 
-# TESTING
+######################## TESTING ########################
 @app.route("/test")
 def test():
     return render_template("base.html")

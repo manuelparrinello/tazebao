@@ -201,7 +201,6 @@ def cliente_delete(cliente_id):
 @app.get("/clienti/getall")
 def get_clienti():
     fetched_clienti = Cliente.query.all()
-    print(fetched_clienti)
     return jsonify(
         [
             {

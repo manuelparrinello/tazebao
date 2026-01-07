@@ -4,10 +4,10 @@
   font-family: "Hanken Grotesk", sans-serif !important;
 }
 
-/*body {
-  opacity: 0;
+body {
+  opacity: 1;
   transition: opacity 0.1s ease-in;
-}*/
+}
 
 .container {
   max-width: 1380px !important;
@@ -21,15 +21,21 @@ body.loaded {
   background-color: #198754 !important;
 }
 
-/*.btn-primary {
-  background-color: #198754 !important;
-  border-color: #198754 !important;
-  font-weight: bold;
-}*/
+.btn-primary:hover {
+}
+
+.btn-warning:hover {
+   transition: 0.3s ease-in-out; 
+}
+
+.btn-danger:hover {
+   transition: 0.3s ease-in-out; 
+}
 
 .btn-primary:hover {
   background-color: #0d6efd !important;
   border-color: #0d6efd !important;
+  transition: 0.3s ease-in-out; 
 }
 
 .btn {

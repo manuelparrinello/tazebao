@@ -99,7 +99,7 @@ const nuovoLavoroApp = Vue.createApp({
 /*--------------------*/
 function deleteCliente(id) {
   return fetch(`/clienti/${id}`, {
-    method: "DELETE",
+    method: "delete",
     headers: {
       Accept: "application/json",
     },
@@ -111,19 +111,19 @@ async function clickForDeleteCliente(event, idCliente) {
   const utenteConferma = confirm("Sei sicuro di voler cancellare il cliente?");
 
   if (utenteConferma === false) {
-    return
+    return;
   }
 
   try {
     const response = await deleteCliente(idCliente);
     console.log("DELETE status:", response.status);
-
     if (response.ok === false) {
       const corpoRispostaComeTesto = await response.text();
       console.error("Errore response:", corpoRispostaComeTesto);
-      throw new Error(`Errore durante l'eliminazione (HTTP ${response.status})`);
+      throw new Error(
+        `Errore durante l'eliminazione (HTTP ${response.status})`
+      );
     }
-
     alert("Cliente eliminato con successo!");
     window.location.href = "/clienti";
   } catch (errore) {
@@ -131,8 +131,6 @@ async function clickForDeleteCliente(event, idCliente) {
     console.error(errore);
   }
 }
-
-
 
 /*-------------------*/
 /*  CANCELLA LAVORO  */
@@ -142,10 +140,10 @@ function deleteLavoro(id) {
   return fetch(`/lavori/${id}`, {
     method: "delete",
     headers: {
-      Accept: 'application/json',
-    }
+      Accept: "application/json",
+    },
   });
-};
+}
 
 async function clickForDeleteLavoro(event, idLavoro) {
   event.preventDefault();
@@ -157,14 +155,58 @@ async function clickForDeleteLavoro(event, idLavoro) {
     if (!response) {
       const corpoRispostaTesto = await response.text();
       console.error("Errore response:", corpoRispostaTesto);
-      throw new Error(`Errore durante l'eliminazione (HTTP ${response.status})`);
+      throw new Error(
+        `Errore durante l'eliminazione (HTTP ${response.status})`
+      );
     }
     window.alert("Lavoro eliminato con successo!");
     window.location.href = "/lavori";
-  }
-  catch (errore) {
+  } catch (errore) {
     alert(errore.message);
     console.error(errore);
   }
-
 }
+
+/*-------------------*/
+/*  TUTTI I CLIENTI  */
+/*-------------------*/
+
+const getAllClienti = Vue.createApp({
+  data() {
+    return {
+      clienti: [],
+      loading: true,
+      error: null,
+      deletingID: null,
+    };
+  },
+  methods: {
+    async loadClienti() {
+      const url = `/clienti/getall`;
+
+      try {
+        const response = await fetch(url, {
+          method: "get",
+          headers: {
+            Accept: "application/json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`Errore richiesta! (HTTP ${response.status})`);
+        }
+        this.clienti = await response.json();
+      } catch (errore) {
+        this.error = errore.message || "Errore imprevisto";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    /* editClienti() --> DA FARE QUI SOTTO*/
+  },
+  mounted() {
+    this.loadClienti();
+    console.log(this.loadClienti())
+  },
+  delimiters: ["[[", "]]"],
+}).mount('#clientiPage');

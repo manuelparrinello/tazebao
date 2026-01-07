@@ -14,7 +14,7 @@
     </div>
 </div>
 
-<div id="clientiPage" class="container p-0">
+<div class="container p-0">
     <table class="table table-striped">
         <thead>
             <tr>
@@ -26,23 +26,25 @@
             </tr>
         </thead>
         <tbody>
-            <template v-if="clienti.length > 0">
-                <tr v-if="clienti" v-for="cliente in clienti">
-                    <td class="fw-bold">[[ cliente.id ]]</td>
-                    <td class="fw-bold"><a :href='`/clienti/${cliente.id}`'>
-                        <span class="cliente-bullet"
-                            :style="{ backgroundColor: cliente.colore }"></span>[[ cliente.nome ]]
-                    </a></td>
-                    <td>[[ cliente.email ]]</td>
-                    <td>[[ cliente.telefono ]]</td>
-                    <td>[[ cliente.note ]]</td>
-                </tr>
-                <tr v-else>
-                    <td colspan="6" class="text-center">Nessun cliente trovato.</td>
-                </tr>
-            </template>
+            {% if clienti %}
+            {% for cliente in clienti %}
+            <tr id="clienteRow" class="display: inline-flex; align-items: center;">
+                <th scope="row">{{ cliente.id }}</th>
+                <td><a href="{{ url_for('cliente_page', cliente_id=cliente.id) }}"
+                        class="fw-bold text-decoration-none"><span class="cliente-bullet"
+                            style="background-color: {{ cliente.colore }} !important;"></span>{{ cliente.name }}</a>
+                </td>
+                <td>{{ cliente.email }}</td>
+                <td>{{ cliente.telefono }}</td>
+                <td>{{ cliente.note }}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center">Nessun cliente trovato.</td>
+            </tr>
+            {% endif %}
         </tbody>
-    </table>
 </div>
 
 <script>
@@ -55,6 +57,8 @@
                 window.location.href = '/clienti'
             })
     };
+
+
 </script>
 
 {% endblock %}

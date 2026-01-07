@@ -5,12 +5,13 @@
 {% block content %}
 
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-    <div class="col-4">
+    <div class="col-4 px-0">
         <h1>Tutti i lavori</h1>
         <p class="mb-4">Elenco di tutti i lavori nel sistema.</p>
     </div>
     <div class="col-8 d-inline-flex justify-content-end px-0">
-        <a href="{{ url_for('nuovo_lavoro') }}"><button class="btn btn-primary"><span><i class="bi bi-journal-plus"></i></span>&nbsp;Nuovo lavoro</button></a>
+        <a href="{{ url_for('nuovo_lavoro') }}"><button class="btn btn-primary"><span><i
+                        class="bi bi-journal-plus"></i></span>&nbsp;Nuovo lavoro</button></a>
     </div>
 </div>
 
@@ -38,17 +39,22 @@
             <tr>
                 <td><span class="fw-bold">{{ lavoro.descrizione }}</span></td>
                 <td><span class="cliente-bullet"
-                        style="background-color: {{ lavoro.cliente.colore }} !important;"></span><a href="/clienti/{{lavoro.cliente.id}}" class="fw-bold text-decoration-none">{{ lavoro.cliente.name}}</a></td>
+                        style="background-color: {{ lavoro.cliente.colore }} !important;"></span><a
+                        href="/clienti/{{lavoro.cliente.id}}" class="fw-bold text-decoration-none">{{
+                        lavoro.cliente.name}}</a></td>
                 <td>{{ lavoro.preventivato | euro }}</td>
                 <td class="text-center"><span class="prio-pill">{{ lavoro.priorita }}</span></td>
                 <td>{{ lavoro.stato if lavoro.stato else '-' }}</td>
                 <td>{{ lavoro.data_inizio if lavoro.data_inizio else '' }}</td>
                 <td>{{ lavoro.data_fine if lavoro.data_fine else "" }}</td>
                 <td>{{ lavoro.data_pagamento if lavoro.data_pagamento else "-" }}</td>
-                <td>{{ lavoro.note if lavoro.note else "-" }}</td>
+                <td id="note_td">{{ lavoro.note if lavoro.note else "-" }}</td>
                 <td>
-                    <span class="action-icon edit-icon"><i class="bi bi-pencil text-success"></i></span>
-                    <span class="action-icon delete-icon"><i class="bi bi-trash3 text-danger"></i></span>
+                    <div class="d-inline-flex">
+                        <span class="action-icon edit-icon"><i class="bi bi-pencil text-success"></i></span>
+                        <a href=""><span onclick="clickForDeleteLavoro(event, {{ lavoro.id }})"
+                                class="action-icon delete-icon"><i class="bi bi-trash3 text-danger"></i></span></a>
+                    </div>
                 </td>
             </tr>
             {% endfor %}
@@ -58,6 +64,7 @@
             </tr>
             {% endif %}
         </tbody>
+    </table>
 </div>
 
 <script>

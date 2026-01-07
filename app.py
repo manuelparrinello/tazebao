@@ -186,7 +186,6 @@ def cliente_page(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     return render_template("cliente.html", cliente=cliente)
 
-
 ## ACTIONS ##
 # Cliente DELETE
 @app.delete("/clienti/<int:cliente_id>")
@@ -221,6 +220,7 @@ def get_clienti():
 @app.get("/clienti/get/<int:cliente_id>")
 def get_cliente_byID(cliente_id):
     c = Cliente.query.get_or_404(cliente_id)
+    countLavori = Lavoro.query.filter_by(cliente_id = cliente_id).count()
     return jsonify(
         {
             "id": c.id,
@@ -229,8 +229,17 @@ def get_cliente_byID(cliente_id):
             "email": c.email,
             "note": c.note,
             "colore": c.colore,
+            "count_lavori" : countLavori
         }
     )
+
+# Lavoro DELETE #
+@app.delete("/lavori/<int:lavoro_id>")
+def lavoro_delete(lavoro_id):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    db.session.delete(lavoro)
+    db.session.commit()
+    return "", 204
 
 
 # TESTING

@@ -131,3 +131,40 @@ async function clickForDeleteCliente(event, idCliente) {
     console.error(errore);
   }
 }
+
+
+
+/*-------------------*/
+/*  CANCELLA LAVORO  */
+/*-------------------*/
+
+function deleteLavoro(id) {
+  return fetch(`/lavori/${id}`, {
+    method: "delete",
+    headers: {
+      Accept: 'application/json',
+    }
+  });
+};
+
+async function clickForDeleteLavoro(event, idLavoro) {
+  event.preventDefault();
+  const conferma = confirm("Vuoi cancellare questo lavoro?");
+  if (!conferma) return;
+
+  try {
+    const response = await deleteLavoro(idLavoro);
+    if (!response) {
+      const corpoRispostaTesto = await response.text();
+      console.error("Errore response:", corpoRispostaTesto);
+      throw new Error(`Errore durante l'eliminazione (HTTP ${response.status})`);
+    }
+    window.alert("Lavoro eliminato con successo!");
+    window.location.href = "/lavori";
+  }
+  catch (errore) {
+    alert(errore.message);
+    console.error(errore);
+  }
+
+}

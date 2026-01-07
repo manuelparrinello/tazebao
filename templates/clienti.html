@@ -4,12 +4,13 @@
 
 {% block content %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-    <div class="col-4">
+    <div class="col-4 px-0">
         <h1>Tutti i clienti</h1>
         <p class="mb-4">Elenco di tutti i clienti presenti nel sistema.</p>
     </div>
     <div class="col-8 d-inline-flex justify-content-end px-0">
-        <a href="{{ url_for('nuovo_cliente') }}"><button class="btn btn-primary"><span><i class="bi bi-person-plus-fill"></i></span>&nbsp;Nuovo cliente</button></a>
+        <a href="{{ url_for('nuovo_cliente') }}"><button class="btn btn-primary"><span><i
+                        class="bi bi-person-plus-fill"></i></span>&nbsp;Nuovo cliente</button></a>
     </div>
 </div>
 

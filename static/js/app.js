@@ -182,7 +182,7 @@ const getAllClienti = Vue.createApp({
   },
   methods: {
     async loadClienti() {
-      const url = `/clienti/getall`;
+      const url = `/api/clienti/getall`;
 
       try {
         const response = await fetch(url, {

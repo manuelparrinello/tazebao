@@ -61,7 +61,7 @@
 
     <script>
         window.onload = async function fetchQuantityLavori() {
-            const url = '/clienti/get/{{ cliente.id }}'
+            const url = '/api/clienti/get/{{ cliente.id }}'
 
             try {
                 const response = await fetch(url, {

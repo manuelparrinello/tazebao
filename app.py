@@ -68,6 +68,7 @@ with app.app_context():
 
 
 ######################## ADD DB RECORDS ########################
+
 # DB - NUOVO CLIENTE
 @app.route("/clienti/new", methods=["GET", "POST"])
 def nuovo_cliente():
@@ -187,6 +188,7 @@ def cliente_page(cliente_id):
 
 
 ######################## AZIONI ########################
+
 # CLIENTE DELETE
 @app.delete("/clienti/<int:cliente_id>")
 def cliente_delete(cliente_id):
@@ -206,6 +208,7 @@ def lavoro_delete(lavoro_id):
 
 
 ######################## APIs ########################
+
 # API - CLIENTI ALL
 @app.get("/api/clienti/getall")
 def get_clienti():
@@ -249,5 +252,6 @@ def test():
     return render_template("base.html")
 
 
+######################### MAIN ##########################
 if __name__ == "__main__":
     app.run(debug=True)

@@ -21,21 +21,40 @@ body.loaded {
   background-color: #198754 !important;
 }
 
-.btn-primary:hover {
+.prio-pill {
+  font-size: .8rem;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 2px 10px 5px;
+}
+
+.prio-low {
+  background: #9be5a0;
+  color: #0f5132;
+}
+
+.prio-med {
+  background: #ffdc6e;
+  color: #664d03;
+}
+
+.prio-high {
+  background: #ffaeb6;
+  color: #842029;
 }
 
 .btn-warning:hover {
-   transition: 0.3s ease-in-out; 
+  transition: 0.3s ease-in-out;
 }
 
 .btn-danger:hover {
-   transition: 0.3s ease-in-out; 
+  transition: 0.3s ease-in-out;
 }
 
 .btn-primary:hover {
   background-color: #0d6efd !important;
   border-color: #0d6efd !important;
-  transition: 0.3s ease-in-out; 
+  transition: 0.3s ease-in-out;
 }
 
 .btn {

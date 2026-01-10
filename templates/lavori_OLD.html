@@ -29,32 +29,40 @@
                 <th scope="col">Data fine</th>
                 <th scope="col">Data pagamento</th>
                 <th scope="col">Note</th>
+                <th scope="col"></th>
 
             </tr>
         </thead>
         <tbody>
-            <template v-if="lavori.length > 0">
-                <tr v-if="lavori" v-for="lavoro in lavori">
-                    <td><span class="fw-bold">[[ lavoro.descrizione ]]</span></td>
-                    <td><span class="cliente-bullet" :style="{ backgroundColor: lavoro.cliente.colore }"></span><a
-                            :href="`/clienti/${lavoro.cliente.id}`" class="fw-bold text-decoration-none">[[
-                            lavoro.cliente.nome ]]</a></td>
-                    <td>[[ lavoro.preventivato ]]€</td>
-                    <td class="text-center">
-                        <span class="prio-pill" :class="prioClass(lavoro.priorita)">
-                            [[ lavoro.priorita ]]
-                        </span>
-                    </td>
-                    <td>[[ lavoro.stato ]]</td>
-                    <td>[[ lavoro.data_inizio || '-' ]]</td>
-                    <td>[[ lavoro.data_fine || '-' ]]</td>
-                    <td>[[ lavoro.data_pagamento || '-' ]]</td>
-                    <td id="note_td">[[ lavoro.note || '-' ]]</td>
-                </tr>
-            </template>
-            <tr v-else>
-                <td colspan="10" class="text-center">Nessun lavoro trovato.</td>
+            {% if lavori %}
+            {% for lavoro in lavori %}
+            <tr>
+                <td><span class="fw-bold">{{ lavoro.descrizione }}</span></td>
+                <td><span class="cliente-bullet"
+                        style="background-color: {{ lavoro.cliente.colore }} !important;"></span><a
+                        href="/clienti/{{lavoro.cliente.id}}" class="fw-bold text-decoration-none">{{
+                        lavoro.cliente.name}}</a></td>
+                <td>{{ lavoro.preventivato | euro }}</td>
+                <td class="text-center"><span class="prio-pill">{{ lavoro.priorita }}</span></td>
+                <td>[[{{ lavoro.stato if lavoro.stato else '-' }}]]</td>
+                <td>{{ lavoro.data_inizio if lavoro.data_inizio else '' }}</td>
+                <td>{{ lavoro.data_fine if lavoro.data_fine else "" }}</td>
+                <td>{{ lavoro.data_pagamento if lavoro.data_pagamento else "-" }}</td>
+                <td id="note_td">{{ lavoro.note if lavoro.note else "-" }}</td>
+                <td>
+                    <div class="d-inline-flex">
+                        <span class="me-1 action-icon edit-icon"><i class="bi bi-pencil text-success"></i></span>
+                        <a href=""><span onclick="clickForDeleteLavoro(event, {{ lavoro.id }})"
+                                class="action-icon delete-icon"><i class="bi bi-trash3 text-danger"></i></span></a>
+                    </div>
+                </td>
             </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="11" class="text-center">Nessun lavoro trovato.</td>
+            </tr>
+            {% endif %}
         </tbody>
     </table>
 </div>

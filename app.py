@@ -227,6 +227,32 @@ def get_clienti():
         ]
     )
 
+# API - LAVORI ALL
+@app.get("/api/lavori/getall")
+def get_lavori():
+    lavori = Lavoro.query.all()
+    return jsonify(
+        [
+            {
+                "id" : l.id,
+                "descrizione" : l.descrizione,
+                "data_inizio" : l.data_inizio,
+                "data_fine" : l.data_fine,
+                "data_pagamento" : l.data_pagamento,
+                "stato" : l.stato,
+                "priorita" : l.priorita,
+                "preventivato" : l.preventivato,
+                "cliente" : {
+                    "id" : l.cliente.id,
+                    "colore" : l.cliente.colore,
+                    "nome" : l.cliente.name
+                },
+                "note" : l.note
+            }
+            for l in lavori
+        ]
+    )
+
 # API - CLIENTE per ID
 @app.get("/api/clienti/get/<int:cliente_id>")
 def get_cliente_byID(cliente_id):

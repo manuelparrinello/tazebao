@@ -244,8 +244,8 @@ const getAllLavori = Vue.createApp({
         this.error = errore.message || "Errore imprevisto";
       } finally {
         setTimeout(() => {
-          
-        });
+          this.loading = false;
+        }, 3000);
         // this.loading = false;
       }
     },

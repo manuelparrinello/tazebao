@@ -15,48 +15,54 @@
     </div>
 </div>
 
+<div id="lavoriPage">
+    <div v-if="loading" class="container vh-100 w-100 align-items-center justify-content-center">
+        <span class="loader mx-auto"></span>
+    </div>
 
-<div class="container p-0 mt-0" id="lavoriPage">
-    <table class="table table-striped" id="tabellaLavori">
-        <thead>
-            <tr>
-                <th scope="col">Descrizione</th>
-                <th scope="col">Cliente</th>
-                <th scope="col">Preventivato</th>
-                <th scope="col">Priorità</th>
-                <th scope="col">Stato</th>
-                <th scope="col">Data inizio</th>
-                <th scope="col">Data fine</th>
-                <th scope="col">Data pagamento</th>
-                <th scope="col">Note</th>
+    <div v-else class="container p-0 mt-0">
+        <table class="table table-striped" id="tabellaLavori">
+            <thead>
+                <tr>
+                    <th scope="col">Descrizione</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Preventivato</th>
+                    <th scope="col">Priorità</th>
+                    <th scope="col">Stato</th>
+                    <th scope="col">Data inizio</th>
+                    <th scope="col">Data fine</th>
+                    <th scope="col">Data pagamento</th>
+                    <th scope="col">Note</th>
 
-            </tr>
-        </thead>
-        <tbody>
-            <template v-if="lavori.length > 0">
-                <tr v-if="lavori" v-for="lavoro in lavori">
-                    <td><span class="fw-bold">[[ lavoro.descrizione ]]</span></td>
-                    <td><span class="cliente-bullet" :style="{ backgroundColor: lavoro.cliente.colore }"></span><a
-                            :href="`/clienti/${lavoro.cliente.id}`" class="fw-bold text-decoration-none">[[
-                            lavoro.cliente.nome ]]</a></td>
-                    <td>[[ lavoro.preventivato ]]€</td>
-                    <td class="text-center">
-                        <span class="prio-pill" :class="prioClass(lavoro.priorita)">
-                            [[ lavoro.priorita ]]
-                        </span>
-                    </td>
-                    <td>[[ lavoro.stato ]]</td>
-                    <td>[[ lavoro.data_inizio || '-' ]]</td>
-                    <td>[[ lavoro.data_fine || '-' ]]</td>
-                    <td>[[ lavoro.data_pagamento || '-' ]]</td>
-                    <td id="note_td">[[ lavoro.note || '-' ]]</td>
                 </tr>
-            </template>
-            <tr v-else>
-                <td colspan="10" class="text-center">Nessun lavoro trovato.</td>
-            </tr>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <template v-if="lavori.length > 0">
+                    <tr v-if="lavori" v-for="lavoro in lavori">
+                        <td><span class="fw-bold">[[ lavoro.descrizione ]]</span></td>
+                        <td><span class="cliente-bullet" :style="{ backgroundColor: lavoro.cliente.colore }"></span><a
+                                :href="`/clienti/${lavoro.cliente.id}`" class="fw-bold text-decoration-none">[[
+                                lavoro.cliente.name ]]</a></td>
+                        <td>[[ lavoro.preventivato ]]€</td>
+                        <td class="text-center">
+                            <span class="prio-pill" :class="prioClass(lavoro.priorita)">
+                                [[ lavoro.priorita ]]
+                            </span>
+                        </td>
+                        <td>[[ lavoro.stato ]]</td>
+                        <td>[[ lavoro.data_inizio || '-' ]]</td>
+                        <td>[[ lavoro.data_fine || '-' ]]</td>
+                        <td>[[ lavoro.data_pagamento || '-' ]]</td>
+                        <td id="note_td">[[ lavoro.note || '-' ]]</td>
+                    </tr>
+                </template>
+                <tr v-else>
+                    <td colspan="10" class="text-center">Nessun lavoro trovato.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 <script>

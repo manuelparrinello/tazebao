@@ -28,6 +28,23 @@ app.jinja_env.filters["euro"] = format_euro
 
 
 # DEFINE DATABASE MODELS HERE IF NEEDED --------------------
+class Lavoro(db.Model):
+    __tablename__ = "lavori"
+    id = db.Column(db.Integer, primary_key=True)
+    descrizione = db.Column(db.String(200), nullable=False)
+    data_inizio = db.Column(db.Date, nullable=True)
+    data_fine = db.Column(db.Date, nullable=True)
+    data_pagamento = db.Column(db.Date, nullable=True)
+    stato = db.Column(db.String(50), nullable=True)
+    priorita = db.Column(db.String(50), nullable=True)
+    preventivato = db.Column(db.Float, nullable=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False)
+    note = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f"<Lavoro {self.descrizione}>"
+
+        
 class Cliente(db.Model):
     __tablename__ = "clienti"
     id = db.Column(db.Integer, primary_key=True)
@@ -44,21 +61,6 @@ class Cliente(db.Model):
         return f"<Cliente {self.name}>"
 
 
-class Lavoro(db.Model):
-    __tablename__ = "lavori"
-    id = db.Column(db.Integer, primary_key=True)
-    descrizione = db.Column(db.String(200), nullable=False)
-    data_inizio = db.Column(db.Date, nullable=True)
-    data_fine = db.Column(db.Date, nullable=True)
-    data_pagamento = db.Column(db.Date, nullable=True)
-    stato = db.Column(db.String(50), nullable=True)
-    priorita = db.Column(db.String(50), nullable=True)
-    preventivato = db.Column(db.Float, nullable=True)
-    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False)
-    note = db.Column(db.Text, nullable=True)
-
-    def __repr__(self):
-        return f"<Lavoro {self.descrizione}>"
 
 
 # CREATE DATABASE TABLES IF THEY DON'T EXIST ----------------
@@ -212,7 +214,7 @@ def lavoro_delete(lavoro_id):
 # API - CLIENTI ALL
 @app.get("/api/clienti/getall")
 def get_clienti():
-    fetched_clienti = Cliente.query.all()
+    clienti = Cliente.query.all()
     return jsonify(
         [
             {
@@ -223,7 +225,7 @@ def get_clienti():
                 "note": c.note,
                 "colore": c.colore,
             }
-            for c in fetched_clienti
+            for c in clienti
         ]
     )
 
@@ -245,7 +247,7 @@ def get_lavori():
                 "cliente" : {
                     "id" : l.cliente.id,
                     "colore" : l.cliente.colore,
-                    "nome" : l.cliente.name
+                    "name" : l.cliente.name
                 },
                 "note" : l.note
             }

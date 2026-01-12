@@ -214,7 +214,7 @@ const getAllClienti = Vue.createApp({
 
 
 /*-------------------*/
-/*  TUTTI I CLIENTI  */
+/*   TUTTI I LAVORI  */
 /*-------------------*/
 
 const getAllLavori = Vue.createApp({
@@ -263,3 +263,16 @@ const getAllLavori = Vue.createApp({
   delimiters: ["[[", "]]"],
 }
 ).mount('#lavoriPage')
+
+
+/*-------------------*/
+/*   CLIENTE PER ID  */
+/*-------------------*/
+const getSingleCliente = Vue.createApp({
+  data() {
+    return {
+      lavori : [],
+      
+    }
+  }
+})

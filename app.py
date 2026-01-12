@@ -259,7 +259,9 @@ def get_lavori():
 @app.get("/api/clienti/get/<int:cliente_id>")
 def get_cliente_byID(cliente_id):
     c = Cliente.query.get_or_404(cliente_id)
-    countLavori = Lavoro.query.filter_by(cliente_id = cliente_id).count()
+    lavori = Lavoro.query.filter_by(cliente_id = cliente_id)
+    countLavori = lavori.count()
+    
     return jsonify(
         {
             "id": c.id,
@@ -268,7 +270,13 @@ def get_cliente_byID(cliente_id):
             "email": c.email,
             "note": c.note,
             "colore": c.colore,
-            "count_lavori" : countLavori
+            "count_lavori" : countLavori,
+            "lavori" : [{
+                "id" : lavoro.id,
+                "descrizione" : lavoro.descrizione,
+                "stato" : lavoro.stato            
+            } for lavoro in lavori ]
+            
         }
     )
 

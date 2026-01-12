@@ -21,6 +21,10 @@ body.loaded {
   background-color: #198754 !important;
 }
 
+.text-primary {
+  color: #198754 !important;
+}
+
 .prio-pill {
   font-size: .8rem;
   font-weight: 700;

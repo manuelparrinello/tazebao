@@ -212,6 +212,19 @@ const getAllClienti = Vue.createApp({
 }).mount('#clientiPage');
 
 
+/*---------------------------*/
+/*   FETCH CLIENTE SINGOLO   */
+/*---------------------------*/
+
+const getSingleCliente = Vue.createApp({
+  data() {
+    return {
+
+    }
+  }
+})
+
+
 
 /*-------------------*/
 /*   TUTTI I LAVORI  */
@@ -250,6 +263,7 @@ const getAllLavori = Vue.createApp({
       }
     },
 
+
     prioClass(prio) {
       if (prio === "Bassa") return "prio-low";
       if (prio === "Media") return "prio-med";
@@ -265,14 +279,3 @@ const getAllLavori = Vue.createApp({
 ).mount('#lavoriPage')
 
 
-/*-------------------*/
-/*   CLIENTE PER ID  */
-/*-------------------*/
-const getSingleCliente = Vue.createApp({
-  data() {
-    return {
-      lavori : [],
-      
-    }
-  }
-})

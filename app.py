@@ -160,7 +160,7 @@ def nuovo_lavoro():
 
 
 
-######################## HTML PAGES ########################
+######################## ROUTES ########################
 
 # HOMEPAGE
 @app.route("/")
@@ -206,6 +206,15 @@ def lavoro_delete(lavoro_id):
     db.session.delete(lavoro)
     db.session.commit()
     return "", 204
+
+
+# CLIENTE EDIT PAE 
+@app.route('/clienti/edit/<int:cliente_id>', methods = ['GET', 'PUT'])
+def cliente_edit(cliente_id):
+    cliente = Cliente.query.get_or_404(cliente_id)
+    if request.method == 'GET':
+        return render_template('cliente_edit.html', cliente = cliente)
+    
 
 
 
@@ -258,6 +267,7 @@ def get_lavori():
 # API - CLIENTE per ID
 @app.get("/api/clienti/get/<int:cliente_id>")
 def get_cliente_byID(cliente_id):
+    
     c = Cliente.query.get_or_404(cliente_id)
     lavori = Lavoro.query.filter_by(cliente_id = cliente_id)
     countLavori = lavori.count()

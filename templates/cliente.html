@@ -7,7 +7,7 @@
     <div class="col-4 px-0">
         <h6 class="fw-bold text-primary" style="letter-spacing: 1.2px;">PAGINA CLIENTE</h6>
         <h1>{{ cliente.name }}</h1>
-        <p>Totale lavori: <span class="fw-bold" id="testdiv"></span></p> 
+        <p>Totale lavori: <span class="fw-bold" id="testdiv"></span></p>
     </div>
     <div class="col-8 d-inline-flex justify-content-end px-0">
         <button onclick="clickForDeleteCliente(event, {{ cliente.id }})" class="btn btn-warning me-3 fw-bold"><span><i
@@ -59,8 +59,8 @@
     </table>
 
 
-
-    <script>
+</div>
+<!-- <script>
         window.onload = async function fetchQuantityLavori() {
             const url = '/api/clienti/get/{{ cliente.id }}'
 
@@ -86,5 +86,5 @@
             }
 
         }
-    </script>
-    {% endblock %}
+    </script> -->
+{% endblock %}

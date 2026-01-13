@@ -178,7 +178,7 @@ const getAllClienti = Vue.createApp({
       loading: true,
       error: null,
       deletingID: null,
-    }
+    };
   },
   methods: {
     async loadClienti() {
@@ -206,10 +206,12 @@ const getAllClienti = Vue.createApp({
   },
   mounted() {
     this.loadClienti();
-    console.log(this.loadClienti())
+    console.log(this.loadClienti());
   },
   delimiters: ["[[", "]]"],
-}).mount('#clientiPage');
+}).mount("#clientiPage");
+
+
 
 
 /*---------------------------*/
@@ -219,10 +221,43 @@ const getAllClienti = Vue.createApp({
 const getSingleCliente = Vue.createApp({
   data() {
     return {
+      cliente: {},
+      error: null,
+      loading: true
+    };
+  },
+  methods: {
+    async loadClienteData() {
+      const root = document.querySelector("#clienteEditPage");
+      const cliente_id = root.dataset.clienteId;
+      const url = `/api/clienti/get/${cliente_id}`;
+      console.log(url);
+      try {
+        const response = await fetch(url, {
+          method: "get",
+          headers: {
+            Accept: "application/json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`Errore richiesta! (HTTP ${response.status})`);
+        }
+        this.cliente = await response.json();
+        console.log(this.cliente.count_lavori)
+      } catch (error) {
+        this.error = error.message || "Errore imprevisto";
+      } finally {
+        this.loading = false
+      }
+    },
+  },
+  mounted() {
+    this.loadClienteData()
+    console.log(this.loadClienteData())
+  },
+  delimiters: ["[[", "]]"]
+}).mount('#clienteEditPage');
 
-    }
-  }
-})
 
 
 
@@ -237,20 +272,20 @@ const getAllLavori = Vue.createApp({
       loading: true,
       error: null,
       deletingID: null,
-    }
+    };
   },
   methods: {
     async loadLavori() {
-      const url = `/api/lavori/getall`
+      const url = `/api/lavori/getall`;
       try {
         const response = await fetch(url, {
-          method: 'get',
+          method: "get",
           headers: {
-            'Accept': 'application/json'
-          }
-        })
+            Accept: "application/json",
+          },
+        });
         if (!response) {
-          throw new error
+          throw new error();
         }
         this.lavori = await response.json();
       } catch (errore) {
@@ -263,19 +298,15 @@ const getAllLavori = Vue.createApp({
       }
     },
 
-
     prioClass(prio) {
       if (prio === "Bassa") return "prio-low";
       if (prio === "Media") return "prio-med";
       if (prio === "Alta") return "prio-high";
       return "";
-    }
+    },
   },
   mounted() {
     this.loadLavori();
   },
   delimiters: ["[[", "]]"],
-}
-).mount('#lavoriPage')
-
-
+}).mount("#lavoriPage");

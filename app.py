@@ -208,7 +208,7 @@ def lavoro_delete(lavoro_id):
     return "", 204
 
 
-# CLIENTE EDIT PAE 
+# CLIENTE EDIT PAGE 
 @app.route('/clienti/edit/<int:cliente_id>', methods = ['GET', 'PUT'])
 def cliente_edit(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)

@@ -21,7 +21,7 @@ const nuovoClienteApp = Vue.createApp({
     },
   },
   methods: {
-    submitForm(e) {
+     submitFormNewCliente(e) {
       e.preventDefault();
       // Creazione di un oggetto FormData per inviare i dati del modulo
       const form = document.querySelector("#nuovoCliente");
@@ -226,6 +226,15 @@ const getSingleCliente = Vue.createApp({
       loading: true
     };
   },
+  computed: {
+    inizialiNome() {
+      if (this.nomeCliente.length) {
+        return this.nomeCliente.charAt(0).toUpperCase();
+      } else {
+        return "-";
+      }
+    },
+  },
   methods: {
     async loadClienteData() {
       const root = document.querySelector("#clienteEditPage");
@@ -251,9 +260,17 @@ const getSingleCliente = Vue.createApp({
       }
     },
   },
+
+  editCliente(e, cliente_id) {
+    e.preventDefault();
+    const url = `/clienti/edit/${cliente_id}`;
+    fetch
+
+
+  }
   mounted() {
-    this.loadClienteData()
-    console.log(this.loadClienteData())
+    this.loadClienteData();
+    console.log(this.loadClienteData());
   },
   delimiters: ["[[", "]]"]
 }).mount('#clienteEditPage');

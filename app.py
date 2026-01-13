@@ -44,7 +44,7 @@ class Lavoro(db.Model):
     def __repr__(self):
         return f"<Lavoro {self.descrizione}>"
 
-        
+
 class Cliente(db.Model):
     __tablename__ = "clienti"
     id = db.Column(db.Integer, primary_key=True)
@@ -61,15 +61,13 @@ class Cliente(db.Model):
         return f"<Cliente {self.name}>"
 
 
-
-
 # CREATE DATABASE TABLES IF THEY DON'T EXIST ----------------
 with app.app_context():
     db.create_all()
 
 
-
 ######################## ADD DB RECORDS ########################
+
 
 # DB - NUOVO CLIENTE
 @app.route("/clienti/new", methods=["GET", "POST"])
@@ -104,6 +102,7 @@ def nuovo_cliente():
 
     if request.method == "GET":
         return render_template("cliente_new.html")
+
 
 # DB - NUOVO LAVORO
 @app.route("/lavori/new", methods=["GET", "POST"])
@@ -159,8 +158,8 @@ def nuovo_lavoro():
         return render_template("lavoro_new.html", clienti=clienti_list)
 
 
-
 ######################## ROUTES ########################
+
 
 # HOMEPAGE
 @app.route("/")
@@ -169,17 +168,20 @@ def index():
         "index.html", title="Home", description="Welcome to the Home Page", path=db_path
     )
 
-# LAVORI 
+
+# LAVORI
 @app.route("/lavori")
 def lavori():
     lavori_list = Lavoro.query.all()
     return render_template("lavori.html", lavori=lavori_list)
+
 
 # CLIENTI
 @app.route("/clienti")
 def clienti():
     clienti_list = Cliente.query.all()
     return render_template("clienti.html", clienti=clienti_list)
+
 
 # CLIENTE SINGLE PAGE
 @app.route("/clienti/<int:cliente_id>")
@@ -188,8 +190,8 @@ def cliente_page(cliente_id):
     return render_template("cliente.html", cliente=cliente)
 
 
-
 ######################## AZIONI ########################
+
 
 # CLIENTE DELETE
 @app.delete("/clienti/<int:cliente_id>")
@@ -199,7 +201,8 @@ def cliente_delete(cliente_id):
     db.session.commit()
     return "", 204
 
-# LAVORO DELETE 
+
+# LAVORO DELETE
 @app.delete("/lavori/<int:lavoro_id>")
 def lavoro_delete(lavoro_id):
     lavoro = Lavoro.query.get_or_404(lavoro_id)
@@ -208,17 +211,40 @@ def lavoro_delete(lavoro_id):
     return "", 204
 
 
-# CLIENTE EDIT PAGE 
-@app.route('/clienti/edit/<int:cliente_id>', methods = ['GET', 'PUT'])
+# CLIENTE EDIT PAGE
+@app.route("/clienti/edit/<int:cliente_id>", methods=["GET", "PUT"])
 def cliente_edit(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
-    if request.method == 'GET':
-        return render_template('cliente_edit.html', cliente = cliente)
-    
-
+    if request.method == "GET":
+        return render_template("cliente_edit.html", cliente=cliente)
+    nomeCliente = request.form.get("nomeCliente").title()
+    telefono = request.form.get("telefono")
+    email = request.form.get("email").lower()
+    note = request.form.get("note")
+    colore = request.form.get("colore")
+    # Aggiungi il nuovo cliente al database
+    edited_cliente = Cliente(name=nomeCliente, telefono=telefono, email=email, note=note, colore=colore)
+    db.session.add(edited_cliente)
+    db.session.commit()
+    return (
+        jsonify(
+            {
+                "message": "Cliente aggiunto con successo!",
+                "data": {
+                    "nome": nomeCliente,
+                    "telefono": telefono,
+                    "email": email,
+                    "note": note,
+                    "colore": colore,
+                },
+            }
+        ),
+        201,
+    )
 
 
 ######################## APIs ########################
+
 
 # API - CLIENTI ALL
 @app.get("/api/clienti/getall")
@@ -238,6 +264,7 @@ def get_clienti():
         ]
     )
 
+
 # API - LAVORI ALL
 @app.get("/api/lavori/getall")
 def get_lavori():
@@ -245,33 +272,34 @@ def get_lavori():
     return jsonify(
         [
             {
-                "id" : l.id,
-                "descrizione" : l.descrizione,
-                "data_inizio" : l.data_inizio,
-                "data_fine" : l.data_fine,
-                "data_pagamento" : l.data_pagamento,
-                "stato" : l.stato,
-                "priorita" : l.priorita,
-                "preventivato" : l.preventivato,
-                "cliente" : {
-                    "id" : l.cliente.id,
-                    "colore" : l.cliente.colore,
-                    "name" : l.cliente.name
+                "id": l.id,
+                "descrizione": l.descrizione,
+                "data_inizio": l.data_inizio,
+                "data_fine": l.data_fine,
+                "data_pagamento": l.data_pagamento,
+                "stato": l.stato,
+                "priorita": l.priorita,
+                "preventivato": l.preventivato,
+                "cliente": {
+                    "id": l.cliente.id,
+                    "colore": l.cliente.colore,
+                    "name": l.cliente.name,
                 },
-                "note" : l.note
+                "note": l.note,
             }
             for l in lavori
         ]
     )
 
+
 # API - CLIENTE per ID
 @app.get("/api/clienti/get/<int:cliente_id>")
 def get_cliente_byID(cliente_id):
-    
+
     c = Cliente.query.get_or_404(cliente_id)
-    lavori = Lavoro.query.filter_by(cliente_id = cliente_id)
+    lavori = Lavoro.query.filter_by(cliente_id=cliente_id)
     countLavori = lavori.count()
-    
+
     return jsonify(
         {
             "id": c.id,
@@ -280,16 +308,17 @@ def get_cliente_byID(cliente_id):
             "email": c.email,
             "note": c.note,
             "colore": c.colore,
-            "count_lavori" : countLavori,
-            "lavori" : [{
-                "id" : lavoro.id,
-                "descrizione" : lavoro.descrizione,
-                "stato" : lavoro.stato            
-            } for lavoro in lavori ]
-            
+            "count_lavori": countLavori,
+            "lavori": [
+                {
+                    "id": lavoro.id,
+                    "descrizione": lavoro.descrizione,
+                    "stato": lavoro.stato,
+                }
+                for lavoro in lavori
+            ],
         }
     )
-
 
 
 ######################## TESTING ########################

@@ -44,17 +44,8 @@
         </tbody>
     </table>
 </div>
+{% endblock %}
 
-<script>
-    function eliminaCliente(cliente_id) {
-        if (!confirm('Sei sicuro di voler eliminare questo cliente?')) return;
-        fetch(`/clienti/delete/${cliente_id}`)
-            .then(response => response.json())
-            .then(msg => {
-                alert(msg);
-                window.location.href = '/clienti'
-            })
-    };
-</script>
-
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/clienti.js') }}"></script>
 {% endblock %}

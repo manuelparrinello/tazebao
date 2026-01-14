@@ -73,28 +73,33 @@
 <!-- <script>
     window.onload = async function fetchQuantityLavori() {
         const url = '/api/clienti/get/{{ cliente.id }}'
-
+        
         try {
             const response = await fetch(url, {
                 method: 'get',
                 headers: {
                     'Accept': 'application/json'
-                }
-            })
-
-            if (!response.ok) {
+                    }
+                    })
+                    
+                    if (!response.ok) {
                 throw new Error(`Errore HTTP ${response.status}`)
-            }
+                }
+                
+                const data = await response.json();
+                document.getElementById('testdiv').innerText = data.count_lavori;
+                }
+                catch (errore) {
+                    console.error(errore)
+                    document.getElementById('testdiv').innerText = "UNDEFINED";
+                    
+                    }
+                    
+                    }
+                </script> -->
+{% endblock %}
 
-            const data = await response.json();
-            document.getElementById('testdiv').innerText = data.count_lavori;
-        }
-        catch (errore) {
-            console.error(errore)
-            document.getElementById('testdiv').innerText = "UNDEFINED";
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/cliente_edit.js') }}"></script>
 
-        }
-
-    }
-</script> -->
 {% endblock %}

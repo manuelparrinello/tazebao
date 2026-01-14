@@ -16,10 +16,10 @@
 </div>
 
 <div id="lavoriPage">
-    <!-- <div v-if="loading" style="height: 800px!important;"
+    <div v-if="loading" style="height: 800px!important;"
         class="d-flex container w-100 align-items-center justify-content-center">
         <span class="loader mx-auto d-flex align-items-center justify-content-center"></span>
-    </div> -->
+    </div>
 
     <div v-else class="container p-0 mt-0">
         <table class="table table-striped" id="tabellaLavori">
@@ -65,8 +65,8 @@
     </div>
 
 </div>
+{% endblock %}
 
-<script>
-
-</script>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/lavori.js') }}"></script>
 {% endblock %}

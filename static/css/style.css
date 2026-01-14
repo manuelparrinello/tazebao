@@ -9,6 +9,10 @@ body {
   transition: opacity 0.1s ease-in;
 }
 
+.desktop-nav-logo, .mobile-nav-logo {
+  padding: 0!important;
+}
+
 .container {
   max-width: 1380px !important;
 }
@@ -18,11 +22,11 @@ body.loaded {
 }
 
 .bg-primary {
-  background-color: #198754 !important;
+  background-color: #7e508d !important;
 }
 
 .text-primary {
-  color: #198754 !important;
+  color: #7e508d !important;
 }
 
 .prio-pill {

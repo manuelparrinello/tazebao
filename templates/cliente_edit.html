@@ -11,62 +11,66 @@
     </div>
 
     <div v-else>
-        <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-            <div class="col-4 px-0">
-                <h6 class="fw-bold text-warning" style="letter-spacing: 1.2px;">MODIFICA CLIENTE</h6>
-                <h1>[[ cliente.nome ]]</h1>
-                <p>Totale lavori:
-                    <span v-if="cliente.count_lavori > 0" class="fw-bold" id="testdiv">[[ cliente.count_lavori ]]</span>
-                    <span v-else class="fw-bold">nessun lavoro per questo cliente</span>
-                </p>
+        <form id="editClienteForm">
+            <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+                <div class="col-4 px-0">
+                    <h6 class="fw-bold text-warning" style="letter-spacing: 1.2px;">MODIFICA CLIENTE</h6>
+                    <h1>[[ cliente.nome ]]</h1>
+                    <p>Totale lavori:
+                        <span v-if="cliente.count_lavori > 0" class="fw-bold" id="testdiv">[[ cliente.count_lavori
+                            ]]</span>
+                        <span v-else class="fw-bold">nessun lavoro per questo cliente</span>
+                    </p>
+                </div>
+                <div class="col-8 d-inline-flex justify-content-end px-0">
+                    <button v-on:click="editCliente($event, {{ cliente.id }})" class="btn btn-primary me-3 fw-bold"><span><i
+                                class="bi bi-floppy"></i></span>&nbsp;Salva
+                        modifiche</button>
+                    <button onclick="clickForDeleteCliente(event, [[ cliente.id ]])"
+                        class="btn btn-danger fw-bold"><span><i class="bi bi-trash3"></i></span>&nbsp;Elimina
+                        cliente</button>
+                </div>
             </div>
-            <div class="col-8 d-inline-flex justify-content-end px-0">
-                <button onclick="" class="btn btn-primary me-3 fw-bold"><span><i
-                            class="bi bi-floppy"></i></span>&nbsp;Salva
-                    modifiche</button>
-                <button onclick="clickForDeleteCliente(event, [[ cliente.id ]])" class="btn btn-danger fw-bold"><span><i
-                            class="bi bi-trash3"></i></span>&nbsp;Elimina cliente</button>
-            </div>
-        </div>
 
 
-        <div class="container p-0 mt-2">
-            <div class="row">
-                <div class="col">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label" for="nomeCliente">Nominativo</label>
-                            <input name="nomeCliente" type="text" v-model="cliente.nome" class="form-control">
+            <div class="container p-0 mt-2">
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label" for="nomeCliente">Nominativo</label>
+                                <input name="nomeCliente" type="text" v-model="cliente.nome" class="form-control">
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row mt-3">
-                        <div class="col-md-5">
-                            <label class="form-label" for="email">Email</label>
-                            <input name="email" type="email" v-model="cliente.email" class="form-control">
+                        <div class="row mt-3">
+                            <div class="col-md-5">
+                                <label class="form-label" for="email">Email</label>
+                                <input name="email" type="email" v-model="cliente.email" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="telefono">Telefono</label>
+                                <input name="telefono" type="tel" v-model="cliente.telefono" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label" for="colore">Colore</label>
+                                <input style="width:100%;" name="colore" type="color" v-model="cliente.colore"
+                                    class="form-control form-control-color" title="Scegli il colore">
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label" for="telefono">Telefono</label>
-                            <input name="telefono" type="tel" v-model="cliente.telefono" class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label" for="colore">Colore</label>
-                            <input style="width:100%;" name="colore" type="color" v-model="cliente.colore"
-                                class="form-control form-control-color" title="Scegli il colore">
-                        </div>
-                    </div>
 
-                    <div class="row mt-3">
-                        <div class="col">
-                            <label class="form-label" for="cliente.telefono">Note</label>
-                            <textarea name="note" v-model="cliente.note" class="form-control"></textarea>
+                        <div class="row mt-3">
+                            <div class="col">
+                                <label class="form-label" for="cliente.telefono">Note</label>
+                                <textarea name="note" v-model="cliente.note" class="form-control"></textarea>
+                            </div>
                         </div>
+
                     </div>
 
                 </div>
-
             </div>
-        </div>
+        </form>
     </div>
 </div>
 

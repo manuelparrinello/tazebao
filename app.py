@@ -217,34 +217,27 @@ def cliente_edit(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     if request.method == "GET":
         return render_template("cliente_edit.html", cliente=cliente)
-    nomeCliente = request.form.get("nomeCliente").title()
-    telefono = request.form.get("telefono")
-    email = request.form.get("email").lower()
-    note = request.form.get("note")
-    colore = request.form.get("colore")
-    # Aggiungi il nuovo cliente al database
-    edited_cliente = Cliente(name=nomeCliente, telefono=telefono, email=email, note=note, colore=colore)
-    db.session.add(edited_cliente)
-    db.session.commit()
-    return (
-        jsonify(
-            {
-                "message": "Cliente aggiunto con successo!",
-                "data": {
-                    "nome": nomeCliente,
-                    "telefono": telefono,
-                    "email": email,
-                    "note": note,
-                    "colore": colore,
-                },
-            }
-        ),
-        201,
-    )
+    if request.method == 'PUT':
+        dataFromJS = request.get_json()
+        if not dataFromJS:
+            return "Errore", 404
+        print(dataFromJS)
+        # Aggiorna i campi del modello
+        # Usiamo .get() per evitare errori se un campo manca nel JSON
+        cliente.name = dataFromJS.get("nomeCliente", cliente.name)
+        cliente.email = dataFromJS.get("email", cliente.email)
+        cliente.telefono = dataFromJS.get("telefono", cliente.telefono)
+        cliente.note = dataFromJS.get("note", cliente.note)
+        cliente.colore = dataFromJS.get("colore", cliente.colore)
+        try:
+            db.session.commit()
+            return jsonify({ "messaggio" : f"Cliente {cliente.name} aggiornato con successo"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return {"Errore nell'aggiornamento dei dati!": str(e)}, 500
 
 
 ######################## APIs ########################
-
 
 # API - CLIENTI ALL
 @app.get("/api/clienti/getall")

@@ -29,37 +29,42 @@ const getSingleCliente = Vue.createApp({
         this.loading = false;
       }
     },
-    editCliente(e, cliente_id) {
+    async editCliente(e, cliente_id) {
       e.preventDefault();
-      const form = document.querySelector('#editClienteForm');
-      const formData = new FormData(form); 
-      formData.append("nomeCliente", this.cliente.nome); 
-      formData.append("telefono", this.cliente.telefono); 
-      formData.append("email", this.cliente.email); 
-      formData.append("note", this.cliente.note); 
+      const form = document.querySelector("#editClienteForm");
+      const formData = new FormData(form);
+      formData.append("nomeCliente", this.cliente.nome);
+      formData.append("telefono", this.cliente.telefono);
+      formData.append("email", this.cliente.email);
+      formData.append("note", this.cliente.note);
       formData.append("colore", this.cliente.colore);
-      const url = `/clienti/edit/${cliente_id}`;
 
-      const formDataJSON = {}
-      formData.forEach(function(value, key) {
+      const formDataJSON = {};
+      formData.forEach(function (value, key) {
         formDataJSON[key] = value;
-      })
-      var json = JSON.stringify(formDataJSON);
+      });
+      var datiClienteJSON = JSON.stringify(formDataJSON);
 
-      console.log(json)
+      console.log(datiClienteJSON);
       try {
-
-        // const response = await fetch(url, {
-        //   method: 'put',
-        //   body: formData,
-        // });
-
-
-
+        const url = `/clienti/edit/${cliente_id}`;
+        const response = await fetch(url, {
+          method: "put",
+          body: datiClienteJSON,
+          headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`Errore nella richiesta: HTTP ${response.status} `);
+        }
+        const data = await response.json();
+        console.log(data["messaggio"]);
+        window.alert(`Cliente ${this.cliente.nome} aggiornato con successo!`);
+        window.location.href = "/clienti";
       } catch {
-
       } finally {
-
       }
     },
   },

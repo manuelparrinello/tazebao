@@ -28,6 +28,12 @@ const getAllLavori = Vue.createApp({
           this.loading = false;
         }, 200000); */
         this.loading = false;
+        Vue.nextTick(() => {
+          var sorttable_table = document.getElementById("tabellaLavori");
+          if (sorttable_table && typeof sorttable !== "undefined") {
+            sorttable.makeSortable(sorttable_table);
+          }
+        });
       }
     },
 

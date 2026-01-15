@@ -22,7 +22,7 @@
     </div>
 
     <div v-else class="container p-0 mt-0">
-        <table class="table table-hover table-striped" id="tabellaLavori">
+        <table class="table sortable table-striped" id="tabellaLavori">
             <thead>
                 <tr>
                     <th scope="col">Descrizione</th>
@@ -44,7 +44,7 @@
                         <td><span class="cliente-bullet" :style="{ backgroundColor: lavoro.cliente.colore }"></span><a
                                 :href="`/clienti/${lavoro.cliente.id}`" class="fw-bold text-decoration-none">[[
                                 lavoro.cliente.name ]]</a></td>
-                        <td>[[ lavoro.preventivato ]]€</td>
+                        <td :sorttable_customkey="[[ lavoro.preventivato ]]" class="text-center">[[ lavoro.preventivato ]]€</td>
                         <td class="text-center">
                             <span class="prio-pill" :class="prioClass(lavoro.priorita)">
                                 [[ lavoro.priorita ]]
@@ -63,7 +63,6 @@
             </tbody>
         </table>
     </div>
-
 </div>
 {% endblock %}
 

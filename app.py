@@ -242,7 +242,7 @@ def cliente_edit(cliente_id):
 # API - CLIENTI ALL
 @app.get("/api/clienti/getall")
 def get_clienti():
-    clienti = Cliente.query.all()
+    clienti = Cliente.query.all()    
     return jsonify(
         [
             {

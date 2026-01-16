@@ -9,6 +9,15 @@ body {
   transition: opacity 0.1s ease-in;
 }
 
+[v-cloak]>*:not(.loader) {
+  display: none;
+}
+
+/* Assicuriamoci che il loader sia visibile se Vue non è ancora partito */
+[v-cloak] .loader {
+  display: block !important;
+}
+
 .desktop-nav-logo,
 .mobile-nav-logo {
   padding: 1rem !important;
@@ -38,7 +47,7 @@ body.loaded {
   font-size: .8rem;
   font-weight: 700;
   border-radius: 10px;
-  padding: 2px 10px 5px;
+  padding: 2px 10px;
 }
 
 .prio-low {
@@ -71,7 +80,7 @@ body.loaded {
 }
 
 .table>:not(caption)>*>* {
-  padding: 0.3rem!important;
+  padding: 0.3rem !important;
 }
 
 .btn {
@@ -94,19 +103,20 @@ body.loaded {
 }
 
 .action-icon.delete-icon {
-  color: white!important;
+  color: white !important;
   background-color: #e73636;
 }
+
 .action-icon.delete-icon:hover {
-  background-color: #ff6560!important;
+  background-color: #ff6560 !important;
 }
 
 .action-icon.edit-icon:hover {
-  background-color: #ffdc43!important;
+  background-color: #ffdc43 !important;
 }
 
 table {
-  font-size: 0.9rem!important;
+  font-size: 0.9rem !important;
 }
 
 .circle-propic {
@@ -154,10 +164,10 @@ table td {
   vertical-align: middle !important;
 }
 
-.table-striped>tbody>tr:nth-child(odd)>td, 
+.table-striped>tbody>tr:nth-child(odd)>td,
 .table-striped>tbody>tr:nth-child(odd)>th {
-   background-color: #d980ff0f; 
- }
+  background-color: #d980ff0f;
+}
 
 .loader {
   width: 48px;

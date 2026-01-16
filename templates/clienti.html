@@ -14,7 +14,7 @@
     </div>
 </div>
 
-<div id="clientiPage" class="container p-0">
+<div id="clientiPage" class="container p-0" v-cloak>
     <table class="table sortable table-striped">
         <thead>
             <tr>
@@ -46,8 +46,8 @@
                     </td>
                     <td class="fw-bold">
                         <a :href='`/clienti/${cliente.id}`'>
-                            <span class="cliente-bullet" :style="{ backgroundColor: cliente.colore }"></span>
-                            [[ cliente.nome ]]
+                            <span class="cliente-bullet" :style="{ backgroundColor: cliente.colore }"></span>[[
+                            cliente.nome ]]
                         </a>
                     </td>
                     <td>[[ cliente.email ]]</td>

@@ -3,7 +3,7 @@
 {% block title %}Tutti i lavori{% endblock %}
 
 {% block content %}
-<div id="clientePage" data-cliente-id="{{ cliente.id }}">
+<div id="clientePage" data-cliente-id="{{ cliente.id }}" v-cloak>
     <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
         <div class="col-4 px-0">
             <h6 class="fw-bold text-primary" style="letter-spacing: 1.2px;">PAGINA CLIENTE</h6>
@@ -90,7 +90,7 @@
             </table>
         </div>
     </div>
-    
+
 </div>
 
 {% endblock %}

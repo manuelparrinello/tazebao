@@ -25,15 +25,15 @@
         <table class="table sortable table-striped" id="tabellaLavori">
             <thead>
                 <tr>
-                    <th scope="col">Descrizione</th>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">Preventivato</th>
-                    <th scope="col">Priorità</th>
-                    <th scope="col">Stato</th>
-                    <th scope="col">Data inizio</th>
-                    <th scope="col">Data fine</th>
-                    <th scope="col">Data pagamento</th>
-                    <th scope="col">Note</th>
+                    <th class="pointer" scope="col">Descrizione</th>
+                    <th class="pointer" scope="col">Cliente</th>
+                    <th class="pointer" scope="col">Preventivato</th>
+                    <th class="pointer" scope="col">Priorità</th>
+                    <th class="pointer" scope="col">Stato</th>
+                    <th class="pointer" scope="col">Data inizio</th>
+                    <th class="pointer" scope="col">Data fine</th>
+                    <th class="pointer" scope="col">Data pagamento</th>
+                    <th class="pointer" scope="col">Note</th>
 
                 </tr>
             </thead>
@@ -44,7 +44,8 @@
                         <td><span class="cliente-bullet" :style="{ backgroundColor: lavoro.cliente.colore }"></span><a
                                 :href="`/clienti/${lavoro.cliente.id}`" class="fw-bold text-decoration-none">[[
                                 lavoro.cliente.name ]]</a></td>
-                        <td :sorttable_customkey="[[ lavoro.preventivato ]]" class="text-center">[[ lavoro.preventivato ]]€</td>
+                        <td :sorttable_customkey="[[ lavoro.preventivato ]]" class="text-center">[[ lavoro.preventivato
+                            ]]€</td>
                         <td class="text-center">
                             <span class="prio-pill" :class="prioClass(lavoro.priorita)">
                                 [[ lavoro.priorita ]]

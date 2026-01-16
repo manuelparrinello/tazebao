@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, render_template, request, redirect
 from flask_cors import CORS
-from babel.numbers import format_currency
 import os
 from flask_sqlalchemy import SQLAlchemy
 

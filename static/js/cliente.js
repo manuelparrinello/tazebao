@@ -3,7 +3,7 @@ const getSingleCliente = Vue.createApp({
     return {
       cliente: {},
       error: null,
-      loading: true
+      loading: true,
     };
   },
   methods: {
@@ -23,17 +23,23 @@ const getSingleCliente = Vue.createApp({
           throw new Error(`Errore richiesta! (HTTP ${response.status})`);
         }
         this.cliente = await response.json();
-        console.log(this.cliente.count_lavori)
+        console.log(this.cliente.count_lavori);
       } catch (error) {
         this.error = error.message || "Errore imprevisto";
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
+    prioClass(prio) {
+      if (prio === "Bassa") return "prio-low";
+      if (prio === "Media") return "prio-med";
+      if (prio === "Alta") return "prio-high";
+      return "";
+    }
   },
   mounted() {
     this.loadClienteData();
     console.log(this.loadClienteData());
   },
-  delimiters: ["[[", "]]"]
-}).mount('#clientePage');
+  delimiters: ["[[", "]]"],
+}).mount("#clientePage");

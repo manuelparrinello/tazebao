@@ -11,7 +11,7 @@ body {
 
 .desktop-nav-logo,
 .mobile-nav-logo {
-  padding: 0 !important;
+  padding: 1rem !important;
 }
 
 .pointer {
@@ -70,28 +70,43 @@ body.loaded {
   transition: 0.3s ease-in-out;
 }
 
+.table>:not(caption)>*>* {
+  padding: 0.3rem!important;
+}
+
 .btn {
   border-radius: 12px !important;
   font-weight: bold;
 }
 
 .action-icon {
-  border: solid 1px grey;
+  border: none;
   display: inline-flex;
   justify-content: center;
   align-items: start;
-  padding: 1px 5px 0px 5px;
+  padding: 3px 5px 0px 5px;
   border-radius: 5px;
 }
 
 .action-icon.edit-icon {
-  border-color: #555;
-  background-color: #ffffff;
+  border: none;
+  background-color: #ffd000;
 }
 
 .action-icon.delete-icon {
-  border-color: #555;
-  background-color: #ffffff;
+  color: white!important;
+  background-color: #e73636;
+}
+.action-icon.delete-icon:hover {
+  background-color: #ff6560!important;
+}
+
+.action-icon.edit-icon:hover {
+  background-color: #ffdc43!important;
+}
+
+table {
+  font-size: 0.9rem!important;
 }
 
 .circle-propic {
@@ -110,7 +125,6 @@ body.loaded {
 .mobile-nav-logo {
   max-width: 160px;
   height: auto;
-  padding: 1rem;
 }
 
 .nav-link {
@@ -139,6 +153,11 @@ body.loaded {
 table td {
   vertical-align: middle !important;
 }
+
+.table-striped>tbody>tr:nth-child(odd)>td, 
+.table-striped>tbody>tr:nth-child(odd)>th {
+   background-color: #d980ff0f; 
+ }
 
 .loader {
   width: 48px;

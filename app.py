@@ -306,6 +306,12 @@ def get_cliente_byID(cliente_id):
                     "id": lavoro.id,
                     "descrizione": lavoro.descrizione,
                     "stato": lavoro.stato,
+                    "preventivato" : lavoro.preventivato,
+                    "data_inizio" : lavoro.data_inizio,
+                    "data_fine" : lavoro.data_fine,
+                    "data_pagamento" : lavoro.data_pagamento,
+                    "priorita" : lavoro.priorita,
+                    "note" : lavoro.note
                 }
                 for lavoro in lavori
             ],

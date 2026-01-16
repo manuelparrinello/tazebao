@@ -15,10 +15,10 @@
 </div>
 
 <div id="clientiPage" class="container p-0">
-    <table class="table sortable table-hover table-striped">
+    <table class="table sortable table-striped">
         <thead>
             <tr>
-                <th class="sorttable_numeric pointer" scope="col">ID</th>
+                <th class="sorttable_nosort" scope="col">Azioni</th>
                 <th class="pointer" scope="col">Nominativo</th>
                 <th class="pointer" scope="col">Email</th>
                 <th class="pointer" scope="col">Telefono</th>
@@ -28,11 +28,28 @@
         <tbody>
             <template v-if="clienti.length > 0">
                 <tr v-if="clienti" v-for="cliente in clienti">
-                    <td :sorttable_customkey="cliente.id" class="fw-bold">[[ cliente.id ]]</td>
-                    <td class="fw-bold"><a :href='`/clienti/${cliente.id}`'>
-                            <span class="cliente-bullet" :style="{ backgroundColor: cliente.colore }"></span>[[
-                            cliente.nome ]]
-                        </a></td>
+                    <td class="fw-bold">
+
+                        <a :href="`/clienti/edit/${ cliente.id }`">
+                            <button title="Modifica cliente" class="action-icon edit-icon me-1 border-0">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </a>
+
+                        <a href="">
+                            <button title="Cancella cliente" @click="clickForDeleteCliente( $event, cliente.id )"
+                                class="action-icon delete-icon border-0">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </a>
+
+                    </td>
+                    <td class="fw-bold">
+                        <a :href='`/clienti/${cliente.id}`'>
+                            <span class="cliente-bullet" :style="{ backgroundColor: cliente.colore }"></span>
+                            [[ cliente.nome ]]
+                        </a>
+                    </td>
                     <td>[[ cliente.email ]]</td>
                     <td>[[ cliente.telefono ]]</td>
                     <td>[[ cliente.note ]]</td>
@@ -47,5 +64,6 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 <script src="{{ url_for('static', filename='js/clienti.js') }}"></script>
 {% endblock %}

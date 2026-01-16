@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Tutti i lavori{% endblock %}
+{% block title %}
+{{ cliente.name }}
+{% endblock %}
 
 {% block content %}
 <div id="clientePage" data-cliente-id="{{ cliente.id }}" v-cloak>
@@ -26,7 +28,6 @@
     </div>
 
     <div v-else>
-
         <div class="mb-5 mt-2" id="anagraficaCliente">
             <hr>
             <div class="row w-100">
@@ -51,10 +52,9 @@
 
         <div class="container p-0 mt-2">
             <h4 class="fw-bold">Lavori associati</h4>
-            <table class="table sortable table-hover table-striped" id="tabellaLavori">
+            <table class="table sortable table-hover mt-2 table-striped table-bordered" id="tabellaLavori">
                 <thead>
                     <tr>
-                        <th class="pointer" scope="col">#</th>
                         <th class="pointer" scope="col">Descrizione</th>
                         <th class="pointer text-center" scope="col">Preventivato</th>
                         <th class="pointer text-center" scope="col">Priorità</th>
@@ -67,22 +67,22 @@
                     </tr>
                 </thead>
                 <tbody>
-
-                    <tr v-if="cliente" v-for="lavoro in cliente.lavori">
-                        <th scope="row">[[ lavoro.id ]]</th>
-                        <td>[[ lavoro.descrizione ]]</td>
-                        <td class="text-center">[[ lavoro.preventivato ]]€</td>
-                        <td class="text-center">
-                            <span class="prio-pill" :class="prioClass(lavoro.priorita)">
-                                [[ lavoro.priorita ]]
-                            </span>
-                        </td>
-                        <td class="text-center">[[ lavoro.stato || '-' ]]</td>
-                        <td class="text-center">[[ lavoro.data_inizio || '-' ]]</td>
-                        <td class="text-center">[[ lavoro.data_fine || "-" ]]</td>
-                        <td class="text-center">[[ lavoro.data_pagamento || "-" ]]</td>
-                        <td>[[ lavoro.note || "-" ]]</td>
-                    </tr>
+                    <template v-if="cliente.lavori.length > 0">
+                        <tr v-for="lavoro in cliente.lavori">
+                            <td class="fw-bold">[[ lavoro.descrizione ]]</td>
+                            <td class="text-center">[[ lavoro.preventivato ]]€</td>
+                            <td class="text-center">
+                                <span class="prio-pill" :class="prioClass(lavoro.priorita)">
+                                    [[ lavoro.priorita ]]
+                                </span>
+                            </td>
+                            <td class="text-center">[[ lavoro.stato || '-' ]]</td>
+                            <td class="text-center">[[ lavoro.data_inizio || '-' ]]</td>
+                            <td class="text-center">[[ lavoro.data_fine || "-" ]]</td>
+                            <td class="text-center">[[ lavoro.data_pagamento || "-" ]]</td>
+                            <td>[[ lavoro.note || "-" ]]</td>
+                        </tr>
+                    </template>
                     <tr v-else>
                         <td colspan="9" class="text-center">Nessun lavoro associato al cliente.</td>
                     </tr>

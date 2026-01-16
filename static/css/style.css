@@ -79,9 +79,9 @@ body.loaded {
   transition: 0.3s ease-in-out;
 }
 
-.table>:not(caption)>*>* {
+/* .table>:not(caption)>*>* {
   padding: 0.3rem !important;
-}
+} */
 
 .btn {
   border-radius: 12px !important;
@@ -98,17 +98,19 @@ body.loaded {
 }
 
 .action-icon.edit-icon {
-  border: none;
-  background-color: #ffd000;
+  border: solid 1px #ffd000;
+  background-color: #ffffff;
 }
 
 .action-icon.delete-icon {
-  color: white !important;
-  background-color: #e73636;
+  border: solid 1px #e73636 !important;
+  color: #e73636 !important;
+  background-color: #ffffff;
 }
 
 .action-icon.delete-icon:hover {
   background-color: #ff6560 !important;
+  color: white !important;
 }
 
 .action-icon.edit-icon:hover {

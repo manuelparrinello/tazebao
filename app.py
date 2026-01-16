@@ -241,7 +241,7 @@ def cliente_edit(cliente_id):
 # API - CLIENTI ALL
 @app.get("/api/clienti/getall")
 def get_clienti():
-    clienti = Cliente.query.all()    
+    clienti = Cliente.query.all()
     return jsonify(
         [
             {
@@ -251,6 +251,7 @@ def get_clienti():
                 "email": c.email,
                 "note": c.note,
                 "colore": c.colore,
+                "count_lavori": Lavoro.query.filter_by(cliente_id=c.id).count(),
             }
             for c in clienti
         ]

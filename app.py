@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template, request, redirect
 from flask_cors import CORS
 import os
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -72,7 +73,7 @@ with app.app_context():
 @app.route("/clienti/new", methods=["GET", "POST"])
 def nuovo_cliente():
     if request.method == "POST":
-        nomeCliente = request.form.get("nomeCliente").title()
+        nomeCliente = request.form.get("nome_cliente").title()
         telefono = request.form.get("telefono")
         email = request.form.get("email").lower()
         note = request.form.get("note")
@@ -116,13 +117,23 @@ def nuovo_lavoro():
         stato = request.form.get("stato")
         preventivato = request.form.get("preventivato")
         note = request.form.get("note")
-
+        
+        def convertToDate(data_string):
+            if data_string:
+                return datetime.strptime(data_string, '%Y-%m-%d').date()
+            return None
+        
+        # 1. Creiamo gli oggetti data PRIMA di usarli nel jsonify        
+        data_inizio_obj = convertToDate(data_inizio)
+        data_fine_obj = convertToDate(data_fine)
+        data_pagamento_obj = convertToDate(data_pagamento)
+        
         # Aggiungi il nuovo lavoro al database
         nuovo_lavoro = Lavoro(
             descrizione=descrizione,
-            data_inizio=data_inizio,
-            data_fine=data_fine,
-            data_pagamento=data_pagamento,
+            data_inizio=data_inizio_obj,
+            data_fine=data_fine_obj,
+            data_pagamento= data_pagamento_obj,
             cliente_id=cliente_id,
             priorita=priorita,
             stato=stato,
@@ -137,9 +148,9 @@ def nuovo_lavoro():
                     "message": "Lavoro aggiunto con successo!",
                     "data": {
                         "descrizione": descrizione,
-                        "data_inizio": data_inizio,
-                        "data_fine": data_fine,
-                        "data_pagamento": data_pagamento,
+                        "data_inizio": data_inizio_obj.strftime('%d/%m/%Y') if data_inizio_obj else None,
+                        "data_fine": data_fine_obj.strftime('%d/%m/%Y') if data_fine_obj else None,
+                        "data_pagamento": data_pagamento_obj.strftime('%d/%m/%Y') if data_pagamento_obj else None,
                         "cliente_id": cliente_id,
                         "priorita": priorita,
                         "stato": stato,
@@ -153,7 +164,6 @@ def nuovo_lavoro():
 
     if request.method == "GET":
         clienti_list = Cliente.query.all()
-        print(clienti_list)
         return render_template("lavoro_new.html", clienti=clienti_list)
 
 
@@ -198,7 +208,9 @@ def cliente_delete(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     db.session.delete(cliente)
     db.session.commit()
-    return "", 204
+    return jsonify({
+        'message' : 'Cliente eliminato con successo'
+    })
 
 
 # LAVORO DELETE
@@ -207,7 +219,9 @@ def lavoro_delete(lavoro_id):
     lavoro = Lavoro.query.get_or_404(lavoro_id)
     db.session.delete(lavoro)
     db.session.commit()
-    return "", 204
+    return jsonify({
+        'message' : f"Lavoro '{lavoro.descrizione}' eliminato con successo"
+    })
 
 
 # CLIENTE EDIT PAGE
@@ -318,6 +332,14 @@ def get_cliente_byID(cliente_id):
             ],
         }
     )
+    
+# API - Recupero ID tramite Nome Cliente
+@app.get('/api/clienti/getid/<string:nome>')
+def get_ID_by_name(nome):
+    cliente = Cliente.query.filter_by(name=nome).first()
+    id = cliente.id
+    print(id)
+    return jsonify({ 'id' : id })
 
 
 ######################## TESTING ########################

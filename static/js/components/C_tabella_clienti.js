@@ -1,6 +1,6 @@
 const TabellaClienti = {
-  props: ["clienti_data"],
-  template: `
+    props: ["clienti_data"],
+    template: `
     <table class="table mt-2 sortable table-hover">
         <thead>
             <tr>
@@ -14,7 +14,7 @@ const TabellaClienti = {
         </thead>
         <tbody>
             <template v-if="clienti_data.length > 0">
-                <tr v-if="clienti_data" v-for="cliente in clienti_data">
+                <tr v-for="cliente in clienti_data">
                     <td class="fw-bold text-center">
 
                         <a :href="'/clienti/edit/' + cliente.id">
@@ -24,8 +24,7 @@ const TabellaClienti = {
                         </a>
 
                         <a href="">
-                            <button title="Cancella cliente" @click="clickForDeleteCliente( $event, cliente.id )"
-                                class="action-icon delete-icon border-0">
+                            <button title="Cancella cliente" @click.prevent="$emit('delete', cliente.id )" class="action-icon delete-icon border-0">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </a>
@@ -49,5 +48,5 @@ const TabellaClienti = {
         </tbody>
     </table>
     `,
-  delimiters: ["[[", "]]"],
+    delimiters: ["[[", "]]"],
 };

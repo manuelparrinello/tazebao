@@ -9,32 +9,40 @@ const nuovoLavoroApp = Vue.createApp({
       priorita: "",
       preventivato: "",
       cliente: "",
+      note: ""
     };
   },
+
   methods: {
-    submitForm(e) {
-      e.preventDefault();
+
+    async submitForm() {
       const form = document.querySelector("#nuovoLavoro");
       const formData = new FormData(form);
+      const cliente_id = formData.get('cliente_id');
       formData.append("descrizione", this.descrizione);
-      formData.append("dataInizio", this.dataInizio);
-      formData.append("dataFine", this.dataFine);
-      formData.append("dataPagamento", this.dataPagamento);
-      formData.append("stato", this.stato);
-      formData.append("priorita", this.priorita);
-      formData.append("preventivato", this.preventivato);
-      formData.append("cliente", this.cliente);
-      fetch("/lavori/new", {
-        method: "POST",
-        body: formData,
-      }).then((response) => {
-        if (response.ok) {
-          window.alert("Lavoro creato con successo!");
-          window.location.href = "/lavori";
-        } else {
-          console.error("Errore durante la creazione del lavoro.");
+      formData.append("data_inizio", this.dataInizio)
+      formData.append("data_fine", this.dataFine)
+      formData.append("data_pagamento", this.dataPagamento)
+      formData.append("cliente_id", cliente_id)
+      formData.append("data_pagamento", this.dataPagamento)
+      formData.append("priorita", this.priorita)
+      formData.append("stato", this.stato)
+      formData.append("preventivato", this.preventivato)
+      formData.append("note", this.note)
+
+      try {
+        const response = await fetch("/lavori/new", {
+          method: "POST",
+          body: formData,
+        })
+        if (!response.ok) {
+          throw new Error('Errore improvviso: HTTP' + response.status);
         }
-      });
+        window.alert("Lavoro aggiunto con successo")
+        window.location.href = `/clienti/${cliente_id}`
+      } catch (error) {
+        console.log(error.message);
+      }
     },
   },
 }).mount("#formLavoro");

@@ -31,7 +31,7 @@ const TabellaLavori = {
                             </span>
                         </td>
                         <td class="text-center">[[ lavoro.stato ]]</td>
-                        <td class="text-center">[[ lavoro.data_inizio || '-' ]]</td>
+                        <td class="text-center">[[ lavoro.data_inizio ? new Date(lavoro.data_inizio).toLocaleDateString('it-IT') : '-' ]]</td>
                         <td class="text-center">[[ lavoro.data_fine || '-' ]]</td>
                         <td class="text-center">[[ lavoro.data_pagamento || '-' ]]</td>
                         <td class="text-center" id="note_td" v-html="renderNoteIcon(lavoro.note)"></td>

@@ -1,6 +1,6 @@
 const getAllLavori = Vue.createApp({
-  components : {
-    'tabella-lavori' : TabellaLavori // Registri il componente
+  components: {
+    'tabella-lavori': TabellaLavori // Registri il componente
   },
   data() {
     return {

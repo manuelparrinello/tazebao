@@ -18,7 +18,7 @@ const TabellaLavori = {
                 <tbody>
                     <template v-if="lavori_data.length > 0">
                         <tr v-for="lavoro in lavori_data">
-                            <td class="fw-bold">[[ lavoro.descrizione ]]</td>
+                            <td>[[ lavoro.descrizione ]]</td>
                             <td class="text-center">[[ lavoro.preventivato ]]€</td>
                             <td class="text-center">
                                 <span class="prio-pill" :class="prioClass(lavoro.priorita)">
@@ -26,9 +26,9 @@ const TabellaLavori = {
                                 </span>
                             </td>
                             <td class="text-center">[[ lavoro.stato || '-' ]]</td>
-                            <td class="text-center">[[ lavoro.data_inizio || '-' ]]</td>
-                            <td class="text-center">[[ lavoro.data_fine || "-" ]]</td>
-                            <td class="text-center">[[ lavoro.data_pagamento || "-" ]]</td>
+                            <td class="text-center">[[ lavoro.data_inizio ? new Date(lavoro.data_inizio).toLocaleDateString('it-IT') : '-' ]]</td>
+                            <td class="text-center">[[ lavoro.data_fine ? new Date(lavoro.data_fine).toLocaleDateString('it-IT') : '-' ]]</td>
+                            <td class="text-center">[[ lavoro.data_pagamento ? new Date(lavoro.data_pagamento).toLocaleDateString('it-IT') : '-' ]]</td>
                             <td class="text-center" v-html="renderNoteIcon(lavoro.note)">[[ lavoro.note || "-" ]]</td>
                         </tr>
                     </template>

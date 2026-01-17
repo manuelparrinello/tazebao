@@ -11,11 +11,11 @@
     <div class="container p-0 mt-5" id="formLavoro">
 
         <div class="row">
-
             <div class="col-2">
                 <div class="mb-3">
-                    <label for="cliente_id" class="form-label">Cliente</label>
-                    <select class="form-control form-select" id="cliente_id" name="cliente_id" required>
+                    <label for="cliente_id" class="form-label fw-bold">Cliente</label>
+                    <select v-model="cliente" class="form-control form-select" id="cliente_id" name="cliente_id"
+                        required>
                         {% if clienti %}
                         {% for cliente in clienti %}
                         <option value="{{ cliente.id }}">{{ cliente.name }}</option>
@@ -26,26 +26,38 @@
                     </select>
                 </div>
             </div>
+        </div>
+
+        <div class="row">
 
             <div class="col-4">
                 <div class="mb-3">
-                    <label for="descrizione" class="form-label">Descrizione</label>
-                    <input type="text" class="form-control" id="descrizione" name="descrizione" required>
+                    <label for="descrizione" class="fw-bold form-label">Descrizione</label>
+                    <input v-model="descrizione" type="text" class="form-control" id="descrizione" name="descrizione"
+                        required>
                 </div>
             </div>
 
             <div class="col-2">
                 <div class="mb-3">
-                    <label for="preventivato" class="form-label">Preventivo</label>
-                    <input type="number" step="0.01" class="form-control" id="preventivato" name="preventivato">
+                    <label for="data_inizio" class="fw-bold form-label">Data Inizio</label>
+                    <input class="form-control" type="date" name="data_inizio" id="data_inizio">
                 </div>
             </div>
 
             <div class="col-2">
                 <div class="mb-3">
-                    <label for="priorita" class="form-label">Priorità</label>
-                    <select class="form-control form-select" name="priorita" id="">
-                        <option value="Bassa">Bassa</option>
+                    <label for="preventivato" class="fw-bold form-label">Preventivo</label>
+                    <input v-model="preventivato" type="number" step="0.01" class="form-control" id="preventivato"
+                        name="preventivato">
+                </div>
+            </div>
+
+            <div class="col-2">
+                <div class="mb-3">
+                    <label for="priorita" class="fw-bold form-label">Priorità</label>
+                    <select v-model="priorita" class="form-control form-select" name="priorita" id="">
+                        <option selected value="Bassa">Bassa</option>
                         <option value="Media">Media</option>
                         <option value="Alta">Alta</option>
                     </select>
@@ -54,8 +66,8 @@
 
             <div class="col-2">
                 <div class="mb-3">
-                    <label for="stato" class="form-label">Stato</label>
-                    <select class="form-control form-select" name="stato" id="">
+                    <label for="stato" class="fw-bold form-label">Stato</label>
+                    <select v-model="stato" class="form-control form-select" name="stato" id="">
                         <option value="Da iniziare">Da iniziare</option>
                         <option value="In attesa">In attesa</option>
                         <option value="In corso">In corso</option>
@@ -64,17 +76,14 @@
                 </div>
             </div>
 
-
         </div>
-
-
 
         <div class="mb-3">
-            <label for="note" class="form-label">Note</label>
-            <textarea class="form-control" id="note" name="note" rows="4"></textarea>
+            <label for="note" class="fw-bold form-label">Note</label>
+            <textarea v-model="note" class="form-control" id="note" name="note" rows="4"></textarea>
         </div>
 
-        <button @click="submitForm" type="submit" class="btn btn-primary">Aggiungi Lavoro</button>
+        <button @click.prevent="submitForm()" type="submit" class="btn btn-primary">Aggiungi Lavoro</button>
 </form>
 {% endblock %}
 

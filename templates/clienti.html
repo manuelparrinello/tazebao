@@ -15,7 +15,7 @@
 </div>
 
 <div id="clientiPage" class="container p-0" v-cloak>
-    <tabella-clienti :clienti_data="clienti"></tabella-clienti>
+    <tabella-clienti :clienti_data="clienti" @delete="clickForDeleteCliente"></tabella-clienti>
 </div>
 {% endblock %}
 

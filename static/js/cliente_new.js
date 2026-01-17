@@ -6,7 +6,6 @@ const nuovoClienteApp = Vue.createApp({
       email: "",
       colore: "",
       note: "",
-      loading: true
     };
   },
   computed: {
@@ -19,32 +18,31 @@ const nuovoClienteApp = Vue.createApp({
     },
   },
   methods: {
-     submitFormNewCliente(e) {
+    async submitFormNewCliente(e) {
       e.preventDefault();
       // Creazione di un oggetto FormData per inviare i dati del modulo
       const form = document.querySelector("#nuovoCliente");
       const formData = new FormData(form);
-      formData.append("nomeCliente", this.nomeCliente);
-      formData.append("telefono", this.telefono);
-      formData.append("email", this.email);
-      formData.append("colore", this.colore);
-      formData.append("note", this.note);
+      formData.append('nome_cliente', this.nomeCliente);
+      formData.append('telefono', this.telefono);
+      formData.append('email', this.email);
+      formData.append('note', this.note);
+      formData.append('colore', this.colore)
 
-      // Invio della richiesta POST al server
-      fetch("/clienti/new", {
-        method: "POST",
-        body: formData,
-      }).then((response) => {
-        if (response.ok) {
-          // Reindirizzamento alla pagina dei clienti dopo il successo
-          window.alert("Cliente creato con successo!");
-          window.location.href = "/clienti";
-        } else {
-          console.error("Errore durante la creazione del cliente.");
+      try {
+        const response = await fetch(`/clienti/new`, {
+          method: 'post',
+          body: formData
+        })
+        if (!response.ok) {
+          throw new Error('Errore richiesta! HTTP' + response.status);
         }
-      }).then(() => {
-        this.loading = false
-      });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        window.alert('Cliente aggiunto!');
+        window.location.href = '/clienti';
+      }
     },
   },
   delimiters: ["[[", "]]"],

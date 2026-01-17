@@ -6,12 +6,7 @@
 
 <div class="container p-0 mt-5" id="formCliente" v-cloak>
 
-    
-    <div v-if="loading" style="height: 800px!important;"
-        class="d-flex container w-100 align-items-center justify-content-center">
-        <span class="loader mx-auto d-flex align-items-center justify-content-center"></span>
-    </div>
-    <form id="nuovoCliente" v-else>
+    <form id="nuovoCliente">
         <!-- FORM INPUTS ------------------------------>
         <div class="row">
             <div class="col-8 pe-5">
@@ -21,7 +16,7 @@
 
                     <div class="col-md-6">
                         <label class="form-label" for="nomeCliente">Nominativo</label>
-                        <input name="nomeCliente" type="text" v-model="nomeCliente" class="form-control">
+                        <input name="nome_cliente" type="text" v-model="nomeCliente" class="form-control">
                     </div>
                 </div>
 
@@ -91,7 +86,6 @@
                 </div>
             </div>
     </form>
-
 
 </div>
 {% endblock %}

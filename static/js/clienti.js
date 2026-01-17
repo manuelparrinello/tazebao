@@ -1,6 +1,6 @@
 const getAllClienti = Vue.createApp({
-  components : {
-    'tabella-clienti' : TabellaClienti
+  components: {
+    'tabella-clienti': TabellaClienti
   },
   data() {
     return {
@@ -32,58 +32,28 @@ const getAllClienti = Vue.createApp({
       }
     },
 
-    deleteCliente(id) {
-      return fetch(`/clienti/${id}`, {
-        method: "delete",
-        headers: {
-          Accept: "application/json",
-        },
-      });
-    },
-
-    async clickForDeleteCliente(event, idCliente) {
-      event.preventDefault();
-      const utenteConferma = confirm(
-        "Sei sicuro di voler cancellare il cliente?"
-      );
-
-      if (utenteConferma === false) {
-        return;
-      }
-
-      try {
-        const response = await deleteCliente(idCliente);
-        console.log("DELETE status:", response.status);
-        if (response.ok === false) {
-          const corpoRispostaComeTesto = await response.text();
-          console.error("Errore response:", corpoRispostaComeTesto);
-          throw new Error(
-            `Errore durante l'eliminazione (HTTP ${response.status})`
-          );
+    async clickForDeleteCliente(cliente_id) {
+      const url = `/clienti/${cliente_id}`;
+      if (window.confirm('Vuoi davvero cancellare il cliente?')) {
+        try {
+          const response = await fetch(url, {
+            method: 'delete'
+          })
+          if (!response.ok) {
+            throw new Error(`Errore richiesta! HTTP(${response.status})`)
+          }
+          alert('Cliente eliminato con successo!');
+          window.location.href = '/clienti';
+        } catch (error) {
+          console.log(error)
         }
-        alert("Cliente eliminato con successo!");
-        window.location.href = "/clienti";
-      } catch (errore) {
-        alert(errore.message);
-        console.error(errore);
       }
-    },
+      return
+    }
   },
-
   mounted() {
     this.loadClienti();
     console.log(this.loadClienti());
   },
   delimiters: ["[[", "]]"],
 }).mount("#clientiPage");
-
-// DELETE CLIENTE //
-function eliminaCliente(cliente_id) {
-  if (!confirm("Sei sicuro di voler eliminare questo cliente?")) return;
-  fetch(`/clienti/delete/${cliente_id}`)
-    .then((response) => response.json())
-    .then((msg) => {
-      alert(msg);
-      window.location.href = "/clienti";
-    });
-}

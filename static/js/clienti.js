@@ -1,4 +1,7 @@
 const getAllClienti = Vue.createApp({
+  components : {
+    'tabella-clienti' : TabellaClienti
+  },
   data() {
     return {
       clienti: [],

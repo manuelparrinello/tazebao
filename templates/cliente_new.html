@@ -4,9 +4,14 @@
 
 {% block content %}
 
-<div class="container p-0 mt-5" id="formCliente">
+<div class="container p-0 mt-5" id="formCliente" v-cloak>
 
-    <form id="nuovoCliente">
+    
+    <div v-if="loading" style="height: 800px!important;"
+        class="d-flex container w-100 align-items-center justify-content-center">
+        <span class="loader mx-auto d-flex align-items-center justify-content-center"></span>
+    </div>
+    <form id="nuovoCliente" v-else>
         <!-- FORM INPUTS ------------------------------>
         <div class="row">
             <div class="col-8 pe-5">

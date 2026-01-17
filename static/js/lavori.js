@@ -1,4 +1,7 @@
 const getAllLavori = Vue.createApp({
+  components : {
+    'tabella-lavori' : TabellaLavori // Registri il componente
+  },
   data() {
     return {
       lavori: [],
@@ -24,9 +27,6 @@ const getAllLavori = Vue.createApp({
       } catch (errore) {
         this.error = errore.message || "Errore imprevisto";
       } finally {
-        /* setTimeout(() => {
-          this.loading = false;
-        }, 200000); */
         this.loading = false;
         Vue.nextTick(() => {
           var sorttable_table = document.getElementById("tabellaLavori");
@@ -35,17 +35,19 @@ const getAllLavori = Vue.createApp({
           }
         });
       }
-    },
-
-    prioClass(prio) {
-      if (prio === "Bassa") return "prio-low";
-      if (prio === "Media") return "prio-med";
-      if (prio === "Alta") return "prio-high";
-      return "";
-    },
+    }
   },
   mounted() {
     this.loadLavori();
+  },
+  updated() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    tooltipTriggerList.forEach(el => {
+      // Evita doppie inizializzazioni
+      if (!bootstrap.Tooltip.getInstance(el)) {
+        new bootstrap.Tooltip(el)
+      }
+    })
   },
   delimiters: ["[[", "]]"],
 }).mount("#lavoriPage");

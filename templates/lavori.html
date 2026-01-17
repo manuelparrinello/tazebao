@@ -16,57 +16,19 @@
 </div>
 
 <div id="lavoriPage" v-cloak>
+
     <div v-if="loading" style="height: 800px!important;"
         class="d-flex container w-100 align-items-center justify-content-center">
         <span class="loader mx-auto d-flex align-items-center justify-content-center"></span>
     </div>
 
     <div v-else class="container p-0 mt-0">
-        <table class="table sortable table-striped mt-2 table-bordered" id="tabellaLavori">
-            <thead>
-                <tr>
-                    <th class="pointer" scope="col">Descrizione</th>
-                    <th class="pointer" scope="col">Cliente</th>
-                    <th class="pointer" scope="col">Preventivato</th>
-                    <th class="pointer" scope="col">Priorità</th>
-                    <th class="pointer" scope="col">Stato</th>
-                    <th class="pointer" scope="col">Data inizio</th>
-                    <th class="pointer" scope="col">Data fine</th>
-                    <th class="pointer" scope="col">Data pagamento</th>
-                    <th class="pointer" scope="col">Note</th>
-
-                </tr>
-            </thead>
-            <tbody>
-                <template v-if="lavori.length > 0">
-                    <tr v-for="lavoro in lavori">
-                        <td><span class="fw-bold">[[ lavoro.descrizione ]]</span></td>
-                        <td><span class="cliente-bullet" :style="{ backgroundColor: lavoro.cliente.colore }"></span><a
-                                :href="`/clienti/${lavoro.cliente.id}`" class="fw-bold text-decoration-none">[[
-                                lavoro.cliente.name ]]</a></td>
-                        <td :sorttable_customkey="[[ lavoro.preventivato ]]" class="text-center">[[ lavoro.preventivato
-                            ]]€</td>
-                        <td class="text-center">
-                            <span class="prio-pill" :class="prioClass(lavoro.priorita)">
-                                [[ lavoro.priorita ]]
-                            </span>
-                        </td>
-                        <td>[[ lavoro.stato ]]</td>
-                        <td>[[ lavoro.data_inizio || '-' ]]</td>
-                        <td>[[ lavoro.data_fine || '-' ]]</td>
-                        <td>[[ lavoro.data_pagamento || '-' ]]</td>
-                        <td id="note_td">[[ lavoro.note || '-' ]]</td>
-                    </tr>
-                </template>
-                <tr v-else>
-                    <td colspan="10" class="text-center">Nessun lavoro trovato.</td>
-                </tr>
-            </tbody>
-        </table>
+        <tabella-lavori :lavori_data="lavori"></tabella-lavori>
     </div>
+
 </div>
 {% endblock %}
-
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/components/C_tabella_lavori.js') }}"></script>
 <script src="{{ url_for('static', filename='js/lavori.js') }}"></script>
 {% endblock %}

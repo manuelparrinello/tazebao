@@ -6,6 +6,7 @@ const nuovoClienteApp = Vue.createApp({
       email: "",
       colore: "",
       note: "",
+      loading: true
     };
   },
   computed: {
@@ -41,6 +42,8 @@ const nuovoClienteApp = Vue.createApp({
         } else {
           console.error("Errore durante la creazione del cliente.");
         }
+      }).then(() => {
+        this.loading = false
       });
     },
   },

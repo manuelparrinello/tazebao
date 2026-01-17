@@ -48,46 +48,9 @@
             <hr>
         </div>
 
-
-
         <div class="container p-0 mt-2">
             <h4 class="fw-bold">Lavori associati</h4>
-            <table class="table sortable table-hover mt-2 table-striped table-bordered" id="tabellaLavori">
-                <thead>
-                    <tr>
-                        <th class="pointer" scope="col">Descrizione</th>
-                        <th class="pointer text-center" scope="col">Preventivato</th>
-                        <th class="pointer text-center" scope="col">Priorità</th>
-                        <th class="pointer text-center" scope="col">Stato</th>
-                        <th class="pointer text-center" scope="col">Data inizio</th>
-                        <th class="pointer text-center" scope="col">Data fine</th>
-                        <th class="pointer text-center" scope="col">Data pagamento</th>
-                        <th class="pointer" scope="col">Note</th>
-
-                    </tr>
-                </thead>
-                <tbody>
-                    <template v-if="cliente.lavori.length > 0">
-                        <tr v-for="lavoro in cliente.lavori">
-                            <td class="fw-bold">[[ lavoro.descrizione ]]</td>
-                            <td class="text-center">[[ lavoro.preventivato ]]€</td>
-                            <td class="text-center">
-                                <span class="prio-pill" :class="prioClass(lavoro.priorita)">
-                                    [[ lavoro.priorita ]]
-                                </span>
-                            </td>
-                            <td class="text-center">[[ lavoro.stato || '-' ]]</td>
-                            <td class="text-center">[[ lavoro.data_inizio || '-' ]]</td>
-                            <td class="text-center">[[ lavoro.data_fine || "-" ]]</td>
-                            <td class="text-center">[[ lavoro.data_pagamento || "-" ]]</td>
-                            <td>[[ lavoro.note || "-" ]]</td>
-                        </tr>
-                    </template>
-                    <tr v-else>
-                        <td colspan="9" class="text-center">Nessun lavoro associato al cliente.</td>
-                    </tr>
-                </tbody>
-            </table>
+            <tabella-lavori :lavori_data="cliente.lavori"></tabella-lavori>
         </div>
     </div>
 
@@ -96,5 +59,6 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/C_tabella_lavori_cliente.js') }}"></script>
 <script src="{{ url_for('static', filename='js/cliente.js') }}"></script>
 {% endblock %}

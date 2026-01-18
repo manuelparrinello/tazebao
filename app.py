@@ -117,23 +117,23 @@ def nuovo_lavoro():
         stato = request.form.get("stato")
         preventivato = request.form.get("preventivato")
         note = request.form.get("note")
-        
+
         def convertToDate(data_string):
             if data_string:
-                return datetime.strptime(data_string, '%Y-%m-%d').date()
+                return datetime.strptime(data_string, "%Y-%m-%d").date()
             return None
-        
-        # 1. Creiamo gli oggetti data PRIMA di usarli nel jsonify        
+
+        # 1. Creiamo gli oggetti data PRIMA di usarli nel jsonify
         data_inizio_obj = convertToDate(data_inizio)
         data_fine_obj = convertToDate(data_fine)
         data_pagamento_obj = convertToDate(data_pagamento)
-        
+
         # Aggiungi il nuovo lavoro al database
         nuovo_lavoro = Lavoro(
             descrizione=descrizione,
             data_inizio=data_inizio_obj,
             data_fine=data_fine_obj,
-            data_pagamento= data_pagamento_obj,
+            data_pagamento=data_pagamento_obj,
             cliente_id=cliente_id,
             priorita=priorita,
             stato=stato,
@@ -148,9 +148,21 @@ def nuovo_lavoro():
                     "message": "Lavoro aggiunto con successo!",
                     "data": {
                         "descrizione": descrizione,
-                        "data_inizio": data_inizio_obj.strftime('%d/%m/%Y') if data_inizio_obj else None,
-                        "data_fine": data_fine_obj.strftime('%d/%m/%Y') if data_fine_obj else None,
-                        "data_pagamento": data_pagamento_obj.strftime('%d/%m/%Y') if data_pagamento_obj else None,
+                        "data_inizio": (
+                            data_inizio_obj.strftime("%d/%m/%Y")
+                            if data_inizio_obj
+                            else None
+                        ),
+                        "data_fine": (
+                            data_fine_obj.strftime("%d/%m/%Y")
+                            if data_fine_obj
+                            else None
+                        ),
+                        "data_pagamento": (
+                            data_pagamento_obj.strftime("%d/%m/%Y")
+                            if data_pagamento_obj
+                            else None
+                        ),
                         "cliente_id": cliente_id,
                         "priorita": priorita,
                         "stato": stato,
@@ -185,6 +197,13 @@ def lavori():
     return render_template("lavori.html", lavori=lavori_list)
 
 
+# LAVORO SINGLE PAGE
+@app.get("/lavori/<int:lavoro_id>")
+def lavoro_page(lavoro_id):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    return render_template("lavoro.html", lavoro=lavoro)
+
+
 # CLIENTI
 @app.route("/clienti")
 def clienti():
@@ -208,9 +227,7 @@ def cliente_delete(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     db.session.delete(cliente)
     db.session.commit()
-    return jsonify({
-        'message' : 'Cliente eliminato con successo'
-    })
+    return jsonify({"message": "Cliente eliminato con successo"})
 
 
 # LAVORO DELETE
@@ -219,9 +236,7 @@ def lavoro_delete(lavoro_id):
     lavoro = Lavoro.query.get_or_404(lavoro_id)
     db.session.delete(lavoro)
     db.session.commit()
-    return jsonify({
-        'message' : f"Lavoro '{lavoro.descrizione}' eliminato con successo"
-    })
+    return jsonify({"message": f"Lavoro '{lavoro.descrizione}' eliminato con successo"})
 
 
 # CLIENTE EDIT PAGE
@@ -230,7 +245,7 @@ def cliente_edit(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     if request.method == "GET":
         return render_template("cliente_edit.html", cliente=cliente)
-    if request.method == 'PUT':
+    if request.method == "PUT":
         dataFromJS = request.get_json()
         if not dataFromJS:
             return "Errore", 404
@@ -244,13 +259,19 @@ def cliente_edit(cliente_id):
         cliente.colore = dataFromJS.get("colore", cliente.colore)
         try:
             db.session.commit()
-            return jsonify({ "messaggio" : f"Cliente {cliente.name} aggiornato con successo"}), 200
+            return (
+                jsonify(
+                    {"messaggio": f"Cliente {cliente.name} aggiornato con successo"}
+                ),
+                200,
+            )
         except Exception as e:
             db.session.rollback()
             return {"Errore nell'aggiornamento dei dati!": str(e)}, 500
 
 
 ######################## APIs ########################
+
 
 # API - CLIENTI ALL
 @app.get("/api/clienti/getall")
@@ -299,6 +320,26 @@ def get_lavori():
     )
 
 
+# API - LAVORO per ID
+@app.get("/api/lavori/get/<int:id>")
+def get_lavoro_byID(id):
+    lavoro = Lavoro.query.get_or_404(id)
+    return jsonify(
+        {
+            "id": lavoro.id,
+            "descrizione": lavoro.descrizione,
+            "data_inizio": lavoro.data_inizio,
+            "data_fine": lavoro.data_fine,
+            "data_pagamento": lavoro.data_pagamento,
+            "priorita": lavoro.priorita,
+            "stato": lavoro.stato,
+            "preventivato": lavoro.preventivato,
+            "note": lavoro.note,
+            "cliente": {"nome": lavoro.cliente.name, "id": lavoro.cliente.id},
+        }
+    )
+
+
 # API - CLIENTE per ID
 @app.get("/api/clienti/get/<int:cliente_id>")
 def get_cliente_byID(cliente_id):
@@ -321,25 +362,26 @@ def get_cliente_byID(cliente_id):
                     "id": lavoro.id,
                     "descrizione": lavoro.descrizione,
                     "stato": lavoro.stato,
-                    "preventivato" : lavoro.preventivato,
-                    "data_inizio" : lavoro.data_inizio,
-                    "data_fine" : lavoro.data_fine,
-                    "data_pagamento" : lavoro.data_pagamento,
-                    "priorita" : lavoro.priorita,
-                    "note" : lavoro.note
+                    "preventivato": lavoro.preventivato,
+                    "data_inizio": lavoro.data_inizio,
+                    "data_fine": lavoro.data_fine,
+                    "data_pagamento": lavoro.data_pagamento,
+                    "priorita": lavoro.priorita,
+                    "note": lavoro.note,
                 }
                 for lavoro in lavori
             ],
         }
     )
-    
+
+
 # API - Recupero ID tramite Nome Cliente
-@app.get('/api/clienti/getid/<string:nome>')
+@app.get("/api/clienti/getid/<string:nome>")
 def get_ID_by_name(nome):
     cliente = Cliente.query.filter_by(name=nome).first()
     id = cliente.id
     print(id)
-    return jsonify({ 'id' : id })
+    return jsonify({"id": id})
 
 
 ######################## TESTING ########################

@@ -1,0 +1,26 @@
+{% extends "base.html" %} {% block title %}{{ lavoro.descrizione }}{% endblock %} {% block content %}
+<div id="lavoroPage" data-lavoro-id="{{ lavoro.id }}" v-cloak>
+    <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+        <div class="col-4 px-0">
+            <h6 class="text-primary fw-bold" style="letter-spacing: 1.2px">
+                PAGINA LAVORO
+            </h6>
+            <h4>{{ lavoro.descrizione }}</h4>
+        </div>
+        <div class="col-8 d-inline-flex justify-content-end px-0">
+            <a href="">
+                <button class="button-61 button-61-warning me-2">
+                    <span><i class="bi bi-pencil"></i></span>&nbsp;Modifica
+                </button>
+            </a>
+            <button onclick="" class="button-61 button-61-danger">
+                <span><i class="bi bi-trash3"></i></span>&nbsp;Elimina cliente
+            </button>
+        </div>
+        <hr />
+    </div>
+</div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lavoro.js') }}"></script>
+{% endblock %}

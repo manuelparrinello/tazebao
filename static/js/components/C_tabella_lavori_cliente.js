@@ -1,17 +1,17 @@
 const TabellaLavori = {
-  props: ["lavori_data"], // Qui dichiari il nome del "tubo". "lavori_data" sostituisce nell'HTML sotto l'oggetto restituito dalla fetch. In questo caso cliente.lavori 
-  template: `
-     <table class="table sortable table-hover mt-2" id="tabellaLavori">
+    props: ["lavori_data"], // Qui dichiari il nome del "tubo". "lavori_data" sostituisce nell'HTML sotto l'oggetto restituito dalla fetch. In questo caso cliente.lavori 
+    template: `
+     <table class="table sortable table-hover border mt-2" id="tabellaLavori">
                 <thead>
                     <tr>
-                        <th class="pointer col-desc" scope="col">Descrizione</th>
-                        <th class="pointer text-center" scope="col">Preventivato</th>
-                        <th class="pointer text-center" scope="col">Priorità</th>
-                        <th class="pointer text-center" scope="col">Stato</th>
-                        <th class="pointer text-center" scope="col">Data inizio</th>
-                        <th class="pointer text-center" scope="col">Data fine</th>
-                        <th class="pointer text-center" scope="col">Data pagamento</th>
-                        <th class="pointer col-note text-center" scope="col">Note</th>
+                        <th class="fw-bold pointer col-desc" scope="col">Descrizione</th>
+                        <th class="fw-bold pointer text-center" scope="col">Preventivato</th>
+                        <th class="fw-bold pointer text-center" scope="col">Priorità</th>
+                        <th class="fw-bold pointer text-center" scope="col">Stato</th>
+                        <th class="fw-bold pointer text-center" scope="col">Inizio</th>
+                        <th class="fw-bold pointer text-center" scope="col">Fine</th>
+                        <th class="fw-bold pointer text-center" scope="col">Pagamento</th>
+                        <th class="fw-bold pointer col-note text-center" scope="col">Note</th>
 
                     </tr>
                 </thead>
@@ -38,27 +38,27 @@ const TabellaLavori = {
                 </tbody>
             </table>
     `,
-  methods: {
-    prioIndex(prio) {
-      if (prio === "Bassa") return 1;
-      if (prio === "Media") return 2;
-      if (prio === "Alta") return 3;
-      return "";
-    },
+    methods: {
+        prioIndex(prio) {
+            if (prio === "Bassa") return 1;
+            if (prio === "Media") return 2;
+            if (prio === "Alta") return 3;
+            return "";
+        },
 
-    prioClass(prio) {
-      if (prio === "Bassa") return "prio-low";
-      if (prio === "Media") return "prio-med";
-      if (prio === "Alta") return "prio-high";
-      return "";
-    },
+        prioClass(prio) {
+            if (prio === "Bassa") return "prio-low";
+            if (prio === "Media") return "prio-med";
+            if (prio === "Alta") return "prio-high";
+            return "";
+        },
 
-    renderNoteIcon(note) {
-      if (note) {
-        return `<i data-bs-placement="left" data-bs-toggle="tooltip" data-bs-title="${note}" class="bi bi-stickies" style="font-size: 1rem; color: #7e508d !important;"></i>`;
-      }
-      return "-";
+        renderNoteIcon(note) {
+            if (note) {
+                return `<i data-bs-placement="left" data-bs-toggle="tooltip" data-bs-title="${note}" class="bi bi-stickies" style="font-size: 1rem; color: #7e508d !important;"></i>`;
+            }
+            return "-";
+        },
     },
-  },
-  delimiters: ["[[", "]]"],
+    delimiters: ["[[", "]]"],
 };

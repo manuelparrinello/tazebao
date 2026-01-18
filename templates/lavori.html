@@ -1,24 +1,19 @@
-{% extends "base.html" %}
-
-{% block title %}Tutti i lavori{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Tutti i lavori{% endblock %} {% block content %}
 
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
     <div class="col-4 px-0">
-        <h1>Tutti i lavori</h1>
+        <h2>Tutti i lavori</h2>
         <p class="mb-4">Elenco di tutti i lavori nel sistema.</p>
     </div>
     <div class="col-8 d-inline-flex justify-content-end px-0">
-        <a href="{{ url_for('nuovo_lavoro') }}"><button class="btn btn-primary"><span><i
+        <a href="{{ url_for('nuovo_lavoro') }}"><button class="button-61"><span><i
                         class="bi bi-journal-plus"></i></span>&nbsp;Nuovo lavoro</button></a>
     </div>
 </div>
 
 <div id="lavoriPage" v-cloak>
 
-    <div v-if="loading" style="height: 800px!important;"
-        class="d-flex container w-100 align-items-center justify-content-center">
+    <div v-if="loading" style="height: 800px!important;" class="d-flex container w-100 align-items-center justify-content-center">
         <span class="loader mx-auto d-flex align-items-center justify-content-center"></span>
     </div>
 
@@ -27,8 +22,7 @@
     </div>
 
 </div>
-{% endblock %}
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/components/C_tabella_lavori.js') }}"></script>
 <script src="{{ url_for('static', filename='js/lavori.js') }}"></script>
 {% endblock %}

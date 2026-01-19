@@ -31,7 +31,7 @@ const TabellaLavori = {
                              </span>
                         </td>
                         <td class="text-center">
-                        <select @update-status="updateStatus" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
+                        <select @click="$emit('test-click', lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
                             <option :value="[[ lavoro.stato ]]" selected>[[ lavoro.stato ]]</option>
                         </select>
                         </td>

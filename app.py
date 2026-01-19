@@ -14,6 +14,8 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 CORS(app)
 
+status_lavori = ["Completato", "In corso", "In attesa", "Da iniziare"]
+
 
 def format_euro(value):
     try:
@@ -128,6 +130,9 @@ def nuovo_lavoro():
         data_fine_obj = convertToDate(data_fine)
         data_pagamento_obj = convertToDate(data_pagamento)
 
+        if stato not in status_lavori:
+            return
+
         # Aggiungi il nuovo lavoro al database
         nuovo_lavoro = Lavoro(
             descrizione=descrizione,
@@ -238,18 +243,27 @@ def lavoro_delete(lavoro_id):
     db.session.commit()
     return jsonify({"message": f"Lavoro '{lavoro.descrizione}' eliminato con successo"})
 
+
 # LAVORO STATUS UPDATE
 @app.patch("/lavori/<int:lavoro_id>")
 def status_lavoro_update(lavoro_id):
     lavoro = Lavoro.query.filter_by(id=lavoro_id).first()
-    lavoro_status = lavoro.stato
-    print(lavoro_status)
-    return jsonify({
-        'lavoro_id' : lavoro.id,
-        'cliente' : lavoro.cliente.name,
-        'stato' : lavoro.stato
-    })
-    
+    data = request.get_json()
+    new_status = data["new_status"]
+    if new_status not in status_lavori:
+        db.session.rollback()
+        return
+    lavoro.stato = new_status
+    db.session.commit()
+    return jsonify(
+        {
+            "lavoro_id": lavoro.id,
+            "lavoro_descrizione": lavoro.descrizione,
+            "cliente": lavoro.cliente.name,
+            "nuovo_stato": new_status,
+        }
+    )
+
 
 # CLIENTE EDIT PAGE
 @app.route("/clienti/edit/<int:cliente_id>", methods=["GET", "PUT"])
@@ -280,8 +294,6 @@ def cliente_edit(cliente_id):
         except Exception as e:
             db.session.rollback()
             return {"Errore nell'aggiornamento dei dati!": str(e)}, 500
-        
-
 
 
 ######################## APIs ########################

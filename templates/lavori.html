@@ -13,12 +13,17 @@
 
 <div id="lavoriPage" v-cloak>
 
-    <div v-if="loading" style="height: 800px!important;" class="d-flex container w-100 align-items-center justify-content-center">
+    <div v-if="loading" style="height: 800px!important;"
+        class="d-flex container w-100 align-items-center justify-content-center">
         <span class="loader mx-auto d-flex align-items-center justify-content-center"></span>
     </div>
 
     <div v-else class="container p-0 mt-0">
-        <tabella-lavori :lavori_data="lavori" @change="updateStatus"></tabella-lavori>
+        <tabella-lavori 
+        :lavori_data="lavori" 
+        :update_status="updateStatus" :filtro_stati="populateExcludedStatuses"
+        :stato_lavori="stato_lavori">
+        </tabella-lavori>
     </div>
 
 </div>

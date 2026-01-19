@@ -1,7 +1,7 @@
 const TabellaLavori = {
     props: ["lavori_data"], // Qui dichiari il nome del "tubo"
     template: `
-    <table class="table sortable mt-2 border table-hover rounded-3" id="tabellaLavori">
+    <table class="table sortable mt-2 table-hover rounded-3" id="tabellaLavori">
             <thead>
                 <tr>
                     <th class="fw-bold pointer col-desc" scope="col">Descrizione</th>
@@ -30,7 +30,11 @@ const TabellaLavori = {
                                 [[ lavoro.priorita ]]
                              </span>
                         </td>
-                        <td class="text-center">[[ lavoro.stato ]]</td>
+                        <td class="text-center">
+                        <select @update-status="updateStatus" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
+                            <option :value="[[ lavoro.stato ]]" selected>[[ lavoro.stato ]]</option>
+                        </select>
+                        </td>
                         <td class="text-center">[[ lavoro.data_inizio ? new Date(lavoro.data_inizio).toLocaleDateString('it-IT') : '-' ]]</td>
                         <td class="text-center">[[ lavoro.data_fine || '-' ]]</td>
                         <td class="text-center">[[ lavoro.data_pagamento || '-' ]]</td>

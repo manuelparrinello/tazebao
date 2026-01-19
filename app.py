@@ -238,6 +238,18 @@ def lavoro_delete(lavoro_id):
     db.session.commit()
     return jsonify({"message": f"Lavoro '{lavoro.descrizione}' eliminato con successo"})
 
+# LAVORO STATUS UPDATE
+@app.patch("/lavori/<int:lavoro_id>")
+def status_lavoro_update(lavoro_id):
+    lavoro = Lavoro.query.filter_by(id=lavoro_id).first()
+    lavoro_status = lavoro.stato
+    print(lavoro_status)
+    return jsonify({
+        'lavoro_id' : lavoro.id,
+        'cliente' : lavoro.cliente.name,
+        'stato' : lavoro.stato
+    })
+    
 
 # CLIENTE EDIT PAGE
 @app.route("/clienti/edit/<int:cliente_id>", methods=["GET", "PUT"])
@@ -268,6 +280,8 @@ def cliente_edit(cliente_id):
         except Exception as e:
             db.session.rollback()
             return {"Errore nell'aggiornamento dei dati!": str(e)}, 500
+        
+
 
 
 ######################## APIs ########################

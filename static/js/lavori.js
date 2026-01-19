@@ -35,7 +35,16 @@ const getAllLavori = Vue.createApp({
           }
         });
       }
+    },
+
+    updateStatus(id) {
+      const select = document.querySelector(`#status_select_${id}`);
+      const select_value = select.value;
+      const url = `/lavori/${id}`;
+      console.log(select_value);
+      console.log(url);
     }
+
   },
   mounted() {
     this.loadLavori();

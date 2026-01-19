@@ -18,7 +18,7 @@
     </div>
 
     <div v-else class="container p-0 mt-0">
-        <tabella-lavori :lavori_data="lavori"></tabella-lavori>
+        <tabella-lavori :lavori_data="lavori" @click="$emit('update-status', lavoro.id)"></tabella-lavori>
     </div>
 
 </div>

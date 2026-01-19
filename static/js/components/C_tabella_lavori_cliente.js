@@ -1,7 +1,7 @@
 const TabellaLavori = {
     props: ["lavori_data"], // Qui dichiari il nome del "tubo". "lavori_data" sostituisce nell'HTML sotto l'oggetto restituito dalla fetch. In questo caso cliente.lavori 
     template: `
-     <table class="table sortable table-hover border mt-2" id="tabellaLavori">
+     <table class="table sortable table-hover mt-2" id="tabellaLavori">
                 <thead>
                     <tr>
                         <th class="fw-bold pointer col-desc" scope="col">Descrizione</th>
@@ -12,13 +12,12 @@ const TabellaLavori = {
                         <th class="fw-bold pointer text-center" scope="col">Fine</th>
                         <th class="fw-bold pointer text-center" scope="col">Pagamento</th>
                         <th class="fw-bold pointer col-note text-center" scope="col">Note</th>
-
                     </tr>
                 </thead>
                 <tbody>
                     <template v-if="lavori_data.length > 0">
                         <tr v-for="lavoro in lavori_data">
-                            <td>[[ lavoro.descrizione ]]</td>
+                            <td><a :href="'/lavori/' + lavoro.id">[[ lavoro.descrizione ]]</a></td>
                             <td class="text-center">[[ lavoro.preventivato ]]€</td>
                             <td class="text-center">
                                 <span class="prio-pill" :class="prioClass(lavoro.priorita)">

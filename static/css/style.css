@@ -20,6 +20,7 @@ a {
 body {
     opacity: 1;
     transition: opacity 0.1s ease-in;
+    padding-bottom: 80px;
 }
 
 .shadow-lg {
@@ -53,17 +54,17 @@ body {
     width: 80px !important;
 }
 
-action-icon {
+/* action-icon {
     border: none;
     display: inline-flex;
     justify-content: center;
     align-items: start;
     margin: auto 2px;
     padding: 0;
-    /* padding: 3px 5px 0px 5px; */
+    padding: 3px 5px 0px 5px;
     border-radius: 5px;
     background: none !important;
-}
+} */
 
 i.bi {
     font-size: 1.2rem;
@@ -186,9 +187,32 @@ body.loaded {
     color: #9600ff !important;
 }
 
-.prio-pill {
-    font-size: 0.8rem;
+.form-select-sm {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.status-select {
+    font-size: .8rem;
+    border-radius: 20px!important;
+}
+
+.status-pill {
+    font-size: .8rem;
     font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 10px;
+    padding: 2px 10px;
+}
+
+.status-low {
+
+}
+
+.prio-pill {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
     border-radius: 10px;
     padding: 2px 10px;
 }

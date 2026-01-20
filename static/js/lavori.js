@@ -16,6 +16,11 @@ const getAllLavori = Vue.createApp({
       return this.stato_lavori.filter((stato) => stato !== stato_attivo);
     },
 
+    updateStatusStyle(e) {
+      selector = e.target;
+      console.log("Selettore attivo: " + selector)
+    },
+
     async loadLavori() {
       const url = `/api/lavori/getall`;
       try {
@@ -49,8 +54,6 @@ const getAllLavori = Vue.createApp({
         return;
       }
       const url = `/lavori/${id}`;
-      console.log(select_value);
-      console.log(url);
 
       try {
         const response = await fetch(url, {
@@ -67,6 +70,7 @@ const getAllLavori = Vue.createApp({
           console.log("Errore nella richiesta! HTTP" + response.status);
           throw new Error("Errore nella richiesta! HTTP" + response.status);
         }
+
         console.log("Dato aggiornato!");
         console.log(await response.json());
       } catch (error) {

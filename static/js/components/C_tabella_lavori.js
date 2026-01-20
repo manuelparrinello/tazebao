@@ -36,7 +36,7 @@ const TabellaLavori = {
                              </span>
                         </td>
                         <td class="text-center">
-                        <select @change="update_status(lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
+                        <select @change="update_status({ id: lavoro.id, event: $event }), update_status_style" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
                             <option :value="lavoro.stato" selected>[[ lavoro.stato ]]</option>
                             <option v-for="stato in filtro_stati(lavoro.stato)" :value="[[ stato ]]">[[stato]]</option>
                         </select>

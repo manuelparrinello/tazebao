@@ -1,11 +1,11 @@
 const TabellaLavori = {
-    props: {
-        lavori_data: Array,
-        stato_lavori: Array,
-        update_status: Function,
-        filtro_stati: Function
-    },
-    template: `
+  props: {
+    lavori_data: Array,
+    stato_lavori: Array,
+    update_status: Function,
+    filtro_stati: Function,
+  },
+  template: `
     <table class="table sortable mt-2 table-hover rounded-3" id="tabellaLavori">
             <thead>
                 <tr>
@@ -36,7 +36,7 @@ const TabellaLavori = {
                              </span>
                         </td>
                         <td class="text-center">
-                        <select @change="update_status($event, lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
+                        <select :class="statusColor(lavoro.stato)" @change="update_status($event, lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
                             <option :value="lavoro.stato" selected>[[ lavoro.stato ]]</option>
                             <option v-for="stato in filtro_stati(lavoro.stato)" :value="[[ stato ]]">[[stato]]</option>
                         </select>
@@ -53,27 +53,43 @@ const TabellaLavori = {
             </tbody>
         </table>
     `,
-    methods: {
-        prioIndex(prio) {
-            if (prio === "Bassa") return 1;
-            if (prio === "Media") return 2;
-            if (prio === "Alta") return 3;
-            return "";
-        },
-
-        prioClass(prio) {
-            if (prio === "Bassa") return "prio-low";
-            if (prio === "Media") return "prio-med";
-            if (prio === "Alta") return "prio-high";
-            return "";
-        },
-
-        renderNoteIcon(note) {
-            if (note) {
-                return `<i data-bs-placement="left" data-bs-toggle="tooltip" data-bs-title="${note}" class="bi bi-stickies" style="font-size: 1rem; color: #7e508d !important;"></i>`;
-            }
-            return "-";
-        },
+  methods: {
+    prioIndex(prio) {
+      if (prio === "Bassa") return 1;
+      if (prio === "Media") return 2;
+      if (prio === "Alta") return 3;
+      return "";
     },
-    delimiters: ["[[", "]]"],
+
+    statusColor(stato) {
+      if (stato === "Da iniziare") {
+        console.log("1. Caricamento colore in corso!");
+        return "selectDaIniziare";
+      } else if (stato === "In corso") {
+        console.log("1. Caricamento colore in corso!");
+        return "selectInCorso";
+      } else if (stato === "In attesa") {
+        console.log("1. Caricamento colore in corso!");
+        return "selectInAttesa";
+      } else {
+        console.log("1. Caricamento colore in corso!");
+        return "selectCompletato";
+      }
+    },
+
+    prioClass(prio) {
+      if (prio === "Bassa") return "prio-low";
+      if (prio === "Media") return "prio-med";
+      if (prio === "Alta") return "prio-high";
+      return "";
+    },
+
+    renderNoteIcon(note) {
+      if (note) {
+        return `<i data-bs-placement="left" data-bs-toggle="tooltip" data-bs-title="${note}" class="bi bi-stickies" style="font-size: 1rem; color: #7e508d !important;"></i>`;
+      }
+      return "-";
+    },
+  },
+  delimiters: ["[[", "]]"],
 };

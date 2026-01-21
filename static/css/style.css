@@ -255,19 +255,19 @@ table {
 }
 
 .selectDaIniziare {
-    border: solid 2px #63a2ff;
+    border: solid 4px #63a2ff;
 }
 
 .selectInCorso {
-    border: solid 2px #ffa463;
+    border: solid 4px #ffa463;
 }
 
 .selectInAttesa {
-    border: solid 2px #6b666f;
+    border: solid 4px #6b666f;
 }
 
 .selectCompletato {
-    border: solid 2px #55b06d;
+    border: solid 4px #55b06d;
 }
 
 .cliente-bullet {

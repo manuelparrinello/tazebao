@@ -54,13 +54,6 @@ const TabellaLavori = {
         </table>
     `,
   methods: {
-    prioIndex(prio) {
-      if (prio === "Bassa") return 1;
-      if (prio === "Media") return 2;
-      if (prio === "Alta") return 3;
-      return "";
-    },
-
     statusColor(stato) {
       if (stato === "Da iniziare") {
         console.log("1. Caricamento colore in corso!");
@@ -77,6 +70,13 @@ const TabellaLavori = {
       }
     },
 
+    prioIndex(prio) {
+      if (prio === "Bassa") return 1;
+      if (prio === "Media") return 2;
+      if (prio === "Alta") return 3;
+      return "";
+    },
+
     prioClass(prio) {
       if (prio === "Bassa") return "prio-low";
       if (prio === "Media") return "prio-med";
@@ -90,6 +90,9 @@ const TabellaLavori = {
       }
       return "-";
     },
+  },
+  mounted() {
+   
   },
   delimiters: ["[[", "]]"],
 };

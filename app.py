@@ -16,19 +16,6 @@ CORS(app)
 
 status_lavori = ["Completato", "In corso", "In attesa", "Da iniziare"]
 
-
-def format_euro(value):
-    try:
-        return (
-            f"{value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") + " €"
-        )
-    except (TypeError, ValueError):
-        return "0,00 €"
-
-
-app.jinja_env.filters["euro"] = format_euro
-
-
 # DEFINE DATABASE MODELS HERE IF NEEDED --------------------
 class Lavoro(db.Model):
     __tablename__ = "lavori"

@@ -9,6 +9,7 @@ const getAllLavori = Vue.createApp({
       loading: true,
       error: null,
       deletingID: null,
+      classesStatus : ["selectDaIniziare", "selectInCorso", "selectInAttesa", "selectCompletato"]
     };
   },
   methods: {
@@ -24,8 +25,9 @@ const getAllLavori = Vue.createApp({
     },
 
     updateStatusStyle(e) {
-      console.log("2. CAMBIO colore in corso!");
       const selector = e.target;
+      var classiEsistenti = selector.classList;
+      console.log(classiEsistenti);
       if (selector.value === "Da iniziare") {
         selector.classList.add("selectDaIniziare");
       } else if (selector.value === "In corso") {
@@ -34,7 +36,7 @@ const getAllLavori = Vue.createApp({
         selector.classList.add("selectInAttesa");
       } else {
         selector.classList.add("selectCompletato");
-      }
+      }  
     },
 
     async updateStatus(e, id) {
@@ -60,7 +62,6 @@ const getAllLavori = Vue.createApp({
           console.log("Errore nella richiesta! HTTP" + response.status);
           throw new Error("Errore nella richiesta! HTTP" + response.status);
         }
-        console.log("Dato aggiornato!");
         console.log(await response.json());
       } catch (error) {
         this.error = error.message || "Errore imprevisto";

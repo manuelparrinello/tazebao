@@ -6,7 +6,11 @@
                 PAGINA LAVORO
             </h6>
             <h4>{{ lavoro.descrizione }}</h4>
-            <p>Stato lavoro: <span class="status-pill">[[ lavoro.stato ]]</span></p>
+            <div class="d-inline-flex">
+                <p><span class="prio-pill me-1" :class="prioClass(lavoro.priorita)">[[ lavoro.priorita ]]
+                        priorità</span></p>
+                <p><span class="prio-pill" :class="statoLavoroText(lavoro.stato)">lavoro [[ lavoro.stato ]]</span></p>
+            </div>
         </div>
         <div class="col-8 d-inline-flex justify-content-end px-0">
             <a href="">
@@ -19,6 +23,29 @@
             </button>
         </div>
         <hr />
+    </div>
+    <div class="mb-5 mt-2" id="anagraficaCliente">
+        <!-- <div class="row w-100">
+                <h5 class="fw-bold">Anagrafica</h5>
+            </div> -->
+        <div class="row w-100">
+            <div class="col-sm .col-lg-3">
+                <strong>Descrizione</strong>: [[ lavoro.descrizione ]]<br />
+                <strong>Prezzo</strong>: [[ lavoro.preventivato ]]€<br />
+            </div>
+            <div class="col-sm .col-lg-3">
+                <strong>Cliente</strong>: <a :href="'/clienti/' + lavoro.cliente?.id">
+                    <span class="cliente-bullet" :style="{ backgroundColor: lavoro.cliente?.colore }"></span>[[
+                    lavoro.cliente?.nome ]]</a><br />
+            </div>
+            <div class="col-sm .col-lg-3">
+                <strong>Note</strong>: [[ lavoro?.note ]]<br />
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+        QUI ANDRANNO I TASK UPDATES
     </div>
     <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
         QUI ANDRANNO I TASK UPDATES

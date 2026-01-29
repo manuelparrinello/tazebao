@@ -16,24 +16,10 @@ CORS(app)
 
 status_lavori = ["Completato", "In corso", "In attesa", "Da iniziare"]
 
-# DEFINE DATABASE MODELS HERE IF NEEDED --------------------
-class Lavoro(db.Model):
-    __tablename__ = "lavori"
-    id = db.Column(db.Integer, primary_key=True)
-    descrizione = db.Column(db.String(200), nullable=False)
-    data_inizio = db.Column(db.Date, nullable=True)
-    data_fine = db.Column(db.Date, nullable=True)
-    data_pagamento = db.Column(db.Date, nullable=True)
-    stato = db.Column(db.String(50), nullable=True)
-    priorita = db.Column(db.String(50), nullable=True)
-    preventivato = db.Column(db.Float, nullable=True)
-    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False)
-    note = db.Column(db.Text, nullable=True)
-
-    def __repr__(self):
-        return f"<Lavoro {self.descrizione}>"
+######################## DB TABLES CREATION ########################
 
 
+# DB - DEFINE CLIENTE
 class Cliente(db.Model):
     __tablename__ = "clienti"
     id = db.Column(db.Integer, primary_key=True)
@@ -48,6 +34,53 @@ class Cliente(db.Model):
 
     def __repr__(self):
         return f"<Cliente {self.name}>"
+
+
+# DB - DEFINE LAVORO
+class Lavoro(db.Model):
+    __tablename__ = "lavori"
+    id = db.Column(db.Integer, primary_key=True)
+    descrizione = db.Column(db.String(200), nullable=False)
+    data_inizio = db.Column(db.Date, nullable=True)
+    data_fine = db.Column(db.Date, nullable=True)
+    data_pagamento = db.Column(db.Date, nullable=True)
+    stato = db.Column(db.String(50), nullable=True)
+    priorita = db.Column(db.String(50), nullable=True)
+    preventivato = db.Column(db.Float, nullable=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False)
+    tasks = db.relationship(
+        "TaskLavoro", backref="lavoro", lazy=True, cascade="all, delete, delete-orphan"
+    )
+    note = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f"<Lavoro {self.descrizione}>"
+
+
+# DB - DEFINE TASKS LAVORO
+class TaskLavoro(db.Model):
+    __tablename__ = "tasks"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    tipo = db.Column(db.String(20), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.now)
+    lavoro = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=False)
+    files = db.relationship(
+        "TaskFile", backref="task", lazy=True, cascade="all, delete, delete-orphan"
+    )
+    note = db.Column(db.Text, nullable=False)
+
+    # DB - DEFINE TASK FILES
+
+
+class TaskFile(db.Model):
+    __tablename__ = "taskfile"
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(100), nullable=False)
+    tipo = db.Column(db.String(20), nullable=False)
+    size = db.Column(db.Float, nullable=False)
+    task_id = db.Column(db.Integer, db.ForeignKey("tasks.id"), nullable=False)
+    note = db.Column(db.Text, nullable=False)
 
 
 # CREATE DATABASE TABLES IF THEY DON'T EXIST ----------------
@@ -348,7 +381,11 @@ def get_lavoro_byID(id):
             "stato": lavoro.stato,
             "preventivato": lavoro.preventivato,
             "note": lavoro.note,
-            "cliente": {"nome": lavoro.cliente.name, "id": lavoro.cliente.id},
+            "cliente": {
+                "nome": lavoro.cliente.name,
+                "id": lavoro.cliente.id,
+                "colore": lavoro.cliente.colore,
+            },
         }
     )
 

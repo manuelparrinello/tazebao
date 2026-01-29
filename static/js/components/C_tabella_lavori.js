@@ -24,9 +24,9 @@ const TabellaLavori = {
             <tbody>
                 <template v-if="lavori_data.length > 0">
                     <tr v-for="lavoro in lavori_data">
-                        <td><span class=""><a class="" :href="'/lavori/' + lavoro.id ">[[ lavoro.descrizione ]]</a></span></td>
+                        <td><span class=""><a class="fw-bold" :href="'/lavori/' + lavoro.id ">[[ lavoro.descrizione ]]</a></span></td>
                         <td><span class="cliente-bullet" :style="{ backgroundColor: lavoro.cliente.colore }"></span><a
-                                :href="/clienti/+ lavoro.cliente.id" class="fw-bold text-decoration-none">[[
+                                :href="/clienti/+ lavoro.cliente.id" class="text-decoration-none">[[
                                 lavoro.cliente.name ]]</a></td>
                         <td :sorttable_customkey="[[ lavoro.preventivato ]]" class="text-center">[[ lavoro.preventivato
                             ]]€</td>

@@ -1,18 +1,32 @@
 from flask import Flask, jsonify, render_template, request, redirect
 from flask_cors import CORS
+from flask_migrate import Migrate
 import os
+from sqlalchemy import MetaData
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 
-app = Flask(__name__)
+# Definiamo uno schema per i nomi dei vincoli
+convention = {
+    "ix": "ix_%(column_0_label)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s",
+}
 
+metadata = MetaData(naming_convention=convention)
+
+
+app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_path = os.path.join(basedir, "app.db")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
+db = SQLAlchemy(app, metadata=metadata)
 CORS(app)
+migrate = Migrate(app, db, render_as_batch=True)
 
 status_lavori = ["Completato", "In corso", "In attesa", "Da iniziare"]
 
@@ -64,7 +78,7 @@ class TaskLavoro(db.Model):
     name = db.Column(db.String(100), nullable=False)
     tipo = db.Column(db.String(20), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.now)
-    lavoro = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=False)
+    lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=False)
     files = db.relationship(
         "TaskFile", backref="task", lazy=True, cascade="all, delete, delete-orphan"
     )

@@ -24,12 +24,35 @@ const getLavoroByID = Vue.createApp({
         console.log("Dati JSON ricevuti!");
         const data = await response.json();
         this.lavoro = data;
-        console.log(this.lavoro.cliente.nome)
+        console.log(this.lavoro.cliente.nome);
       } catch (error) {
         this.error = error.message || "Errore imprevisto";
       } finally {
         this.loading = false;
       }
+    },
+
+    renderStatusIcon(stato) {
+      if (stato == "In attesa") return "bi bi-hourglass-top";
+      if (stato == "In corso") return "bi bi-activity";
+      if (stato == "Da iniziare") return "bi bi-play";
+      if (stato == "Completato") return "bi bi-check-lg";
+      return "";
+    },
+
+    renderPrioIcon(prio) {
+      if (prio == "Alta") return "bi bi-fire";
+      if (prio == "Media") return "bi bi-flag-fill";
+      if (prio == "Bassa") return "bi bi-cup-hot-fill";
+      return "";
+    },
+
+    statoColorText(stato) {
+      if (stato == "In attesa") return "stato-in-attesa-onlytext";
+      if (stato == "In corso") return "stato-in-corso-onlytext";
+      if (stato == "Da iniziare") return "stato-da-iniziare-onlytext";
+      if (stato == "Completato") return "stato-completato-onlytext";
+      return "";
     },
 
     statoLavoroText(stato) {
@@ -47,6 +70,7 @@ const getLavoroByID = Vue.createApp({
       return "";
     },
   },
+
   mounted() {
     this.loadLavoroData();
   },

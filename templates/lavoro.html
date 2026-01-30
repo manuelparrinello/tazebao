@@ -2,33 +2,41 @@
 <div id="lavoroPage" data-lavoro-id="{{ lavoro.id }}" v-cloak>
     <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between mb-3">
         <div class="col-4 px-0">
-            <h6 class="text-primary fw-bold" style="letter-spacing: 1.2px">
-                PAGINA LAVORO
-            </h6>
-            <h4>{{ lavoro.descrizione }}</h4>
+            <div class="breadcrumbs mb-3">
+                <h6 class="text-primary" style="letter-spacing: 1.2px">
+                    <span class="text-muted"><a class="a-no-color" href="/lavori">LAVORI</a></span> / <span
+                        class="text-uppercase fw-bold">{{ lavoro.descrizione }}</span>
+                </h6>
+            </div>
+            <h4 class="fw-bold">{{ lavoro.descrizione }}</h4>
 
             <!-- SUMMARY PRIO E STATUS -->
-            <div class="d-inline-flex align-items-center mb-5">
+            <!-- <div class="d-inline-flex align-items-center mb-3">
 
-                <div class="card me-2">
-                    <div class="card-body-small d-inline-flex align-items-center shadow shadow-sm">
-                        <span class="font-size-sm me-1">
-                            PRIORITA': 
+                <div class="me-2 rounded-5 border-light-subtle">
+
+                    <div class="d-inline-flex align-items-center">
+                        <span class="prio-pill font-size-pill rounded-5 mx-auto d-flex align-items-center"
+                            :class="prioClass(lavoro.priorita)">
+                            <i class="me-1" :class="renderPrioIcon(lavoro.priorita)"></i>
+                            [[ lavoro.priorita ]] PRIORITA'
                         </span>
-                        <span class="prio-pill rounded-5 me-1" :class="prioClass(lavoro.priorita)">[[ lavoro.priorita ]]</span>
+                    </div>
+
+                </div>
+
+                <div class="rounded-5 border-light-subtle">
+                    <div class="d-inline-flex align-items-center">
+                        <span class="prio-pill font-size-pill rounded-5 mx-auto d-flex align-items-center"
+                            :class="statoLavoroText(lavoro.stato)">
+                            <i class="me-1" :class="renderStatusIcon(lavoro.stato)"></i>
+                            [[ lavoro.stato ]]
+                        </span>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-body-small d-inline-flex align-items-center shadow shadow-sm">
-                        <span class="font-size-sm me-1">
-                            STATUS:
-                        </span>
-                        <span class="prio-pill" :class="statoLavoroText(lavoro.stato)">[[ lavoro.stato ]]</span>
-                    </div>
-                </div>
 
-            </div>
+            </div> -->
         </div>
 
         <!-- PULSANTI AZIONI -->
@@ -48,36 +56,79 @@
 
 
     <!-- ANAGRAFICA LAVORO -->
-    <div class="mb-5 mt-2" id="anagraficaLavoro">
+    <div class="mb-3 mt-2" id="anagraficaLavoro">
         <div class="row w-100">
-            <h5 class="fw-bold">Anagrafica Lavoro</h5>
-        </div>
-        <div class="row w-100">
-            <div class="col-12">
-                <span class="me-2"><strong>Prezzo</strong>: [[ lavoro.preventivato ]]€</span>
-                <div class="me-2 d-flex">
-                    <strong class="me-2 d-flex">Cliente:</strong>
-                    <a :href="'/clienti/' + lavoro.cliente?.id">
-                        <span class="cliente-bullet" :style="{ backgroundColor: lavoro.cliente?.colore }"></span>[[ lavoro.cliente?.nome ]]</a>
+
+            <div class="col-auto me-3">
+                <div class="d-flex flex-column">
+                    <span class="data-label">Prezzo</span>
+                    <h6 class="fw-bold mt-1">[[ lavoro.preventivato ]]€</h6>
                 </div>
-                <strong>Note</strong>: [[ lavoro?.note ]]
             </div>
-        </div>
-        <hr />
-        <div class="row w-100">
-            <h5 class="fw-bold">Pagamento</h5>
-        </div>
-        <hr />
-        <div class="row w-100">
+
+            <div class="col-auto me-3">
+                <div class="d-flex flex-column">
+                    <span class="data-label text-muted">Cliente</span>
+                    <div class="d-inline-flex">
+                        <a :href="'/clienti/' + lavoro.cliente?.id">
+                            <div class="d-flex align-items-center">
+                                <h6 class="fw-bold mb-0 mt-1 text-dark a-no-color">
+                                    [[ lavoro.cliente?.nome ]]
+                                </h6>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-auto me-3">
+                <div class="d-flex flex-column">
+                    <span class="data-label text-muted">Priorità</span>
+                    <div class="d-inline-flex">
+                        <div class="d-flex align-items-center">
+                            <h6 class="fw-bold mb-0 mt-1">
+                                <!-- <i class="me-1" :class="renderPrioIcon(lavoro.priorita)"></i> -->
+                                [[ lavoro.priorita ]]
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-auto me-3">
+                <div class="d-flex flex-column">
+                    <span class="data-label text-muted">Stato</span>
+                    <div class="d-inline-flex">
+                        <div class="d-flex align-items-center">
+                            <h6 class="fw-bold mb-0 mt-1" :class="statoColorText(lavoro.stato)">
+                                <!-- <i class="me-1" :class="renderPrioIcon(lavoro.priorita)"></i> -->
+                                [[ lavoro.stato ]]
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
-    <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-        QUI ANDRANNO I TASK UPDATES
+
+    <hr />
+    <div class="row w-100">
+        <div class="col">
+            <h5 class="fw-bold"></h5><strong>Note: </strong>[[ lavoro?.note ]]
+        </div>
     </div>
-    <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-        QUI ANDRANNO I TASK UPDATES
+    <hr />
+    <div class="row w-100">
+
     </div>
+</div>
+<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+    QUI ANDRANNO I TASK UPDATES
+</div>
+<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+    QUI ANDRANNO I TASK UPDATES
+</div>
 </div>
 {% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>

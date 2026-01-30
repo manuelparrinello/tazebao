@@ -9,10 +9,10 @@ const TabellaLavori = {
     <table class="table sortable mt-2 table-hover rounded-3" id="tabellaLavori">
             <thead>
                 <tr>
+                    <th class="fw-bold pointer text-center col-prio" scope="col">Prio</th>
                     <th class="fw-bold pointer col-desc" scope="col">Descrizione</th>
                     <th class="fw-bold pointer col-cliente" scope="col">Cliente</th>
-                    <th class="fw-bold pointer text-center" scope="col">Preventivato</th>
-                    <th class="fw-bold pointer text-center" scope="col">Prio</th>
+                    <th class="fw-bold pointer" scope="col">Prezzo</th>
                     <th class="fw-bold pointer text-center" scope="col">Stato</th>
                     <th class="fw-bold pointer text-center" scope="col">Inizio</th>
                     <th class="fw-bold pointer text-center" scope="col">Fine</th>
@@ -24,17 +24,17 @@ const TabellaLavori = {
             <tbody>
                 <template v-if="lavori_data.length > 0">
                     <tr v-for="lavoro in lavori_data">
-                        <td><span class=""><a class="fw-bold" :href="'/lavori/' + lavoro.id ">[[ lavoro.descrizione ]]</a></span></td>
-                        <td><span class="cliente-bullet" :style="{ backgroundColor: lavoro.cliente.colore }"></span><a
-                                :href="/clienti/+ lavoro.cliente.id" class="text-decoration-none">[[
-                                lavoro.cliente.name ]]</a></td>
-                        <td :sorttable_customkey="[[ lavoro.preventivato ]]" class="text-center">[[ lavoro.preventivato
-                            ]]€</td>
-                        <td :sorttable_customkey="prioIndex(lavoro.priorita)" class="text-center">
-                            <span class="prio-pill" :class="prioClass(lavoro.priorita)">
-                                [[ lavoro.priorita ]]
+                    <td :sorttable_customkey="prioIndex(lavoro.priorita)" class="text-center col-prio">
+                            <span v-html="prioPill(lavoro.priorita)" :class="prioClass(lavoro.priorita)">
                              </span>
                         </td>
+                    <td><span class=""><a class="fw-bold text-decoration-underline" :href="'/lavori/' + lavoro.id ">[[ lavoro.descrizione ]]</a></span></td>
+                        <td><i :style="{ color : lavoro.cliente.colore }" class="bi bi-person-circle me-2"></i><a
+                                :href="/clienti/+ lavoro.cliente.id" class="text-decoration-none a-no-color">[[
+                                lavoro.cliente.name ]]</a></td>
+                        <td :sorttable_customkey="[[ lavoro.preventivato ]]" class="">[[ lavoro.preventivato
+                            ]]€</td>
+                        
                         <td class="text-center">
                         <select :class="statusColor(lavoro.stato)" @change="update_status($event, lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
                             <option :value="lavoro.stato" selected>[[ lavoro.stato ]]</option>
@@ -54,6 +54,13 @@ const TabellaLavori = {
         </table>
     `,
     methods: {
+        prioPill(prio) {
+            if (prio === "Bassa") return `<i class="bi bi-emoji-smile"></i>`;
+            if (prio === "Media") return `<i class="bi bi-emoji-neutral"></i>`;
+            if (prio === "Alta") return `<i class="bi bi-emoji-angry"></i>`;
+            return "";
+        }, 
+
         statusColor(stato) {
             if (stato === "Da iniziare") {
                 console.log("1. Caricamento colore in corso!");

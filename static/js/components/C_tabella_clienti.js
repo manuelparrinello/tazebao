@@ -17,7 +17,7 @@ const TabellaClienti = {
                    </td>
                     <td class="">
                         <a class="fw-bold text-decoration-none" :href="'/clienti/' + cliente.id">
-                            <span class="cliente-bullet" :style="{ backgroundColor: cliente.colore }"></span>[[
+                            <i :style="{ color : cliente.colore }" class="bi bi-person-circle me-2"></i>[[
                             cliente.nome ]]
                         </a>
                     </td>

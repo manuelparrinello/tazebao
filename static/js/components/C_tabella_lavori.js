@@ -11,13 +11,13 @@ const TabellaLavori = {
                 <tr>
                     <th class="fw-bold pointer text-center col-prio" scope="col">Prio</th>
                     <th class="fw-bold pointer col-desc" scope="col">Descrizione</th>
-                    <th class="fw-bold pointer col-cliente" scope="col">Cliente</th>
                     <th class="fw-bold pointer" scope="col">Prezzo</th>
                     <th class="fw-bold pointer text-center" scope="col">Stato</th>
                     <th class="fw-bold pointer text-center" scope="col">Inizio</th>
                     <th class="fw-bold pointer text-center" scope="col">Fine</th>
                     <th class="fw-bold pointer text-center" scope="col">Pagamento</th>
                     <th class="fw-bold pointer text-center col-note" scope="col">Note</th>
+                    <th class="fw-bold pointer col-cliente" scope="col">Cliente</th>
 
                 </tr>
             </thead>

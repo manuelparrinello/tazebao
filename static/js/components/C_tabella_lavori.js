@@ -7,51 +7,70 @@ const TabellaLavori = {
     },
     template: `
     <table class="table sortable mt-2 table-hover rounded-3" id="tabellaLavori">
-            <thead>
-                <tr>
-                    <th class="fw-bold pointer text-center col-prio" scope="col">Prio</th>
-                    <th class="fw-bold pointer col-desc" scope="col">Descrizione</th>
-                    <th class="fw-bold pointer" scope="col">Prezzo</th>
-                    <th class="fw-bold pointer text-center" scope="col">Stato</th>
-                    <th class="fw-bold pointer text-center" scope="col">Inizio</th>
-                    <th class="fw-bold pointer text-center" scope="col">Fine</th>
-                    <th class="fw-bold pointer text-center" scope="col">Pagamento</th>
-                    <th class="fw-bold pointer text-center col-note" scope="col">Note</th>
-                    <th class="fw-bold pointer col-cliente" scope="col">Cliente</th>
+   <thead>
+      <tr>
+         <th class="fw-bold pointer text-center col-prio" scope="col">Prio</th>
+         <th class="fw-bold pointer col-desc" scope="col">Descrizione</th>
+         <th class="fw-bold pointer" scope="col">Prezzo</th>
+         <th class="fw-bold pointer col-cliente" scope="col">Cliente</th>
+         <th class="fw-bold pointer text-center" scope="col">Inizio</th>
+         <th class="fw-bold pointer text-center" scope="col">Fine</th>
+         <th class="fw-bold pointer text-center" scope="col">Pagamento</th>
+         <th class="fw-bold pointer text-center col-note" scope="col">Note</th>
+         <th class="fw-bold pointer text-center" scope="col">Stato</th>
+      </tr>
+   </thead>
+   <tbody>
+      <template v-if="lavori_data.length > 0">
+         <tr v-for="lavoro in lavori_data">
 
-                </tr>
-            </thead>
-            <tbody>
-                <template v-if="lavori_data.length > 0">
-                    <tr v-for="lavoro in lavori_data">
-                    <td :sorttable_customkey="prioIndex(lavoro.priorita)" class="text-center col-prio">
-                            <span v-html="prioPill(lavoro.priorita)" :class="prioClass(lavoro.priorita)">
-                             </span>
-                        </td>
-                    <td><span class=""><a class="fw-bold text-decoration-underline" :href="'/lavori/' + lavoro.id ">[[ lavoro.descrizione ]]</a></span></td>
-                        <td><i :style="{ color : lavoro.cliente.colore }" class="bi bi-person-circle me-2"></i><a
-                                :href="/clienti/+ lavoro.cliente.id" class="text-decoration-none a-no-color">[[
-                                lavoro.cliente.name ]]</a></td>
-                        <td :sorttable_customkey="[[ lavoro.preventivato ]]" class="">[[ lavoro.preventivato
-                            ]]€</td>
-                        
-                        <td class="text-center">
-                        <select :class="statusColor(lavoro.stato)" @change="update_status($event, lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
-                            <option :value="lavoro.stato" selected>[[ lavoro.stato ]]</option>
-                            <option v-for="stato in filtro_stati(lavoro.stato)" :value="[[ stato ]]">[[stato]]</option>
-                        </select>
-                        </td>
-                        <td class="text-center">[[ lavoro.data_inizio ? new Date(lavoro.data_inizio).toLocaleDateString('it-IT') : '-' ]]</td>
-                        <td class="text-center">[[ lavoro.data_fine || '-' ]]</td>
-                        <td class="text-center">[[ lavoro.data_pagamento || '-' ]]</td>
-                        <td class="text-center" id="note_td" v-html="renderNoteIcon(lavoro.note)"></td>
-                    </tr>
-                </template>
-                <tr v-else>
-                    <td colspan="10" class="text-center">Nessun lavoro trovato.</td>
-                </tr>
-            </tbody>
-        </table>
+            <!-- PRIORITA -->
+            <td :sorttable_customkey="prioIndex(lavoro.priorita)" class="text-center col-prio">
+               <span v-html="prioPill(lavoro.priorita)" :class="prioClass(lavoro.priorita)">
+               </span>
+            </td>
+
+            <!-- DESCRIZIONE -->
+            <td><span class=""><a class="fw-bold text-decoration-underline" :href="'/lavori/' + lavoro.id ">[[ lavoro.descrizione ]]</a></span></td>
+
+            <!-- PREZZO -->
+            <td :sorttable_customkey="[[ lavoro.preventivato ]]" class="">[[ lavoro.preventivato ]]€
+            </td>
+
+            <!-- CLIENTE -->
+            <td><i :style="{ color : lavoro.cliente.colore }" class="bi bi-person-circle me-2"></i><a
+               :href="/clienti/+ lavoro.cliente.id" class="text-decoration-none a-no-color">[[
+               lavoro.cliente.name ]]</a>
+            </td>
+
+            <!-- DATA INIZIO -->
+            <td class="text-center">[[ lavoro.data_inizio ? new Date(lavoro.data_inizio).toLocaleDateString('it-IT') : '-' ]]</td>
+
+            <!-- DATA FINE -->
+            <td class="text-center">[[ lavoro.data_fine || '-' ]]</td>
+
+            <!-- DATA PAGAMENTO -->
+            <td class="text-center">[[ lavoro.data_pagamento || '-' ]]</td>
+
+            <!-- NOTE -->
+            <td class="text-center" id="note_td" v-html="renderNoteIcon(lavoro.note)"></td>
+            
+            <!-- STATO -->
+            <td class="text-center">
+               <select :class="statusColor(lavoro.stato)" @change="update_status($event, lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
+                  <option :value="lavoro.stato" selected>[[ lavoro.stato ]]</option>
+                  <option v-for="stato in filtro_stati(lavoro.stato)" :value="[[ stato ]]">[[stato]]</option>
+               </select>
+            </td>
+
+
+         </tr>
+      </template>
+      <tr v-else>
+         <td colspan="10" class="text-center">Nessun lavoro trovato.</td>
+      </tr>
+   </tbody>
+</table>
     `,
     methods: {
         prioPill(prio) {
@@ -59,7 +78,7 @@ const TabellaLavori = {
             if (prio === "Media") return `<i class="bi bi-emoji-neutral"></i>`;
             if (prio === "Alta") return `<i class="bi bi-emoji-angry"></i>`;
             return "";
-        }, 
+        },
 
         statusColor(stato) {
             if (stato === "Da iniziare") {

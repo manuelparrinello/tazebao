@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            background-color: #f0f0f0; /* Grigio per far risaltare il foglio */
+            margin: 0;
+            padding: 0;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm; /* Margini interni al foglio */
+            margin: 10mm auto; /* Centra il foglio nello schermo */
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-sizing: border-box; /* Include il padding nelle dimensioni totali */
+        }
+
+        /* Ottimizzazione per la stampa */
+        @media print {
+            body {
+                background: none;
+            }
+            .page {
+                margin: 0;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <h1>Titolo del Documento</h1>
+        <div>
+            {{ dato }} 
+        </div>
+    </div>
+</body>
+</html>

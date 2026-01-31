@@ -1,0 +1,20 @@
+{% extends "base.html" %} {% block title %}Nuovo preventivo {% endblock %}
+
+{% block content %}
+
+<h1>Nuovo preventivo</h1>
+<p class="mb-4">Compila il modulo sottostante per aggiungere un nuovo preventivo.</p>
+
+<div id="nuovoPreventivo">
+    <form action="" id="formNuovoPreventivo">
+        <label for="titolo_prova">Titolo prova</label>
+        <input type="text" name="titolo_prova" :value="titoloProva">
+        <button @click="sendForm">Vacci</button>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/preventivo.js') }}"></script>
+{% endblock %}

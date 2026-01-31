@@ -26,10 +26,10 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Forza Flask a ricaricare i template ogni volta che cambiano
-app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Opzionale: disabilita la cache del browser per i file statici durante lo sviluppo
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 db = SQLAlchemy(app, metadata=metadata)
 CORS(app)
 migrate = Migrate(app, db, render_as_batch=True)
@@ -37,6 +37,7 @@ migrate = Migrate(app, db, render_as_batch=True)
 status_lavori = ["Completato", "In corso", "In attesa", "Da iniziare"]
 
 ######################## DB TABLES CREATION ########################
+
 
 # DB - DEFINE CLIENTE
 class Cliente(db.Model):
@@ -261,31 +262,39 @@ def cliente_page(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     return render_template("cliente.html", cliente=cliente)
 
+
 # NUOVO PREVENTIVO
 @app.route("/preventivi/nuovo", methods=["POST", "GET"])
 def nuovo_preventivo():
     if request.method == "POST":
-        titolo_prova_FROMJS = request.form.get("titolo_prova")
-        
+        cliente = request.form.get("cliente")
+        descrizione = request.form.get("descrizioni")
+
         # QUESTO E' L'URL CHE SI VEDRA' SUL DOCUMENTO PREVENTIVO COMPILATO:
-        target_url = url_for('visualizza_preventivo', titolo_prova = titolo_prova_FROMJS)
-        return jsonify({
-            'target_url' : target_url
-        })
+        target_url = url_for(
+            "visualizza_preventivo",
+            cliente=cliente,
+        )
+        return jsonify({"target_url": target_url})
     return render_template("preventivo_new.html")
+
 
 # ->
 # -> QUI SI INSERISCE LA RICHIESTA GET (window.location.ref)
 # CHE VIENE GESTITA DALLA ROUTE QUI IN BASSO
 
+
 @app.get("/preventivi/visualizza")
 def visualizza_preventivo():
     # Recupero il dato tramite il query params passato
-    titolo_prova = request.args.get('titolo_prova', 'Nessun dato')
+    titolo_prova = request.args.get(
+        "titolo_prova", "Nessun dato proveniente dall'URL generato in target_url"
+    )
     print(f"IL DATO CHE FLASK STA PASSANDO: {titolo_prova}")
-    
+
     # Qui l'URL è già generato.. Questa riga serve solo a inserire la variabile "dato" sulla pagina, passata tramite query params
-    return render_template("_preventivo.html", dato = titolo_prova )
+    return render_template("_preventivo.html", dato=titolo_prova)
+
 
 ######################## AZIONI ########################
 
@@ -476,8 +485,6 @@ def get_ID_by_name(nome):
     id = cliente.id
     print(id)
     return jsonify({"id": id})
-
-    
 
 
 ######################## TESTING ########################

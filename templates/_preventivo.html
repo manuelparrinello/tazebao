@@ -1,25 +1,32 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/preventivo.css') }}">
     <style>
         body {
-            background-color: #f0f0f0; /* Grigio per far risaltare il foglio */
+            background-color: #2c2c2c;
+            /* Grigio per far risaltare il foglio */
             margin: 0;
             padding: 0;
         }
-
+        
         .page {
             width: 210mm;
             min-height: 297mm;
-            padding: 20mm; /* Margini interni al foglio */
-            margin: 10mm auto; /* Centra il foglio nello schermo */
+            padding: 15mm;
+            /* Margini interni al foglio */
+            margin: 10mm auto;
+            /* Centra il foglio nello schermo */
             background: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            box-sizing: border-box; /* Include il padding nelle dimensioni totali */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            /* Include il padding nelle dimensioni totali */
         }
-
         /* Ottimizzazione per la stampa */
+        
         @media print {
             body {
                 background: none;
@@ -31,12 +38,98 @@
         }
     </style>
 </head>
+
 <body>
-    <div class="page">
-        <h1>Titolo del Documento</h1>
-        <div>
-            {{ dato }} 
+    <div class="page" id="nuovoPreventivo">
+        <div class="row">
+
+            <!-- INTESTAZIONE AZIENDA -->
+            <div class="col-6 ">
+                <span class="fw-bold">COSEBELLE - Comunicazione e altre cose<br></span>
+                <span>Via Mazzini 141, 91025 Marsala (TP)<br></span>
+                <span>indirizzoemail@gmail.com - 0923123456<br></span>
+                <span>P.IVA 01234567890 - SDI USAL8PV<br></span>
+            </div>
+
+            <!-- LOGO AZIENDA -->
+            <div class="col-6 d-inline-flex justify-content-end align-items-center">
+                <img class="company-logo" src="{{ url_for('static', filename='/img/LogoCosebelle.png')}}" alt="">
+            </div>
+
         </div>
+
+
+        <div style="margin-top: 90px;" class="row">
+            <!-- INTESTAZIONE CLIENTE -->
+            <div class="col-6">
+                <span><strong>CLIENTE<br></strong></span>
+                <span class="fw-bold">{{ name_ragsoc }}<br></span>
+                <span>{{ indirizzo_cliente }}<br></span>
+                <span>{{ mail_cliente }} - {{ telefono_cliente }}<br></span>
+                <span>P.IVA {{ p_iva_cliente }} - SDI {{ sdi_cliente }}<br></span>
+            </div>
+
+            <!-- DATI PREVENTIVO -->
+            <div class="col-6">
+                <div class="text-end">
+                    <span><strong>
+                        PREVENTIVO N. {{ n_preventivo }} <br>
+                        SCADENZA PREVENIVO: 1 anno
+                    </strong></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELLA PREVENTIVO -->
+        <div class="row mt-5">
+            <p>
+                <strong>PREVENTIVO DI SPESA</strong>
+            </p>
+            <table class="table">
+                <thead>
+                    <tr class="tr-thickborder">
+                        <th scope="col">QTY</th>
+                        <th scope="col">Descrizione</th>
+                        <th class="text-end" style="width: 90px;" scope="col">Imponibile</th>
+                        <th class="text-end" style="width: 90px;" scope="col">Ivato</th>
+                        <th class="text-end" style="width: 100px;" scope="col">Totale ivato</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">{{ qty_lavoro }}</th>
+                        <td>{{ lavoro }}</td>
+                        <td class="text-end">{{ prezzo_ie }}€</td>
+                        <td class="text-end">{{ prezzo_ii }}€</td>
+                        <td class="text-end">{{ prezzo_subtotale }}€</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TABELLA SUBTOTALE -->
+        <div class="row">
+            <div class="col-6"></div>
+            <div class="col-6">
+                <table class="table">
+                    <tr>
+                        <th class="text-start">Subtotale</th>
+                        <th class="text-end">{{ subtotale }}€</th>
+                    </tr>
+                    <tr>
+                        <th class="text-start">Tasse varie</th>
+                        <th class="text-end">{{ tasse_varie }}€</th>
+                    </tr>
+                    <tr class="tr-thickborder">
+                        <th class="text-start">TOTALE</th>
+                        <th class="text-end">{{ totale }}€</th>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+
     </div>
 </body>
+
 </html>

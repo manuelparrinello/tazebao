@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    font-family: 'Roboto';
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+.company-logo {
+    width: 200px;
+}
+
+tr.tr-thickborder {
+    border-width: 2px !important;
+    border-left: none;
+    border-right: none;
+    border-color: black;
+}

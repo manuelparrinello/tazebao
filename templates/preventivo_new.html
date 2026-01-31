@@ -1,20 +1,35 @@
-{% extends "base.html" %} {% block title %}Nuovo preventivo {% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Nuovo preventivo {% endblock %} {% block content %}
 
 <h1>Nuovo preventivo</h1>
 <p class="mb-4">Compila il modulo sottostante per aggiungere un nuovo preventivo.</p>
 
 <div id="nuovoPreventivo">
     <form action="" id="formNuovoPreventivo">
-        <label for="titolo_prova">Titolo prova</label>
-        <input type="text" name="titolo_prova" :value="titoloProva">
-        <button @click="sendForm">Vacci</button>
+        <div class="row">
+
+            <!-- SELECT CLIENTI -->
+            <div class="col-auto">
+                <div class="form-group">
+                    <label class="form-label" for="titolo_prova">Cliente</label>
+                    <select class="form-control form-select" name="clienti" id="">
+                        <option v-for="cliente in clienti" :value="cliente.id">[[ cliente.nome ]]</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- DESCRIZIONE LAVORO -->
+            <div class="col-auto">
+                <div class="form-group">
+                    <label class="form-label" for="titolo_prova">Titolo prova</label>
+                    <input class="form-control" type="text" name="descrizione" :value="descrizione">
+                </div>
+            </div>
+
+        </div>
+        <button class="btn btn-primary mt-2" @click="sendForm">Vacci</button>
     </form>
 </div>
 
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/preventivo.js') }}"></script>
 {% endblock %}

@@ -1,38 +1,67 @@
-{% extends "base.html" %}
-
-{% block title %}Nuovo Cliente{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Nuovo Cliente{% endblock %} {% block content %}
 
 <div class="container p-0 mt-5" id="formCliente" v-cloak>
 
     <form id="nuovoCliente">
         <!-- FORM INPUTS ------------------------------>
         <div class="row">
-            <div class="col-8 pe-5">
+            <div class="col">
                 <div class="row">
                     <h1>Nuovo cliente</h1>
                     <p class="mb-4">Compila il modulo sottostante per aggiungere un nuovo cliente.</p>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label" for="nomeCliente">Nominativo</label>
-                        <input name="nome_cliente" type="text" v-model="nomeCliente" class="form-control">
+                        <input style="text-transform:capitalize" name="nome_cliente" type="text" v-model="nomeCliente" class="form-control">
                     </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label" for="nomeCliente">Indirizzo</label>
+                        <input style="text-transform:capitalize" name="indirizzo" type="text" v-model="indirizzo" class="form-control">
+                    </div>
+
+                    <div class="col-md-1">
+                        <label class="form-label" for="nomeCliente">CAP</label>
+                        <input maxlength="5" style="text-transform:capitalize" name="cap" type="text" v-model="cap" class="form-control">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label" for="nomeCliente">Città</label>
+                        <input style="text-transform:capitalize" name="citta" type="text" v-model="citta" class="form-control">
+                    </div>
+
+                    <div class="col-1">
+                        <label class="form-label" for="nomeCliente">Provincia</label>
+                        <input style="text-transform:uppercase" name="provincia" type="text" v-model="provincia" maxlength="2" class="form-control">
+                    </div>
+
+
                 </div>
 
                 <div class="row mt-3">
-                    <div class="col-md-5">
+                    <div class="col-md-3">
                         <label class="form-label" for="email">Email</label>
                         <input name="email" type="email" v-model="email" class="form-control">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-2 col-sm-12">
                         <label class="form-label" for="telefono">Telefono</label>
                         <input name="telefono" type="tel" v-model="telefono" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2 col-sm-12">
+                        <label class="form-label" for="telefono">P.IVA/C.F</label>
+                        <input name="p_iva" style="text-transform:uppercase" type="text" v-model="p_iva" class="form-control">
+                    </div>
+                    <div class="col-md-1 col-sm-12">
+                        <label class="form-label" for="telefono">SDI</label>
+                        <input name="sdi" style="text-transform:uppercase" type="text" v-model="sdi" class="form-control">
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <label class="form-label" for="telefono">PEC</label>
+                        <input name="pec" type="email" v-model="pec" class="form-control">
+                    </div>
+                    <div class="col-md-1">
                         <label class="form-label" for="colore">Colore</label>
-                        <input style="width:100%;" name="colore" type="color" v-model="colore"
-                            class="form-control form-control-color" title="Scegli il colore">
+                        <input name="colore" style="width:100%;" type="color" v-model="colore" class="form-control form-control-color" title="Scegli il colore">
                     </div>
                 </div>
 
@@ -46,51 +75,10 @@
 
             </div>
 
-
-            <!-- PREVIEW CARD -------------------------------->
-            <div class="col-4">
-                <div class="card h-100" style="border: none!important;">
-                    <div class="card-body px-4 py-3 text-center">
-                        <span class="circle-propic" :style="{ backgroundColor: colore }">[[ inizialiNome ]]</span>
-                        <!-- Nome Cliente -->
-                        <div class=" mt-3">
-                            <h6 class="fw-bolder">Nome</h6>
-                            <h6 class="mb-0 text-capitalize">[[ nomeCliente ? nomeCliente : '-' ]]</h6>
-                        </div>
-                        <!-- Email -->
-                        <div class="mt-3">
-                            <h6 class="fw-bolder">Email</h6>
-                            <h6 class="mb-0">[[ email ? email : '-' ]]</h6>
-                        </div>
-                        <!-- Telefono -->
-                        <div class="mt-3">
-                            <h6 class="fw-bolder">Telefono</h6>
-                            <h6 class="mb-0">[[ telefono ? telefono : '-' ]]</h6>
-                        </div>
-                        <!-- Note -->
-                        <div class="mt-3">
-                            <h6 class="fw-bolder">Note</h6>
-                            <h6 class="mb-0">[[ note ? note : '-' ]]</h6>
-                        </div>
-                        <!-- Colore -->
-                        <div class="mt-3">
-                            <h6 class="fw-bolder">Colore</h6>
-                            <h6 class="mb-0">
-                                <span v-if="colore" :style="{ color: colore, fontWeight: 'bold' }">
-                                    [[ colore ]]
-                                </span>
-                                <span v-else>-</span>
-                            </h6>
-                        </div>
-                    </div>
-                </div>
-            </div>
     </form>
 
-</div>
-{% endblock %}
+    </div>
+    {% endblock %} {% block scripts %}
+    <script src="{{ url_for('static', filename='js/cliente_new.js') }}"></script>
 
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/cliente_new.js') }}"></script>
-
-{% endblock %}
+    {% endblock %}

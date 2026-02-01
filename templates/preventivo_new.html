@@ -5,20 +5,51 @@
 
 <div id="nuovoPreventivo">
     <form action="" id="formNuovoPreventivo">
-        <div class="row">
+
+        <div class="row mb-3">
 
             <!-- SELECT CLIENTI -->
-            <div class="col-auto">
+            <div class="col-3">
                 <div class="form-group">
                     <label class="form-label" for="titolo_prova">Cliente</label>
-                    <select class="form-control form-select" name="cliente" id="">
-                        <option v-for="cliente in clienti" :value="cliente.id">[[ cliente.nome ]]</option>
+                    <select @change="loadClienteDataByID" class="form-control form-select" name="cliente" id="">
+                        <option value="" selected disabled>Seleziona cliente</option>
+                        <option v-for="cliente in clienti" :value="cliente.id">[[ cliente?.nome ]]</option>
                     </select>
                 </div>
             </div>
 
-            <!-- DESCRIZIONE LAVORO -->
+        </div>
+
+        <div class="row">
+            <hr>
             <div class="col-auto">
+                <h5 class="fw-bold">Anagrafica</h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-auto me-3">
+                <div class="d-flex flex-column">
+                    <span class="fw-bold data-label">Nome / Ragione Sociale</span>
+                    <h6 class="mt-1">[[ clienteData?.nome ]]</h6>
+                </div>
+            </div>
+            <div class="col-auto me-3">
+                <div class="d-flex flex-column">
+                    <span class="fw-bold data-label">Indirizzo</span>
+
+                    <h6 v-if="clienteData.indirizzo" class="mt-1">[[ clienteData?.indirizzo ]], [[ clienteData?.cap ]] [[ clienteData?.citta ]] ([[ clienteData?.provincia ]])</h6>
+                    <h6 v-else></h6>
+                </div>
+            </div>
+        </div>
+        <hr>
+
+        <div class="row mt-2">
+
+            <!-- DESCRIZIONE LAVORO -->
+            <div class="col-3">
                 <div class="form-group">
                     <label class="form-label" for="titolo_prova">Descrizione</label>
                     <input class="form-control" type="text" name="descrizione" :value="descrizione">
@@ -34,6 +65,7 @@
             </div>
 
         </div>
+
         <button class="btn btn-primary mt-2" @click="sendForm">Vacci</button>
     </form>
 </div>

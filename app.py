@@ -44,13 +44,22 @@ class Cliente(db.Model):
     __tablename__ = "clienti"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    indirizzo = db.Column(db.String(100), nullable=True)
+    citta = db.Column(db.String(50), nullable=True)
+    cap = db.Column(db.String(5), nullable=True)
+    provincia = db.Column(db.String(2), nullable=True)
+
     email = db.Column(db.String(100), nullable=False)
     telefono = db.Column(db.String(20), nullable=False)
+    p_iva = db.Column(db.String(30), nullable=True)
+    sdi = db.Column(db.String(7), nullable=True)
+    pec = db.Column(db.String(100), nullable=True)
+    colore = db.Column(db.String(20), nullable=True)
+
+    note = db.Column(db.Text, nullable=True)
     lavori = db.relationship(
         "Lavoro", backref="cliente", lazy=True, cascade="all, delete, delete-orphan"
     )
-    note = db.Column(db.Text, nullable=True)
-    colore = db.Column(db.String(20), nullable=True)
 
     def __repr__(self):
         return f"<Cliente {self.name}>"
@@ -90,7 +99,8 @@ class TaskLavoro(db.Model):
     )
     note = db.Column(db.Text, nullable=False)
 
-    # DB - DEFINE TASK FILES
+
+# DB - DEFINE TASK FILES
 
 
 class TaskFile(db.Model):
@@ -116,13 +126,31 @@ with app.app_context():
 def nuovo_cliente():
     if request.method == "POST":
         nomeCliente = request.form.get("nome_cliente").title()
-        telefono = request.form.get("telefono")
+        indirizzo = request.form.get("indirizzo").title()
+        cap = request.form.get("cap")
+        citta = request.form.get("citta").title()
+        provincia = request.form.get("provincia").upper()
         email = request.form.get("email").lower()
-        note = request.form.get("note")
+        telefono = request.form.get("telefono")
+        p_iva = request.form.get("p_iva")
+        sdi = request.form.get("sdi")
+        pec = request.form.get("pec")
         colore = request.form.get("colore")
+        note = request.form.get("note")
         # Aggiungi il nuovo cliente al database
         nuovo_cliente = Cliente(
-            name=nomeCliente, telefono=telefono, email=email, note=note, colore=colore
+            name=nomeCliente,
+            indirizzo=indirizzo,
+            cap=cap,
+            citta=citta,
+            provincia=provincia,
+            p_iva=p_iva,
+            sdi=sdi,
+            pec=pec,
+            telefono=telefono,
+            email=email,
+            note=note,
+            colore=colore,
         )
         db.session.add(nuovo_cliente)
         db.session.commit()
@@ -269,7 +297,7 @@ def nuovo_preventivo():
     if request.method == "POST":
         iva = 1.22
         cliente_id = request.form.get("cliente")
-        cliente= Cliente.query.filter_by(id=cliente_id).first().name
+        cliente = Cliente.query.filter_by(id=cliente_id).first().name
         prezzo = request.form.get("prezzo")
         prezzo_ii = float(prezzo) * iva
         prezzo_subtotale = prezzo_ii
@@ -277,17 +305,16 @@ def nuovo_preventivo():
         totale = tasse_varie + prezzo_subtotale
         descrizione = request.form.get("descrizione")
 
-
         # QUESTO E' L'URL CHE SI VEDRA' SUL DOCUMENTO PREVENTIVO COMPILATO:
         target_url = url_for(
             "visualizza_preventivo",
             cliente=cliente,
-            prezzo = prezzo,
-            prezzo_ii = prezzo_ii,
-            prezzo_subtotale = prezzo_subtotale,
-            tasse_varie = tasse_varie,
-            totale = totale,
-            descrizione = descrizione
+            prezzo=prezzo,
+            prezzo_ii=prezzo_ii,
+            prezzo_subtotale=prezzo_subtotale,
+            tasse_varie=tasse_varie,
+            totale=totale,
+            descrizione=descrizione,
         )
         return jsonify({"target_url": target_url})
     return render_template("preventivo_new.html")
@@ -305,23 +332,23 @@ def visualizza_preventivo():
     prezzo = request.args.get("prezzo", "Nessun cliente")
     prezzo_ii = request.args.get("prezzo_ii", "Nessun cliente")
     prezzo_subtotale = request.args.get("prezzo_subtotale", "Nessun cliente")
-    tasse_varie = request.args.get("tasse_varie", "Nessun cliente"
-    )
+    tasse_varie = request.args.get("tasse_varie", "Nessun cliente")
     totale = request.args.get("totale", "Nessun dato")
     descrizione = request.args.get("descrizione", "Nessun dato")
 
     # print(f"IL DATO CHE FLASK STA PASSANDO: {titolo_prova}")
 
     # Qui l'URL è già generato.. Questa riga serve solo a inserire la variabile "dato" sulla pagina, passata tramite query params
-    return render_template("_preventivo.html",
-                           cliente=cliente,
-                           prezzo=prezzo,
-                           prezzo_ii=prezzo_ii,
-                           prezzo_subtotale=prezzo_subtotale,
-                           tasse_varie=tasse_varie,
-                           totale=totale,
-                           descrizione=descrizione
-                           )
+    return render_template(
+        "_preventivo.html",
+        cliente=cliente,
+        prezzo=prezzo,
+        prezzo_ii=prezzo_ii,
+        prezzo_subtotale=prezzo_subtotale,
+        tasse_varie=tasse_varie,
+        totale=totale,
+        descrizione=descrizione,
+    )
 
 
 ######################## AZIONI ########################
@@ -483,10 +510,17 @@ def get_cliente_byID(cliente_id):
         {
             "id": c.id,
             "nome": c.name,
-            "telefono": c.telefono,
+            "indirizzo": c.indirizzo,
+            "citta": c.citta,
+            "cap": c.cap,
+            "provincia": c.provincia,
             "email": c.email,
-            "note": c.note,
+            "telefono": c.telefono,
+            "p_iva": c.p_iva,
+            "sdi": c.sdi,
+            "pec": c.pec,
             "colore": c.colore,
+            "note": c.note,
             "count_lavori": countLavori,
             "lavori": [
                 {

@@ -2,8 +2,8 @@ const preventivo = Vue.createApp({
     data() {
         return {
             descrizione: "",
-            prezzo : "",
-            cliente : "",
+            prezzo: "",
+            clienteData: {},
             indirizzo_cliente: "",
             p_iva_cliente: "",
             sdi_cliente: "",
@@ -46,6 +46,27 @@ const preventivo = Vue.createApp({
             this.clienti = data;
             for (const cliente of this.clienti) {
                 console.log(cliente['nome'])
+            }
+        },
+
+        async loadClienteDataByID(e) {
+            const id = e.target.value;
+            console.log(id)
+            const url = `/api/clienti/get/${id}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'get',
+                    content: 'application/json'
+                });
+                if (!response.ok) {
+                    throw new Error("Errore HTML:" + response.status);
+                };
+                const data = await response.json();
+                this.clienteData = data;
+                console.log(this.clienteData.indirizzo)
+            } catch (error) {
+                console.log(error.message);
             }
         }
     },

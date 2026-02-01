@@ -4,7 +4,7 @@ const TabellaClienti = {
     <table class="table mt-2 sortable table-hover rounded-2 p-2">
         <thead>
             <tr>
-                <th width="200px" class="fw-bold pointer" scope="col">Nominativo</th>
+                <th width="500px" class="fw-bold pointer" scope="col">Nominativo</th>
                 <th title="Quantità di lavori del cliente" width="50px" class="fw-bold text-center pointer" scope="col">Qty</th>
                 <th class="fw-bold pointer" scope="col">Email</th>
                 <th class="fw-bold pointer" scope="col">Telefono</th>

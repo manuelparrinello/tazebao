@@ -101,7 +101,7 @@ i.bi {
 }
 
 .container {
-  max-width: 1380px !important;
+  /* max-width: 1380px !important; */
 }
 
 body.loaded {

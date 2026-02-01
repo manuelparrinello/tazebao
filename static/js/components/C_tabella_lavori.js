@@ -13,8 +13,10 @@ const TabellaLavori = {
          <th class="fw-bold pointer col-desc" scope="col">Descrizione</th>
          <th class="fw-bold pointer" scope="col">Prezzo</th>
          <th class="fw-bold pointer col-cliente" scope="col">Cliente</th>
+         <!--
          <th class="fw-bold pointer text-center" scope="col">Inizio</th>
          <th class="fw-bold pointer text-center" scope="col">Fine</th>
+         -->
          <th class="fw-bold pointer text-center" scope="col">Pagamento</th>
          <th class="fw-bold pointer text-center col-note" scope="col">Note</th>
          <th class="fw-bold pointer text-center" scope="col">Stato</th>
@@ -43,11 +45,12 @@ const TabellaLavori = {
                lavoro.cliente.name ]]</a>
             </td>
 
-            <!-- DATA INIZIO -->
-            <td class="text-center">[[ lavoro.data_inizio ? new Date(lavoro.data_inizio).toLocaleDateString('it-IT') : '-' ]]</td>
+            
+            <!-- DATA INIZIO 
+            <td class="text-center">[[ lavoro.data_inizio ? new Date(lavoro.data_inizio).toLocaleDateString('it-IT') : '-' ]]</td>-->
 
-            <!-- DATA FINE -->
-            <td class="text-center">[[ lavoro.data_fine || '-' ]]</td>
+            <!-- DATA FINE 
+            <td class="text-center">[[ lavoro.data_fine || '-' ]]</td>-->
 
             <!-- DATA PAGAMENTO -->
             <td class="text-center">[[ lavoro.data_pagamento || '-' ]]</td>

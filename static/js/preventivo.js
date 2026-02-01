@@ -16,8 +16,6 @@ const preventivo = Vue.createApp({
             const url = `/preventivi/nuovo`;
             const form = document.querySelector("#formNuovoPreventivo");
             const formData = new FormData(form);
-            formData.append("cliente", this.titoloProva);
-            formData.append("titolo_prova", this.titoloProva);
             const response = await fetch(url, {
                 method: 'POST',
                 body: formData,
@@ -72,7 +70,7 @@ const preventivo = Vue.createApp({
     },
     mounted() {
         this.loadClienti();
+        this.loadClienteDataByID();
     },
-
     delimiters: ["[[", "]]"],
 }).mount("#nuovoPreventivo");

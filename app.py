@@ -297,7 +297,17 @@ def nuovo_preventivo():
     if request.method == "POST":
         iva = 1.22
         cliente_id = request.form.get("cliente")
-        cliente = Cliente.query.filter_by(id=cliente_id).first().name
+        cliente_q = Cliente.query.filter_by(id=cliente_id).first()
+        cliente = cliente_q.name
+        indirizzo = cliente_q.indirizzo
+        cap = cliente_q.cap
+        citta = cliente_q.citta
+        provincia = cliente_q.provincia
+        email = cliente_q.email
+        telefono = cliente_q.telefono
+        p_iva = cliente_q.p_iva
+        sdi = cliente_q.sdi
+        pec = cliente_q.pec
         prezzo = request.form.get("prezzo")
         prezzo_ii = float(prezzo) * iva
         prezzo_subtotale = prezzo_ii
@@ -309,6 +319,15 @@ def nuovo_preventivo():
         target_url = url_for(
             "visualizza_preventivo",
             cliente=cliente,
+            indirizzo=indirizzo,
+            cap=cap,
+            citta=citta,
+            provincia=provincia,
+            email=email,
+            telefono=telefono,
+            p_iva=p_iva,
+            sdi=sdi,
+            pec=pec,
             prezzo=prezzo,
             prezzo_ii=prezzo_ii,
             prezzo_subtotale=prezzo_subtotale,
@@ -329,6 +348,15 @@ def nuovo_preventivo():
 def visualizza_preventivo():
     # Recupero il dato tramite il query params passato
     cliente = request.args.get("cliente", "Nessun cliente")
+    indirizzo = request.args.get("indirizzo", "Nessun indirizzo")
+    cap = request.args.get("cap", "Nessun cap")
+    citta = request.args.get("citta", "Nessuna citta")
+    provincia = request.args.get("provincia", "Nessuna provincia")
+    email = request.args.get("email", "Nessuna email")
+    telefono = request.args.get("telefono", "Nessun telefono")
+    p_iva = request.args.get("p_iva", "Nessuna p_iva")
+    sdi = request.args.get("sdi", "Nessuno sdi")
+    pec = request.args.get("pec", "Nessuna pec")
     prezzo = request.args.get("prezzo", "Nessun cliente")
     prezzo_ii = request.args.get("prezzo_ii", "Nessun cliente")
     prezzo_subtotale = request.args.get("prezzo_subtotale", "Nessun cliente")
@@ -342,6 +370,15 @@ def visualizza_preventivo():
     return render_template(
         "_preventivo.html",
         cliente=cliente,
+        indirizzo=indirizzo,
+        cap=cap,
+        citta=citta,
+        provincia=provincia,
+        email=email,
+        telefono=telefono,
+        p_iva=p_iva,
+        sdi=sdi,
+        pec=pec,
         prezzo=prezzo,
         prezzo_ii=prezzo_ii,
         prezzo_subtotale=prezzo_subtotale,

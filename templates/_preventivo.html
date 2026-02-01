@@ -63,10 +63,10 @@
             <!-- INTESTAZIONE CLIENTE -->
             <div class="col-6">
                 <span><strong>CLIENTE<br></strong></span>
-                <span class="fw-bold">{{ cliente if cliente else 'n.d'}}<br></span>
-                <span>{{ indirizzo_cliente if indirizzo_cliente else 'n.d'}}<br></span>
-                <span>{{ mail_cliente if indirizzo_cliente else 'n.d' }} - {{ telefono_cliente if telefono_cliente else 'n.d' }}<br></span>
-                <span>P.IVA {{ p_iva_cliente if p_iva_cliente else 'n.d' }} - SDI {{ sdi_cliente if sdi_cliente else 'n.d' }}<br></span>
+                <span class="fw-bold">{{ cliente }}<br></span>
+                <span>{{ indirizzo if indirizzo else 'n.d'}}, {{ cap if cap else 'n.d' }} {{ citta if citta else 'n.d' }} ({{ provincia if provincia else 'n.d' }})<br></span>
+                <span>{{ email if email else 'n.d' }} - {{ telefono if telefono else 'n.d' }}<br></span>
+                <span><span style="text-transform: uppercase;">P.IVA {{ p_iva if p_iva else 'n.d' }}</span> - SDI {{ sdi if sdi else 'n.d' }}<br></span>
             </div>
 
             <!-- DATI PREVENTIVO -->
@@ -109,8 +109,8 @@
 
         <!-- TABELLA SUBTOTALE -->
         <div class="row">
-            <div class="col-6"></div>
-            <div class="col-6">
+            <div class="col-7"></div>
+            <div class="col-5 px-0">
                 <table class="table">
                     <tr>
                         <th class="text-start">Subtotale</th>
@@ -133,8 +133,9 @@
 
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="{{ url_for('static', filename='js/preventivo.js') }}"></script>
 
-    
+
 </body>
 
 </html>

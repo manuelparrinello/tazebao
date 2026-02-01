@@ -63,10 +63,10 @@
             <!-- INTESTAZIONE CLIENTE -->
             <div class="col-6">
                 <span><strong>CLIENTE<br></strong></span>
-                <span class="fw-bold">{{ name_ragsoc }}<br></span>
-                <span>{{ indirizzo_cliente }}<br></span>
-                <span>{{ mail_cliente }} - {{ telefono_cliente }}<br></span>
-                <span>P.IVA {{ p_iva_cliente }} - SDI {{ sdi_cliente }}<br></span>
+                <span class="fw-bold">{{ cliente if cliente else 'n.d'}}<br></span>
+                <span>{{ indirizzo_cliente if indirizzo_cliente else 'n.d'}}<br></span>
+                <span>{{ mail_cliente if indirizzo_cliente else 'n.d' }} - {{ telefono_cliente if telefono_cliente else 'n.d' }}<br></span>
+                <span>P.IVA {{ p_iva_cliente if p_iva_cliente else 'n.d' }} - SDI {{ sdi_cliente if sdi_cliente else 'n.d' }}<br></span>
             </div>
 
             <!-- DATI PREVENTIVO -->
@@ -98,8 +98,8 @@
                 <tbody>
                     <tr>
                         <th scope="row">{{ qty_lavoro }}</th>
-                        <td>{{ lavoro }}</td>
-                        <td class="text-end">{{ prezzo_ie }}€</td>
+                        <td>{{ descrizione }}</td>
+                        <td class="text-end">{{ prezzo }}€</td>
                         <td class="text-end">{{ prezzo_ii }}€</td>
                         <td class="text-end">{{ prezzo_subtotale }}€</td>
                     </tr>
@@ -114,7 +114,7 @@
                 <table class="table">
                     <tr>
                         <th class="text-start">Subtotale</th>
-                        <th class="text-end">{{ subtotale }}€</th>
+                        <th class="text-end">{{ prezzo_subtotale }}€</th>
                     </tr>
                     <tr>
                         <th class="text-start">Tasse varie</th>
@@ -130,6 +130,11 @@
         </div>
 
     </div>
+
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    
 </body>
 
 </html>

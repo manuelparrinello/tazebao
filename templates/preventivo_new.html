@@ -11,7 +11,7 @@
             <div class="col-auto">
                 <div class="form-group">
                     <label class="form-label" for="titolo_prova">Cliente</label>
-                    <select class="form-control form-select" name="clienti" id="">
+                    <select class="form-control form-select" name="cliente" id="">
                         <option v-for="cliente in clienti" :value="cliente.id">[[ cliente.nome ]]</option>
                     </select>
                 </div>
@@ -20,8 +20,16 @@
             <!-- DESCRIZIONE LAVORO -->
             <div class="col-auto">
                 <div class="form-group">
-                    <label class="form-label" for="titolo_prova">Titolo prova</label>
+                    <label class="form-label" for="titolo_prova">Descrizione</label>
                     <input class="form-control" type="text" name="descrizione" :value="descrizione">
+                </div>
+            </div>
+
+            <!-- PREZZO DESC -->
+            <div class="col-auto">
+                <div class="form-group">
+                    <label class="form-label" for="titolo_prova">Prezzo task</label>
+                    <input class="form-control" type="number" name="prezzo" :value="prezzo">
                 </div>
             </div>
 

@@ -267,13 +267,27 @@ def cliente_page(cliente_id):
 @app.route("/preventivi/nuovo", methods=["POST", "GET"])
 def nuovo_preventivo():
     if request.method == "POST":
-        cliente = request.form.get("cliente")
-        descrizione = request.form.get("descrizioni")
+        iva = 1.22
+        cliente_id = request.form.get("cliente")
+        cliente= Cliente.query.filter_by(id=cliente_id).first().name
+        prezzo = request.form.get("prezzo")
+        prezzo_ii = float(prezzo) * iva
+        prezzo_subtotale = prezzo_ii
+        tasse_varie = 8
+        totale = tasse_varie + prezzo_subtotale
+        descrizione = request.form.get("descrizione")
+
 
         # QUESTO E' L'URL CHE SI VEDRA' SUL DOCUMENTO PREVENTIVO COMPILATO:
         target_url = url_for(
             "visualizza_preventivo",
             cliente=cliente,
+            prezzo = prezzo,
+            prezzo_ii = prezzo_ii,
+            prezzo_subtotale = prezzo_subtotale,
+            tasse_varie = tasse_varie,
+            totale = totale,
+            descrizione = descrizione
         )
         return jsonify({"target_url": target_url})
     return render_template("preventivo_new.html")
@@ -287,13 +301,27 @@ def nuovo_preventivo():
 @app.get("/preventivi/visualizza")
 def visualizza_preventivo():
     # Recupero il dato tramite il query params passato
-    titolo_prova = request.args.get(
-        "titolo_prova", "Nessun dato proveniente dall'URL generato in target_url"
+    cliente = request.args.get("cliente", "Nessun cliente")
+    prezzo = request.args.get("prezzo", "Nessun cliente")
+    prezzo_ii = request.args.get("prezzo_ii", "Nessun cliente")
+    prezzo_subtotale = request.args.get("prezzo_subtotale", "Nessun cliente")
+    tasse_varie = request.args.get("tasse_varie", "Nessun cliente"
     )
-    print(f"IL DATO CHE FLASK STA PASSANDO: {titolo_prova}")
+    totale = request.args.get("totale", "Nessun dato")
+    descrizione = request.args.get("descrizione", "Nessun dato")
+
+    # print(f"IL DATO CHE FLASK STA PASSANDO: {titolo_prova}")
 
     # Qui l'URL è già generato.. Questa riga serve solo a inserire la variabile "dato" sulla pagina, passata tramite query params
-    return render_template("_preventivo.html", dato=titolo_prova)
+    return render_template("_preventivo.html",
+                           cliente=cliente,
+                           prezzo=prezzo,
+                           prezzo_ii=prezzo_ii,
+                           prezzo_subtotale=prezzo_subtotale,
+                           tasse_varie=tasse_varie,
+                           totale=totale,
+                           descrizione=descrizione
+                           )
 
 
 ######################## AZIONI ########################

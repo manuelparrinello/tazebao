@@ -2,6 +2,8 @@ const preventivo = Vue.createApp({
     data() {
         return {
             descrizione: "",
+            prezzo : "",
+            cliente : "",
             indirizzo_cliente: "",
             p_iva_cliente: "",
             sdi_cliente: "",
@@ -14,6 +16,7 @@ const preventivo = Vue.createApp({
             const url = `/preventivi/nuovo`;
             const form = document.querySelector("#formNuovoPreventivo");
             const formData = new FormData(form);
+            formData.append("cliente", this.titoloProva);
             formData.append("titolo_prova", this.titoloProva);
             const response = await fetch(url, {
                 method: 'POST',

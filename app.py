@@ -36,10 +36,12 @@ migrate = Migrate(app, db, render_as_batch=True)
 
 status_lavori = ["Completato", "In corso", "In attesa", "Da iniziare"]
 
+
 @app.template_filter()
 def euroFormat(value):
     value = float(value)
     return "{:.2f}".format(value).replace(".", ",")
+
 
 ######################## DB TABLES CREATION ########################
 
@@ -316,7 +318,7 @@ def nuovo_preventivo():
         prezzo = request.form.get("prezzo")
         prezzo_ii = float(prezzo) * iva
         qty = float(request.form.get("qty"))
-        qty= int(qty)
+        qty = int(qty)
         prezzo_subtotale = prezzo_ii * qty
         tasse_varie = 8
         totale = tasse_varie + prezzo_subtotale
@@ -341,7 +343,7 @@ def nuovo_preventivo():
             tasse_varie=tasse_varie,
             totale=totale,
             descrizione=descrizione,
-            qty=qty
+            qty=qty,
         )
         return jsonify({"target_url": target_url})
     return render_template("preventivo_new.html")
@@ -350,6 +352,18 @@ def nuovo_preventivo():
 # ->
 # -> QUI SI INSERISCE LA RICHIESTA GET (window.location.ref)
 # CHE VIENE GESTITA DALLA ROUTE QUI IN BASSO
+
+
+# RENDERIZZA Righe Preventivo
+@app.get("/presentivi/addrow")
+def render_row():
+    id_riga = request.form.get("idRiga")
+    qty = request.form.get("qty")
+    descrizione = request.form.get("descrizione")
+    prezzo = float(request.form.get("prezzo"))
+    return jsonify(
+        {"id_riga": id_riga, "qty": qty, "descrizione": descrizione, "prezzo": prezzo}
+    )
 
 
 @app.get("/preventivi/visualizza")
@@ -371,9 +385,7 @@ def visualizza_preventivo():
     tasse_varie = request.args.get("tasse_varie", "Nessun cliente")
     totale = request.args.get("totale", "Nessun dato")
     descrizione = request.args.get("descrizione", "Nessun dato")
-    qty=request.args.get("qty", "Nessun dato")
-
-    # print(f"IL DATO CHE FLASK STA PASSANDO: {titolo_prova}")
+    qty = request.args.get("qty", "Nessun dato")
 
     # Qui l'URL è già generato.. Questa riga serve solo a inserire la variabile "dato" sulla pagina, passata tramite query params
     return render_template(
@@ -394,7 +406,7 @@ def visualizza_preventivo():
         tasse_varie=tasse_varie,
         totale=totale,
         descrizione=descrizione,
-        qty=qty
+        qty=qty,
     )
 
 

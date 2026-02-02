@@ -10,7 +10,10 @@ const preventivo = Vue.createApp({
             sdi_cliente: "",
             clienti: [],
             loading: true,
-            rigaLavoro : []
+            righeLavoro: [],
+            idRiga: 0,
+            addingHasEnded: false,
+            indiceRigheLavoro: 0
         };
     },
     methods: {
@@ -69,10 +72,23 @@ const preventivo = Vue.createApp({
             }
         },
 
-        addRigaPreventivo() {
+        async addRigaPreventivo(e) {
+            e.preventDefault();
             const form = document.querySelector('#formNuovoPreventivo');
             const formData = new FormData(form);
-            const riga = 
+            console.log(`Indice PRIMA: ` + this.indiceRigheLavoro)
+            const riga = {
+                idRiga: this.idRiga,
+                qty: formData.get('qty'),
+                descrizione: formData.get('descrizione'),
+                prezzo: formData.get('prezzo')
+            };
+            this.righeLavoro.push(riga);
+            this.idRiga++;
+            this.indiceRigheLavoro++;
+            console.log(`Indice DOPO:  ` + this.indiceRigheLavoro)
+            console.log(this.righeLavoro);
+            // const url = `/preventivi/addrow`
         }
     },
     mounted() {

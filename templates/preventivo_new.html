@@ -32,10 +32,7 @@
                                 </div>
                                 <div class="d-flex flex-column">
                                     <span class="data-label fw-bold mt-2">Indirizzo</span>
-                                    <p v-if="clienteData.indirizzo" class="mt-1 mb-0">[[ clienteData?.indirizzo || '-' ]],
-                                        [[
-                                        clienteData?.cap || '-' ]] [[ clienteData?.citta ]] ([[ clienteData?.provincia
-                                        ]])
+                                    <p v-if="clienteData.indirizzo" class="mt-1 mb-0">[[ clienteData?.indirizzo || '-' ]], [[ clienteData?.cap || '-' ]] [[ clienteData?.citta ]] ([[ clienteData?.provincia ]])
                                     </p>
                                     <p class="mt-1 mb-0" v-else><b>-</b></p>
                                 </div>
@@ -80,14 +77,13 @@
                 <h5 class="fw-bold">Righe preventivo</h5>
                 <div class="card rounded rounded-4 shadow-sm g-0">
                     <div class="card-body">
-                        <div class="row align-items-md-end g-2">
+                        <div :id="idRiga" class="row align-items-md-end g-2">
 
                             <!-- QTY LAVORO -->
                             <div class="col-auto">
                                 <div class="form-group">
                                     <!-- <label class="form-label" for="qty">Qtà</label> -->
-                                    <input placeholder="Qtà" style="max-width: 80px" class="form-control" type="number"
-                                        name="qty" :value="qty">
+                                    <input placeholder="Qtà" style="max-width: 80px" class="form-control" type="number" name="qty" :value="qty">
                                 </div>
                             </div>
 
@@ -95,30 +91,59 @@
                             <div class="col">
                                 <div class="form-group">
                                     <!-- <label class="form-label" for="titolo_prova">Descrizione</label> -->
-                                    <textarea placeholder="Inserisci descrizione lavoro" rows="1" class="form-control"
-                                        type="text" name="descrizione" :value="descrizione"></textarea>
+                                    <textarea placeholder="Inserisci descrizione lavoro" rows="1" class="form-control" type="text" name="descrizione" :value="descrizione"></textarea>
                                 </div>
                             </div>
 
                             <!-- PREZZO DESC -->
                             <div class="col-2">
                                 <div class="input-group">
-                                    <input placeholder="Prezzo" class="form-control" type="number" name="prezzo"
-                                        :value="prezzo">
+                                    <input placeholder="Prezzo" class="form-control" type="number" name="prezzo" :value="prezzo">
                                     <span class="input-group-text">€</span>
                                 </div>
                             </div>
 
                             <div class="col-auto">
                                 <label for=""></label>
-                                <button class="btn btn-primary" @click="sendForm">Add</button>
+                                <button class="btn btn-primary" @click="addRigaPreventivo">Add</button>
                             </div>
 
                         </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col">
+
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width:50px;">QTY</th>
+                                    <th style="width: auto">Descrizione</th>
+                                    <th style="width: 130px">Prezzo</th>
+                                </tr>
+                            </thead>
+                            <tbody v-if="righeLavoro.length > 0">
+                                <tr v-for="riga in righeLavoro">
+                                    <td>[[ riga.qty]]</td>
+                                    <td>[[ riga.descrizione]]</td>
+                                    <td>[[ riga.prezzo]]€</td>
+                                </tr>
+                            </tbody>
+                            <tbody v-else class="text-center">
+                                <tr>
+                                    <td colspan="3">Aggiungi una riga di lavoro</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
 
                     </div>
                 </div>
             </div>
+        </div>
     </form>
 </div>
 

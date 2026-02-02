@@ -20,11 +20,11 @@ a {
 }
 
 a:hover {
-    text-decoration: underline!important;
+  text-decoration: underline !important;
 }
 
 .a-no-color {
-    color: unset;
+  color: unset;
 }
 
 body {
@@ -37,7 +37,7 @@ body {
   box-shadow: none !important;
 }
 
-[v-cloak] > *:not(.loader) {
+[v-cloak]>*:not(.loader) {
   display: none;
 }
 
@@ -50,7 +50,7 @@ body {
 }
 
 .col-prio {
-    width: 40px;
+  width: 40px;
 }
 
 .col-cliente {
@@ -107,6 +107,7 @@ i.bi {
 body.loaded {
   opacity: 1;
 }
+
 
 /* CSS */
 
@@ -181,8 +182,10 @@ body.loaded {
 }
 
 .data-label {
-  color: #555;
+  color: #9600ff;
   font-weight: 500;
+  font-size: .8em;
+  margin-top: 0.6rem;
 }
 
 .status-select {
@@ -314,19 +317,19 @@ body.loaded {
 }
 
 .stato-completato-onlytext {
-    color: #77bd8a;
+  color: #77bd8a;
 }
 
 .stato-da-iniziare-onlytext {
-    color: #87b2f2;
+  color: #87b2f2;
 }
 
 .stato-in-attesa-onlytext {
-    color: #6b666f;
+  color: #6b666f;
 }
 
 .stato-in-corso-onlytext {
-    color: #ffa463;
+  color: #ffa463;
 }
 
 .stato-completato-text {
@@ -366,8 +369,9 @@ body.loaded {
 }
 
 .bi-person-circle {
-    color: #adb5bd;
+  color: #adb5bd;
 }
+
 
 /* Esempio: Se il select è in stato "In corso", l'alone diventa giallo invece che azzurro */
 
@@ -450,5 +454,3 @@ table td {
     clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%);
   }
 }
-
-

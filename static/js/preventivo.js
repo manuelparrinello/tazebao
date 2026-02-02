@@ -25,8 +25,7 @@ const preventivo = Vue.createApp({
             }
             const data = await response.json()
             let target_url = data['target_url'];
-            console.log(target_url);
-            window.location.href = target_url;
+            window.open(target_url, `_blank`)
         },
 
         async loadClienti() {
@@ -42,14 +41,11 @@ const preventivo = Vue.createApp({
             }
             const data = await response.json();
             this.clienti = data;
-            for (const cliente of this.clienti) {
-                console.log(cliente['nome'])
-            }
+            for (const cliente of this.clienti) {}
         },
 
         async loadClienteDataByID(e) {
             const id = e.target.value;
-            console.log(id)
             const url = `/api/clienti/get/${id}`;
 
             try {
@@ -62,7 +58,6 @@ const preventivo = Vue.createApp({
                 };
                 const data = await response.json();
                 this.clienteData = data;
-                console.log(this.clienteData.indirizzo)
             } catch (error) {
                 console.log(error.message);
             }
@@ -70,7 +65,6 @@ const preventivo = Vue.createApp({
     },
     mounted() {
         this.loadClienti();
-        this.loadClienteDataByID();
     },
     delimiters: ["[[", "]]"],
 }).mount("#nuovoPreventivo");

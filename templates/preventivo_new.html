@@ -6,112 +6,119 @@
 <div id="nuovoPreventivo">
     <form action="" id="formNuovoPreventivo">
 
-        <div class="row mb-3">
-
-            <!-- SELECT CLIENTI -->
+        <div class="row mb-3 g-4">
             <div class="col-3">
-                <div class="form-group">
-                    <label class="form-label" for="titolo_prova">Cliente</label>
-                    <select @change="loadClienteDataByID" class="form-control form-select" name="cliente" id="">
-                        <option value="" selected disabled>Seleziona cliente</option>
-                        <option v-for="cliente in clienti" :value="cliente.id">[[ cliente?.nome ]]</option>
-                    </select>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="row">
-            <!-- ANAGRAFICA -->
-            <hr class="my-4">
-            <div class="col-7">
-                <div class="row">
-                    <div class="col">
-                        <h5 class="fw-bold">Anagrafica</h5>
-                    </div>
-                </div>
-                <div class="row">
-                    <!-- nominativo e indirizzo -->
-                    <div class="col-6 me-3">
-                        <div class="d-flex flex-column">
-                            <span class="data-label fw-bold">Nome / Ragione Sociale</span>
-                            <h6 class="mt-1">[[ clienteData?.nome || '-' ]]</h6>
-                        </div>
-                        <div class="d-flex flex-column">
-                            <span class="data-label fw-bold">Indirizzo</span>
-                            <h6 v-if="clienteData.indirizzo" class="mt-1">[[ clienteData?.indirizzo || '-' ]], [[ clienteData?.cap || '-' ]] [[ clienteData?.citta ]] ([[ clienteData?.provincia ]])</h6>
-                            <h6 v-else><b>-</b></h6>
-                        </div>
-                    </div>
-                    <!-- p.iva/cf e sdi-->
-                    <div class="col-auto">
-                        <div class="d-flex flex-column">
-                            <span class="data-label fw-bold">P.IVA / C.F</span>
-                            <h6 style="text-transform:uppercase" class="mt-1">[[ clienteData?.p_iva || '-' ]]</h6>
-                        </div>
-                        <div class="d-flex flex-column">
-                            <span class="data-label fw-bold">Cod. Univ.</span>
-                            <h6 style="text-transform:uppercase" class="mt-1">[[ clienteData?.sdi || '-' ]]</h6>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CONTATTI -->
-            <div class="col-5">
-
-                <div class="row">
-                    <div class="col">
-                        <h5 class="fw-bold">Contatti</h5>
-                    </div>
-                </div>
-                <div class="row">
-                    <!-- email e pec-->
-                    <div class="col-6 me-3">
-                        <div class="d-flex flex-column">
-                            <span class="data-label fw-bold">Email</span>
-                            <h6 class="mt-1">[[ clienteData?.email || '-' ]]</h6>
+                <h5 class="fw-bold">Cliente</h5>
+                <div class="card rounded rounded-4 shadow-sm">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <!-- SELECT CLIENTI -->
+                            <div class="col-12">
+                                <select @change="loadClienteDataByID" class="form-select" name="cliente" id="">
+                                    <option value="" selected disabled>Seleziona cliente</option>
+                                    <option v-for="cliente in clienti" :value="cliente.id">[[ cliente?.nome ]]</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="d-flex flex-column">
-                            <span class="data-label fw-bold">PEC</span>
-                            <h6 class="mt-1">[[ clienteData?.pec || '-' ]]</h6>
-                        </div>
-                    </div>
-                    <!-- telefono -->
-                    <div class="col-5 me-3">
-                        <div class="d-flex flex-column">
-                            <span class="data-label fw-bold">Telefono</span>
-                            <h6 class="mt-1">[[ clienteData?.telefono || '-' ]]</h6>
+                        <div v-cloak>
+                            <!-- ANAGRAFICA -->
+
+                            <div class="row mt-3">
+                                <!-- nominativo e indirizzo -->
+                                <div class="d-flex flex-column">
+                                    <span class="data-label fw-bold mt-2">Nome / Ragione Sociale</span>
+                                    <p class="mt-1 mb-0">[[ clienteData?.nome || '-' ]]</p>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <span class="data-label fw-bold mt-2">Indirizzo</span>
+                                    <p v-if="clienteData.indirizzo" class="mt-1 mb-0">[[ clienteData?.indirizzo || '-' ]],
+                                        [[
+                                        clienteData?.cap || '-' ]] [[ clienteData?.citta ]] ([[ clienteData?.provincia
+                                        ]])
+                                    </p>
+                                    <p class="mt-1 mb-0" v-else><b>-</b></p>
+                                </div>
+                                <!-- p.iva/cf e sdi-->
+                                <div class="d-flex flex-column">
+                                    <span class="data-label fw-bold mt-2">P.IVA / C.F</span>
+                                    <p style="text-transform:uppercase" class="mt-1 mb-0">[[ clienteData?.p_iva || '-' ]]
+                                    </p>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <span class="data-label fw-bold mt-2">Cod. Univ.</span>
+                                    <p style="text-transform:uppercase" class="mt-1 mb-0">[[ clienteData?.sdi || '-' ]]</p>
+                                </div>
+                            </div>
+
+                            <!-- CONTATTI -->
+                            <hr>
+                            <div class="row">
+                                <!-- email e pec-->
+                                <div class="d-flex flex-column">
+                                    <span class="data-label fw-bold mt-2">Email</span>
+                                    <p class="mt-1 mb-0">[[ clienteData?.email || '-' ]]</p>
+                                </div>
+
+                                <div class="d-flex flex-column">
+                                    <span class="data-label fw-bold mt-2">PEC</span>
+                                    <p class="mt-1 mb-0">[[ clienteData?.pec || '-' ]]</p>
+                                </div>
+                                <!-- telefono -->
+                                <div class="d-flex flex-column">
+                                    <span class="data-label fw-bold" mt-2>Telefono</span>
+                                    <p class="mt-1 mb-0">[[ clienteData?.telefono || '-' ]]</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <hr class="my-3">
-        </div>
 
 
-        <div class="row mt-2">
+            <div class="col-9">
+                <h5 class="fw-bold">Righe preventivo</h5>
+                <div class="card rounded rounded-4 shadow-sm g-0">
+                    <div class="card-body">
+                        <div class="row align-items-md-end g-2">
 
-            <!-- DESCRIZIONE LAVORO -->
-            <div class="col-3">
-                <div class="form-group">
-                    <label class="form-label" for="titolo_prova">Descrizione</label>
-                    <input class="form-control" type="text" name="descrizione" :value="descrizione">
+                            <!-- QTY LAVORO -->
+                            <div class="col-auto">
+                                <div class="form-group">
+                                    <!-- <label class="form-label" for="qty">Qtà</label> -->
+                                    <input placeholder="Qtà" style="max-width: 80px" class="form-control" type="number"
+                                        name="qty" :value="qty">
+                                </div>
+                            </div>
+
+                            <!-- DESCRIZIONE LAVORO -->
+                            <div class="col">
+                                <div class="form-group">
+                                    <!-- <label class="form-label" for="titolo_prova">Descrizione</label> -->
+                                    <textarea placeholder="Inserisci descrizione lavoro" rows="1" class="form-control"
+                                        type="text" name="descrizione" :value="descrizione"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- PREZZO DESC -->
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input placeholder="Prezzo" class="form-control" type="number" name="prezzo"
+                                        :value="prezzo">
+                                    <span class="input-group-text">€</span>
+                                </div>
+                            </div>
+
+                            <div class="col-auto">
+                                <label for=""></label>
+                                <button class="btn btn-primary" @click="sendForm">Add</button>
+                            </div>
+
+                        </div>
+
+                    </div>
                 </div>
             </div>
-
-            <!-- PREZZO DESC -->
-            <div class="col-auto">
-                <div class="form-group">
-                    <label class="form-label" for="titolo_prova">Prezzo task</label>
-                    <input class="form-control" type="number" name="prezzo" :value="prezzo">
-                </div>
-            </div>
-
-        </div>
-
-        <button class="btn btn-primary mt-2" @click="sendForm">Vacci</button>
     </form>
 </div>
 

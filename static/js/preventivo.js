@@ -1,16 +1,20 @@
 const preventivo = Vue.createApp({
     data() {
         return {
+            qty: "",
             descrizione: "",
             prezzo: "",
             clienteData: {},
             indirizzo_cliente: "",
             p_iva_cliente: "",
             sdi_cliente: "",
-            clienti: []
+            clienti: [],
+            loading: true,
+            rigaLavoro : []
         };
     },
     methods: {
+
         async sendForm(e) {
             e.preventDefault();
             const url = `/preventivi/nuovo`;
@@ -60,7 +64,15 @@ const preventivo = Vue.createApp({
                 this.clienteData = data;
             } catch (error) {
                 console.log(error.message);
+            } finally {
+                this.loading = false
             }
+        },
+
+        addRigaPreventivo() {
+            const form = document.querySelector('#formNuovoPreventivo');
+            const formData = new FormData(form);
+            const riga = 
         }
     },
     mounted() {

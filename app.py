@@ -36,6 +36,11 @@ migrate = Migrate(app, db, render_as_batch=True)
 
 status_lavori = ["Completato", "In corso", "In attesa", "Da iniziare"]
 
+@app.template_filter()
+def euroFormat(value):
+    value = float(value)
+    return "{:.2f}".format(value).replace(".", ",")
+
 ######################## DB TABLES CREATION ########################
 
 
@@ -310,7 +315,9 @@ def nuovo_preventivo():
         pec = cliente_q.pec
         prezzo = request.form.get("prezzo")
         prezzo_ii = float(prezzo) * iva
-        prezzo_subtotale = prezzo_ii
+        qty = float(request.form.get("qty"))
+        qty= int(qty)
+        prezzo_subtotale = prezzo_ii * qty
         tasse_varie = 8
         totale = tasse_varie + prezzo_subtotale
         descrizione = request.form.get("descrizione")
@@ -334,6 +341,7 @@ def nuovo_preventivo():
             tasse_varie=tasse_varie,
             totale=totale,
             descrizione=descrizione,
+            qty=qty
         )
         return jsonify({"target_url": target_url})
     return render_template("preventivo_new.html")
@@ -363,6 +371,7 @@ def visualizza_preventivo():
     tasse_varie = request.args.get("tasse_varie", "Nessun cliente")
     totale = request.args.get("totale", "Nessun dato")
     descrizione = request.args.get("descrizione", "Nessun dato")
+    qty=request.args.get("qty", "Nessun dato")
 
     # print(f"IL DATO CHE FLASK STA PASSANDO: {titolo_prova}")
 
@@ -385,6 +394,7 @@ def visualizza_preventivo():
         tasse_varie=tasse_varie,
         totale=totale,
         descrizione=descrizione,
+        qty=qty
     )
 
 

@@ -76,7 +76,7 @@ const preventivo = Vue.createApp({
             e.preventDefault();
             const form = document.querySelector('#formNuovoPreventivo');
             const formData = new FormData(form);
-            console.log(`Indice PRIMA: ` + this.indiceRigheLavoro)
+            // console.log(`Indice PRIMA: ` + this.indiceRigheLavoro)
             const riga = {
                 idRiga: this.idRiga,
                 qty: formData.get('qty'),
@@ -86,19 +86,14 @@ const preventivo = Vue.createApp({
             this.righeLavoro.push(riga);
             this.idRiga++;
             // const url = `/preventivi/addrow`
-            const subtotale = 0
-            console.log(`LOG PREZZO: ` + this.righeLavoro[this.indiceRigheLavoro].prezzo)
-                // function calcSubtotale() {
-                //     for (const prezzo in this.righeLavoro[this.indiceRigheLavoro]) {
-                //         subtotale += prezzo;
-                //     }
-                //     return subtotale;
-                // }
-                // calcSubtotale()
-            console.log(subtotale);
+            let subtotale = 0
+            const prezzo_a = this.righeLavoro[this.indiceRigheLavoro].prezzo
             this.indiceRigheLavoro++;
-            console.log(`Indice DOPO:  ` + this.indiceRigheLavoro)
-            console.log(this.righeLavoro);
+            // console.log(`Indice DOPO:  ` + this.indiceRigheLavoro)
+            for (element of this.righeLavoro) {
+                subtotale =+ element.prezzo;
+                console.log(subtotale)
+            }
         }
     },
     mounted() {

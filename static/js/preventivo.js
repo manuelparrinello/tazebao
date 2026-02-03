@@ -13,7 +13,7 @@ const preventivo = Vue.createApp({
             righeLavoro: [],
             idRiga: 0,
             addingHasEnded: false,
-            indiceRigheLavoro: 0
+            indiceRigheLavoro: 0,
         };
     },
     methods: {
@@ -85,10 +85,20 @@ const preventivo = Vue.createApp({
             };
             this.righeLavoro.push(riga);
             this.idRiga++;
+            // const url = `/preventivi/addrow`
+            const subtotale = 0
+            console.log(`LOG PREZZO: ` + this.righeLavoro[this.indiceRigheLavoro].prezzo)
+                // function calcSubtotale() {
+                //     for (const prezzo in this.righeLavoro[this.indiceRigheLavoro]) {
+                //         subtotale += prezzo;
+                //     }
+                //     return subtotale;
+                // }
+                // calcSubtotale()
+            console.log(subtotale);
             this.indiceRigheLavoro++;
             console.log(`Indice DOPO:  ` + this.indiceRigheLavoro)
             console.log(this.righeLavoro);
-            // const url = `/preventivi/addrow`
         }
     },
     mounted() {

@@ -12,12 +12,10 @@ const preventivo = Vue.createApp({
             loading: true,
             righeLavoro: [],
             idRiga: 0,
-            addingHasEnded: false,
             indiceRigheLavoro: 0,
         };
     },
     methods: {
-
         async sendForm(e) {
             e.preventDefault();
             const url = `/preventivi/nuovo`;
@@ -51,6 +49,7 @@ const preventivo = Vue.createApp({
             for (const cliente of this.clienti) {}
         },
 
+
         async loadClienteDataByID(e) {
             const id = e.target.value;
             const url = `/api/clienti/get/${id}`;
@@ -72,28 +71,30 @@ const preventivo = Vue.createApp({
             }
         },
 
+        calcSubtotale() {
+            var parziali = [];
+            for (const element of this.righeLavoro) {
+                parziali.push(element.totaleRiga);
+            }
+            return parziali
+        },
+
         async addRigaPreventivo(e) {
             e.preventDefault();
             const form = document.querySelector('#formNuovoPreventivo');
             const formData = new FormData(form);
-            // console.log(`Indice PRIMA: ` + this.indiceRigheLavoro)
+            const indiceRigheLavoro = 0;
             const riga = {
                 idRiga: this.idRiga,
                 qty: formData.get('qty'),
                 descrizione: formData.get('descrizione'),
-                prezzo: formData.get('prezzo')
+                prezzo: formData.get('prezzo'),
+                totaleRiga: Number(formData.get('qty')) * Number(formData.get('prezzo')),
             };
             this.righeLavoro.push(riga);
-            this.idRiga++;
-            // const url = `/preventivi/addrow`
-            let subtotale = 0
-            const prezzo_a = this.righeLavoro[this.indiceRigheLavoro].prezzo
+            console.log(this.righeLavoro[indiceRigheLavoro].totaleRiga);
             this.indiceRigheLavoro++;
-            // console.log(`Indice DOPO:  ` + this.indiceRigheLavoro)
-            for (element of this.righeLavoro) {
-                subtotale =+ element.prezzo;
-                console.log(subtotale)
-            }
+            this.idRiga++;
         }
     },
     mounted() {

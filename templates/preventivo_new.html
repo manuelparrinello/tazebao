@@ -125,7 +125,7 @@
                                 </tr>
                             </thead>
                             <tbody v-if="righeLavoro.length > 0">
-                                <tr v-for="riga in righeLavoro">
+                                <tr v-for="riga in righeLavoro" :id="calcIdRiga()">
                                     <td>[[ riga.qty]]</td>
                                     <td>[[ riga.descrizione]]</td>
                                     <td>[[ riga.prezzo]]€</td>

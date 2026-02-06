@@ -7,7 +7,9 @@
     <form action="" id="formNuovoPreventivo">
 
         <div class="row mb-3 g-4">
-            <div class="col">
+
+            <!-- CARD CLIENTE  -->
+            <div class="col mb-3">
                 <h5 class="fw-bold">Cliente</h5>
                 <div class="card rounded rounded-4 shadow-sm">
                     <div class="card-body">
@@ -21,7 +23,7 @@
                             </div>
                         </div>
 
-                        <div v-if="clienteSelezionato" v-cloak>
+                        <div v-if="clienteSelezionato != 'Seleziona cliente'" v-cloak>
                             <!-- ANAGRAFICA -->
 
                             <div class="row mt-3">
@@ -99,7 +101,7 @@
                             <div class="col-auto">
                                 <div class="form-group">
                                     <!-- <label class="form-label" for="qty">Qtà</label> -->
-                                    <input placeholder="Qtà" style="max-width: 80px" class="form-control" type="number" name="qty" :value="qty">
+                                    <input min="0" placeholder="Qtà" style="max-width: 80px" class="form-control" type="number" name="qty" :value="qty">
                                 </div>
                             </div>
 
@@ -120,8 +122,7 @@
                             </div>
 
                             <div class="col-auto">
-                                <label for=""></label>
-                                <button class="btn btn-primary" @click="addRigaPreventivo">Add</button>
+                                <button class="button-61 pointer" @click="addRigaPreventivo">+</button>
                             </div>
 
                         </div>
@@ -139,16 +140,16 @@
                                             <tr>
                                                 <th style="width:50px;">Qtà</th>
                                                 <th style="width: auto">Descrizione</th>
-                                                <th style="width: 130px">Prezzo</th>
-                                                <th style="width: 130px">Totale</th>
+                                                <th class="text-center" style="width: 130px">Prezzo unitario</th>
+                                                <th class="text-center" style="width: 130px">Totale</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr v-if="righe.length > 0" v-for="riga in righe" :id="riga.idRiga">
                                                 <td>[[ riga.qty ]]</td>
                                                 <td>[[ riga.descrizione ]]</td>
-                                                <td>[[ riga.prezzo ]]€</td>
-                                                <td>[[ riga.totaleRiga ]]€</td>
+                                                <td class="text-center">[[ riga.prezzo ]]€</td>
+                                                <td class="text-center">[[ riga.totaleRiga ]]€</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -159,6 +160,7 @@
                             </div>
                         </div>
                     </div>
+                    subtotale : [[ subtotale ]]
                 </div>
 
             </div>

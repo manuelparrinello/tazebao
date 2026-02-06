@@ -15,7 +15,7 @@ const preventivo = Vue.createApp({
             loading: true,
             subtotale: 0,
             totali: [],
-            clienteSelezionato: ""
+            clienteSelezionato: "Seleziona cliente",
         };
     },
     methods: {
@@ -77,27 +77,38 @@ const preventivo = Vue.createApp({
         },
 
         calcSubtotale() {
-            var riga = this.righe[this.indiceRiga];
-            for (riga of this.righe) {
-                this.totali.push(riga.totaleRiga);
+            this.totali = [];
+            this.subtotale = 0;
+
+            for (const riga of this.righe) {
+                const totaleRiga = Number(riga.totaleRiga) || 0;
+                this.totali.push(totaleRiga);
+                this.subtotale += totaleRiga;
             }
-            this.subtotale += riga.totaleRiga;
         },
 
         async addRigaPreventivo(e) {
             e.preventDefault();
-            console.clear();
+            if (this.clienteSelezionato === "Seleziona cliente") {
+                window.alert("Seleziona cliente!");
+                return;
+            }
+            // console.clear();
             const form = document.querySelector("#formNuovoPreventivo");
             const formData = new FormData(form);
+            const qty = Number(formData.get("qty")) || 0;
+            const prezzo = Number(formData.get("prezzo")) || 0;
+            const descrizione = String(formData.get("descrizione") || "").trim();
             const riga = {
                 idRiga: this.idRiga,
-                qty: formData.get("qty"),
-                descrizione: formData.get("descrizione"),
-                prezzo: formData.get("prezzo"),
+                qty: qty,
+                descrizione: descrizione,
+                prezzo: prezzo,
                 totaleRiga: Number(formData.get("qty")) * Number(formData.get("prezzo")),
             };
             this.righe.push(riga);
             this.calcSubtotale();
+            console.log(this.subtotale);
             this.idRiga++;
             this.indiceRiga++;
         },

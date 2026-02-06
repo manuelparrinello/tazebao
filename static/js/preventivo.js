@@ -9,10 +9,13 @@ const preventivo = Vue.createApp({
             p_iva_cliente: "",
             sdi_cliente: "",
             clienti: [],
-            righeLavoro: [],
+            righe: [],
+            idRiga: 0,
             indiceRiga: 0,
             loading: true,
-            idRiga: 0,
+            subtotale: 0,
+            totali: [],
+            clienteSelezionato: ""
         };
     },
     methods: {
@@ -50,6 +53,7 @@ const preventivo = Vue.createApp({
         },
 
         async loadClienteDataByID(e) {
+            e.preventDefault();
             const id = e.target.value;
             const url = `/api/clienti/get/${id}`;
 
@@ -73,18 +77,18 @@ const preventivo = Vue.createApp({
         },
 
         calcSubtotale() {
-            const parziali = [];
-            for (const element of this.righeLavoro) {
-                parziali.push(element.totaleRiga);
-                return parziali;
+            var riga = this.righe[this.indiceRiga];
+            for (riga of this.righe) {
+                this.totali.push(riga.totaleRiga);
             }
+            this.subtotale += riga.totaleRiga;
         },
 
         async addRigaPreventivo(e) {
             e.preventDefault();
+            console.clear();
             const form = document.querySelector("#formNuovoPreventivo");
             const formData = new FormData(form);
-
             const riga = {
                 idRiga: this.idRiga,
                 qty: formData.get("qty"),
@@ -92,12 +96,10 @@ const preventivo = Vue.createApp({
                 prezzo: formData.get("prezzo"),
                 totaleRiga: Number(formData.get("qty")) * Number(formData.get("prezzo")),
             };
-            this.righeLavoro.push(riga);
+            this.righe.push(riga);
+            this.calcSubtotale();
             this.idRiga++;
             this.indiceRiga++;
-            console.log(`INDICE RIGA: ${this.indiceRiga}`);
-            console.log(`ID RIGA: ${this.idRiga}`);
-            console.log(`RIGA: ${this.righeLavoro[0]}`);
         },
     },
     mounted() {

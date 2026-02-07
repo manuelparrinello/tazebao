@@ -16,8 +16,7 @@
                         <div class="form-group">
                             <!-- SELECT CLIENTI -->
                             <div class="col-12">
-                                <select @change="loadClienteDataByID" class="form-select" name="cliente"
-                                    v-model="clienteSelezionato" required>
+                                <select @change="loadClienteDataByID" class="form-select" name="cliente" v-model="clienteSelezionato" required>
                                     <option selected disabled>Seleziona cliente</option>
                                     <option v-for="cliente in clienti" :value="cliente.id">[[ cliente?.nome ]]</option>
                                 </select>
@@ -36,9 +35,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="data-label fw-bold mt-2">Indirizzo</span>
-                                        <p v-if="clienteData.indirizzo" class="mt-1 mb-0">[[ clienteData?.indirizzo ||
-                                            '-' ]], [[ clienteData?.cap || '-' ]] [[ clienteData?.citta ]] ([[
-                                            clienteData?.provincia ]])
+                                        <p v-if="clienteData.indirizzo" class="mt-1 mb-0">[[ clienteData?.indirizzo || '-' ]], [[ clienteData?.cap || '-' ]] [[ clienteData?.citta ]] ([[ clienteData?.provincia ]])
                                         </p>
                                         <p class="mt-1 mb-0" v-else><b>-</b></p>
                                     </div>
@@ -47,14 +44,13 @@
                                     <!-- p.iva/cf e sdi-->
                                     <div class="d-flex flex-column">
                                         <span class="data-label fw-bold mt-2">P.IVA / C.F</span>
-                                        <p style="text-transform:uppercase" class="mt-1 mb-0">[[ clienteData?.p_iva ||
-                                            '-' ]]
+                                        <p style="text-transform:uppercase" class="mt-1 mb-0">[[ clienteData?.p_iva || '-' ]]
                                         </p>
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="data-label fw-bold mt-2">Cod. Univ.</span>
-                                        <p style="text-transform:uppercase" class="mt-1 mb-0">[[ clienteData?.sdi || '-'
-                                            ]]</p>
+                                        <p style="text-transform:uppercase" class="mt-1 mb-0">[[ clienteData?.sdi || '-' ]]
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -106,8 +102,7 @@
                             <div class="col-auto">
                                 <div class="form-group">
                                     <!-- <label class="form-label" for="qty">Qtà</label> -->
-                                    <input min="0" placeholder="Qtà" style="max-width: 80px" class="form-control"
-                                        type="number" name="qty" :value="qty">
+                                    <input min="0" placeholder="Qtà" style="max-width: 80px" class="form-control" type="number" name="qty" :value="qty">
                                 </div>
                             </div>
 
@@ -115,16 +110,14 @@
                             <div class="col">
                                 <div class="form-group">
                                     <!-- <label class="form-label" for="titolo_prova">Descrizione</label> -->
-                                    <textarea placeholder="Inserisci descrizione lavoro" rows="1" class="form-control"
-                                        type="text" name="descrizione" :value="descrizione"></textarea>
+                                    <textarea placeholder="Inserisci descrizione lavoro" rows="1" class="form-control" type="text" name="descrizione" :value="descrizione"></textarea>
                                 </div>
                             </div>
 
                             <!-- PREZZO DESC -->
                             <div class="col-2">
                                 <div class="input-group">
-                                    <input placeholder="Prezzo" class="form-control" type="number" name="prezzo"
-                                        :value="prezzo">
+                                    <input placeholder="Prezzo" class="form-control" type="number" name="prezzo" :value="prezzo">
                                     <span class="input-group-text">€</span>
                                 </div>
                             </div>
@@ -178,6 +171,7 @@
             </div>
         </div>
 
+        <button @click="sendForm($event)">VAI</button>
 </div>
 </form>
 </div>

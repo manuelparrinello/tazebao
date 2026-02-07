@@ -118,8 +118,8 @@ class TaskFile(db.Model):
     size = db.Column(db.Float, nullable=False)
     task_id = db.Column(db.Integer, db.ForeignKey("tasks.id"), nullable=False)
     note = db.Column(db.Text, nullable=False)
- 
-    
+
+
 # DB - PREVENTIVI
 class Preventivo(db.Model):
     __tablename__ = "preventivi"
@@ -127,7 +127,22 @@ class Preventivo(db.Model):
     qty = db.Column(db.Integer, nullable=False)
     descrizione = db.Column(db.Text, nullable=False)
     prezzo = db.Column(db.Float, nullable=False)
-    lavoro_id = db.relationship("Lavoro", backref="lavoro", lazy=True, cascade="all, delete, delete-orphan")
+    lavoro_id = db.relationship(
+        "Lavoro", backref="lavoro", lazy=True, cascade="all, delete, delete-orphan"
+    )
+    # MI SONO FERMATO QUI
+
+
+# DB - RIGHE PREVENTIVO
+class RigaPreventivo(db.Model):
+    __tablename__ = "righe_preventivo"
+    id = db.Column(db.Integer, primary_key=True)
+    qty = db.Column(db.Numeric(10, 2), nullable=False, default=1)
+    descrizione = db.Column(db.Text, nullable=False)
+    prezzo_ie = db.Column(db.Numeric(10, 2), nullable=False)
+    prezzo_ii = db.Column(db.Numeric(10, 2), nullable=False)
+    totale_riga = db.Column(db.Numeric(10, 2), nullable=False)
+    preventivo = db.relationship("Preventivo", back_populates="righe")
 
 
 # CREATE DATABASE TABLES IF THEY DON'T EXIST ----------------
@@ -158,7 +173,7 @@ def nuovo_cliente():
         # Aggiungi il nuovo cliente al database
         nuovo_cliente = Cliente(
             name=nome,
-            ragsoc = ragsoc,
+            ragsoc=ragsoc,
             indirizzo=indirizzo,
             cap=cap,
             citta=citta,
@@ -271,6 +286,34 @@ def nuovo_lavoro():
         clienti_list = Cliente.query.all()
         return render_template("lavoro_new.html", clienti=clienti_list)
 
+    # DB - NUOVO PREVENTIVO
+
+
+@app.route("/preventivi/nuovo", methods=["POST", "GET"])
+def nuovo_preventivo():
+    if request.method == "POST":
+        iva = 1.22
+        tasse_varie = 8
+        data = request.get_json()
+        cliente_id = data["cliente_id"]
+        cliente = Cliente.query.filter_by(id=cliente_id).first()
+        print("Cliente: " + cliente.name + ", ID: " + str(cliente.id))
+        righe = [
+            {
+                "qty": riga["qty"],
+                "descrizione": riga["descrizione"],
+                "prezzo_ie": float(riga["prezzo"]),
+                "prezzo_ii": float(riga["prezzo"]) * iva,
+                "totale": (float(riga["prezzo"]) * iva) * float(riga["qty"]),
+            }
+            for riga in data["righe"]
+        ]
+        print(righe)
+        nuovo_preventivo = Preventivo()
+
+        return jsonify({"cliente_id": cliente.id, "righe": [riga for riga in righe]})
+    return render_template("preventivo_new.html")
+
 
 ######################## ROUTES ########################
 
@@ -309,85 +352,6 @@ def clienti():
 def cliente_page(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     return render_template("cliente.html", cliente=cliente)
-
-
-# NUOVO PREVENTIVO
-@app.route("/preventivi/nuovo", methods=["POST", "GET"])
-def nuovo_preventivo():
-    if request.method == "POST":
-        iva = 1.22
-        data = request.json
-
-        ragsoc = data['ragsoc']
-        p_iva = data['p_iva']
-        indirizzo = data['indirizzo']
-        citta = data['citta']
-        cap = data['cap']
-        provincia = data['provincia']
-        email = data['email']
-        telefono = data['telefono']
-        sdi = data['sdi']
-        pec = data['pec']
-        righe = [
-            { 
-             'qty' : riga['qty'],
-             'descrizione' : riga['descrizione'],
-             'prezzo' : riga['prezzo']
-             } for riga in data['righe']
-            ]
-
-        cliente_id = request.form.get("cliente")
-        cliente_q = Cliente.query.filter_by(id=cliente_id).first()
-        cliente = cliente_q.name
-        ragsoc = cliente.ragsoc,
-        indirizzo = cliente_q.indirizzo
-        cap = cliente_q.cap
-        citta = cliente_q.citta
-        provincia = cliente_q.provincia
-        email = cliente_q.email
-        telefono = cliente_q.telefono
-        p_iva = cliente_q.p_iva
-        sdi = cliente_q.sdi
-        pec = cliente_q.pec
-        prezzo = request.form.get("prezzo")
-        prezzo_ii = float(prezzo) * iva
-        qty = float(request.form.get("qty"))
-        qty = int(qty)
-        prezzo_subtotale = prezzo_ii * qty
-        tasse_varie = 8
-        totale = tasse_varie + prezzo_subtotale
-        descrizione = request.form.get("descrizione")
-
-        # QUESTO E' L'URL CHE SI VEDRA' SUL DOCUMENTO PREVENTIVO COMPILATO:
-        target_url = url_for(
-            "visualizza_preventivo",
-            cliente=cliente,
-            ragsoc=ragsoc,
-            indirizzo=indirizzo,
-            cap=cap,
-            citta=citta,
-            provincia=provincia,
-            email=email,
-            telefono=telefono,
-            p_iva=p_iva,
-            sdi=sdi,
-            pec=pec,
-            prezzo=prezzo,
-            prezzo_ii=prezzo_ii,
-            prezzo_subtotale=prezzo_subtotale,
-            tasse_varie=tasse_varie,
-            totale=totale,
-            descrizione=descrizione,
-            qty=qty,
-        )
-        
-        return jsonify({"target_url": target_url})
-    return render_template("preventivo_new.html")
-
-
-# ->
-# -> QUI SI INSERISCE LA RICHIESTA GET (window.location.ref)
-# CHE VIENE GESTITA DALLA ROUTE QUI IN BASSO
 
 
 # RENDERIZZA Righe Preventivo
@@ -606,7 +570,7 @@ def get_cliente_byID(cliente_id):
         {
             "id": c.id,
             "nome": c.name,
-            "ragsoc" : c.ragsoc,
+            "ragsoc": c.ragsoc,
             "indirizzo": c.indirizzo,
             "citta": c.citta,
             "cap": c.cap,

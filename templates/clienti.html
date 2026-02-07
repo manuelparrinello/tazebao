@@ -8,16 +8,16 @@
         <a href="{{ url_for('nuovo_cliente') }}"><button class="button-61">
                 <span><i class="bi bi-person-plus-fill"></i></span>&nbsp;Nuovo
                 cliente
-            </button></a
-        >
+            </button></a>
     </div>
 </div>
 
 <div id="clientiPage" class="container p-0" v-cloak>
-    <tabella-clienti
-        :clienti_data="clienti"
-        @delete="clickForDeleteCliente"
-    ></tabella-clienti>
+    <div class="card rounded rounded-4 shadow-sm">
+        <div class="card-body">
+            <tabella-clienti :clienti_data="clienti" @delete="clickForDeleteCliente"></tabella-clienti>
+        </div>
+    </div>
 </div>
 {% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>

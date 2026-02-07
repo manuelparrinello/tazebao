@@ -51,6 +51,7 @@ class Cliente(db.Model):
     __tablename__ = "clienti"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    ragsoc = db.Column(db.String(100), nullable=False)
     indirizzo = db.Column(db.String(100), nullable=True)
     citta = db.Column(db.String(50), nullable=True)
     cap = db.Column(db.String(5), nullable=True)
@@ -87,6 +88,7 @@ class Lavoro(db.Model):
     tasks = db.relationship(
         "TaskLavoro", backref="lavoro", lazy=True, cascade="all, delete, delete-orphan"
     )
+    preventivo_id = db.Column(db.Integer, db.ForeignKey("preventivi.id"), nullable=True)
     note = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
@@ -108,8 +110,6 @@ class TaskLavoro(db.Model):
 
 
 # DB - DEFINE TASK FILES
-
-
 class TaskFile(db.Model):
     __tablename__ = "taskfile"
     id = db.Column(db.Integer, primary_key=True)
@@ -118,6 +118,16 @@ class TaskFile(db.Model):
     size = db.Column(db.Float, nullable=False)
     task_id = db.Column(db.Integer, db.ForeignKey("tasks.id"), nullable=False)
     note = db.Column(db.Text, nullable=False)
+ 
+    
+# DB - PREVENTIVI
+class Preventivo(db.Model):
+    __tablename__ = "preventivi"
+    id = db.Column(db.Integer, primary_key=True)
+    qty = db.Column(db.Integer, nullable=False)
+    descrizione = db.Column(db.Text, nullable=False)
+    prezzo = db.Column(db.Float, nullable=False)
+    lavoro_id = db.relationship("Lavoro", backref="lavoro", lazy=True, cascade="all, delete, delete-orphan")
 
 
 # CREATE DATABASE TABLES IF THEY DON'T EXIST ----------------
@@ -132,7 +142,8 @@ with app.app_context():
 @app.route("/clienti/new", methods=["GET", "POST"])
 def nuovo_cliente():
     if request.method == "POST":
-        nomeCliente = request.form.get("nome_cliente").title()
+        nome = request.form.get("nome").title()
+        ragsoc = request.form.get("ragsoc").title()
         indirizzo = request.form.get("indirizzo").title()
         cap = request.form.get("cap")
         citta = request.form.get("citta").title()
@@ -146,7 +157,8 @@ def nuovo_cliente():
         note = request.form.get("note")
         # Aggiungi il nuovo cliente al database
         nuovo_cliente = Cliente(
-            name=nomeCliente,
+            name=nome,
+            ragsoc = ragsoc,
             indirizzo=indirizzo,
             cap=cap,
             citta=citta,
@@ -166,7 +178,8 @@ def nuovo_cliente():
                 {
                     "message": "Cliente aggiunto con successo!",
                     "data": {
-                        "nome": nomeCliente,
+                        "nome": nome,
+                        "ragsoc": ragsoc,
                         "telefono": telefono,
                         "email": email,
                         "note": note,
@@ -303,9 +316,30 @@ def cliente_page(cliente_id):
 def nuovo_preventivo():
     if request.method == "POST":
         iva = 1.22
+        data = request.json
+
+        ragsoc = data['ragsoc']
+        p_iva = data['p_iva']
+        indirizzo = data['indirizzo']
+        citta = data['citta']
+        cap = data['cap']
+        provincia = data['provincia']
+        email = data['email']
+        telefono = data['telefono']
+        sdi = data['sdi']
+        pec = data['pec']
+        righe = [
+            { 
+             'qty' : riga['qty'],
+             'descrizione' : riga['descrizione'],
+             'prezzo' : riga['prezzo']
+             } for riga in data['righe']
+            ]
+
         cliente_id = request.form.get("cliente")
         cliente_q = Cliente.query.filter_by(id=cliente_id).first()
         cliente = cliente_q.name
+        ragsoc = cliente.ragsoc,
         indirizzo = cliente_q.indirizzo
         cap = cliente_q.cap
         citta = cliente_q.citta
@@ -328,6 +362,7 @@ def nuovo_preventivo():
         target_url = url_for(
             "visualizza_preventivo",
             cliente=cliente,
+            ragsoc=ragsoc,
             indirizzo=indirizzo,
             cap=cap,
             citta=citta,
@@ -345,6 +380,7 @@ def nuovo_preventivo():
             descrizione=descrizione,
             qty=qty,
         )
+        
         return jsonify({"target_url": target_url})
     return render_template("preventivo_new.html")
 
@@ -370,6 +406,7 @@ def render_row():
 def visualizza_preventivo():
     # Recupero il dato tramite il query params passato
     cliente = request.args.get("cliente", "Nessun cliente")
+    ragsoc = request.args.get("ragsoc", "Nessuna ragione sociale")
     indirizzo = request.args.get("indirizzo", "Nessun indirizzo")
     cap = request.args.get("cap", "Nessun cap")
     citta = request.args.get("citta", "Nessuna citta")
@@ -569,6 +606,7 @@ def get_cliente_byID(cliente_id):
         {
             "id": c.id,
             "nome": c.name,
+            "ragsoc" : c.ragsoc,
             "indirizzo": c.indirizzo,
             "citta": c.citta,
             "cap": c.cap,

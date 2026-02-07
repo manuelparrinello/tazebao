@@ -51,11 +51,11 @@ body {
 }
 
 .col-prio {
-  width: 40px;
+  width: 55px;
 }
 
 .col-cliente {
-  width: 200px !important;
+  width: 300px !important;
 }
 
 .col-actions {
@@ -64,6 +64,14 @@ body {
 
 .col-note {
   width: 80px !important;
+}
+
+.col-prezzo {
+  width: 100px !important;
+}
+
+.col-pagamento {
+  width: 200px!important;
 }
 
 i.bi {

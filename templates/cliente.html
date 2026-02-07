@@ -36,7 +36,7 @@
             </div>
             <div class="row w-100">
                 <div class="col-sm .col-lg-3">
-                    <strong>Nome</strong>: [[ cliente.nome ]]<br />
+                    <strong>Nome</strong>: [[ cliente.ragsoc ]]<br />
                     <strong>Telefono</strong>: [[ cliente.telefono ]]<br />
                 </div>
                 <div class="col-sm .col-lg-3">
@@ -54,7 +54,11 @@
 
         <div class="container p-0 mt-2">
             <h4 class="fw-bold mb-3">Lavori associati</h4>
-            <tabella-lavori :update_status="updateStatus" :lavori_data="cliente.lavori" :filtro_stati="populateExcludedStatuses"></tabella-lavori>
+            <div class="card rounded rounded-4 shadow-sm">
+                <div class="card-body">
+                    <tabella-lavori :update_status="updateStatus" :lavori_data="cliente.lavori" :filtro_stati="populateExcludedStatuses"></tabella-lavori>
+                </div>
+            </div>
         </div>
     </div>
 </div>

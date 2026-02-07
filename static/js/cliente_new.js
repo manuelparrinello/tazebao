@@ -1,7 +1,8 @@
 const nuovoClienteApp = Vue.createApp({
     data() {
         return {
-            nomeCliente: "",
+            nome: "",
+            ragsoc: "",
             telefono: "",
             email: "",
             indirizzo: "",
@@ -30,7 +31,8 @@ const nuovoClienteApp = Vue.createApp({
             // Creazione di un oggetto FormData per inviare i dati del modulo
             const form = document.querySelector("#nuovoCliente");
             const formData = new FormData(form);
-            formData.append('nome_cliente', this.nomeCliente);
+            formData.append('nome', this.nome);
+            formData.append('ragsoc', this.ragsoc);
             formData.append('indirizzo', this.indirizzo);
             formData.append('citta', this.citta);
             formData.append('cap', this.cap);

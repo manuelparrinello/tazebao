@@ -6,12 +6,12 @@ const TabellaLavori = {
         filtro_stati: Function,
     },
     template: `
-    <table class="table sortable mt-2 table-hover rounded-3" id="tabellaLavori">
+    <table class="table sortable my-0 table-hover rounded-3" id="tabellaLavori">
    <thead>
       <tr>
          <th class="fw-bold pointer text-center col-prio" scope="col">Prio</th>
          <th class="fw-bold pointer col-desc" scope="col">Descrizione</th>
-         <th class="fw-bold pointer" scope="col">Prezzo</th>
+         <th class="fw-bold pointer col-prezzo" scope="col">Prezzo</th>
          <th class="fw-bold pointer col-cliente" scope="col">Cliente</th>
          <!--
          <th class="fw-bold pointer text-center" scope="col">Inizio</th>
@@ -70,7 +70,7 @@ const TabellaLavori = {
          </tr>
       </template>
       <tr v-else>
-         <td colspan="10" class="text-center">Nessun lavoro trovato.</td>
+         <td colspan="7" class="text-center">Nessun lavoro trovato.</td>
       </tr>
    </tbody>
 </table>

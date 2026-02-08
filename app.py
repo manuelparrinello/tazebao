@@ -124,13 +124,23 @@ class TaskFile(db.Model):
 class Preventivo(db.Model):
     __tablename__ = "preventivi"
     id = db.Column(db.Integer, primary_key=True)
-    qty = db.Column(db.Integer, nullable=False)
-    descrizione = db.Column(db.Text, nullable=False)
-    prezzo = db.Column(db.Float, nullable=False)
-    lavoro_id = db.relationship(
-        "Lavoro", backref="lavoro", lazy=True, cascade="all, delete, delete-orphan"
+
+    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False)
+    data_creazione = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    stato = db.Column(db.String(20), default="bozza", nullable=False)
+
+    # 1 preventivo -> N lavori (se ti serve davvero questo legame)
+    lavori = db.relationship(
+        "Lavoro",
+        backref="preventivo",  # su Lavoro avrai .preventivo
+        lazy=True,
     )
-    # MI SONO FERMATO QUI
+    righe = db.relationship(
+        "RigaPreventivo",
+        back_populates="preventivo",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
 
 
 # DB - RIGHE PREVENTIVO
@@ -143,6 +153,9 @@ class RigaPreventivo(db.Model):
     prezzo_ii = db.Column(db.Numeric(10, 2), nullable=False)
     totale_riga = db.Column(db.Numeric(10, 2), nullable=False)
     preventivo = db.relationship("Preventivo", back_populates="righe")
+    preventivo_id = db.Column(
+        db.Integer, db.ForeignKey("preventivi.id"), nullable=False
+    )
 
 
 # CREATE DATABASE TABLES IF THEY DON'T EXIST ----------------
@@ -170,7 +183,7 @@ def nuovo_cliente():
         pec = request.form.get("pec")
         colore = request.form.get("colore")
         note = request.form.get("note")
-        # Aggiungi il nuovo cliente al database
+
         nuovo_cliente = Cliente(
             name=nome,
             ragsoc=ragsoc,
@@ -286,9 +299,8 @@ def nuovo_lavoro():
         clienti_list = Cliente.query.all()
         return render_template("lavoro_new.html", clienti=clienti_list)
 
-    # DB - NUOVO PREVENTIVO
 
-
+# DB - NUOVO PREVENTIVO
 @app.route("/preventivi/nuovo", methods=["POST", "GET"])
 def nuovo_preventivo():
     if request.method == "POST":
@@ -309,7 +321,7 @@ def nuovo_preventivo():
             for riga in data["righe"]
         ]
         print(righe)
-        nuovo_preventivo = Preventivo()
+        nuovo_preventivo = Preventivo(cliente)
 
         return jsonify({"cliente_id": cliente.id, "righe": [riga for riga in righe]})
     return render_template("preventivo_new.html")

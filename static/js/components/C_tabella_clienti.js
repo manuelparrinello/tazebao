@@ -28,7 +28,7 @@ const TabellaClienti = {
                 </tr>
             </template>
             <tr v-else>
-                <td colspan="6" class="text-center">Nessun cliente trovato.</td>
+                <td colspan="5" class="text-center">Nessun cliente trovato.</td>
             </tr>
         </tbody>
     </table>

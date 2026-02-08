@@ -19,29 +19,6 @@ const preventivo = Vue.createApp({
         };
     },
     methods: {
-        async sendForm(e) {
-            e.preventDefault();
-            const url = `/preventivi/nuovo`;
-            const dataToSend_raw = {
-                cliente_id: this.clienteData.id,
-                righe: this.righe,
-            };
-            const dataToSend = JSON.stringify(dataToSend_raw);
-            const response = await fetch(url, {
-                method: "POST",
-                body: dataToSend,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            if (!response.ok) {
-                throw new Error("Errore richiesta: HTTP " + response.status);
-            }
-            const data = await response.json();
-            //   let target_url = data["target_url"];
-            //   window.open(target_url, `_blank`);
-        },
-
         async loadClienti() {
             const url = `/api/clienti/getall`;
             const response = await fetch(url, {
@@ -103,19 +80,49 @@ const preventivo = Vue.createApp({
             const formData = new FormData(form);
             const qty = Number(formData.get("qty")) || 0;
             const prezzo = Number(formData.get("prezzo")) || 0;
-            const descrizione = String(formData.get("descrizione") || "").trim();
+            const descrizione = String(
+                formData.get("descrizione") || "",
+            ).trim();
             const riga = {
                 idRiga: this.idRiga,
                 qty: qty,
                 descrizione: descrizione,
                 prezzo: prezzo,
-                totaleRiga: Number(formData.get("qty")) * Number(formData.get("prezzo")),
+                totaleRiga:
+                    Number(formData.get("qty")) *
+                    Number(formData.get("prezzo")),
             };
             this.righe.push(riga);
             this.calcSubtotale();
             console.log(this.subtotale);
             this.idRiga++;
             this.indiceRiga++;
+        },
+
+        async viewPreventivo(id) {
+            const url = `/preventivi/visualizza/${id}`;
+        },
+
+        async sendForm(e) {
+            e.preventDefault();
+            const url = `/preventivi/nuovo`;
+            const dataToSend_raw = {
+                cliente_id: this.clienteData.id,
+                righe: this.righe,
+            };
+            const dataToSend = JSON.stringify(dataToSend_raw);
+            const response = await fetch(url, {
+                method: "POST",
+                body: dataToSend,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            if (!response.ok) {
+                throw new Error("Errore richiesta: HTTP " + response.status);
+            }
+            const data = await response.json();
+            console.log(data);
         },
     },
     mounted() {

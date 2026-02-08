@@ -46,7 +46,7 @@ def euroFormat(value):
 ######################## DB TABLES CREATION ########################
 
 
-# DB - DEFINE CLIENTE
+# DB MODEL - DEFINE CLIENTE
 class Cliente(db.Model):
     __tablename__ = "clienti"
     id = db.Column(db.Integer, primary_key=True)
@@ -56,7 +56,6 @@ class Cliente(db.Model):
     citta = db.Column(db.String(50), nullable=True)
     cap = db.Column(db.String(5), nullable=True)
     provincia = db.Column(db.String(2), nullable=True)
-
     email = db.Column(db.String(100), nullable=False)
     telefono = db.Column(db.String(20), nullable=False)
     p_iva = db.Column(db.String(30), nullable=True)
@@ -68,12 +67,15 @@ class Cliente(db.Model):
     lavori = db.relationship(
         "Lavoro", backref="cliente", lazy=True, cascade="all, delete, delete-orphan"
     )
+    preventivi = db.relationship(
+        "Preventivo", backref="cliente", lazy=True, cascade="all, delete, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<Cliente {self.name}>"
 
 
-# DB - DEFINE LAVORO
+# DB MODEL - DEFINE LAVORO
 class Lavoro(db.Model):
     __tablename__ = "lavori"
     id = db.Column(db.Integer, primary_key=True)
@@ -95,7 +97,7 @@ class Lavoro(db.Model):
         return f"<Lavoro {self.descrizione}>"
 
 
-# DB - DEFINE TASKS LAVORO
+# DB MODEL - DEFINE TASKS LAVORO
 class TaskLavoro(db.Model):
     __tablename__ = "tasks"
     id = db.Column(db.Integer, primary_key=True)
@@ -109,7 +111,7 @@ class TaskLavoro(db.Model):
     note = db.Column(db.Text, nullable=False)
 
 
-# DB - DEFINE TASK FILES
+# DB MODEL - DEFINE TASK FILES
 class TaskFile(db.Model):
     __tablename__ = "taskfile"
     id = db.Column(db.Integer, primary_key=True)
@@ -120,14 +122,14 @@ class TaskFile(db.Model):
     note = db.Column(db.Text, nullable=False)
 
 
-# DB - PREVENTIVI
+# DB MODEL - PREVENTIVI
 class Preventivo(db.Model):
     __tablename__ = "preventivi"
     id = db.Column(db.Integer, primary_key=True)
-
     cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False)
     data_creazione = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     stato = db.Column(db.String(20), default="bozza", nullable=False)
+    totale_preventivo = db.Column(db.Float, nullable=True)
 
     # 1 preventivo -> N lavori (se ti serve davvero questo legame)
     lavori = db.relationship(
@@ -143,7 +145,7 @@ class Preventivo(db.Model):
     )
 
 
-# DB - RIGHE PREVENTIVO
+# DB MODEL - RIGHE PREVENTIVO
 class RigaPreventivo(db.Model):
     __tablename__ = "righe_preventivo"
     id = db.Column(db.Integer, primary_key=True)
@@ -321,9 +323,33 @@ def nuovo_preventivo():
             for riga in data["righe"]
         ]
         print(righe)
-        nuovo_preventivo = Preventivo(cliente)
+        nuovo_preventivo = Preventivo(
+            cliente_id=cliente_id,
+            righe=[
+                RigaPreventivo(
+                    qty=riga["qty"],
+                    descrizione=riga["descrizione"],
+                    prezzo_ie=float(riga["prezzo_ie"]),
+                    prezzo_ii=float(riga["prezzo_ie"]) * iva,
+                    totale_riga=float(riga["prezzo_ii"]) * float(riga["qty"]),
+                )
+                for riga in righe
+            ],
+            totale_preventivo=sum((riga["totale"]) for riga in righe) + tasse_varie,
+        )
+        db.session.add(nuovo_preventivo)
+        db.session.commit()
 
-        return jsonify({"cliente_id": cliente.id, "righe": [riga for riga in righe]})
+        return (
+            jsonify(
+                {
+                    "cliente_id": cliente.id,
+                    "preventivo_id": nuovo_preventivo.id,
+                    "righe": [riga for riga in righe],
+                }
+            ),
+            200,
+        )
     return render_template("preventivo_new.html")
 
 
@@ -378,48 +404,14 @@ def render_row():
     )
 
 
-@app.get("/preventivi/visualizza")
-def visualizza_preventivo():
-    # Recupero il dato tramite il query params passato
-    cliente = request.args.get("cliente", "Nessun cliente")
-    ragsoc = request.args.get("ragsoc", "Nessuna ragione sociale")
-    indirizzo = request.args.get("indirizzo", "Nessun indirizzo")
-    cap = request.args.get("cap", "Nessun cap")
-    citta = request.args.get("citta", "Nessuna citta")
-    provincia = request.args.get("provincia", "Nessuna provincia")
-    email = request.args.get("email", "Nessuna email")
-    telefono = request.args.get("telefono", "Nessun telefono")
-    p_iva = request.args.get("p_iva", "Nessuna p_iva")
-    sdi = request.args.get("sdi", "Nessuno sdi")
-    pec = request.args.get("pec", "Nessuna pec")
-    prezzo = request.args.get("prezzo", "Nessun cliente")
-    prezzo_ii = request.args.get("prezzo_ii", "Nessun cliente")
-    prezzo_subtotale = request.args.get("prezzo_subtotale", "Nessun cliente")
-    tasse_varie = request.args.get("tasse_varie", "Nessun cliente")
-    totale = request.args.get("totale", "Nessun dato")
-    descrizione = request.args.get("descrizione", "Nessun dato")
-    qty = request.args.get("qty", "Nessun dato")
-
-    # Qui l'URL è già generato.. Questa riga serve solo a inserire la variabile "dato" sulla pagina, passata tramite query params
-    return render_template(
-        "_preventivo.html",
-        cliente=cliente,
-        indirizzo=indirizzo,
-        cap=cap,
-        citta=citta,
-        provincia=provincia,
-        email=email,
-        telefono=telefono,
-        p_iva=p_iva,
-        sdi=sdi,
-        pec=pec,
-        prezzo=prezzo,
-        prezzo_ii=prezzo_ii,
-        prezzo_subtotale=prezzo_subtotale,
-        tasse_varie=tasse_varie,
-        totale=totale,
-        descrizione=descrizione,
-        qty=qty,
+@app.get("/preventivi/visualizza/<int:id>")
+def visualizza_preventivo(id):
+    preventivo = Preventivo.query.filter_by(id=id).first_or_404()
+    return jsonify(
+        {
+            "preventivo_id": preventivo.id,
+            "cliente": preventivo.cliente.ragsoc,
+        }
     )
 
 

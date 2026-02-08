@@ -71,7 +71,7 @@ body {
 }
 
 .col-pagamento {
-  width: 200px!important;
+  width: 200px !important;
 }
 
 i.bi {
@@ -183,6 +183,11 @@ body.loaded {
 
 .link-primary {
   color: #9600ff !important;
+}
+
+#textarea_descrizione {
+  resize: none;
+  overflow: hidden;
 }
 
 .form-select-sm {

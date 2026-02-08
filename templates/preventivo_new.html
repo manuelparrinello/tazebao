@@ -110,7 +110,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <!-- <label class="form-label" for="titolo_prova">Descrizione</label> -->
-                                    <textarea placeholder="Inserisci descrizione lavoro" rows="1" class="form-control" type="text" name="descrizione" :value="descrizione"></textarea>
+                                    <textarea placeholder="Inserisci descrizione lavoro" rows="1" class="form-control" type="text" name="descrizione" v-model="descrizione" @input="dbg($event);autoResize($event)"></textarea>
                                 </div>
                             </div>
 

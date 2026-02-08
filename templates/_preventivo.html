@@ -43,17 +43,18 @@
     <div class="page" id="nuovoPreventivo">
         <div class="row">
 
-            {{ preventivo.cliente.ragsoc }}
-            {% for riga in preventivo.righe %}
-                {{ riga.id }}
-                {{ riga.descrizione }}
-                {{ riga.qty }}
-                {{ riga.prezzo_ie }}
-                {{ riga.prezzo_ii }}
-                {{ riga.prezzo_ii }}
-                {{ riga.totale_riga }}
-            {% endfor %}
+            <!-- INTESTAZIONE AZIENDA -->
+            <div class="col-6 ">
+                <span class="fw-bold">COSEBELLE - Comunicazione e altre cose<br></span>
+                <span>Via Mazzini 141, 91025 Marsala (TP)<br></span>
+                <span>indirizzoemail@gmail.com - 0923123456<br></span>
+                <span>P.IVA 01234567890 - SDI USAL8PV<br></span>
+            </div>
 
+            <!-- LOGO AZIENDA -->
+            <div class="col-6 d-inline-flex justify-content-end align-items-center">
+                <img class="company-logo" src="{{ url_for('static', filename='/img/LogoCosebelle.png')}}" alt="">
+            </div>
 
         </div>
 
@@ -61,13 +62,20 @@
         <div style="margin-top: 90px;" class="row">
             <!-- INTESTAZIONE CLIENTE -->
             <div class="col-6">
+                <span><strong>CLIENTE<br></strong></span>
+                <span class="fw-bold">{{ preventivo.cliente.ragsoc }}<br></span>
+                <span>{{ preventivo.cliente.indirizzo if preventivo.cliente.indirizzo else 'n.d'}}, {{ preventivo.cliente.cap if preventivo.cliente.cap else 'n.d' }} {{ preventivo.cliente.citta if preventivo.cliente.citta else 'n.d' }} ({{ preventivo.cliente.provincia if preventivo.cliente.provincia else 'n.d' }})<br></span>
+                <span>{{ preventivo.cliente.email if preventivo.cliente.email else 'n.d' }} - {{ preventivo.cliente.telefono if preventivo.cliente.telefono else 'n.d' }}<br></span>
+                <span style="text-transform: uppercase;">P.IVA {{ preventivo.cliente.p_iva if preventivo.cliente.p_iva else 'n.d' }} - SDI {{ preventivo.cliente.sdi if preventivo.cliente.sdi else 'n.d' }}<br></span>
             </div>
 
             <!-- DATI PREVENTIVO -->
             <div class="col-6">
                 <div class="text-end">
                     <span><strong>
-                        SCADENZA PREVENIVO: 1 anno
+                        *** DA SISTEMARE LA NUMERAZIONE PROGRESSIVA ***<br>
+                        PREVENTIVO N. {{ preventivo.id }} <br>
+                        SCADENZA PREVENTIVO: 1 anno
                     </strong></span>
                 </div>
             </div>
@@ -89,8 +97,15 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for riga in preventivo.righe %}
                     <tr>
+                        <th scope="row">{{ riga.qty }}</th>
+                        <td>{{ riga.descrizione }}</td>
+                        <td class="text-end">{{  riga.prezzo_ie | euroFormat }}€</td>
+                        <td class="text-end">{{ riga.prezzo_ii | euroFormat}}€</td>
+                        <td class="text-end">{{ riga.totale_riga | euroFormat}}€</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -100,6 +115,18 @@
             <div class="col-7"></div>
             <div class="col-5 px-0">
                 <table class="table">
+                    <tr>
+                        <th class="text-start">Subtotale</th>
+                        <th class="text-end">{{ subtotale | euroFormat}}€</th>
+                    </tr>
+                    <tr>
+                        <td class="text-start">Tasse varie</td>
+                        <td class="text-end">{{ 8 | euroFormat}}€</td>
+                    </tr>
+                    <tr class="tr-thickborder">
+                        <th class="text-start">TOTALE</th>
+                        <th class="text-end">{{ preventivo.totale_preventivo | euroFormat}}€</th>
+                    </tr>
 
                 </table>
             </div>

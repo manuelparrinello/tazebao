@@ -19,6 +19,14 @@ const preventivo = Vue.createApp({
         };
     },
     methods: {
+        dbg(e) {
+            console.log("RAW:", JSON.stringify(e.target.value));
+            console.log("MODEL:", JSON.stringify(this.descrizione));
+        },
+        autoResize(e) {
+            e.target.style.height = "auto";
+            e.target.style.height = e.target.scrollHeight + "px";
+        },
         async loadClienti() {
             const url = `/api/clienti/getall`;
             const response = await fetch(url, {

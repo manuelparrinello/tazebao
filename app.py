@@ -407,7 +407,11 @@ def render_row():
 @app.get("/preventivi/visualizza/<int:id>")
 def visualizza_preventivo(id):
     preventivo = Preventivo.query.filter_by(id=id).first_or_404()
-    return render_template("_preventivo.html", preventivo=preventivo)
+    righe = preventivo.righe
+    subtotale = sum((riga.totale_riga) for riga in righe)
+    return render_template(
+        "_preventivo.html", preventivo=preventivo, subtotale=subtotale
+    )
 
 
 ######################## AZIONI ########################

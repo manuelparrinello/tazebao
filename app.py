@@ -407,12 +407,7 @@ def render_row():
 @app.get("/preventivi/visualizza/<int:id>")
 def visualizza_preventivo(id):
     preventivo = Preventivo.query.filter_by(id=id).first_or_404()
-    return jsonify(
-        {
-            "preventivo_id": preventivo.id,
-            "cliente": preventivo.cliente.ragsoc,
-        }
-    )
+    return render_template("_preventivo.html", preventivo=preventivo)
 
 
 ######################## AZIONI ########################

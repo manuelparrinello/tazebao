@@ -99,8 +99,9 @@ const preventivo = Vue.createApp({
             this.indiceRiga++;
         },
 
-        async viewPreventivo(id) {
+        viewPreventivo(id) {
             const url = `/preventivi/visualizza/${id}`;
+            window.location.href = url;
         },
 
         async sendForm(e) {
@@ -122,7 +123,15 @@ const preventivo = Vue.createApp({
                 throw new Error("Errore richiesta: HTTP " + response.status);
             }
             const data = await response.json();
-            console.log(data);
+            var preventivo_id = data.preventivo_id;
+            console.log(preventivo_id);
+            var conferma = window.confirm(
+                "Preventivo salvato. Vuoi visualizzarlo?",
+            );
+            if (!conferma) {
+                window.location.href = "/clienti";
+            }
+            this.viewPreventivo(preventivo_id);
         },
     },
     mounted() {

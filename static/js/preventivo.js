@@ -1,7 +1,7 @@
 const preventivo = Vue.createApp({
     data() {
         return {
-            qty: "",
+            qty: "1",
             descrizione: "",
             prezzo: "",
             clienteData: {},
@@ -77,39 +77,44 @@ const preventivo = Vue.createApp({
             }
         },
 
+        euroFormat(value) {
+            const n = Number(value) || 0;
+            return n.toFixed(2).replace(".", ",");
+        },
+
         async addRigaPreventivo(e) {
             e.preventDefault();
             if (this.clienteSelezionato === "Seleziona cliente") {
                 window.alert("Seleziona cliente!");
                 return;
             }
-            console.clear();
-            const form = document.querySelector("#formNuovoPreventivo");
-            const formData = new FormData(form);
-            const qty = Number(formData.get("qty")) || 0;
-            const prezzo = Number(formData.get("prezzo")) || 0;
-            const descrizione = String(
-                formData.get("descrizione") || "",
-            ).trim();
+            // console.clear();
+            // const form = document.querySelector("#formNuovoPreventivo");
+            // const formData = new FormData(form);
+            // const qty = Number(formData.get("qty")) || 0;
+            // const prezzo = Number(formData.get("prezzo")) || 0;
+            // const descrizione = String(formData.get("descrizione") || "");
             const riga = {
                 idRiga: this.idRiga,
-                qty: qty,
-                descrizione: descrizione,
-                prezzo: prezzo,
-                totaleRiga:
-                    Number(formData.get("qty")) *
-                    Number(formData.get("prezzo")),
+                qty: Number(this.qty) || 0,
+                descrizione: this.descrizione,
+                prezzo: Number(this.prezzo) || 0,
+                totaleRiga: Number(this.qty) * Number(this.prezzo),
             };
             this.righe.push(riga);
             this.calcSubtotale();
             console.log(this.subtotale);
+            console.log(this.descrizione);
             this.idRiga++;
             this.indiceRiga++;
+            this.qty = 1;
+            this.descrizione = "";
+            this.prezzo = undefined;
         },
 
         viewPreventivo(id) {
             const url = `/preventivi/visualizza/${id}`;
-            window.location.href = url;
+            window.open(url, "_blank");
         },
 
         async sendForm(e) {

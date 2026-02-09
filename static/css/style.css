@@ -185,9 +185,16 @@ body.loaded {
   color: #9600ff !important;
 }
 
+
 #textarea_descrizione {
   resize: none;
   overflow: hidden;
+  white-space: pre-wrap;
+}
+
+.descrizione-preventivo {
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .form-select-sm {

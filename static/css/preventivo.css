@@ -16,3 +16,8 @@ tr.tr-thickborder {
     border-right: none;
     border-color: black;
 }
+
+.descrizione-preventivo {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+}

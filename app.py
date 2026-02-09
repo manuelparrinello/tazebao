@@ -43,6 +43,13 @@ def euroFormat(value):
     return "{:.2f}".format(value).replace(".", ",")
 
 
+@app.template_filter("nl2br")
+def nl2br_filter(text):
+    if text:
+        return text.replace("\n", "<br>\n")
+    return ""
+
+
 ######################## DB TABLES CREATION ########################
 
 
@@ -322,7 +329,6 @@ def nuovo_preventivo():
             }
             for riga in data["righe"]
         ]
-        print(righe)
         nuovo_preventivo = Preventivo(
             cliente_id=cliente_id,
             righe=[
@@ -408,6 +414,8 @@ def render_row():
 def visualizza_preventivo(id):
     preventivo = Preventivo.query.filter_by(id=id).first_or_404()
     righe = preventivo.righe
+    for riga in preventivo.righe:
+        print(f"DESCRIZIONE LETTA: {repr(riga.descrizione)}")
     subtotale = sum((riga.totale_riga) for riga in righe)
     return render_template(
         "_preventivo.html", preventivo=preventivo, subtotale=subtotale

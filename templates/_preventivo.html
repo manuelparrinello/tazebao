@@ -100,7 +100,8 @@
                     {% for riga in preventivo.righe %}
                     <tr>
                         <th scope="row">{{ riga.qty | int}}</th>
-                        <td>{{ riga.descrizione }}</td>
+                        <td style="white-space: pre-wrap; word-wrap: break-word;">{{ riga.descrizione | nl2br | safe }}
+                        </td>
                         <td class="text-end">{{  riga.prezzo_ie | euroFormat }}€</td>
                         <td class="text-end">{{ riga.prezzo_ii | euroFormat}}€</td>
                         <td class="text-end">{{ riga.totale_riga | euroFormat}}€</td>

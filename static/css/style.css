@@ -114,7 +114,7 @@ i.bi {
 }
 
 .container {
-  max-width: 1440px !important;
+  max-width: 1366px !important;
 }
 
 body.loaded {
@@ -219,6 +219,10 @@ body.loaded {
   resize: none;
   overflow: hidden;
   white-space: pre-wrap;
+}
+
+#tr_subtotale {
+  border-top-width: medium!important;
 }
 
 .descrizione-preventivo {

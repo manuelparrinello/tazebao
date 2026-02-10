@@ -16,6 +16,7 @@ const preventivo = Vue.createApp({
             subtotale: 0,
             totali: [],
             clienteSelezionato: "Seleziona cliente",
+            tassa: 8.18
         };
     },
     methods: {
@@ -88,12 +89,6 @@ const preventivo = Vue.createApp({
                 window.alert("Seleziona cliente!");
                 return;
             }
-            // console.clear();
-            // const form = document.querySelector("#formNuovoPreventivo");
-            // const formData = new FormData(form);
-            // const qty = Number(formData.get("qty")) || 0;
-            // const prezzo = Number(formData.get("prezzo")) || 0;
-            // const descrizione = String(formData.get("descrizione") || "");
             const riga = {
                 idRiga: this.idRiga,
                 qty: Number(this.qty) || 0,

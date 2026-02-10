@@ -132,13 +132,14 @@
                     </div>
                 </div>
 
+                <!-- RIGHE PREVENTIVO -->
                 <div class="col col-sm mt-4">
                     <h5 class="fw-bold">Righe preventivo</h5>
                     <div class="card rounded rounded-4 shadow-sm g-0">
                         <div class="card-body p-4">
                             <div class="col-auto col-sm align-content-center" v-if="righe.length > 0" v-cloak>
                                 <div>
-                                    <table class="table font-size-md-sm">
+                                    <table class="table">
                                         <thead>
                                             <tr>
                                                 <th style="width: auto; width: 50px;">Qtà</th>
@@ -185,42 +186,6 @@
                                                     ]]€</td>
                                             </tr>
                                         </tbody>
-
-                                        
-                                        
-
-                                        <!-- <tbody>
-                                            <tr v-if="righe.length > 0" v-for="riga in righe" :id="riga.idRiga">
-                                                <td class="descrizione-preventivo"><strong class="text-primary">[[
-                                                        riga.qty ]]x</strong> : [[ riga.descrizione ]]</td>
-                                                <td class="text-end">[[ euroFormat(riga.prezzo) ]]€</td>
-                                                <td class="text-end">[[ euroFormat(riga.totaleRiga) ]]€</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="fw-bold">Subtotale</td>
-                                                <td></td>
-                                                <td class="fw-bold text-end">[[ euroFormat(subtotale) ]]€
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-left">IVA 22%</td>
-                                                <td></td>
-                                                <td class="text-end">[[ euroFormat(subtotale * 0.22) ]]€
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-left">Tassa XYZ</td>
-                                                <td></td>
-                                                <td class="text-end">[[ euroFormat(tassa) ]]€
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="fw-bold">TOTALE</td>
-                                                <td></td>
-                                                <td class="fw-bold text-end">[[ euroFormat((subtotale * 1.22) + tassa)
-                                                    ]]€</td>
-                                            </tr>
-                                        </tbody> -->
 
                                     </table>
 

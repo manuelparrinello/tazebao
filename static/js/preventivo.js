@@ -16,7 +16,7 @@ const preventivo = Vue.createApp({
             subtotale: 0,
             totali: [],
             clienteSelezionato: "Seleziona cliente",
-            tassa: 8.18
+            tassa: 8.18,
         };
     },
     methods: {
@@ -107,6 +107,13 @@ const preventivo = Vue.createApp({
             this.prezzo = undefined;
         },
 
+        deleteRigaPreventivo(id) {
+            this.righe = this.righe.filter((riga) => {
+                return riga["idRiga"] !== id;
+            });
+            this.calcSubtotale();
+        },
+
         viewPreventivo(id) {
             const url = `/preventivi/visualizza/${id}`;
             window.open(url, "_blank");
@@ -146,4 +153,5 @@ const preventivo = Vue.createApp({
         this.loadClienti();
     },
     delimiters: ["[[", "]]"],
+    computed() {},
 }).mount("#nuovoPreventivo");

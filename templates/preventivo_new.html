@@ -3,6 +3,7 @@
 <h1>Nuovo preventivo</h1>
 <p class="mb-4">Compila il modulo sottostante per aggiungere un nuovo preventivo.</p>
 
+
 <div id="nuovoPreventivo">
     <form action="" id="formNuovoPreventivo">
 
@@ -142,6 +143,7 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
+                                                <th style="width: auto; width: 50px;"></th>
                                                 <th style="width: auto; width: 50px;">Qtà</th>
                                                 <th style="width: auto">Descrizione</th>
                                                 <th class="text-end" style="width: 130px">Prezzo
@@ -151,6 +153,13 @@
                                         </thead>
                                         <tbody>
                                             <tr v-if="righe.length > 0" v-for="riga in righe" :id="riga.idRiga">
+                                                <td class="text-center">
+                                                    <strong @click="deleteRigaPreventivo(riga.idRiga)"
+                                                        class="text-secondary icon-trash-righe pointer"
+                                                        title="Elimina riga">
+                                                        <i class="bi bi-trash"></i>
+                                                    </strong>
+                                                </td>
                                                 <td class="text-start"><strong class="text-primary">[[
                                                         riga.qty ]]x</strong></td>
                                                 <td class="descrizione-preventivo">[[ riga.descrizione ]]</td>
@@ -159,12 +168,14 @@
                                             </tr>
                                             <tr id="tr_subtotale">
                                                 <td></td>
+                                                <td></td>
                                                 <td class="fw-bold">Subtotale</td>
                                                 <td></td>
                                                 <td class="fw-bold text-end">[[ euroFormat(subtotale) ]]€
                                                 </td>
                                             </tr>
                                             <tr>
+                                                <td></td>
                                                 <td></td>
                                                 <td class="text-left">IVA 22%</td>
                                                 <td></td>
@@ -173,12 +184,14 @@
                                             </tr>
                                             <tr>
                                                 <td></td>
+                                                <td></td>
                                                 <td class="text-left">Tassa XYZ</td>
                                                 <td></td>
                                                 <td class="text-end">[[ euroFormat(tassa) ]]€
                                                 </td>
                                             </tr>
                                             <tr>
+                                                <td></td>
                                                 <td></td>
                                                 <td class="fw-bold">TOTALE</td>
                                                 <td></td>
@@ -194,7 +207,6 @@
                                 <button class="button-61 w-100" @click="sendForm($event)">Salva</button>
                             </div>
 
-
                             <div v-else class="d-flex align-items-center justify-content-center">
                                 <span class="text-secondary">Nessuna riga aggiunta</span>
                             </div>
@@ -208,6 +220,8 @@
 
     </form>
 </div>
+
+
 
 {% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/preventivo.js') }}"></script>

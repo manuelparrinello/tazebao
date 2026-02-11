@@ -6,6 +6,83 @@
   font-weight: 500;
 }
 
+/* SIDEBAR */
+:root {
+  --app-primary: #9600ff;
+  --sidebar-expanded: 260px;
+  --sidebar-collapsed: 80px;
+}
+
+
+@media (min-width: 992px) {
+  body {
+    padding-left: var(--sidebar-expanded);
+  }
+
+  body.sidebar-collapsed {
+    padding-left: var(--sidebar-collapsed);
+  }
+}
+
+/* Desktop layout */
+@media (min-width: 992px) {
+
+  .app-sidebar-desktop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: var(--sidebar-expanded);
+    overflow-y: auto;
+    background: var(--bs-body-bg);
+    transition: width .2s ease;
+  }
+
+  body.sidebar-collapsed .app-sidebar-desktop {
+    width: var(--sidebar-collapsed);
+  }
+
+  body.sidebar-collapsed .nav-label,
+  body.sidebar-collapsed .brand-text {
+    display: none !important;
+  }
+
+  body.sidebar-collapsed .nav-link {
+    justify-content: center;
+  }
+}
+
+/* Link */
+.app-sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  border-radius: .75rem;
+  padding: .6rem .75rem;
+  color: var(--bs-body-color);
+}
+
+.app-sidebar .nav-link:hover {
+  background: rgba(150, 0, 255, .08);
+  color: var(--app-primary);
+}
+
+.app-sidebar .nav-link.active {
+  background: rgba(150, 0, 255, .14);
+  color: var(--app-primary);
+  font-weight: 600;
+}
+
+.brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--app-primary);
+  box-shadow: 0 0 0 4px rgba(150, 0, 255, .12);
+}
+
+/* FINE SIDEBAR */
+
 p,
 h1,
 h2,
@@ -38,7 +115,7 @@ body {
   box-shadow: none !important;
 }
 
-[v-cloak] > *:not(.loader) {
+[v-cloak]>*:not(.loader) {
   display: none;
 }
 
@@ -123,6 +200,14 @@ body.loaded {
 
 /* CSS */
 
+#menu-mobile-btn {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  background: var(--app-primary);
+  border: var(--app-primary);
+}
+
 .button-61 {
   background-color: #9600ff;
   align-items: center;
@@ -199,6 +284,10 @@ body.loaded {
   color: #ffffff;
 }
 
+.icon-trash-righe:hover {
+  color: #9600ff !important;
+}
+
 .bg-primary {
   background-color: #9600ff !important;
 }
@@ -222,7 +311,7 @@ body.loaded {
 }
 
 #tr_subtotale {
-  border-top-width: medium!important;
+  border-top-width: medium !important;
 }
 
 .descrizione-preventivo {

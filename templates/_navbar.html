@@ -1,71 +1,106 @@
-<!-- NAVBAR DESKTOP -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary d-none d-lg-flex">
-    <div class="container d-inline-flex justify-content-space-between">
-        <a class="navbar-brand" href="">
-            <img class="mobile-nav-logo px-0" src="{{ url_for('static', filename='img/Logo_W.png')}}" alt="" />
-        </a>
+<!-- SIDEBAR DESKTOP -->
+<aside class="app-sidebar app-sidebar-desktop d-none d-lg-block border-end p-3">
 
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link text-light fw-medium" href="{{ url_for('index') }}">
-                        <i class="bi bi-speedometer2"></i>&nbsp;Dashboard</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-light fw-medium" href="{{ url_for('lavori') }}">
-                        <i class="bi bi-list-task"></i>&nbsp;Lavori</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-light fw-medium" href="{{ url_for('clienti') }}">
-                        <i class="bi bi-people-fill"></i>&nbsp;Clienti</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-light fw-medium" href="{{ url_for('nuovo_preventivo') }}">
-                        <i class="bi bi-file-earmark-bar-graph"></i>&nbsp;Preventivi</a>
-                </li>
-            </ul>
+    <!-- Brand -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center gap-2">
+            <div class="brand-dot"></div>
+            <div class="brand-text">
+                <div class="fw-bold">Opus</div>
+                <div class="text-secondary small">Gestionale</div>
+            </div>
         </div>
-    </div>
-</nav>
 
-<!-- NAVBAR MOBILE -->
-<nav class="navbar navbar-dark bg-primary d-lg-none">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="{{ url_for('index') }}">
-            <img class="desktop-nav-logo" src="{{ url_for('static', filename='img/Logo_W.png')}}" alt="" />
-        </a>
-
-        <!-- HAMBURGER -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenuWrapper" aria-controls="mobileMenuWrapper" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+        <!-- Toggle collasso -->
+        <button class="btn btn-sm btn-outline-secondary" id="btnToggleSidebar">
+            <i class="bi bi-layout-sidebar-inset"></i>
         </button>
     </div>
-</nav>
 
-<!-- WRAPPER ISOLANTE (QUESTO RISOLVE IL PROBLEMA!) -->
-<div class="collapse bg-dark d-lg-none" id="mobileMenuWrapper">
-    <div class="container pt-2 pb-4 px-4">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link text-light fw-medium" href="{{ url_for('index') }}" data-bs-target="#mobileMenuWrapper">
-                    <i class="bi bi-speedometer2"></i>&nbsp;Dashboard
-                </a>
-            </li>
+    <!-- Menu -->
+    <ul class="nav nav-pills flex-column gap-1">
 
-            <li class="nav-item">
-                <a class="nav-link text-light fw-medium" href="{{ url_for('nuovo_lavoro') }}" data-bs-target="#mobileMenuWrapper">
-                    <i class="bi bi-plus-square"></i>&nbsp;Nuovo lavoro
-                </a>
-            </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index') }}">
+                <i class="bi bi-speedometer2"></i>
+                <span class="nav-label">Dashboard</span>
+            </a>
+        </li>
 
-            <li class="nav-item">
-                <a class="nav-link text-light fw-medium" href="{{ url_for('lavori') }}" data-bs-target="#mobileMenuWrapper">
-                    <i class="bi bi-list-task"></i>&nbsp;Tutti i lavori
-                </a>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('clienti') }}">
+                <i class="bi bi-people"></i>
+                <span class="nav-label">Clienti</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('lavori') }}">
+                <i class="bi bi-briefcase"></i>
+                <span class="nav-label">Lavori</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('nuovo_preventivo') }}">
+                <i class="bi bi-receipt"></i>
+                <span class="nav-label">Preventivi</span>
+            </a>
+        </li>
+
+        <li class="nav-item mt-3">
+            <div class="text-secondary small px-2 nav-label">Amministrazione</div>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="bi bi-file-earmark-text"></i>
+                <span class="nav-label">Fatture</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="bi bi-gear"></i>
+                <span class="nav-label">Impostazioni</span>
+            </a>
+        </li>
+
+    </ul>
+</aside>
+
+
+<!-- SIDEBAR MOBILE -->
+<div class="offcanvas offcanvas-start app-sidebar d-lg-none" tabindex="-1" id="sidebarMobile">
+
+    <div class="offcanvas-header">
+        <div class="d-flex align-items-center gap-2">
+            <div class="brand-dot"></div>
+            <h5 class="m-0">Opus</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+
+    <div class="offcanvas-body">
+        <ul class="nav nav-pills flex-column gap-1">
+            <li class="nav-item"><a class="nav-link active" href="{{ url_for('index') }}"><i
+                        class="bi bi-speedometer2"></i> Dashboard</a>
             </li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('clienti') }}"><i class="bi bi-people"></i>
+                    Clienti</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('lavori') }}"><i class="bi bi-briefcase"></i>
+                    Lavori</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('nuovo_preventivo') }}"><i
+                        class="bi bi-receipt"></i> Preventivi</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-file-earmark-text"></i> Fatture</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear"></i> Impostazioni</a></li>
         </ul>
     </div>
 </div>
+
+<script>
+    document.getElementById("btnToggleSidebar")
+        ?.addEventListener("click", () => {
+            document.body.classList.toggle("sidebar-collapsed");
+        });
+</script>

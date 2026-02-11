@@ -314,7 +314,7 @@ def nuovo_lavoro():
 def nuovo_preventivo():
     if request.method == "POST":
         iva = 1.22
-        tasse_varie = 8
+        tasse_varie = 8.18
         data = request.get_json()
         cliente_id = data["cliente_id"]
         cliente = Cliente.query.filter_by(id=cliente_id).first()

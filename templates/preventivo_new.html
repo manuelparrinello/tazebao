@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block title %}Nuovo preventivo {% endblock %} {% block content %}
 
-<h1>Nuovo preventivo</h1>
+<h2>Nuovo preventivo</h2>
 <p class="mb-4">Compila il modulo sottostante per aggiungere un nuovo preventivo.</p>
 
 
@@ -34,7 +34,7 @@
 
                                     <div class="d-flex flex-column">
                                         <span class="data-label fw-bold mt-2">Nome / Ragione Sociale</span>
-                                        <p class="mt-1 mb-0">[[ clienteData?.ragsoc || '-' ]]</p>
+                                        <p class="mt-2 mb-0">[[ clienteData?.ragsoc || '-' ]]</p>
                                     </div>
 
                                     <div class="d-flex flex-column">

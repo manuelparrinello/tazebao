@@ -6,11 +6,145 @@
   font-weight: 500;
 }
 
-/* SIDEBAR */
-:root {
-  --app-primary: #9600ff;
-  --sidebar-expanded: 260px;
-  --sidebar-collapsed: 80px;
+/* =========================
+   VARIABILI
+========================= */
+
+:root{
+    --app-primary: #9600ff !important;
+    --bs-primary: #9600ff !important;
+    --bs-btn-primary: #9600ff !important;
+    --sidebar-expanded: 280px;
+    --sidebar-collapsed: 84px;
+}
+
+/* =========================
+   LAYOUT GENERALE
+========================= */
+
+.app-content{
+    min-height: 100vh;
+    transition: margin-left .2s ease;
+}
+
+/* =========================
+   SIDEBAR DESKTOP
+========================= */
+
+@media (min-width: 992px){
+
+    .app-sidebar{
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: var(--sidebar-expanded);
+        background: var(--bs-body-bg);
+        display: flex;
+        flex-direction: column;
+        z-index: 1030;
+        transition: width .2s ease;
+    }
+
+    .app-content{
+        margin-left: var(--sidebar-expanded);
+    }
+
+    /* --- COLLAPSED --- */
+
+    body.sidebar-collapsed .app-sidebar{
+        width: var(--sidebar-collapsed);
+    }
+
+    body.sidebar-collapsed .app-content{
+        margin-left: var(--sidebar-collapsed);
+    }
+
+    body.sidebar-collapsed .nav-label,
+    body.sidebar-collapsed .brand-text{
+        display: none !important;
+    }
+
+    body.sidebar-collapsed .nav-link{
+        justify-content: center;
+    }
+
+    body.sidebar-collapsed .sidebar-user{
+        justify-content: center;
+    }
+}
+
+/* =========================
+   NAV LINK STYLING
+========================= */
+
+.app-sidebar .nav-link,
+.app-sidebar-mobile .nav-link{
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .6rem .75rem;
+    border-radius: .75rem;
+    color: var(--bs-body-color);
+    transition: background .15s ease, color .15s ease;
+}
+
+.app-sidebar .nav-link:hover,
+.app-sidebar-mobile .nav-link:hover{
+    /* background: rgba(150, 0, 255, .08); */
+    color: var(--app-primary);
+}
+
+.app-sidebar .nav-link.active,
+.app-sidebar-mobile .nav-link.active{
+    background: rgba(150, 0, 255, .14);
+    color: var(--app-primary);
+    font-weight: 600;
+}
+
+.nav-sublink{
+    padding: .45rem .6rem;
+    border-radius: .6rem;
+}
+
+/* =========================
+   SUBMENU BUTTON
+========================= */
+
+.sidebar-collapse-btn{
+    background: transparent;
+    border: none;
+    text-align: left;
+    width: 100%;
+}
+
+/* =========================
+   USER AREA
+========================= */
+
+.sidebar-user{
+    display: flex;
+    align-items: center;
+}
+
+/* =========================
+   LOGO DOT
+========================= */
+
+.brand-dot{
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--app-primary);
+    box-shadow: 0 0 0 4px rgba(150, 0, 255, .12);
+}
+
+/* =========================
+   MOBILE OFFCANVAS
+========================= */
+
+.app-sidebar-mobile{
+    width: 270px;
 }
 
 /* FINE SIDEBAR */

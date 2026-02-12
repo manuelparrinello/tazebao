@@ -1,11 +1,11 @@
-from flask import Flask, jsonify, render_template, request, redirect, url_for
-from flask_cors import CORS
-from flask_migrate import Migrate
 import os
-from sqlalchemy import MetaData
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
+from flask import Flask, jsonify, redirect, render_template, request, url_for
+from flask_cors import CORS
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import MetaData
 
 # Definiamo uno schema per i nomi dei vincoli
 convention = {
@@ -413,13 +413,7 @@ def render_row():
 @app.get("/preventivi/visualizza/<int:id>")
 def visualizza_preventivo(id):
     preventivo = Preventivo.query.filter_by(id=id).first_or_404()
-    righe = preventivo.righe
-    for riga in preventivo.righe:
-        print(f"DESCRIZIONE LETTA: {repr(riga.descrizione)}")
-    subtotale = sum((riga.totale_riga) for riga in righe)
-    return render_template(
-        "_preventivo.html", preventivo=preventivo, subtotale=subtotale
-    )
+    return render_template("_preventivo.html", preventivo=preventivo)
 
 
 ######################## AZIONI ########################

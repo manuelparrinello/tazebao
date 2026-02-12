@@ -11,46 +11,90 @@
                 </div>
             </div>
 
-            <button class="btn btn-sm btn-outline-secondary" id="btnSidebarCollapse">
-                <i class="bi bi-layout-sidebar-inset"></i>
-            </button>
+
         </div>
     </div>
 
     <nav class="sidebar-nav p-2 flex-grow-1">
         <ul class="nav nav-pills flex-column gap-1">
 
-            <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('index') }}">
+            <li class="nav-item mt-4">
+                <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}"
+                    href="{{ url_for('index') }}">
                     <i class="bi bi-speedometer2"></i>
                     <span class="nav-label">Dashboard</span>
                 </a>
             </li>
 
-            <!-- esempio submenu -->
-            <li class="nav-item">
-                <button class="nav-link w-100"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#submenuPreventivi">
-                    <i class="bi bi-receipt"></i>
-                    <span class="nav-label">Preventivi</span>
-                </button>
+            <!-- PREVENTIVI -->
+            <div class="d-inline-flex align-items-center px-2 mt-3">
+                <span class="title-menu-divider">Preventivi</span>
+                <hr class="hr-sidebar ms-2 me-4">
+            </div>
 
-                <div class="collapse" id="submenuPreventivi">
-                    <ul class="nav flex-column ms-4 mt-1">
-                        <li>
-                            <a class="nav-link" href="{{ url_for('nuovo_preventivo') }}">
-                                Nuovo
-                            </a>
-                        </li>
-                        <li>
-                            <a class="nav-link" href="#">
-                                Lista
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+            <!-- nuovo preventivo -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('nuovo_preventivo') }}">
+                    <i class="bi bi-plus"></i>
+                    <span class="nav-label">Nuovo preventivo</span>
+                </a>
             </li>
+
+            <!-- tutti i preventivi -->
+            <li class="nav-item">
+                <span class="nav-link">
+                    <i class="bi bi-list-ul"></i>
+                    <span class="nav-label">Tutti</span>
+                </span>
+            </li>
+
+            <!-- CLIENTI -->
+            <div class="d-inline-flex align-items-center px-2 mt-3">
+                <span class="title-menu-divider">Clienti</span>
+                <hr class="hr-sidebar ms-2 me-4">
+            </div>
+
+            <!-- nuovo cliente -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('nuovo_cliente') }}">
+                    <i class="bi bi-person-plus"></i>
+                    <span class="nav-label">Nuovo cliente</span>
+                </a>
+            </li>
+
+            <!-- tutti i clienti -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('clienti') }}">
+                    <i class="bi bi-list-ul"></i>
+                    <span class="nav-label">Tutti</span>
+                </a>
+            </li>
+
+
+
+            <!-- LAVORI e TASK -->
+            <div class="d-inline-flex align-items-center px-2 mt-3">
+                <span class="title-menu-divider">Lavori & Task</span>
+                <hr class="hr-sidebar ms-2 me-4">
+            </div>
+
+            <!-- nuovo cliente -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('nuovo_cliente') }}">
+                    <i class="bi bi-person-plus"></i>
+                    <span class="nav-label">Task</span>
+                </a>
+            </li>
+
+            <!-- tutti i clienti -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('lavori') }}">
+                    <i class="bi bi-briefcase"></i>
+                    <span class="nav-label">Lavori</span>
+                </a>
+            </li>
+
+
 
         </ul>
     </nav>
@@ -69,3 +113,30 @@
     </div>
 
 </aside>
+
+<!-- SIDEBAR MOBILE (Offcanvas) -->
+<div class="offcanvas offcanvas-start d-lg-none app-sidebar-mobile" tabindex="-1" id="sidebarMobile"
+    aria-labelledby="sidebarMobileLabel">
+
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="sidebarMobileLabel">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Chiudi"></button>
+    </div>
+
+    <div class="offcanvas-body p-2">
+        <ul class="nav nav-pills flex-column gap-1">
+            <li class="nav-item"><a class="nav-link active" href="#"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-people"></i> Clienti</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-briefcase"></i> Lavori</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-receipt"></i> Preventivi</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear"></i> Impostazioni</a></li>
+        </ul>
+
+        <div class="mt-3 pt-3 border-top">
+            <a class="btn btn-outline-danger w-100" href="/logout">
+                <i class="bi bi-box-arrow-right me-2"></i> Logout
+            </a>
+        </div>
+    </div>
+</div>

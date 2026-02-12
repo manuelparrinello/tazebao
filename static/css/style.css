@@ -23,8 +23,9 @@
 ========================= */
 
 .app-content{
-    min-height: 100vh;
+    /* min-height: 100vh; */
     transition: margin-left .2s ease;
+    padding: 80px!important;
 }
 
 /* =========================
@@ -83,7 +84,7 @@
     display: flex;
     align-items: center;
     gap: .75rem;
-    padding: .6rem .75rem;
+    padding: 0.2rem 0.75rem;
     border-radius: .75rem;
     color: var(--bs-body-color);
     transition: background .15s ease, color .15s ease;
@@ -110,6 +111,18 @@
 /* =========================
    SUBMENU BUTTON
 ========================= */
+
+.submenu {
+  margin-left: 2.5rem!important;
+}
+
+.title-menu-divider {
+  margin-left: 15.75px;
+}
+
+.hr-sidebar {
+  width: auto !important;
+}
 
 .sidebar-collapse-btn{
     background: transparent;

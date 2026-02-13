@@ -1,5 +1,6 @@
-{% extends "base.html" %} {% block title %}Preventivi{% endblock %} {% block content %}
+{% extends "base.html" %} {% block title %}Preventivi{% endblock %}
 
+ {% block content %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
     <div class="col-4 px-0">
         <h2>Tutti i preventivi</h2>
@@ -10,3 +11,19 @@
                         class="bi bi-journal-plus"></i></span>&nbsp;Nuovo lavoro</button></a>
     </div>
 </div>
+
+<div id="preventivi" v-cloak>
+    <div v-if="preventivi.length > 0" >
+        <div v-for="preventivo in preventivi">
+            <span>preventivo.descrizione</span>
+            <span>preventivo.qty</span>
+            <span>preventivo.lavoro</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/preventivi.js') }}"></script>
+{% endblock %}

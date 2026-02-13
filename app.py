@@ -139,7 +139,7 @@ class Preventivo(db.Model):
     totale_preventivo = db.Column(db.Float, nullable=True)
 
     # 1 preventivo -> N lavori (se ti serve davvero questo legame)
-    lavori = db.relationship(
+    lavoro = db.relationship(
         "Lavoro",
         backref="preventivo",  # su Lavoro avrai .preventivo
         lazy=True,
@@ -397,28 +397,12 @@ def cliente_page(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     return render_template("cliente.html", cliente=cliente)
 
+
 # PREVENTIVI
 @app.get("/preventivi")
 def preventivi():
-    p = Preventivo.query.all()
-    return jsonify({
-        'id' : p.id,
-        'data' : p.data_creazione,
-        'cliente_id' : p.cliente_id,
-        'stato' : p.stato,
-        'totale_preventivo' : p.totale_preventivo,
-        'lavori' : p.
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    })
+    return render_template("preventivi.html")
+
 
 # RENDERIZZA Righe Preventivo
 @app.get("/presentivi/addrow")
@@ -636,6 +620,33 @@ def get_ID_by_name(nome):
     id = cliente.id
     print(id)
     return jsonify({"id": id})
+
+
+# API - PREVENTIVI
+@app.get("/preventivi/getall")
+def fetch_preventivi():
+    p = Preventivo.query.all()
+    return jsonify(
+        {
+            "id": p.id,
+            "data": p.data_creazione,
+            "cliente_id": p.cliente_id,
+            "stato": p.stato,
+            "totale_preventivo": p.totale_preventivo,
+            "lavoro": p.lavoro,
+            "righe": [
+                {
+                    "id": riga.id,
+                    "qty": riga.qty,
+                    "descrizione": riga.descrizione,
+                    "prezzo_ie": riga.prezzo_ie,
+                    "prezzo_ii": riga.prezzo_ii,
+                    "totale_riga": riga.totale_riga,
+                }
+                for riga in p.righe
+            ],
+        }
+    )
 
 
 ######################## TESTING ########################

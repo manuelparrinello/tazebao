@@ -397,6 +397,28 @@ def cliente_page(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     return render_template("cliente.html", cliente=cliente)
 
+# PREVENTIVI
+@app.get("/preventivi")
+def preventivi():
+    p = Preventivo.query.all()
+    return jsonify({
+        'id' : p.id,
+        'data' : p.data_creazione,
+        'cliente_id' : p.cliente_id,
+        'stato' : p.stato,
+        'totale_preventivo' : p.totale_preventivo,
+        'lavori' : p.
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    })
 
 # RENDERIZZA Righe Preventivo
 @app.get("/presentivi/addrow")
@@ -410,6 +432,7 @@ def render_row():
     )
 
 
+# VISUALIZZA PREVENTIVO GENERATO
 @app.get("/preventivi/visualizza/<int:id>")
 def visualizza_preventivo(id):
     preventivo = Preventivo.query.filter_by(id=id).first_or_404()

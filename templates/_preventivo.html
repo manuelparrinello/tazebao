@@ -63,7 +63,7 @@
             <!-- INTESTAZIONE CLIENTE -->
             <div class="col-6">
                 <span><strong>CLIENTE<br></strong></span>
-                <span class="fw-bold">{{ preventivo.cliente.ragsoc }}<br></span>
+                <span class="fw-bold">[[ preventivo.cliente.ragsoc ]]<br></span>
                 <span>{{ preventivo.cliente.indirizzo if preventivo.cliente.indirizzo else 'n.d'}}, {{ preventivo.cliente.cap if preventivo.cliente.cap else 'n.d' }} {{ preventivo.cliente.citta if preventivo.cliente.citta else 'n.d' }} ({{ preventivo.cliente.provincia if preventivo.cliente.provincia else 'n.d' }})<br></span>
                 <span>{{ preventivo.cliente.email if preventivo.cliente.email else 'n.d' }} - {{ preventivo.cliente.telefono if preventivo.cliente.telefono else 'n.d' }}<br></span>
                 <span style="text-transform: uppercase;">P.IVA {{ preventivo.cliente.p_iva if preventivo.cliente.p_iva else 'n.d' }} - SDI {{ preventivo.cliente.sdi if preventivo.cliente.sdi else 'n.d' }}<br></span>

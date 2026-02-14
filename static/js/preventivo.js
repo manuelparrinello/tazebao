@@ -119,6 +119,10 @@ const preventivo = Vue.createApp({
             window.open(url, "_blank");
         },
 
+        async loadPreventivoData(){
+            
+        },
+
         async sendForm(e) {
             e.preventDefault();
             const url = `/preventivi/nuovo`;
@@ -151,6 +155,7 @@ const preventivo = Vue.createApp({
     },
     mounted() {
         this.loadClienti();
+        console.log(this.clienti);
     },
     delimiters: ["[[", "]]"],
     computed() {},

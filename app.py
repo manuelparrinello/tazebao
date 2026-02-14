@@ -343,6 +343,13 @@ def nuovo_preventivo():
             ],
             totale_preventivo=sum((riga["totale"]) for riga in righe) + tasse_varie,
         )
+        subtotale = 0
+
+        for riga in data["righe"]:
+            subtotale += riga["totaleRiga"]
+            print(f"TOTALE RIGA: {riga['totaleRiga']}")
+            print(f"SUBTOTALE: {subtotale}")
+
         db.session.add(nuovo_preventivo)
         db.session.commit()
 
@@ -350,8 +357,20 @@ def nuovo_preventivo():
             jsonify(
                 {
                     "cliente_id": cliente.id,
+                    "cliente_nome": cliente.name,
+                    "ragsoc": cliente.ragsoc,
+                    "indirizzo": cliente.indirizzo,
+                    "citta": cliente.citta,
+                    "cap": cliente.cap,
+                    "provincia": cliente.provincia,
+                    "email": cliente.email,
+                    "telefono": cliente.telefono,
+                    "p_iva": cliente.p_iva,
+                    "sdi": cliente.sdi,
+                    "pec": cliente.pec,
                     "preventivo_id": nuovo_preventivo.id,
                     "righe": [riga for riga in righe],
+                    "subtotale": subtotale,
                 }
             ),
             200,
@@ -623,7 +642,7 @@ def get_ID_by_name(nome):
 
 
 # API - PREVENTIVI
-@app.get("/preventivi/getall")
+@app.get("/api/preventivi/getall")
 def fetch_preventivi():
     p = Preventivo.query.all()
     return jsonify(
@@ -647,6 +666,42 @@ def fetch_preventivi():
             ],
         }
     )
+
+
+# API - PREVENTIVO BY ID
+@app.get("/api/preventivi/get/<int:id>")
+def get_preventivo_byID(id):
+    preventivo = Preventivo.query.filter_by(id=id).first_or_404()
+    return jsonify({
+        'id' : preventivo.id,
+        'cliente' : preventivo.cliente,
+        'data' : preventivo.data,
+        'stato' : preventivo.stato,
+        'lavoro' : preventivo.lavoro,
+        'totale_preventivo' : preventivo.totale_preventivo,
+        'cliente' : {
+            'nome' : preventivo.cliente.name,
+            'ragsoc' : preventivo.cliente.ragsoc,
+            'indirizzo' : preventivo.cliente.indirizzo,
+            'citta' : preventivo.cliente.citta,
+            'cap' : preventivo.cliente.cap,
+            'provincia' : preventivo.cliente.provincia,
+            'email' : preventivo.cliente.email,
+            'telefono' : preventivo.cliente.telefono,
+            'p_iva' : preventivo.cliente.p_iva,
+            'sdi' : preventivo.cliente.sdi,
+            'pec' : preventivo.cliente.pec,
+            'colore' : preventivo.cliente.colore,
+        },
+        'righe' : {
+            'id' : preventivo.righe.id,
+            'qty' : preventivo.righe.qty,
+            'descrizione' : preventivo.righe.descrizione,
+            'prezzo_ie' : preventivo.righe.prezzo_ie,
+            'prezzo_ii' : preventivo.righe.prezzo_ii,
+            'totale_riga' : preventivo.righe.totale_riga,
+        }
+    })
 
 
 ######################## TESTING ########################

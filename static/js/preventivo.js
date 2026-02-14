@@ -3,6 +3,7 @@ const preventivo = Vue.createApp({
         return {
             qty: "1",
             descrizione: "",
+            descrizionePreventivo: "",
             prezzo: "",
             clienteData: {},
             indirizzo_cliente: "",
@@ -11,6 +12,8 @@ const preventivo = Vue.createApp({
             clienti: [],
             righe: [],
             idRiga: 0,
+            preventivoId : "",
+            preventivoData : {},
             indiceRiga: 0,
             loading: true,
             subtotale: 0,
@@ -41,6 +44,7 @@ const preventivo = Vue.createApp({
             }
             const data = await response.json();
             this.clienti = data;
+            console.log(this.clienti)
         },
 
         async loadClienteDataByID(e) {
@@ -119,14 +123,11 @@ const preventivo = Vue.createApp({
             window.open(url, "_blank");
         },
 
-        async loadPreventivoData(){
-            
-        },
-
         async sendForm(e) {
             e.preventDefault();
             const url = `/preventivi/nuovo`;
             const dataToSend_raw = {
+                descrizione_preventivo : this.descrizionePreventivo,
                 cliente_id: this.clienteData.id,
                 righe: this.righe,
             };
@@ -143,6 +144,7 @@ const preventivo = Vue.createApp({
             }
             const data = await response.json();
             var preventivo_id = data.preventivo_id;
+            this.preventivoId = preventivo_id;
             console.log(preventivo_id);
             var conferma = window.confirm(
                 "Preventivo salvato. Vuoi visualizzarlo?",

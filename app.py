@@ -92,13 +92,11 @@ class Lavoro(db.Model):
     data_pagamento = db.Column(db.Date, nullable=True)
     stato = db.Column(db.String(50), nullable=True)
     priorita = db.Column(db.String(50), nullable=True)
-    preventivato = db.Column(db.Float, nullable=True)
+    preventivi = db.relationship('Preventivo', backref='lavoro', lazy=True, cascade="all, delete, delete-orphan")
     cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False)
     tasks = db.relationship(
         "TaskLavoro", backref="lavoro", lazy=True, cascade="all, delete, delete-orphan"
     )
-    preventivo_id = db.Column(db.Integer, db.ForeignKey("preventivi.id"), nullable=True)
-    note = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
         return f"<Lavoro {self.descrizione}>"
@@ -133,17 +131,12 @@ class TaskFile(db.Model):
 class Preventivo(db.Model):
     __tablename__ = "preventivi"
     id = db.Column(db.Integer, primary_key=True)
+    descrizione = db.Column(db.String(200), nullable=False)
     cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False)
     data_creazione = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     stato = db.Column(db.String(20), default="bozza", nullable=False)
     totale_preventivo = db.Column(db.Float, nullable=True)
-
-    # 1 preventivo -> N lavori (se ti serve davvero questo legame)
-    lavoro = db.relationship(
-        "Lavoro",
-        backref="preventivo",  # su Lavoro avrai .preventivo
-        lazy=True,
-    )
+    lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=True)
     righe = db.relationship(
         "RigaPreventivo",
         back_populates="preventivo",
@@ -317,6 +310,7 @@ def nuovo_preventivo():
         tasse_varie = 8.18
         data = request.get_json()
         cliente_id = data["cliente_id"]
+        descrizione = data["descrizione_preventivo"]
         cliente = Cliente.query.filter_by(id=cliente_id).first()
         print("Cliente: " + cliente.name + ", ID: " + str(cliente.id))
         righe = [
@@ -330,6 +324,7 @@ def nuovo_preventivo():
             for riga in data["righe"]
         ]
         nuovo_preventivo = Preventivo(
+            descrizione = descrizione,
             cliente_id=cliente_id,
             righe=[
                 RigaPreventivo(
@@ -643,16 +638,61 @@ def get_ID_by_name(nome):
 
 # API - PREVENTIVI
 @app.get("/api/preventivi/getall")
-def fetch_preventivi():
-    p = Preventivo.query.all()
+def get_preventivi():
+    preventivi = Preventivo.query.all()
+    return jsonify(
+        [
+            {
+                "id": p.id,
+                "descrizione" : p.descrizione,
+                "data": p.data_creazione,
+                "cliente": Cliente.query.filter_by(id=p.cliente_id).first_or_404().name,
+                "stato": p.stato,
+                "totale_preventivo": p.totale_preventivo,
+                "lavoro": p.lavoro,
+                "righe": [
+                    {
+                        "id": riga.id,
+                        "qty": riga.qty,
+                        "descrizione": riga.descrizione,
+                        "prezzo_ie": riga.prezzo_ie,
+                        "prezzo_ii": riga.prezzo_ii,
+                        "totale_riga": riga.totale_riga,
+                    }
+                    for riga in p.righe
+                ],
+            }
+            for p in preventivi
+        ]
+    )
+
+
+# API - PREVENTIVO BY ID
+@app.get("/api/preventivi/get/<int:id>")
+def get_preventivo_byID(id):
+    preventivo = Preventivo.query.filter_by(id=id).first_or_404()
     return jsonify(
         {
-            "id": p.id,
-            "data": p.data_creazione,
-            "cliente_id": p.cliente_id,
-            "stato": p.stato,
-            "totale_preventivo": p.totale_preventivo,
-            "lavoro": p.lavoro,
+            "id": preventivo.id,
+            "cliente": preventivo.cliente,
+            "data": preventivo.data_creazione,
+            "stato": preventivo.stato,
+            "lavoro": preventivo.lavoro,
+            "totale_preventivo": preventivo.totale_preventivo,
+            "cliente": {
+                "nome": preventivo.cliente.name,
+                "ragsoc": preventivo.cliente.ragsoc,
+                "indirizzo": preventivo.cliente.indirizzo,
+                "citta": preventivo.cliente.citta,
+                "cap": preventivo.cliente.cap,
+                "provincia": preventivo.cliente.provincia,
+                "email": preventivo.cliente.email,
+                "telefono": preventivo.cliente.telefono,
+                "p_iva": preventivo.cliente.p_iva,
+                "sdi": preventivo.cliente.sdi,
+                "pec": preventivo.cliente.pec,
+                "colore": preventivo.cliente.colore,
+            },
             "righe": [
                 {
                     "id": riga.id,
@@ -662,46 +702,10 @@ def fetch_preventivi():
                     "prezzo_ii": riga.prezzo_ii,
                     "totale_riga": riga.totale_riga,
                 }
-                for riga in p.righe
+                for riga in preventivo.righe
             ],
         }
     )
-
-
-# API - PREVENTIVO BY ID
-@app.get("/api/preventivi/get/<int:id>")
-def get_preventivo_byID(id):
-    preventivo = Preventivo.query.filter_by(id=id).first_or_404()
-    return jsonify({
-        'id' : preventivo.id,
-        'cliente' : preventivo.cliente,
-        'data' : preventivo.data,
-        'stato' : preventivo.stato,
-        'lavoro' : preventivo.lavoro,
-        'totale_preventivo' : preventivo.totale_preventivo,
-        'cliente' : {
-            'nome' : preventivo.cliente.name,
-            'ragsoc' : preventivo.cliente.ragsoc,
-            'indirizzo' : preventivo.cliente.indirizzo,
-            'citta' : preventivo.cliente.citta,
-            'cap' : preventivo.cliente.cap,
-            'provincia' : preventivo.cliente.provincia,
-            'email' : preventivo.cliente.email,
-            'telefono' : preventivo.cliente.telefono,
-            'p_iva' : preventivo.cliente.p_iva,
-            'sdi' : preventivo.cliente.sdi,
-            'pec' : preventivo.cliente.pec,
-            'colore' : preventivo.cliente.colore,
-        },
-        'righe' : {
-            'id' : preventivo.righe.id,
-            'qty' : preventivo.righe.qty,
-            'descrizione' : preventivo.righe.descrizione,
-            'prezzo_ie' : preventivo.righe.prezzo_ie,
-            'prezzo_ii' : preventivo.righe.prezzo_ii,
-            'totale_riga' : preventivo.righe.totale_riga,
-        }
-    })
 
 
 ######################## TESTING ########################

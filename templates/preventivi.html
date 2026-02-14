@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block title %}Preventivi{% endblock %}
 
- {% block content %}
+{% block content %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
     <div class="col-4 px-0">
         <h2>Tutti i preventivi</h2>
@@ -13,12 +13,37 @@
 </div>
 
 <div id="preventivi" v-cloak>
-    <div v-if="preventivi.length > 0" >
-        <div v-for="preventivo in preventivi">
-            <span>preventivo.descrizione</span>
-            <span>preventivo.qty</span>
-            <span>preventivo.lavoro</span>
+    <div v-if="preventivi.length > 0">
+
+        <div class="card rounded border border-light-subtle">
+            <div class="card-body p-4">
+
+                <table class="table my-0 sortable table-hover rounded-2 p-2">
+                    <thead>
+                        <tr>
+                            <th style="max-width: 50px;" class="fw-bold">ID</th>
+                            <th class="fw-bold">Descrizione</th>
+                            <th class="fw-bold">Cliente</th>
+                            <th class="fw-bold">Data creazione</th>
+                            <th class="fw-bold">Totale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="preventivo in preventivi">
+                            <td>[[ preventivo.id ]]</td>
+                            <td>[[ preventivo.descrizione ]]</td>
+                            <td>[[ preventivo.cliente]]</td>
+                            <td>[[ preventivo.data_creazione]]</td>
+                            <td>[[ preventivo.totale_preventivo ]]€</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
         </div>
+    </div>
+    <div v-else>
+        Nessun preventivo presente
     </div>
 </div>
 {% endblock %}

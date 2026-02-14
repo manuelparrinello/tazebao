@@ -7,15 +7,24 @@ const preventivi = Vue.createApp({
     methods: {
         async fetchAllPreventivi() {
             const url = `/api/preventivi/getall`;
-            const response = await fetch(url, {
-                method: "get",
-                headers: {
-                    Accept: "application/json",
-                },
-            });
-            const data = await response.json();
-            console.log(data);
-            this.preventivi = data;
+            try {
+                const response = await fetch(url, {
+                    method: "get",
+                    headers: {
+                        'Accept': "application/json",
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error('Errore HTTP:' + response.status)
+                }
+                const data = await response.json();
+                // console.log(data);
+                this.preventivi = data; 
+                console.log(this.preventivi)   
+            } catch (err) {
+               console.log(err);
+            }
+            
         },
     },
     delimiters: ["[[", "]]"],

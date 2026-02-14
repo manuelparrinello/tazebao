@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='/css/preventivo.css') }}">
     <style>
         body {
@@ -12,7 +13,7 @@
             margin: 0;
             padding: 0;
         }
-        
+
         .page {
             width: 210mm;
             min-height: 297mm;
@@ -25,12 +26,14 @@
             box-sizing: border-box;
             /* Include il padding nelle dimensioni totali */
         }
+
         /* Ottimizzazione per la stampa */
-        
+
         @media print {
             body {
                 background: none;
             }
+
             .page {
                 margin: 0;
                 box-shadow: none;
@@ -40,7 +43,7 @@
 </head>
 
 <body>
-    <div class="page" id="nuovoPreventivo">
+    <div class="page" id="preventivoView" v-cloak>
         <div class="row">
 
             <!-- INTESTAZIONE AZIENDA -->
@@ -63,20 +66,21 @@
             <!-- INTESTAZIONE CLIENTE -->
             <div class="col-6">
                 <span><strong>CLIENTE<br></strong></span>
-                <span class="fw-bold">[[ preventivo.cliente.ragsoc ]]<br></span>
-                <span>{{ preventivo.cliente.indirizzo if preventivo.cliente.indirizzo else 'n.d'}}, {{ preventivo.cliente.cap if preventivo.cliente.cap else 'n.d' }} {{ preventivo.cliente.citta if preventivo.cliente.citta else 'n.d' }} ({{ preventivo.cliente.provincia if preventivo.cliente.provincia else 'n.d' }})<br></span>
-                <span>{{ preventivo.cliente.email if preventivo.cliente.email else 'n.d' }} - {{ preventivo.cliente.telefono if preventivo.cliente.telefono else 'n.d' }}<br></span>
-                <span style="text-transform: uppercase;">P.IVA {{ preventivo.cliente.p_iva if preventivo.cliente.p_iva else 'n.d' }} - SDI {{ preventivo.cliente.sdi if preventivo.cliente.sdi else 'n.d' }}<br></span>
+                <span class="fw-bold">[[ cliente?.ragsoc ]]<br></span>
+                <span>[[ cliente?.indirizzo ]], [[ cliente?.cap ]] [[ cliente?.citta ]] ([[ cliente?.provincia
+                    ]])<br></span>
+                <span>[[ cliente?.email ]] - [[ cliente?.telefono ]] <br></span>
+                <span style="text-transform: uppercase;">P.IVA [[ cliente?.p_iva ]] - SDI [[ cliente?.sdi ]]<br></span>
             </div>
 
             <!-- DATI PREVENTIVO -->
             <div class="col-6">
                 <div class="text-end">
                     <span><strong>
-                        *** DA SISTEMARE LA NUMERAZIONE PROGRESSIVA ***<br>
-                        PREVENTIVO N. {{ preventivo.id }} <br>
-                        SCADENZA PREVENTIVO: 1 anno
-                    </strong></span>
+                            *** DA SISTEMARE LA NUMERAZIONE PROGRESSIVA ***<br>
+                            PREVENTIVO N. {{ preventivo.id }} <br>
+                            SCADENZA PREVENTIVO: 1 anno
+                        </strong></span>
                 </div>
             </div>
         </div>
@@ -86,29 +90,32 @@
             <p>
                 <strong>PREVENTIVO DI SPESA</strong>
             </p>
-            <table class="table">
-                <thead>
-                    <tr class="tr-thickborder">
-                        <th style="width: 40px;" scope="col">QTY</th>
-                        <th style="width: auto" scope="col">Descrizione</th>
-                        <th class="text-end" style="width: 90px;" scope="col">Imponibile</th>
-                        <th class="text-end" style="width: 90px;" scope="col">Ivato</th>
-                        <th class="text-end" style="width: 100px;" scope="col">Totale ivato</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for riga in preventivo.righe %}
-                    <tr>
-                        <th scope="row">{{ riga.qty | int}}</th>
-                        <td style="white-space: pre-wrap; word-wrap: break-word;">{{ riga.descrizione | nl2br | safe }}
-                        </td>
-                        <td class="text-end">{{  riga.prezzo_ie | euroFormat }}€</td>
-                        <td class="text-end">{{ riga.prezzo_ii | euroFormat}}€</td>
-                        <td class="text-end">{{ riga.totale_riga | euroFormat}}€</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div v-if="preventivoData && preventivoData.righe?.length" v-cloak>
+                <table class="table">
+                    <thead>
+                        <tr class="tr-thickborder">
+                            <th style="width: 40px;" scope="col">QTY</th>
+                            <th style="width: auto" scope="col">Descrizione</th>
+                            <th class="text-end" style="width: 90px;" scope="col">Imponibile</th>
+                            <th class="text-end" style="width: 90px;" scope="col">Ivato</th>
+                            <th class="text-end" style="width: 100px;" scope="col">Totale ivato</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="riga in preventivoData.righe">
+                            <th scope="row">[[ riga?.qty ]]</th>
+                            <td style="white-space: pre-wrap; word-wrap: break-word;">[[ riga?.descrizione ]]
+                            </td>
+                            <td class="text-end">[[ riga?.prezzo_ie ]]€</td>
+                            <td class="text-end">[[ riga?.prezzo_ii ]]€</td>
+                            <td class="text-end">[[ riga?.totale_riga ]]€</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div v-else>
+                nessun dato
+            </div>
         </div>
 
         <!-- TABELLA SUBTOTALE -->
@@ -118,15 +125,15 @@
                 <table class="table">
                     <tr>
                         <th class="text-start">Subtotale</th>
-                        <th class="text-end">{{ subtotale | euroFormat}}€</th>
+                        <th class="text-end">[[ subtotale ]]€</th>
                     </tr>
                     <tr>
                         <td class="text-start">Tasse varie</td>
-                        <td class="text-end">{{ 8 | euroFormat}}€</td>
+                        <td class="text-end">[[ 8 ]]€</td>
                     </tr>
                     <tr class="tr-thickborder">
                         <th class="text-start">TOTALE</th>
-                        <th class="text-end">{{ preventivo.totale_preventivo | euroFormat}}€</th>
+                        <th class="text-end">[[ preventivoData?.totale_preventivo ]]€</th>
                     </tr>
 
                 </table>
@@ -137,7 +144,7 @@
 
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="{{ url_for('static', filename='js/preventivo.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/_preventivo.js') }}"></script>
 
 
 </body>

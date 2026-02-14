@@ -6,7 +6,7 @@ const TabellaLavori = {
         filtro_stati: Function,
     },
     template: `
-    <table class="table sortable my-0 table-hover rounded-3" id="tabellaLavori">
+    <table class="table sortable my-0 table-hover rounded-3 no-last-border" id="tabellaLavori">
    <thead>
       <tr>
          <th class="fw-bold pointer text-center col-prio" scope="col">Prio</th>

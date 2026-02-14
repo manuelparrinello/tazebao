@@ -3,25 +3,25 @@
 {% block content %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
     <div class="col-4 px-0">
-        <h2>Tutti i preventivi</h2>
-        <p class="mb-4">Elenco di tutti i preventivi aggiunti a sistema.</p>
+        <h3 class="fw-bold">Tutti i preventivi</h3>
+        <p>Elenco di tutti i preventivi aggiunti a sistema.</p>
     </div>
     <div class="col-8 d-inline-flex justify-content-end px-0">
-        <a href="{{ url_for('nuovo_lavoro') }}"><button class="button-61"><span><i
-                        class="bi bi-journal-plus"></i></span>&nbsp;Nuovo lavoro</button></a>
+        <a href="{{ url_for('nuovo_preventivo') }}"><button class="button-61"><span><i
+                        class="bi bi-journal-plus"></i></span>&nbsp;Nuovo preventivo</button></a>
     </div>
 </div>
-
-<div id="preventivi" v-cloak>
+<hr>
+<div class="mt-5" id="preventivi" v-cloak>
     <div v-if="preventivi.length > 0">
 
-        <div class="card rounded border border-light-subtle">
+        <div class="card rounded-3 border border-light-subtle">
             <div class="card-body p-4">
 
-                <table class="table my-0 sortable table-hover rounded-2 p-2">
+                <table class="table my-0 sortable table-hover rounded-3 p-2 no-last-border">
                     <thead>
                         <tr>
-                            <th style="max-width: 50px;" class="fw-bold">ID</th>
+                            <th style="width: 50px;" class="fw-bold">ID</th>
                             <th class="fw-bold">Descrizione</th>
                             <th class="fw-bold">Cliente</th>
                             <th class="fw-bold">Data creazione</th>

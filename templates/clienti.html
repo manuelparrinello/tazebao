@@ -1,8 +1,8 @@
 {% extends "base.html" %} {% block title %}Tutti i clienti{% endblock %} {% block content %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
     <div class="col-4 px-0">
-        <h2>Tutti i clienti</h2>
-        <p class="mb-4">Elenco di tutti i clienti presenti nel sistema.</p>
+        <h3 class="fw-bolder">Tutti i clienti</h3>
+        <p>Elenco di tutti i clienti presenti nel sistema.</p>
     </div>
     <div class="col-8 d-inline-flex justify-content-end px-0">
         <a href="{{ url_for('nuovo_cliente') }}"><button class="button-61">
@@ -11,9 +11,10 @@
             </button></a>
     </div>
 </div>
+<hr>
 
-<div id="clientiPage" class="" v-cloak>
-    <div class="card rounded border border-light-subtle">
+<div id="clientiPage" class="mt-5" v-cloak>
+    <div class="card rounded-3 border border-light-subtle">
         <div class="card-body">
             <tabella-clienti :clienti_data="clienti" @delete="clickForDeleteCliente"></tabella-clienti>
         </div>

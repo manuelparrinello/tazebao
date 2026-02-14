@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block title %}{{ lavoro.descrizione }}{% endblock %} {% block content %}
 <div id="lavoroPage" data-lavoro-id="{{ lavoro.id }}" v-cloak>
     <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between mb-3">
-        <div class="col-4 px-0">
+        <div class="col-4 px-0 mb-5">
             <div class="breadcrumbs mb-3">
                 <h6 class="text-primary" style="letter-spacing: 1.2px">
                     <span class="text-muted me-2"><a class="a-no-color" href="/lavori">LAVORI</a></span> / <span class="text-uppercase fw-bold">{{ lavoro.descrizione }}</span>

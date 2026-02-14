@@ -1,7 +1,7 @@
 const TabellaClienti = {
     props: ["clienti_data"],
     template: `
-    <table class="table my-0 sortable table-hover rounded-2 p-2">
+    <table class="table my-0 sortable table-hover rounded-3 p-2 no-last-border">
         <thead>
             <tr>
                 <th class="fw-bold pointer col-cliente" scope="col">Nominativo</th>

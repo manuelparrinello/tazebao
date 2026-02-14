@@ -1,10 +1,16 @@
-{% extends "base.html" %} {% block title %}Nuovo preventivo {% endblock %} {% block content %}
+{% extends "base.html" %} {% block title %}Nuovo preventivo {% endblock %}
 
-<h2>Nuovo preventivo</h2>
-<p class="mb-4">Compila il modulo sottostante per aggiungere un nuovo preventivo.</p>
+{% block content %}
+<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+    <div class="col-4 px-0">
+        <h3 class="fw-bolder">Nuovo preventivo</h3>
+        <p>Compila il modulo sottostante per aggiungere un nuovo preventivo.</p>
+    </div>
+</div>
 
+<hr>
 
-<div id="nuovoPreventivo">
+<div class="mt-5" id="nuovoPreventivo">
     <form action="" id="formNuovoPreventivo">
 
         <div class="row mb-3 g-4">
@@ -12,7 +18,7 @@
             <!-- CARD CLIENTE  -->
             <div class="col col-sm mb-3">
                 <h5 class="fw-bold">Cliente</h5>
-                <div class="card rounded border border-light-subtle">
+                <div class="card rounded-3 border border-light-subtle">
                     <div class="card-body p-4">
                         <div class="form-group">
 
@@ -21,7 +27,8 @@
                                 <select @change="loadClienteDataByID" class="form-select" name="cliente"
                                     v-model="clienteSelezionato" required>
                                     <option selected disabled>Seleziona cliente</option>
-                                    <option v-for="cliente in clienti" :value="cliente.id">[[ cliente?.nome ]]</option>
+                                    <option v-for="cliente in clienti" :value="cliente.id">[[ cliente?.nome ]]
+                                    </option>
                                 </select>
                             </div>
 
@@ -30,151 +37,151 @@
                     </div>
                 </div>
             </div>
+        </div>
+</div>
 
-            <!-- AGGIUNGI RIGHE -->
-            <div class="col-md-9">
-                <h5 class="fw-bold">Descrizione</h5>
-                <div class="card rounded g-0 border border-light-subtle">
-                    <div class="card-body p-4">
-                        <input class="form-control" type="text" placeholder="Aggiungi una descrizione breve" v-model="descrizionePreventivo">
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md">
-                    <h5 class="fw-bold">Aggiungi righe</h5>
-                    <div class="card rounded g-0 border border-light-subtle">
-                        <div class="card-body p-4">
-                            <div :id="idRiga" class="row align-items-md-start g-2">
+<!-- AGGIUNGI RIGHE -->
+<div class="col-md-9">
+    <h5 class="fw-bold">Descrizione</h5>
+    <div class="card rounded-3 g-0 border border-light-subtle">
+        <div class="card-body p-4">
+            <input class="form-control" type="text" placeholder="Aggiungi una descrizione breve"
+                v-model="descrizionePreventivo">
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md">
+        <h5 class="fw-bold">Aggiungi righe</h5>
+        <div class="card rounded-3 g-0 border border-light-subtle">
+            <div class="card-body p-4">
+                <div :id="idRiga" class="row align-items-md-start g-2">
 
-                                <!-- QTY LAVORO -->
-                                <div class="col-auto">
-                                    <div class="form-group">
-                                        <!-- <label class="form-label" for="qty">Qtà</label> -->
-                                        <input min="1" placeholder="Qtà" style="max-width: 80px"
-                                            class="align-baseline form-control" type="number" name="qty" :value="qty"
-                                            v-model="qty">
-                                    </div>
-                                </div>
-
-                                <!-- DESCRIZIONE LAVORO -->
-                                <div class="col">
-                                    <div class="form-group">
-                                        <!-- <label class="form-label" for="titolo_prova">Descrizione</label> -->
-                                        <textarea placeholder="Inserisci descrizione lavoro" rows="1"
-                                            class="form-control" type="text" name="descrizione" v-model="descrizione"
-                                            @input="autoResize($event)"></textarea>
-                                    </div>
-                                </div>
-
-                                <!-- PREZZO DESC -->
-                                <div class="col-2">
-                                    <div class="input-group">
-                                        <input placeholder="Prezzo" class="align-baseline form-control" type="number"
-                                            name="prezzo" v-model="prezzo">
-                                        <span class="input-group-text">€</span>
-                                    </div>
-                                </div>
-
-                                <div class="col-auto align-self-xxl-center">
-
-                                    <button class="button-61-p0" @click="addRigaPreventivo"> <i
-                                            class="bi bi-plus-lg"></i></button>
-                                </div>
-
-                            </div>
+                    <!-- QTY LAVORO -->
+                    <div class="col-auto">
+                        <div class="form-group">
+                            <!-- <label class="form-label" for="qty">Qtà</label> -->
+                            <input min="1" placeholder="Qtà" style="max-width: 80px" class="align-baseline form-control"
+                                type="number" name="qty" :value="qty" v-model="qty">
                         </div>
                     </div>
 
-                    <!-- RIGHE PREVENTIVO -->
-                    <div class="col col-sm mt-4">
-                        <h5 class="fw-bold">Righe preventivo</h5>
-                        <div class="card rounded g-0 border border-light-subtle">
-                            <div class="card-body p-4">
-                                <div class="col-auto col-sm align-content-center" v-if="righe.length > 0" v-cloak>
-                                    <div>
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: auto; width: 50px;"></th>
-                                                    <th style="width: auto; width: 50px;">Qtà</th>
-                                                    <th style="width: auto">Descrizione</th>
-                                                    <th class="text-end" style="width: 130px">Prezzo
-                                                    </th>
-                                                    <th class="text-end" style="width: 130px">Totale</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-if="righe.length > 0" v-for="riga in righe" :id="riga.idRiga">
-                                                    <td class="text-center">
-                                                        <strong @click="deleteRigaPreventivo(riga.idRiga)"
-                                                            class="text-secondary icon-trash-righe pointer"
-                                                            title="Elimina riga">
-                                                            <i class="bi bi-trash"></i>
-                                                        </strong>
-                                                    </td>
-                                                    <td class="text-start"><strong class="text-primary">[[
-                                                            riga.qty ]]x</strong></td>
-                                                    <td class="descrizione-preventivo">[[ riga.descrizione ]]</td>
-                                                    <td class="text-end">[[ euroFormat(riga.prezzo) ]]€</td>
-                                                    <td class="text-end">[[ euroFormat(riga.totaleRiga) ]]€</td>
-                                                </tr>
-                                                <tr id="tr_subtotale">
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td class="fw-bold">Subtotale</td>
-                                                    <td></td>
-                                                    <td class="fw-bold text-end">[[ euroFormat(subtotale) ]]€
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td class="text-left">IVA 22%</td>
-                                                    <td></td>
-                                                    <td class="text-end">[[ euroFormat(subtotale * 0.22) ]]€
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td class="text-left">Tassa XYZ</td>
-                                                    <td></td>
-                                                    <td class="text-end">[[ euroFormat(tassa) ]]€
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td class="fw-bold">TOTALE</td>
-                                                    <td></td>
-                                                    <td class="fw-bold text-end">[[ euroFormat((subtotale * 1.22) +
-                                                        tassa)
-                                                        ]]€</td>
-                                                </tr>
-                                            </tbody>
-
-                                        </table>
-
-                                    </div>
-
-                                    <button class="button-61 w-100" @click="sendForm($event)">Salva</button>
-                                </div>
-
-                                <div v-else class="d-flex align-items-center justify-content-center">
-                                    <span class="text-secondary">Nessuna riga aggiunta</span>
-                                </div>
-
-                            </div>
+                    <!-- DESCRIZIONE LAVORO -->
+                    <div class="col">
+                        <div class="form-group">
+                            <!-- <label class="form-label" for="titolo_prova">Descrizione</label> -->
+                            <textarea placeholder="Inserisci descrizione lavoro" rows="1" class="form-control"
+                                type="text" name="descrizione" v-model="descrizione"
+                                @input="autoResize($event)"></textarea>
                         </div>
+                    </div>
+
+                    <!-- PREZZO DESC -->
+                    <div class="col-2">
+                        <div class="input-group">
+                            <input placeholder="Prezzo" class="align-baseline form-control" type="number" name="prezzo"
+                                v-model="prezzo">
+                            <span class="input-group-text">€</span>
+                        </div>
+                    </div>
+
+                    <div class="col-auto align-self-xxl-center">
+
+                        <button class="button-61-p0" @click="addRigaPreventivo"> <i class="bi bi-plus-lg"></i></button>
                     </div>
 
                 </div>
             </div>
-
         </div>
 
-    </form>
+        <!-- RIGHE PREVENTIVO -->
+        <div class="col col-sm mt-4">
+            <h5 class="fw-bold">Righe preventivo</h5>
+            <div class="card rounded-3 g-0 border border-light-subtle">
+                <div class="card-body p-4">
+                    <div class="col-auto col-sm align-content-center" v-if="righe.length > 0" v-cloak>
+                        <div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: auto; width: 50px;"></th>
+                                        <th style="width: auto; width: 50px;">Qtà</th>
+                                        <th style="width: auto">Descrizione</th>
+                                        <th class="text-end" style="width: 130px">Prezzo
+                                        </th>
+                                        <th class="text-end" style="width: 130px">Totale</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-if="righe.length > 0" v-for="riga in righe" :id="riga.idRiga">
+                                        <td class="text-center">
+                                            <strong @click="deleteRigaPreventivo(riga.idRiga)"
+                                                class="text-secondary icon-trash-righe pointer" title="Elimina riga">
+                                                <i class="bi bi-trash"></i>
+                                            </strong>
+                                        </td>
+                                        <td class="text-start"><strong class="text-primary">[[
+                                                riga.qty ]]x</strong></td>
+                                        <td class="descrizione-preventivo">[[ riga.descrizione ]]</td>
+                                        <td class="text-end">[[ euroFormat(riga.prezzo) ]]€</td>
+                                        <td class="text-end">[[ euroFormat(riga.totaleRiga) ]]€</td>
+                                    </tr>
+                                    <tr id="tr_subtotale">
+                                        <td></td>
+                                        <td></td>
+                                        <td class="fw-bold">Subtotale</td>
+                                        <td></td>
+                                        <td class="fw-bold text-end">[[ euroFormat(subtotale) ]]€
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-left">IVA 22%</td>
+                                        <td></td>
+                                        <td class="text-end">[[ euroFormat(subtotale * 0.22) ]]€
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-left">Tassa XYZ</td>
+                                        <td></td>
+                                        <td class="text-end">[[ euroFormat(tassa) ]]€
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="fw-bold">TOTALE</td>
+                                        <td></td>
+                                        <td class="fw-bold text-end">[[ euroFormat((subtotale * 1.22) +
+                                            tassa)
+                                            ]]€</td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        <button class="button-61 w-100" @click="sendForm($event)">Salva</button>
+                    </div>
+
+                    <div v-else class="d-flex align-items-center justify-content-center">
+                        <span class="text-secondary">Nessuna riga aggiunta</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</div>
+
+</form>
 </div>
 
 

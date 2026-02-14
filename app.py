@@ -1,11 +1,13 @@
 import os
 from datetime import datetime
-
+import locale
 from flask import Flask, jsonify, redirect, render_template, request, url_for
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
+
+locale.setlocale(locale.LC_TIME, "it_IT.UTF-8")
 
 # Definiamo uno schema per i nomi dei vincoli
 convention = {
@@ -649,6 +651,7 @@ def get_preventivi():
                 "cliente": Cliente.query.filter_by(id=p.cliente_id).first_or_404().name,
                 "stato": p.stato,
                 "totale_preventivo": p.totale_preventivo,
+                "data_creazione" : p.data_creazione.isoformat(),
                 "lavoro": p.lavoro,
                 "righe": [
                     {
@@ -678,7 +681,7 @@ def get_preventivo_byID(id):
             "data": preventivo.data_creazione,
             "stato": preventivo.stato,
             "lavoro": preventivo.lavoro,
-            "totale_preventivo": preventivo.totale_preventivo,
+            "totale_preventivo": float(preventivo.totale_preventivo),
             "cliente": {
                 "nome": preventivo.cliente.name,
                 "ragsoc": preventivo.cliente.ragsoc,
@@ -698,9 +701,9 @@ def get_preventivo_byID(id):
                     "id": riga.id,
                     "qty": riga.qty,
                     "descrizione": riga.descrizione,
-                    "prezzo_ie": riga.prezzo_ie,
-                    "prezzo_ii": riga.prezzo_ii,
-                    "totale_riga": riga.totale_riga,
+                    "prezzo_ie": float(riga.prezzo_ie),
+                    "prezzo_ii": float(riga.prezzo_ii),
+                    "totale_riga": float(riga.totale_riga),
                 }
                 for riga in preventivo.righe
             ],

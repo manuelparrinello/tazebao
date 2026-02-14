@@ -1,17 +1,13 @@
 <!-- SIDEBAR DESKTOP -->
-<aside class="app-sidebar d-none d-lg-flex flex-column border-end">
+<aside class="bg-primary text-light app-sidebar d-none d-lg-flex flex-column border-end">
 
-    <div class="sidebar-logo p-3 border-bottom">
+    <div class="sidebar-logo p-3">
         <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-2">
-                <span class="brand-dot"></span>
-                <div class="brand-text">
-                    <div class="fw-bold">Opus</div>
-                    <div class="text-secondary small">Gestionale</div>
+            <div class="d-flex align-items-center gap-2 mx-auto">
+                <div class="desktop-nav-logo mx-auto">
+                    <img class="img-fluid mx-auto" src="{{ url_for('static', filename='img/Logo_W.png') }}" alt="">
                 </div>
             </div>
-
-
         </div>
     </div>
 
@@ -19,7 +15,7 @@
         <ul class="nav nav-pills flex-column gap-1">
 
             <li class="nav-item mt-4">
-                <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}"
+                <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}"
                     href="{{ url_for('index') }}">
                     <i class="bi bi-speedometer2"></i>
                     <span class="nav-label">Dashboard</span>
@@ -28,13 +24,13 @@
 
             <!-- PREVENTIVI -->
             <div class="d-inline-flex align-items-center px-2 mt-3">
-                <span class="title-menu-divider">Preventivi</span>
-                <hr class="hr-sidebar ms-2 me-4">
+                <span class="title-menu-divider fw-bold">Preventivi</span>
+                <hr class="ms-2 me-4 w-100">
             </div>
 
             <!-- nuovo preventivo -->
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('nuovo_preventivo') }}">
+                <a class="nav-link {% if request.endpoint == 'nuovo_preventivo' %}active{% endif %}" href="{{ url_for('nuovo_preventivo') }}">
                     <i class="bi bi-plus"></i>
                     <span class="nav-label">Nuovo preventivo</span>
                 </a>
@@ -42,7 +38,7 @@
 
             <!-- tutti i preventivi -->
             <li class="nav-item">
-                <a  href="{{ url_for('preventivi') }}" class="nav-link">
+                <a href="{{ url_for('preventivi') }}" class="nav-link {% if request.endpoint == 'preventivi' %}active{% endif %}">
                     <i class="bi bi-list-ul"></i>
                     <span class="nav-label">Tutti</span>
                 </a>
@@ -50,13 +46,13 @@
 
             <!-- CLIENTI -->
             <div class="d-inline-flex align-items-center px-2 mt-3">
-                <span class="title-menu-divider">Clienti</span>
-                <hr class="hr-sidebar ms-2 me-4">
+                <span class="title-menu-divider fw-bold">Clienti</span>
+                <hr class="ms-2 me-4 w-100">
             </div>
 
             <!-- nuovo cliente -->
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('nuovo_cliente') }}">
+                <a class="nav-link {% if request.endpoint == 'nuovo_cliente' %}active{% endif %}" href="{{ url_for('nuovo_cliente') }}">
                     <i class="bi bi-person-plus"></i>
                     <span class="nav-label">Nuovo cliente</span>
                 </a>
@@ -64,7 +60,7 @@
 
             <!-- tutti i clienti -->
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('clienti') }}">
+                <a class="nav-link {% if request.endpoint == 'clienti' %}active{% endif %}" href="{{ url_for('clienti') }}">
                     <i class="bi bi-list-ul"></i>
                     <span class="nav-label">Tutti</span>
                 </a>
@@ -74,13 +70,13 @@
 
             <!-- LAVORI e TASK -->
             <div class="d-inline-flex align-items-center px-2 mt-3">
-                <span class="title-menu-divider">Lavori & Task</span>
-                <hr class="hr-sidebar ms-2 me-4">
+                <span class="title-menu-divider fw-bold">Lavori & Task</span>
+                <hr class="ms-2 me-4 w-auto">
             </div>
 
             <!-- nuovo cliente -->
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('nuovo_cliente') }}">
+                <a class="nav-link {% if request.endpoint == 'nuovo_lavoro' %}active{% endif %}" href="{{ url_for('nuovo_cliente') }}">
                     <i class="bi bi-person-plus"></i>
                     <span class="nav-label">Task</span>
                 </a>
@@ -88,7 +84,7 @@
 
             <!-- tutti i clienti -->
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('lavori') }}">
+                <a class="nav-link {% if request.endpoint == 'lavori' %}active{% endif %}" href="{{ url_for('lavori') }}">
                     <i class="bi bi-briefcase"></i>
                     <span class="nav-label">Lavori</span>
                 </a>

@@ -3,7 +3,7 @@ const preventivo = Vue.createApp({
     return {
       qty: "1",
       descrizione: "",
-      descrizionePreventivo: "",
+      titoloPreventivo: "",
       prezzo: "",
       clienteData: {},
       indirizzo_cliente: "",
@@ -92,20 +92,20 @@ const preventivo = Vue.createApp({
         window.alert("Seleziona cliente!");
         return;
       }
-      if (this.descrizionePreventivo == "") {
+      if (this.titoloPreventivo == "") {
         const data = new Date();
 
-        this.descrizionePreventivo = `Preventivo del ${data.getUTCDate()}/${data.getUTCMonth() + 1}/${data.getUTCFullYear()}`;
+        this.titoloPreventivo = `Preventivo del ${data.getUTCDate()}/${data.getUTCMonth() + 1}/${data.getUTCFullYear()}`;
       }
       const riga = {
         idRiga: this.idRiga,
         qty: Number(this.qty) || 0,
         descrizione: this.descrizione,
-        descrizionePreventivo: this.descrizionePreventivo,
+        titoloPreventivo: this.titoloPreventivo,
         prezzo: Number(this.prezzo) || 0,
         totaleRiga: Number(this.qty) * Number(this.prezzo),
       };
-      console.log(this.descrizionePreventivo);
+      console.log(this.titoloPreventivo);
       this.righe.push(riga);
       this.calcSubtotale();
       console.log(this.subtotale);
@@ -133,7 +133,7 @@ const preventivo = Vue.createApp({
       e.preventDefault();
       const url = `/preventivi/nuovo`;
       const dataToSend_raw = {
-        descrizione_preventivo: this.descrizionePreventivo,
+        titolo_preventivo: this.titoloPreventivo,
         cliente_id: this.clienteData.id,
         righe: this.righe,
       };

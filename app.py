@@ -312,7 +312,7 @@ def nuovo_preventivo():
         tasse_varie = 8.18
         data = request.get_json()
         cliente_id = data["cliente_id"]
-        descrizione = data["descrizione_preventivo"]
+        descrizione = data["titolo_preventivo"]
         cliente = Cliente.query.filter_by(id=cliente_id).first()
         print("Cliente: " + cliente.name + ", ID: " + str(cliente.id))
         righe = [

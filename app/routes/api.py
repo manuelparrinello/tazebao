@@ -1,6 +1,6 @@
 from datetime import date, datetime, time, timedelta
 
-from flask import Blueprint, jsonify, request, url_for
+from flask import Blueprint, g, jsonify, request, url_for
 
 from ..auth import login_required
 from ..extensions import db
@@ -9,8 +9,15 @@ from ..finance_service import (
     delete_financial_movement,
     finance_summary,
 )
-from ..models import CalendarEvent, Cliente, FinancialMovement, Lavoro, Preventivo
-from ..models import CALENDAR_EVENT_TYPES, TASK_CATEGORIES, TASK_PRIORITIES, TASK_STATUSES, Task
+from ..models import CalendarEvent, Cliente, EmailLog, FinancialMovement, Lavoro, Preventivo
+from ..models import (
+    CALENDAR_EVENT_TYPES,
+    EMAIL_DIRECTIONS,
+    TASK_CATEGORIES,
+    TASK_PRIORITIES,
+    TASK_STATUSES,
+    Task,
+)
 
 
 bp = Blueprint("api", __name__)
@@ -68,6 +75,42 @@ def apply_calendar_payload(event, data, partial=False):
         raise ValueError("La data inizio evento e obbligatoria.")
     if event.end_datetime and event.end_datetime < event.start_datetime:
         raise ValueError("La data fine non puo precedere la data inizio.")
+
+
+def apply_email_payload(email_log, data, partial=False):
+    if not partial or "subject" in data:
+        email_log.subject = (data.get("subject") or "").strip()
+    if not partial or "body" in data:
+        email_log.body = (data.get("body") or "").strip() or None
+    if not partial or "direction" in data:
+        email_log.direction = data.get("direction") or "outbound"
+    if not partial or "email_address" in data:
+        email_log.email_address = (data.get("email_address") or "").strip().lower()
+    if not partial or "cliente_id" in data:
+        email_log.cliente_id = parse_optional_id(data.get("cliente_id"))
+    if not partial or "lavoro_id" in data:
+        email_log.lavoro_id = parse_optional_id(data.get("lavoro_id"))
+    if not partial or "task_id" in data:
+        email_log.task_id = parse_optional_id(data.get("task_id"))
+    if not partial or "sent_at" in data:
+        email_log.sent_at = parse_optional_datetime(data.get("sent_at"))
+    if not partial or "message_id" in data:
+        email_log.message_id = (data.get("message_id") or "").strip() or None
+    if not partial or "thread_id" in data:
+        email_log.thread_id = (data.get("thread_id") or "").strip() or None
+    if not partial or "provider" in data:
+        email_log.provider = (data.get("provider") or "").strip() or None
+    if not partial or "provider_account" in data:
+        email_log.provider_account = (data.get("provider_account") or "").strip() or None
+
+    if not email_log.subject:
+        raise ValueError("L'oggetto e obbligatorio.")
+    if email_log.direction not in EMAIL_DIRECTIONS:
+        raise ValueError("Direzione comunicazione non valida.")
+    if not email_log.email_address:
+        raise ValueError("L'indirizzo email e obbligatorio.")
+    if email_log.sent_at is None:
+        raise ValueError("La data comunicazione e obbligatoria.")
 
 
 def task_due_date_to_calendar_event(task):
@@ -359,6 +402,74 @@ def delete_finance_movement(movement_id):
         return api_response(False, None, "Movimento non trovato.", 404)
     deleted = movement.to_dict()
     delete_financial_movement(movement)
+    db.session.commit()
+    return api_response(data=deleted)
+
+
+@bp.get("/api/emails")
+@login_required
+def get_email_logs():
+    query = EmailLog.query
+    cliente_id = request.args.get("cliente_id", type=int)
+    if cliente_id:
+        query = query.filter_by(cliente_id=cliente_id)
+    email_logs = query.order_by(EmailLog.sent_at.desc(), EmailLog.id.desc()).all()
+    return api_response(data=[email_log.to_dict() for email_log in email_logs])
+
+
+@bp.get("/api/emails/<int:email_id>")
+@login_required
+def get_email_log(email_id):
+    email_log = db.session.get(EmailLog, email_id)
+    if email_log is None:
+        return api_response(False, None, "Comunicazione non trovata.", 404)
+    return api_response(data=email_log.to_dict())
+
+
+@bp.post("/api/emails")
+@login_required
+def create_email_log():
+    data = request.get_json(silent=True) or {}
+    email_log = EmailLog()
+
+    try:
+        email_log.created_by = g.current_user.id if g.get("current_user") else None
+        apply_email_payload(email_log, data)
+        db.session.add(email_log)
+        db.session.commit()
+    except ValueError as exc:
+        db.session.rollback()
+        return api_response(False, None, str(exc), 400)
+
+    return api_response(data=email_log.to_dict(), status=201)
+
+
+@bp.patch("/api/emails/<int:email_id>")
+@login_required
+def update_email_log(email_id):
+    email_log = db.session.get(EmailLog, email_id)
+    if email_log is None:
+        return api_response(False, None, "Comunicazione non trovata.", 404)
+    data = request.get_json(silent=True) or {}
+
+    try:
+        apply_email_payload(email_log, data, partial=True)
+        db.session.commit()
+    except ValueError as exc:
+        db.session.rollback()
+        return api_response(False, None, str(exc), 400)
+
+    return api_response(data=email_log.to_dict())
+
+
+@bp.delete("/api/emails/<int:email_id>")
+@login_required
+def delete_email_log(email_id):
+    email_log = db.session.get(EmailLog, email_id)
+    if email_log is None:
+        return api_response(False, None, "Comunicazione non trovata.", 404)
+    deleted = email_log.to_dict()
+    db.session.delete(email_log)
     db.session.commit()
     return api_response(data=deleted)
 

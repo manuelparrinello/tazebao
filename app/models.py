@@ -52,6 +52,7 @@ FINANCE_CATEGORIES = (
     "costituzione_societa",
     "generale",
 )
+EMAIL_DIRECTIONS = ("inbound", "outbound")
 
 
 class User(db.Model):
@@ -338,6 +339,77 @@ class FinancialMovement(db.Model):
                 if self.creator
                 else None
             ),
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
+class EmailLog(db.Model):
+    __tablename__ = "erp_email_logs"
+
+    id = db.Column(db.Integer, primary_key=True)
+    subject = db.Column(db.String(255), nullable=False)
+    body = db.Column(db.Text, nullable=True)
+    direction = db.Column(db.String(20), nullable=False, default="outbound")
+    email_address = db.Column(db.String(255), nullable=False, index=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=True)
+    lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=True)
+    task_id = db.Column(db.Integer, db.ForeignKey("erp_tasks.id"), nullable=True)
+    sent_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    message_id = db.Column(db.String(255), nullable=True, index=True)
+    thread_id = db.Column(db.String(255), nullable=True, index=True)
+    provider = db.Column(db.String(80), nullable=True)
+    provider_account = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+    cliente = db.relationship("Cliente", backref="email_logs")
+    lavoro = db.relationship("Lavoro", backref="email_logs")
+    task = db.relationship("Task", backref="email_logs")
+    creator = db.relationship("User", backref="email_logs")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "subject": self.subject,
+            "body": self.body,
+            "direction": self.direction,
+            "email_address": self.email_address,
+            "cliente_id": self.cliente_id,
+            "cliente": (
+                {"id": self.cliente.id, "name": self.cliente.name}
+                if self.cliente
+                else None
+            ),
+            "lavoro_id": self.lavoro_id,
+            "lavoro": (
+                {"id": self.lavoro.id, "descrizione": self.lavoro.descrizione}
+                if self.lavoro
+                else None
+            ),
+            "task_id": self.task_id,
+            "task": (
+                {"id": self.task.id, "name": self.task.name}
+                if self.task
+                else None
+            ),
+            "sent_at": self.sent_at.isoformat() if self.sent_at else None,
+            "created_by": self.created_by,
+            "creator": (
+                {"id": self.creator.id, "name": self.creator.name, "email": self.creator.email}
+                if self.creator
+                else None
+            ),
+            "message_id": self.message_id,
+            "thread_id": self.thread_id,
+            "provider": self.provider,
+            "provider_account": self.provider_account,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

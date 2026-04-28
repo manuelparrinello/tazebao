@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Comunicazioni{% endblock %}
+
+{% macro labelize(value) -%}
+{{ value.replace("_", " ").title() if value else "-" }}
+{%- endmacro %}
+
+{% macro direction_badge(direction) -%}
+{% if direction == "inbound" %}
+<span class="badge text-bg-info">Ricevuta</span>
+{% else %}
+<span class="badge text-bg-success">Inviata</span>
+{% endif %}
+{%- endmacro %}
+
+{% block content %}
+<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+    <div class="col-12 col-lg-6 px-0">
+        <h6 class="text-primary fw-bold" style="letter-spacing: 1.2px">ERP</h6>
+        <h3 class="fw-bolder">Comunicazioni</h3>
+        <p>Registro manuale delle email e delle comunicazioni collegate ai clienti.</p>
+    </div>
+    <div class="col-12 col-lg-6 d-inline-flex justify-content-lg-end px-0">
+        <a href="{{ url_for('emails.emails_new') }}" class="btn btn-primary">
+            <i class="bi bi-plus"></i>&nbsp;Nuova comunicazione
+        </a>
+    </div>
+</div>
+<hr>
+
+<form method="get" action="{{ url_for('emails.emails_index') }}" class="row g-2 align-items-end mt-4">
+    <div class="col-12 col-md-8 col-lg-5">
+        <label for="q" class="form-label fw-bold">Cerca</label>
+        <input type="search" class="form-control" id="q" name="q" value="{{ search }}" placeholder="Cliente, email o oggetto">
+    </div>
+    <div class="col-12 col-md-auto">
+        <button type="submit" class="btn btn-outline-primary">
+            <i class="bi bi-search"></i>&nbsp;Cerca
+        </button>
+        {% if search %}
+        <a href="{{ url_for('emails.emails_index') }}" class="btn btn-outline-secondary">Reset</a>
+        {% endif %}
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm mt-4">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Comunicazione</th>
+                    <th>Direzione</th>
+                    <th>Collegamenti</th>
+                    <th class="text-end">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for email_log in email_logs %}
+                <tr>
+                    <td class="text-nowrap">{{ email_log.sent_at.strftime("%d/%m/%Y %H:%M") if email_log.sent_at else "-" }}</td>
+                    <td>
+                        <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) }}" class="fw-bold text-decoration-none">{{ email_log.subject }}</a>
+                        <div class="small text-secondary">{{ email_log.email_address }}</div>
+                    </td>
+                    <td>{{ direction_badge(email_log.direction) }}</td>
+                    <td class="small">
+                        {% if email_log.cliente %}
+                        <a href="{{ url_for('cliente_page', cliente_id=email_log.cliente.id) }}">{{ email_log.cliente.name }}</a>
+                        {% endif %}
+                        {% if email_log.lavoro %}
+                        <span class="text-secondary">/</span>
+                        <a href="{{ url_for('lavoro_page', lavoro_id=email_log.lavoro.id) }}">{{ email_log.lavoro.descrizione }}</a>
+                        {% endif %}
+                        {% if email_log.task %}
+                        <span class="text-secondary">/</span>
+                        <a href="{{ url_for('tasks.task_edit', task_id=email_log.task.id) }}">{{ email_log.task.name }}</a>
+                        {% endif %}
+                        {% if not email_log.cliente and not email_log.lavoro and not email_log.task %}
+                        <span class="text-secondary">Nessun collegamento</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <div class="d-inline-flex gap-2">
+                            <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="{{ url_for('emails.emails_delete', email_id=email_log.id) }}" method="post" onsubmit="return confirm('Eliminare questa comunicazione?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-secondary py-5">Nessuna comunicazione registrata.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

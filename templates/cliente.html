@@ -27,6 +27,7 @@
         <a href="{{ quick_actions.nuovo_evento }}" class="btn btn-outline-primary"><i class="bi bi-calendar-plus"></i>&nbsp;Nuovo evento</a>
         <a href="{{ quick_actions.nuovo_preventivo }}" class="btn btn-outline-primary"><i class="bi bi-receipt"></i>&nbsp;Nuovo preventivo</a>
         <a href="{{ quick_actions.nuovo_movimento }}" class="btn btn-outline-primary"><i class="bi bi-cash-coin"></i>&nbsp;Nuovo movimento</a>
+        <a href="{{ quick_actions.nuova_comunicazione }}" class="btn btn-outline-primary"><i class="bi bi-envelope-plus"></i>&nbsp;Nuova comunicazione</a>
         <a href="{{ url_for('cliente_edit', cliente_id=cliente.id) }}" class="btn btn-warning"><i class="bi bi-pencil"></i>&nbsp;Modifica</a>
     </div>
 </div>
@@ -171,6 +172,37 @@
                 </div>
                 {% else %}
                 {{ empty_state("Nessun movimento economico collegato.") }}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <div class="col-12">
+        <section class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="fw-bolder mb-3">Comunicazioni Email</h5>
+                {% if email_logs %}
+                <div class="list-group list-group-flush">
+                    {% for email_log in email_logs %}
+                    <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) }}" class="list-group-item list-group-item-action px-0">
+                        <div class="d-flex align-items-center justify-content-between gap-3">
+                            <div>
+                                <div class="fw-bold">{{ email_log.subject }}</div>
+                                <div class="small text-secondary">
+                                    {{ "Ricevuta" if email_log.direction == "inbound" else "Inviata" }}
+                                    &middot; {{ email_log.email_address }}
+                                    &middot; {{ email_log.sent_at.strftime("%d/%m/%Y %H:%M") if email_log.sent_at else "-" }}
+                                </div>
+                            </div>
+                            <span class="badge {{ 'text-bg-info' if email_log.direction == 'inbound' else 'text-bg-success' }}">
+                                {{ "Inbound" if email_log.direction == "inbound" else "Outbound" }}
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ empty_state("Nessuna comunicazione email collegata.") }}
                 {% endif %}
             </div>
         </section>

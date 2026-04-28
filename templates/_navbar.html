@@ -110,6 +110,19 @@
                 </a>
             </li>
 
+            <!-- COMUNICAZIONI -->
+            <div class="d-inline-flex align-items-center px-2 mt-3">
+                <span class="title-menu-divider fw-bold">Comunicazioni</span>
+                <hr class="ms-2 me-4 w-100">
+            </div>
+
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint and request.endpoint.startswith('emails.') %}active{% endif %}" href="{{ url_for('emails.emails_index') }}">
+                    <i class="bi bi-envelope"></i>
+                    <span class="nav-label">Comunicazioni</span>
+                </a>
+            </li>
+
         </ul>
     </nav>
 
@@ -151,6 +164,8 @@
             <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('calendar.') %}active{% endif %}" href="{{ url_for('calendar.calendar_index') }}"><i class="bi bi-calendar3"></i> Calendario</a></li>
             <li class="nav-item mt-3 pt-3 border-top"><span class="small fw-bold text-secondary px-3">Finanze</span></li>
             <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('finance.') %}active{% endif %}" href="{{ url_for('finance.finance_index') }}"><i class="bi bi-cash-coin"></i> Finanze</a></li>
+            <li class="nav-item mt-3 pt-3 border-top"><span class="small fw-bold text-secondary px-3">Comunicazioni</span></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('emails.') %}active{% endif %}" href="{{ url_for('emails.emails_index') }}"><i class="bi bi-envelope"></i> Comunicazioni</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('preventivi') }}"><i class="bi bi-receipt"></i> Preventivi</a></li>
             <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear"></i> Impostazioni</a></li>
         </ul>

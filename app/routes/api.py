@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import date, datetime, time, timedelta
 
 from flask import Blueprint, jsonify, request
 
@@ -104,6 +104,66 @@ def task_due_date_to_calendar_event(task):
     }
 
 
+def serialize_dashboard_task(task):
+    return {
+        "id": task.id,
+        "name": task.name,
+        "status": task.status,
+        "priority": task.priority,
+        "due_date": task.due_date.isoformat() if task.due_date else None,
+        "cliente": (
+            {"id": task.cliente.id, "name": task.cliente.name}
+            if task.cliente
+            else None
+        ),
+        "lavoro": (
+            {"id": task.lavoro.id, "descrizione": task.lavoro.descrizione}
+            if task.lavoro
+            else None
+        ),
+    }
+
+
+def serialize_dashboard_event(event):
+    return {
+        "id": event.id,
+        "title": event.title,
+        "event_type": event.event_type,
+        "start_datetime": (
+            event.start_datetime.isoformat() if event.start_datetime else None
+        ),
+        "cliente": (
+            {"id": event.cliente.id, "name": event.cliente.name}
+            if event.cliente
+            else None
+        ),
+        "lavoro": (
+            {"id": event.lavoro.id, "descrizione": event.lavoro.descrizione}
+            if event.lavoro
+            else None
+        ),
+    }
+
+
+def serialize_dashboard_quote(preventivo):
+    return {
+        "id": preventivo.id,
+        "descrizione": preventivo.descrizione,
+        "stato": preventivo.stato,
+        "data_creazione": (
+            preventivo.data_creazione.isoformat()
+            if preventivo.data_creazione
+            else None
+        ),
+        "totale_preventivo": preventivo.totale_preventivo,
+        "cliente": (
+            {"id": preventivo.cliente.id, "name": preventivo.cliente.name}
+            if preventivo.cliente
+            else None
+        ),
+    }
+
+
 def apply_task_payload(task, data, partial=False):
     if not partial or "name" in data:
         task.name = (data.get("name") or "").strip()
@@ -151,6 +211,75 @@ def get_clienti():
             for c in clienti
         ]
     )
+
+
+@bp.get("/api/dashboard/summary")
+@login_required
+def get_dashboard_summary():
+    today = date.today()
+    due_soon_limit = today + timedelta(days=7)
+    now = datetime.combine(today, time.min)
+    upcoming_limit = now + timedelta(days=7)
+    closed_task_statuses = ("completata", "annullata")
+    closed_job_statuses = ("completato", "completata", "chiuso", "chiusa")
+    draft_quote_statuses = ("bozza", "draft")
+    accepted_quote_statuses = ("accettato", "accettata", "approvato", "approvata")
+
+    open_tasks = Task.query.filter(~Task.status.in_(closed_task_statuses))
+    task_open_count = open_tasks.count()
+    task_due_soon_count = (
+        open_tasks.filter(Task.due_date >= today)
+        .filter(Task.due_date <= due_soon_limit)
+        .count()
+    )
+    overdue_task_count = open_tasks.filter(Task.due_date < today).count()
+
+    upcoming_events = (
+        CalendarEvent.query.filter(CalendarEvent.start_datetime >= now)
+        .filter(CalendarEvent.start_datetime <= upcoming_limit)
+        .order_by(CalendarEvent.start_datetime.asc())
+        .limit(5)
+        .all()
+    )
+
+    recent_tasks = (
+        Task.query.order_by(Task.updated_at.desc(), Task.created_at.desc()).limit(5).all()
+    )
+    recent_quotes = (
+        Preventivo.query.order_by(Preventivo.data_creazione.desc()).limit(5).all()
+    )
+
+    data = {
+        "task_open_count": task_open_count,
+        "task_due_soon_count": task_due_soon_count,
+        "overdue_task_count": overdue_task_count,
+        "upcoming_events_count": (
+            CalendarEvent.query.filter(CalendarEvent.start_datetime >= now)
+            .filter(CalendarEvent.start_datetime <= upcoming_limit)
+            .count()
+        ),
+        "active_clients_count": Cliente.query.count(),
+        "active_jobs_count": Lavoro.query.filter(
+            db.or_(
+                Lavoro.stato.is_(None),
+                ~db.func.lower(Lavoro.stato).in_(closed_job_statuses),
+            )
+        ).count(),
+        "draft_quotes_count": Preventivo.query.filter(
+            db.func.lower(Preventivo.stato).in_(draft_quote_statuses)
+        ).count(),
+        "accepted_quotes_count": Preventivo.query.filter(
+            db.func.lower(Preventivo.stato).in_(accepted_quote_statuses)
+        ).count(),
+        "recent_tasks": [serialize_dashboard_task(task) for task in recent_tasks],
+        "upcoming_events": [
+            serialize_dashboard_event(event) for event in upcoming_events
+        ],
+        "recent_quotes": [
+            serialize_dashboard_quote(preventivo) for preventivo in recent_quotes
+        ],
+    }
+    return api_response(data=data)
 
 
 @bp.get("/api/tasks")

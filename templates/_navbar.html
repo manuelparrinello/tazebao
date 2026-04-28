@@ -22,14 +22,6 @@
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}"
-                    href="{{ url_for('index') }}">
-                    <i class="bi bi-speedometer2"></i>
-                    <span class="nav-label">Dashboard</span>
-                </a>
-            </li>
-
             <!-- PREVENTIVI -->
             <div class="d-inline-flex align-items-center px-2 mt-3">
                 <span class="title-menu-divider fw-bold">Preventivi</span>
@@ -97,13 +89,6 @@
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link {% if request.endpoint and request.endpoint.startswith('finance.') %}active{% endif %}" href="{{ url_for('finance.finance_index') }}">
-                    <i class="bi bi-cash-coin"></i>
-                    <span class="nav-label">Finanze</span>
-                </a>
-            </li>
-
             <!-- tutti i clienti -->
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'lavori' %}active{% endif %}" href="{{ url_for('lavori') }}">
@@ -112,7 +97,18 @@
                 </a>
             </li>
 
+            <!-- FINANZE -->
+            <div class="d-inline-flex align-items-center px-2 mt-3">
+                <span class="title-menu-divider fw-bold">Finanze</span>
+                <hr class="ms-2 me-4 w-100">
+            </div>
 
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint and request.endpoint.startswith('finance.') %}active{% endif %}" href="{{ url_for('finance.finance_index') }}">
+                    <i class="bi bi-cash-coin"></i>
+                    <span class="nav-label">Finanze</span>
+                </a>
+            </li>
 
         </ul>
     </nav>
@@ -149,12 +145,11 @@
         <ul class="nav nav-pills flex-column gap-1">
             <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.app_shell' %}active{% endif %}" href="{{ url_for('main.app_shell') }}"><i class="bi bi-grid-1x2"></i> Dashboard ERP</a>
             </li>
-            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
-            </li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('clienti') }}"><i class="bi bi-people"></i> Clienti</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('lavori') }}"><i class="bi bi-briefcase"></i> Lavori</a></li>
             <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('tasks.') %}active{% endif %}" href="{{ url_for('tasks.tasks') }}"><i class="bi bi-list-check"></i> Task</a></li>
             <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('calendar.') %}active{% endif %}" href="{{ url_for('calendar.calendar_index') }}"><i class="bi bi-calendar3"></i> Calendario</a></li>
+            <li class="nav-item mt-3 pt-3 border-top"><span class="small fw-bold text-secondary px-3">Finanze</span></li>
             <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('finance.') %}active{% endif %}" href="{{ url_for('finance.finance_index') }}"><i class="bi bi-cash-coin"></i> Finanze</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('preventivi') }}"><i class="bi bi-receipt"></i> Preventivi</a></li>
             <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear"></i> Impostazioni</a></li>

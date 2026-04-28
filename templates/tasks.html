@@ -46,9 +46,6 @@
                         <tr>
                             <td>
                                 <a class="fw-bold a-no-color" href="{{ url_for('tasks.task_edit', task_id=task.id) }}">{{ task.name }}</a>
-                                {% if task.note %}
-                                <div class="small text-secondary">{{ task.note }}</div>
-                                {% endif %}
                             </td>
                             <td><span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span></td>
                             <td><span class="badge rounded-pill bg-primary">{{ labelize(task.status) }}</span></td>

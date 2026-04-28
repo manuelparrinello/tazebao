@@ -6,8 +6,26 @@
 {{ "%.2f"|format(value or 0)|replace(".", ",") }}€
 {%- endmacro %}
 
+{% macro signed_euro(value) -%}
+{% set amount = value or 0 %}
+{% if amount > 0 %}+{{ "%.2f"|format(amount)|replace(".", ",") }}€{% elif amount < 0 %}-{{ "%.2f"|format(amount|abs)|replace(".", ",") }}€{% else %}{{ "%.2f"|format(0)|replace(".", ",") }}€{% endif %}
+{%- endmacro %}
+
+{% macro balance_class(value) -%}
+{% set amount = value or 0 %}
+{% if amount > 0 %}text-success{% elif amount < 0 %}text-danger{% else %}text-secondary{% endif %}
+{%- endmacro %}
+
 {% macro labelize(value) -%}
 {{ value.replace("_", " ").title() if value else "-" }}
+{%- endmacro %}
+
+{% macro income_status_badge(status) -%}
+{% if status == "effettiva" %}
+<span class="badge rounded-pill text-bg-success">{{ labelize(status) }}</span>
+{% else %}
+<span class="badge rounded-pill text-bg-warning">{{ labelize(status) }}</span>
+{% endif %}
 {%- endmacro %}
 
 {% macro movement_table(movements, kind) -%}
@@ -37,7 +55,7 @@
                 <td><span class="badge rounded-pill text-bg-light border">{{ labelize(movement.category) }}</span></td>
                 <td>
                     {% if kind == "entrata" %}
-                    <span class="badge rounded-pill bg-primary">{{ labelize(movement.movement_status) }}</span>
+                    {{ income_status_badge(movement.movement_status) }}
                     {% else %}
                     <span class="badge rounded-pill text-bg-warning">{{ labelize(movement.expense_type) }}</span>
                     {% endif %}
@@ -104,7 +122,7 @@
         <div class="card h-100 border-0 shadow-sm">
             <div class="card-body p-4">
                 <p class="text-secondary small mb-2">In cassa</p>
-                <div class="display-6 fw-bold text-primary">{{ euro(summary.current_balance) }}</div>
+                <div class="display-6 fw-bold {{ balance_class(summary.current_balance) }}">{{ signed_euro(summary.current_balance) }}</div>
             </div>
         </div>
     </div>

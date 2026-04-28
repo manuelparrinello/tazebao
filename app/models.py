@@ -6,6 +6,28 @@ from .extensions import db
 
 
 VALID_USER_ROLES = ("admin", "operatore", "readonly")
+TASK_CATEGORIES = (
+    "social_media",
+    "grafica",
+    "amministrazione",
+    "fotografia",
+    "web",
+    "commerciale",
+    "generale",
+)
+TASK_STATUSES = (
+    "da_fare",
+    "in_corso",
+    "in_revisione",
+    "completata",
+    "annullata",
+)
+TASK_PRIORITIES = (
+    "bassa",
+    "media",
+    "alta",
+    "urgente",
+)
 
 
 class User(db.Model):
@@ -105,6 +127,63 @@ class TaskFile(db.Model):
     size = db.Column(db.Float, nullable=False)
     task_id = db.Column(db.Integer, db.ForeignKey("tasks.id"), nullable=False)
     note = db.Column(db.Text, nullable=False)
+
+
+class Task(db.Model):
+    __tablename__ = "erp_tasks"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(160), nullable=False)
+    note = db.Column(db.Text, nullable=True)
+    category = db.Column(db.String(40), nullable=False, default="generale")
+    status = db.Column(db.String(40), nullable=False, default="da_fare")
+    priority = db.Column(db.String(40), nullable=False, default="media")
+    due_date = db.Column(db.Date, nullable=True)
+    lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=True)
+    assignee_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+    lavoro = db.relationship("Lavoro", backref="erp_tasks")
+    cliente = db.relationship("Cliente", backref="erp_tasks")
+    assignee = db.relationship("User", backref="assigned_tasks")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "note": self.note,
+            "category": self.category,
+            "status": self.status,
+            "priority": self.priority,
+            "due_date": self.due_date.isoformat() if self.due_date else None,
+            "lavoro_id": self.lavoro_id,
+            "lavoro": (
+                {"id": self.lavoro.id, "descrizione": self.lavoro.descrizione}
+                if self.lavoro
+                else None
+            ),
+            "cliente_id": self.cliente_id,
+            "cliente": (
+                {"id": self.cliente.id, "name": self.cliente.name}
+                if self.cliente
+                else None
+            ),
+            "assignee_id": self.assignee_id,
+            "assignee": (
+                {"id": self.assignee.id, "name": self.assignee.name, "email": self.assignee.email}
+                if self.assignee
+                else None
+            ),
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
 
 
 class Preventivo(db.Model):

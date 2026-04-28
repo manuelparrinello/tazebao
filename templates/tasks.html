@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Task{% endblock %}
+
+{% macro labelize(value) -%}
+{{ value.replace("_", " ").title() }}
+{%- endmacro %}
+
+{% block content %}
+<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+    <div class="col-12 col-lg-5 px-0">
+        <h3 class="fw-bolder">Task</h3>
+        <p>Elenco delle task ERP operative.</p>
+    </div>
+    <div class="col-12 col-lg-7 d-inline-flex justify-content-lg-end px-0">
+        <a href="{{ url_for('tasks.task_new') }}">
+            <button class="button-61">
+                <span><i class="bi bi-plus-lg"></i></span>&nbsp;Nuovo task
+            </button>
+        </a>
+    </div>
+</div>
+<hr>
+
+<div class="mt-5">
+    <div class="card rounded-3 border border-light-subtle">
+        <div class="card-body p-4">
+            {% if tasks %}
+            <div class="table-responsive">
+                <table class="table table-hover my-0">
+                    <thead>
+                        <tr>
+                            <th class="fw-bold">Task</th>
+                            <th class="fw-bold">Categoria</th>
+                            <th class="fw-bold">Stato</th>
+                            <th class="fw-bold">Priorita</th>
+                            <th class="fw-bold">Scadenza</th>
+                            <th class="fw-bold">Cliente</th>
+                            <th class="fw-bold">Lavoro</th>
+                            <th class="fw-bold">Assegnata a</th>
+                            <th class="fw-bold text-end">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td>
+                                <a class="fw-bold a-no-color" href="{{ url_for('tasks.task_edit', task_id=task.id) }}">{{ task.name }}</a>
+                                {% if task.note %}
+                                <div class="small text-secondary">{{ task.note }}</div>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span></td>
+                            <td><span class="badge rounded-pill bg-primary">{{ labelize(task.status) }}</span></td>
+                            <td><span class="badge rounded-pill text-bg-warning">{{ labelize(task.priority) }}</span></td>
+                            <td>{{ task.due_date.strftime("%d/%m/%Y") if task.due_date else "-" }}</td>
+                            <td>{{ task.cliente.name if task.cliente else "-" }}</td>
+                            <td>{{ task.lavoro.descrizione if task.lavoro else "-" }}</td>
+                            <td>{{ task.assignee.name or task.assignee.email if task.assignee else "-" }}</td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('tasks.task_edit', task_id=task.id) }}">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                {% if task.status != "annullata" %}
+                                <form action="{{ url_for('tasks.task_delete', task_id=task.id) }}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="mb-0 text-secondary">Nessuna task presente.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

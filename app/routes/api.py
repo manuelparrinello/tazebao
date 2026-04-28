@@ -1,9 +1,60 @@
-from flask import Blueprint, jsonify
+from datetime import datetime
 
+from flask import Blueprint, jsonify, request
+
+from ..auth import login_required
+from ..extensions import db
 from ..models import Cliente, Lavoro, Preventivo
+from ..models import TASK_CATEGORIES, TASK_PRIORITIES, TASK_STATUSES, Task
 
 
 bp = Blueprint("api", __name__)
+
+
+def api_response(success=True, data=None, error=None, status=200):
+    return jsonify({"success": success, "data": data, "error": error}), status
+
+
+def parse_optional_date(value):
+    if not value:
+        return None
+    return datetime.strptime(value, "%Y-%m-%d").date()
+
+
+def parse_optional_id(value):
+    if value in (None, ""):
+        return None
+    return int(value)
+
+
+def apply_task_payload(task, data, partial=False):
+    if not partial or "name" in data:
+        task.name = (data.get("name") or "").strip()
+    if not partial or "note" in data:
+        task.note = (data.get("note") or "").strip() or None
+    if not partial or "category" in data:
+        task.category = data.get("category") or "generale"
+    if not partial or "status" in data:
+        task.status = data.get("status") or "da_fare"
+    if not partial or "priority" in data:
+        task.priority = data.get("priority") or "media"
+    if not partial or "due_date" in data:
+        task.due_date = parse_optional_date(data.get("due_date"))
+    if not partial or "lavoro_id" in data:
+        task.lavoro_id = parse_optional_id(data.get("lavoro_id"))
+    if not partial or "cliente_id" in data:
+        task.cliente_id = parse_optional_id(data.get("cliente_id"))
+    if not partial or "assignee_id" in data:
+        task.assignee_id = parse_optional_id(data.get("assignee_id"))
+
+    if not task.name:
+        raise ValueError("Il titolo task e obbligatorio.")
+    if task.category not in TASK_CATEGORIES:
+        raise ValueError("Categoria task non valida.")
+    if task.status not in TASK_STATUSES:
+        raise ValueError("Stato task non valido.")
+    if task.priority not in TASK_PRIORITIES:
+        raise ValueError("Priorita task non valida.")
 
 
 @bp.get("/api/clienti/getall")
@@ -23,6 +74,68 @@ def get_clienti():
             for c in clienti
         ]
     )
+
+
+@bp.get("/api/tasks")
+@login_required
+def get_tasks():
+    tasks = Task.query.order_by(Task.created_at.desc()).all()
+    return api_response(data=[task.to_dict() for task in tasks])
+
+
+@bp.get("/api/tasks/<int:task_id>")
+@login_required
+def get_task(task_id):
+    task = db.session.get(Task, task_id)
+    if task is None:
+        return api_response(False, None, "Task non trovata.", 404)
+    return api_response(data=task.to_dict())
+
+
+@bp.post("/api/tasks")
+@login_required
+def create_task():
+    data = request.get_json(silent=True) or {}
+    task = Task()
+
+    try:
+        apply_task_payload(task, data)
+        db.session.add(task)
+        db.session.commit()
+    except ValueError as exc:
+        db.session.rollback()
+        return api_response(False, None, str(exc), 400)
+
+    return api_response(data=task.to_dict(), status=201)
+
+
+@bp.patch("/api/tasks/<int:task_id>")
+@login_required
+def update_task(task_id):
+    task = db.session.get(Task, task_id)
+    if task is None:
+        return api_response(False, None, "Task non trovata.", 404)
+    data = request.get_json(silent=True) or {}
+
+    try:
+        apply_task_payload(task, data, partial=True)
+        db.session.commit()
+    except ValueError as exc:
+        db.session.rollback()
+        return api_response(False, None, str(exc), 400)
+
+    return api_response(data=task.to_dict())
+
+
+@bp.delete("/api/tasks/<int:task_id>")
+@login_required
+def delete_task(task_id):
+    task = db.session.get(Task, task_id)
+    if task is None:
+        return api_response(False, None, "Task non trovata.", 404)
+    task.status = "annullata"
+    db.session.commit()
+    return api_response(data=task.to_dict())
 
 
 @bp.get("/api/lavori/getall")

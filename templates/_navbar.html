@@ -84,8 +84,8 @@
 
             <!-- nuovo cliente -->
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'nuovo_lavoro' %}active{% endif %}" href="{{ url_for('nuovo_cliente') }}">
-                    <i class="bi bi-person-plus"></i>
+                <a class="nav-link {% if request.endpoint and request.endpoint.startswith('tasks.') %}active{% endif %}" href="{{ url_for('tasks.tasks') }}">
+                    <i class="bi bi-list-check"></i>
                     <span class="nav-label">Task</span>
                 </a>
             </li>
@@ -137,9 +137,10 @@
             </li>
             <li class="nav-item"><a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
             </li>
-            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-people"></i> Clienti</a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-briefcase"></i> Lavori</a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-receipt"></i> Preventivi</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('clienti') }}"><i class="bi bi-people"></i> Clienti</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('lavori') }}"><i class="bi bi-briefcase"></i> Lavori</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('tasks.') %}active{% endif %}" href="{{ url_for('tasks.tasks') }}"><i class="bi bi-list-check"></i> Task</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('preventivi') }}"><i class="bi bi-receipt"></i> Preventivi</a></li>
             <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear"></i> Impostazioni</a></li>
         </ul>
 

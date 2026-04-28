@@ -1,3 +1,6 @@
+const selectedPreventivoClienteId =
+  document.querySelector("#nuovoPreventivo")?.dataset.selectedClienteId || "";
+
 const preventivo = Vue.createApp({
   data() {
     return {
@@ -18,7 +21,9 @@ const preventivo = Vue.createApp({
       loading: true,
       subtotale: 0,
       totali: [],
-      clienteSelezionato: "Seleziona cliente",
+      clienteSelezionato: selectedPreventivoClienteId
+        ? Number(selectedPreventivoClienteId)
+        : "Seleziona cliente",
       tassa: 8.18,
     };
   },
@@ -47,8 +52,10 @@ const preventivo = Vue.createApp({
     },
 
     async loadClienteDataByID(e) {
-      e.preventDefault();
-      const id = e.target.value;
+      if (e?.preventDefault) {
+        e.preventDefault();
+      }
+      const id = e?.target?.value || e;
       const url = `/api/clienti/get/${id}`;
 
       try {
@@ -160,7 +167,11 @@ const preventivo = Vue.createApp({
     },
   },
   mounted() {
-    this.loadClienti();
+    this.loadClienti().then(() => {
+      if (this.clienteSelezionato !== "Seleziona cliente") {
+        this.loadClienteDataByID(this.clienteSelezionato);
+      }
+    });
   },
   delimiters: ["[[", "]]"],
   computed() {},

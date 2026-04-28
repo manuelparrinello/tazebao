@@ -211,7 +211,7 @@ def calendar_index():
 @bp.route("/calendar/new", methods=["GET", "POST"])
 @login_required
 def calendar_new():
-    event = CalendarEvent()
+    event = CalendarEvent(cliente_id=request.args.get("cliente_id", type=int))
     error = None
 
     if request.method == "POST":

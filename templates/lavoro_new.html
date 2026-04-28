@@ -10,7 +10,7 @@
 
 <form id="nuovoLavoro">
 
-    <div class="mt-5" id="formLavoro">
+    <div class="mt-5" id="formLavoro" data-selected-cliente-id="{{ selected_cliente_id or '' }}">
 
         <div class="row">
             <div class="col-2">
@@ -20,7 +20,7 @@
                         required>
                         {% if clienti %}
                         {% for cliente in clienti %}
-                        <option value="{{ cliente.id }}">{{ cliente.name }}</option>
+                        <option value="{{ cliente.id }}" {% if selected_cliente_id == cliente.id %}selected{% endif %}>{{ cliente.name }}</option>
                         {% endfor %}
                         {% else %}
                         <option value="noclient" disabled>Nessun cliente trovato</option>

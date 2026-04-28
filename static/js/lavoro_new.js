@@ -8,7 +8,7 @@ const nuovoLavoroApp = Vue.createApp({
       stato: "",
       priorita: "",
       preventivato: "",
-      cliente: "",
+      cliente: document.querySelector("#formLavoro")?.dataset.selectedClienteId || "",
       note: ""
     };
   },

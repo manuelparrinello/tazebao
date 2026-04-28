@@ -83,7 +83,12 @@ def nuovo_lavoro():
 
     if request.method == "GET":
         clienti_list = Cliente.query.all()
-        return render_template("lavoro_new.html", clienti=clienti_list)
+        selected_cliente_id = request.args.get("cliente_id", type=int)
+        return render_template(
+            "lavoro_new.html",
+            clienti=clienti_list,
+            selected_cliente_id=selected_cliente_id,
+        )
 
 
 @bp.route("/lavori")

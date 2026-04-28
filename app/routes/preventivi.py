@@ -116,7 +116,10 @@ def nuovo_preventivo():
             ),
             200,
         )
-    return render_template("preventivo_new.html")
+    return render_template(
+        "preventivo_new.html",
+        selected_cliente_id=request.args.get("cliente_id", type=int),
+    )
 
 
 @bp.get("/preventivi")

@@ -69,7 +69,10 @@ def finance_index():
 @bp.route("/finance/new", methods=["GET", "POST"])
 @login_required
 def finance_new():
-    movement = FinancialMovement(movement_date=date.today())
+    movement = FinancialMovement(
+        movement_date=date.today(),
+        cliente_id=request.args.get("cliente_id", type=int),
+    )
     error = None
 
     if request.method == "POST":

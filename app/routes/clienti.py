@@ -1,7 +1,8 @@
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, render_template, request, url_for
 
+from ..auth import login_required
 from ..extensions import db
-from ..models import Cliente, Lavoro
+from ..models import CalendarEvent, Cliente, FinancialMovement, Lavoro, Preventivo, Task
 
 
 bp = Blueprint("clienti", __name__)
@@ -69,9 +70,58 @@ def clienti():
 
 
 @bp.route("/clienti/<int:cliente_id>")
+@login_required
 def cliente_page(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
-    return render_template("cliente.html", cliente=cliente)
+    lavori = (
+        Lavoro.query.filter_by(cliente_id=cliente_id)
+        .order_by(Lavoro.id.desc())
+        .limit(10)
+        .all()
+    )
+    tasks = (
+        Task.query.filter_by(cliente_id=cliente_id)
+        .order_by(Task.updated_at.desc(), Task.created_at.desc())
+        .limit(10)
+        .all()
+    )
+    eventi = (
+        CalendarEvent.query.filter_by(cliente_id=cliente_id)
+        .order_by(CalendarEvent.start_datetime.desc())
+        .limit(10)
+        .all()
+    )
+    preventivi = (
+        Preventivo.query.filter_by(cliente_id=cliente_id)
+        .order_by(Preventivo.data_creazione.desc())
+        .limit(10)
+        .all()
+    )
+    movimenti = (
+        FinancialMovement.query.filter_by(cliente_id=cliente_id)
+        .order_by(FinancialMovement.movement_date.desc(), FinancialMovement.id.desc())
+        .limit(10)
+        .all()
+    )
+
+    quick_actions = {
+        "nuovo_lavoro": url_for("nuovo_lavoro", cliente_id=cliente.id),
+        "nuovo_task": url_for("tasks.task_new", cliente_id=cliente.id),
+        "nuovo_evento": url_for("calendar.calendar_new", cliente_id=cliente.id),
+        "nuovo_preventivo": url_for("nuovo_preventivo", cliente_id=cliente.id),
+        "nuovo_movimento": url_for("finance.finance_new", cliente_id=cliente.id),
+    }
+
+    return render_template(
+        "cliente.html",
+        cliente=cliente,
+        lavori=lavori,
+        tasks=tasks,
+        eventi=eventi,
+        preventivi=preventivi,
+        movimenti=movimenti,
+        quick_actions=quick_actions,
+    )
 
 
 @bp.delete("/clienti/<int:cliente_id>")

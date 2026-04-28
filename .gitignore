@@ -1,2 +1,10 @@
-.venv,
-venv
+venv/
+.vs/
+__pycache__/
+*.pyc
+app.db
+backups/
+.env
+instance/
+node_modules/
+dist/

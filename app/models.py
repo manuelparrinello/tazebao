@@ -35,6 +35,23 @@ CALENDAR_EVENT_TYPES = (
     "promemoria",
     "generale",
 )
+FINANCE_MOVEMENT_TYPES = ("entrata", "uscita")
+FINANCE_MOVEMENT_STATUSES = ("prevista", "effettiva")
+FINANCE_EXPENSE_TYPES = ("fissa", "variabile")
+FINANCE_CATEGORIES = (
+    "pagamento_cliente",
+    "fornitore",
+    "software",
+    "advertising",
+    "consulenza",
+    "attrezzatura",
+    "tasse",
+    "stipendio",
+    "commercialista",
+    "banca",
+    "costituzione_societa",
+    "generale",
+)
 
 
 class User(db.Model):
@@ -252,6 +269,73 @@ class CalendarEvent(db.Model):
                     "email": self.assigned_user.email,
                 }
                 if self.assigned_user
+                else None
+            ),
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
+class FinancialMovement(db.Model):
+    __tablename__ = "erp_financial_movements"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(160), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    movement_type = db.Column(db.String(20), nullable=False)
+    movement_status = db.Column(db.String(20), nullable=False, default="prevista")
+    expense_type = db.Column(db.String(20), nullable=True)
+    category = db.Column(db.String(50), nullable=False, default="generale")
+    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    movement_date = db.Column(db.Date, nullable=False)
+    month = db.Column(db.Integer, nullable=False)
+    year = db.Column(db.Integer, nullable=False)
+    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=True)
+    lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=True)
+    created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+    cliente = db.relationship("Cliente", backref="financial_movements")
+    lavoro = db.relationship("Lavoro", backref="financial_movements")
+    creator = db.relationship("User", backref="financial_movements")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "movement_type": self.movement_type,
+            "movement_status": self.movement_status,
+            "expense_type": self.expense_type,
+            "category": self.category,
+            "amount": float(self.amount) if self.amount is not None else 0.0,
+            "movement_date": (
+                self.movement_date.isoformat() if self.movement_date else None
+            ),
+            "month": self.month,
+            "year": self.year,
+            "cliente_id": self.cliente_id,
+            "cliente": (
+                {"id": self.cliente.id, "name": self.cliente.name}
+                if self.cliente
+                else None
+            ),
+            "lavoro_id": self.lavoro_id,
+            "lavoro": (
+                {"id": self.lavoro.id, "descrizione": self.lavoro.descrizione}
+                if self.lavoro
+                else None
+            ),
+            "created_by": self.created_by,
+            "creator": (
+                {"id": self.creator.id, "name": self.creator.name, "email": self.creator.email}
+                if self.creator
                 else None
             ),
             "created_at": self.created_at.isoformat() if self.created_at else None,

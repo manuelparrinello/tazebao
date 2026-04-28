@@ -95,6 +95,18 @@ if (document.getElementById("app")) {
           { title: "Preventivi accettati", value: this.summary.accepted_quotes_count, icon: "bi-check2-circle" },
         ];
       },
+      financeCards() {
+        if (!this.summary) return [];
+        return [
+          { title: "In cassa", value: this.formatCurrency(this.summary.current_balance), icon: "bi-cash-coin" },
+          { title: "Entrate effettive mese", value: this.formatCurrency(this.summary.month_income_effective), icon: "bi-arrow-down-circle" },
+          { title: "Entrate previste mese", value: this.formatCurrency(this.summary.month_income_expected), icon: "bi-clock-history" },
+          { title: "Uscite mese", value: this.formatCurrency(this.summary.month_expenses_total), icon: "bi-arrow-up-circle" },
+          { title: "Spese fisse", value: this.formatCurrency(this.summary.month_expenses_fixed), icon: "bi-pin-angle" },
+          { title: "Spese variabili", value: this.formatCurrency(this.summary.month_expenses_variable), icon: "bi-shuffle" },
+          { title: "Bilancio mese", value: this.formatCurrency(this.summary.month_balance), icon: "bi-graph-up" },
+        ];
+      },
     },
     mounted() {
       this.loadDashboard();
@@ -189,6 +201,30 @@ if (document.getElementById("app")) {
                   </div>
                 </div>
               </article>
+            </div>
+          </div>
+
+          <div class="mt-5">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h2 class="h5 mb-0">Finanze</h2>
+              <a class="btn btn-sm btn-outline-primary" href="/finance">Apri finanze</a>
+            </div>
+            <div class="row g-4">
+              <div class="col-12 col-md-6 col-xl-3" v-for="card in financeCards" :key="card.title">
+                <article class="card h-100 border-0 shadow-sm">
+                  <div class="card-body p-4">
+                    <div class="d-flex align-items-start justify-content-between gap-3">
+                      <div>
+                        <p class="text-secondary small mb-2">[[ card.title ]]</p>
+                        <div class="h3 fw-bold mb-0">[[ card.value ]]</div>
+                      </div>
+                      <div class="rounded-3 bg-primary text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
+                        <i class="bi" :class="card.icon"></i>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </div>
             </div>
           </div>
 

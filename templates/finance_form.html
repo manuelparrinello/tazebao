@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% macro selected(current, value) -%}
+{% if current == value %}selected{% endif %}
+{%- endmacro %}
+
+{% macro labelize(value) -%}
+{{ value.replace("_", " ").title() if value else "-" }}
+{%- endmacro %}
+
+{% block content %}
+<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+    <div class="col-12 col-lg-6 px-0">
+        <h3 class="fw-bolder">{{ page_title }}</h3>
+        <p>Registra entrate previste/effettive e uscite fisse/variabili.</p>
+    </div>
+    <div class="col-12 col-lg-6 d-inline-flex justify-content-lg-end px-0">
+        <a href="{{ url_for('finance.finance_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>&nbsp;Torna alle finanze
+        </a>
+    </div>
+</div>
+<hr>
+
+{% if error %}
+<div class="alert alert-danger mt-4">{{ error }}</div>
+{% endif %}
+
+<form action="{{ form_action }}" method="post" class="mt-5">
+    <div class="card rounded-3 border border-light-subtle">
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-12 col-lg-5">
+                    <label for="title" class="form-label fw-bold">Titolo</label>
+                    <input type="text" class="form-control" id="title" name="title" value="{{ movement.title or '' }}" required>
+                </div>
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label for="movement_type" class="form-label fw-bold">Tipo</label>
+                    <select class="form-control form-select" id="movement_type" name="movement_type" required>
+                        {% for movement_type in movement_types %}
+                        <option value="{{ movement_type }}" {{ selected(movement.movement_type or 'uscita', movement_type) }}>{{ labelize(movement_type) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label for="movement_status" class="form-label fw-bold">Stato entrata</label>
+                    <select class="form-control form-select" id="movement_status" name="movement_status">
+                        {% for status in movement_statuses %}
+                        <option value="{{ status }}" {{ selected(movement.movement_status or 'prevista', status) }}>{{ labelize(status) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label for="expense_type" class="form-label fw-bold">Tipo uscita</label>
+                    <select class="form-control form-select" id="expense_type" name="expense_type">
+                        <option value="">Nessuno</option>
+                        {% for expense_type in expense_types %}
+                        <option value="{{ expense_type }}" {{ selected(movement.expense_type, expense_type) }}>{{ labelize(expense_type) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label for="amount" class="form-label fw-bold">Importo</label>
+                    <div class="input-group">
+                        <input type="number" min="0" step="0.01" class="form-control" id="amount" name="amount" value="{{ movement.amount or '' }}" required>
+                        <span class="input-group-text">€</span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label for="movement_date" class="form-label fw-bold">Data</label>
+                    <input type="date" class="form-control" id="movement_date" name="movement_date" value="{{ movement.movement_date.isoformat() if movement.movement_date else '' }}" required>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label for="category" class="form-label fw-bold">Categoria</label>
+                    <select class="form-control form-select" id="category" name="category">
+                        {% for category in categories %}
+                        <option value="{{ category }}" {{ selected(movement.category or 'generale', category) }}>{{ labelize(category) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label for="cliente_id" class="form-label fw-bold">Cliente</label>
+                    <select class="form-control form-select" id="cliente_id" name="cliente_id">
+                        <option value="">Nessun cliente</option>
+                        {% for cliente in clienti %}
+                        <option value="{{ cliente.id }}" {{ selected(movement.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label for="lavoro_id" class="form-label fw-bold">Lavoro</label>
+                    <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
+                        <option value="">Nessun lavoro</option>
+                        {% for lavoro in lavori %}
+                        <option value="{{ lavoro.id }}" {{ selected(movement.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label for="description" class="form-label fw-bold">Descrizione</label>
+                    <textarea class="form-control" id="description" name="description" rows="4">{{ movement.description or '' }}</textarea>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

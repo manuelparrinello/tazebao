@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Finanze{% endblock %}
+
+{% macro euro(value) -%}
+{{ "%.2f"|format(value or 0)|replace(".", ",") }}€
+{%- endmacro %}
+
+{% macro labelize(value) -%}
+{{ value.replace("_", " ").title() if value else "-" }}
+{%- endmacro %}
+
+{% macro movement_table(movements, kind) -%}
+{% if movements %}
+<div class="table-responsive">
+    <table class="table table-hover my-0">
+        <thead>
+            <tr>
+                <th class="fw-bold">Data</th>
+                <th class="fw-bold">Titolo</th>
+                <th class="fw-bold">Categoria</th>
+                <th class="fw-bold">{{ "Stato" if kind == "entrata" else "Tipo" }}</th>
+                <th class="fw-bold text-end">Importo</th>
+                <th class="fw-bold text-end">Azioni</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movement in movements %}
+            <tr>
+                <td>{{ movement.movement_date.strftime("%d/%m/%Y") }}</td>
+                <td>
+                    <a class="fw-bold a-no-color" href="{{ url_for('finance.finance_edit', movement_id=movement.id) }}">{{ movement.title }}</a>
+                    {% if movement.description %}
+                    <div class="small text-secondary">{{ movement.description }}</div>
+                    {% endif %}
+                </td>
+                <td><span class="badge rounded-pill text-bg-light border">{{ labelize(movement.category) }}</span></td>
+                <td>
+                    {% if kind == "entrata" %}
+                    <span class="badge rounded-pill bg-primary">{{ labelize(movement.movement_status) }}</span>
+                    {% else %}
+                    <span class="badge rounded-pill text-bg-warning">{{ labelize(movement.expense_type) }}</span>
+                    {% endif %}
+                </td>
+                <td class="text-end fw-bold">{{ euro(movement.amount|float) }}</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('finance.finance_edit', movement_id=movement.id) }}">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <form action="{{ url_for('finance.finance_delete', movement_id=movement.id) }}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="mb-0 text-secondary">Nessun movimento presente.</p>
+{% endif %}
+{%- endmacro %}
+
+{% block content %}
+<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+    <div class="col-12 col-lg-5 px-0">
+        <h3 class="fw-bolder">Finanze</h3>
+        <p>Riepilogo budget, entrate, uscite e saldo interno.</p>
+    </div>
+    <div class="col-12 col-lg-7 d-inline-flex justify-content-lg-end px-0">
+        <a href="{{ url_for('finance.finance_new') }}">
+            <button class="button-61">
+                <span><i class="bi bi-plus-lg"></i></span>&nbsp;Nuovo movimento
+            </button>
+        </a>
+    </div>
+</div>
+<hr>
+
+<form method="get" class="row g-3 align-items-end mt-4">
+    <div class="col-12 col-md-3">
+        <label for="month" class="form-label fw-bold">Mese</label>
+        <select class="form-control form-select" id="month" name="month">
+            {% for month_number, month_name in months %}
+            {% if month_number > 0 %}
+            <option value="{{ month_number }}" {% if month_number == current_month %}selected{% endif %}>{{ month_name }}</option>
+            {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-12 col-md-2">
+        <label for="year" class="form-label fw-bold">Anno</label>
+        <input type="number" class="form-control" id="year" name="year" value="{{ current_year }}">
+    </div>
+    <div class="col-12 col-md-auto">
+        <button type="submit" class="btn btn-primary">Filtra</button>
+    </div>
+</form>
+
+<div class="row g-4 mt-4">
+    <div class="col-12 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <p class="text-secondary small mb-2">In cassa</p>
+                <div class="display-6 fw-bold text-primary">{{ euro(summary.current_balance) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <p class="text-secondary small mb-2">Bilancio mese</p>
+                <div class="display-6 fw-bold">{{ euro(summary.month_balance) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <p class="text-secondary small mb-2">Entrate effettive</p>
+                <div class="h2 fw-bold mb-0">{{ euro(summary.month_income_effective) }}</div>
+                <div class="text-secondary small">Previste: {{ euro(summary.month_income_expected) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <p class="text-secondary small mb-2">Uscite mese</p>
+                <div class="h2 fw-bold mb-0">{{ euro(summary.month_expenses_total) }}</div>
+                <div class="text-secondary small">Fisse {{ euro(summary.month_expenses_fixed) }} · Variabili {{ euro(summary.month_expenses_variable) }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-12 col-xl-6">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="fw-bolder mb-3">Entrate {{ summary.month_name }} {{ summary.year }}</h5>
+                {{ movement_table(income_movements, "entrata") }}
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-6">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="fw-bolder mb-3">Uscite {{ summary.month_name }} {{ summary.year }}</h5>
+                {{ movement_table(expense_movements, "uscita") }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -4,7 +4,12 @@ from flask import Blueprint, jsonify, request, url_for
 
 from ..auth import login_required
 from ..extensions import db
-from ..models import CalendarEvent, Cliente, Lavoro, Preventivo
+from ..finance_service import (
+    apply_financial_payload,
+    delete_financial_movement,
+    finance_summary,
+)
+from ..models import CalendarEvent, Cliente, FinancialMovement, Lavoro, Preventivo
 from ..models import CALENDAR_EVENT_TYPES, TASK_CATEGORIES, TASK_PRIORITIES, TASK_STATUSES, Task
 
 
@@ -227,6 +232,7 @@ def get_dashboard_summary():
     closed_job_statuses = ("completato", "completata", "chiuso", "chiusa")
     draft_quote_statuses = ("bozza", "draft")
     accepted_quote_statuses = ("accettato", "accettata", "approvato", "approvata")
+    finance_data = finance_summary(today.year, today.month)
 
     open_tasks = Task.query.filter(~Task.status.in_(closed_task_statuses))
     task_open_count = open_tasks.count()
@@ -281,8 +287,91 @@ def get_dashboard_summary():
         "recent_quotes": [
             serialize_dashboard_quote(preventivo) for preventivo in recent_quotes
         ],
+        "current_balance": finance_data["current_balance"],
+        "month_income_effective": finance_data["month_income_effective"],
+        "month_income_expected": finance_data["month_income_expected"],
+        "month_expenses_fixed": finance_data["month_expenses_fixed"],
+        "month_expenses_variable": finance_data["month_expenses_variable"],
+        "month_expenses_total": finance_data["month_expenses_total"],
+        "month_balance": finance_data["month_balance"],
     }
     return api_response(data=data)
+
+
+@bp.get("/api/finance")
+@login_required
+def get_finance_movements():
+    movements = FinancialMovement.query.order_by(
+        FinancialMovement.movement_date.desc(), FinancialMovement.id.desc()
+    ).all()
+    return api_response(data=[movement.to_dict() for movement in movements])
+
+
+@bp.get("/api/finance/<int:movement_id>")
+@login_required
+def get_finance_movement(movement_id):
+    movement = db.session.get(FinancialMovement, movement_id)
+    if movement is None:
+        return api_response(False, None, "Movimento non trovato.", 404)
+    return api_response(data=movement.to_dict())
+
+
+@bp.post("/api/finance")
+@login_required
+def create_finance_movement():
+    data = request.get_json(silent=True) or {}
+    movement = FinancialMovement()
+
+    try:
+        apply_financial_payload(movement, data)
+        db.session.add(movement)
+        db.session.commit()
+    except ValueError as exc:
+        db.session.rollback()
+        return api_response(False, None, str(exc), 400)
+
+    return api_response(data=movement.to_dict(), status=201)
+
+
+@bp.patch("/api/finance/<int:movement_id>")
+@login_required
+def update_finance_movement(movement_id):
+    movement = db.session.get(FinancialMovement, movement_id)
+    if movement is None:
+        return api_response(False, None, "Movimento non trovato.", 404)
+    data = request.get_json(silent=True) or {}
+
+    try:
+        apply_financial_payload(movement, data, partial=True)
+        db.session.commit()
+    except ValueError as exc:
+        db.session.rollback()
+        return api_response(False, None, str(exc), 400)
+
+    return api_response(data=movement.to_dict())
+
+
+@bp.delete("/api/finance/<int:movement_id>")
+@login_required
+def delete_finance_movement(movement_id):
+    movement = db.session.get(FinancialMovement, movement_id)
+    if movement is None:
+        return api_response(False, None, "Movimento non trovato.", 404)
+    deleted = movement.to_dict()
+    delete_financial_movement(movement)
+    db.session.commit()
+    return api_response(data=deleted)
+
+
+@bp.get("/api/finance/summary")
+@login_required
+def get_finance_summary():
+    today = date.today()
+    year = request.args.get("year", today.year, type=int)
+    month = request.args.get("month", today.month, type=int)
+    if month < 1 or month > 12:
+        return api_response(False, None, "Mese non valido.", 400)
+    return api_response(data=finance_summary(year, month))
 
 
 @bp.get("/api/tasks")

@@ -97,6 +97,13 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint and request.endpoint.startswith('finance.') %}active{% endif %}" href="{{ url_for('finance.finance_index') }}">
+                    <i class="bi bi-cash-coin"></i>
+                    <span class="nav-label">Finanze</span>
+                </a>
+            </li>
+
             <!-- tutti i clienti -->
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'lavori' %}active{% endif %}" href="{{ url_for('lavori') }}">
@@ -148,6 +155,7 @@
             <li class="nav-item"><a class="nav-link" href="{{ url_for('lavori') }}"><i class="bi bi-briefcase"></i> Lavori</a></li>
             <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('tasks.') %}active{% endif %}" href="{{ url_for('tasks.tasks') }}"><i class="bi bi-list-check"></i> Task</a></li>
             <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('calendar.') %}active{% endif %}" href="{{ url_for('calendar.calendar_index') }}"><i class="bi bi-calendar3"></i> Calendario</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('finance.') %}active{% endif %}" href="{{ url_for('finance.finance_index') }}"><i class="bi bi-cash-coin"></i> Finanze</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('preventivi') }}"><i class="bi bi-receipt"></i> Preventivi</a></li>
             <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear"></i> Impostazioni</a></li>
         </ul>

@@ -198,11 +198,11 @@ if (document.getElementById("app")) {
                 <div class="card-body p-4">
                   <h2 class="h5 mb-3">Prossimi eventi</h2>
                   <div v-if="summary.upcoming_events.length === 0" class="text-secondary">Nessun evento nei prossimi 7 giorni.</div>
-                  <div v-for="event in summary.upcoming_events" :key="event.id" class="border-bottom py-3">
+                  <a v-for="event in summary.upcoming_events" :key="event.id" :href="event.url" class="d-block border-bottom py-3 text-dark">
                     <div class="fw-bold">[[ event.title ]]</div>
                     <div class="small text-secondary">[[ formatDateTime(event.start_datetime) ]] · [[ labelize(event.event_type) ]]</div>
                     <div v-if="event.cliente" class="small text-secondary">[[ event.cliente.name ]]</div>
-                  </div>
+                  </a>
                 </div>
               </article>
             </div>
@@ -212,11 +212,11 @@ if (document.getElementById("app")) {
                 <div class="card-body p-4">
                   <h2 class="h5 mb-3">Task recenti</h2>
                   <div v-if="summary.recent_tasks.length === 0" class="text-secondary">Nessuna task presente.</div>
-                  <div v-for="task in summary.recent_tasks" :key="task.id" class="border-bottom py-3">
+                  <a v-for="task in summary.recent_tasks" :key="task.id" :href="task.url" class="d-block border-bottom py-3 text-dark">
                     <div class="fw-bold">[[ task.name ]]</div>
                     <div class="small text-secondary">[[ labelize(task.status) ]] · [[ labelize(task.priority) ]]</div>
                     <div class="small" :class="task.due_date ? 'text-secondary' : 'text-muted'">Scadenza: [[ formatDate(task.due_date) ]]</div>
-                  </div>
+                  </a>
                 </div>
               </article>
             </div>
@@ -226,11 +226,11 @@ if (document.getElementById("app")) {
                 <div class="card-body p-4">
                   <h2 class="h5 mb-3">Preventivi recenti</h2>
                   <div v-if="summary.recent_quotes.length === 0" class="text-secondary">Nessun preventivo presente.</div>
-                  <div v-for="quote in summary.recent_quotes" :key="quote.id" class="border-bottom py-3">
+                  <a v-for="quote in summary.recent_quotes" :key="quote.id" :href="quote.url" class="d-block border-bottom py-3 text-dark">
                     <div class="fw-bold">[[ quote.descrizione ]]</div>
                     <div class="small text-secondary">[[ quote.cliente ? quote.cliente.name : '-' ]] · [[ labelize(quote.stato) ]]</div>
                     <div class="small text-secondary">[[ formatDate(quote.data_creazione) ]] · [[ formatCurrency(quote.totale_preventivo) ]]</div>
-                  </div>
+                  </a>
                 </div>
               </article>
             </div>

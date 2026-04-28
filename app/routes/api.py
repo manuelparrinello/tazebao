@@ -1,6 +1,6 @@
 from datetime import date, datetime, time, timedelta
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, url_for
 
 from ..auth import login_required
 from ..extensions import db
@@ -107,6 +107,7 @@ def task_due_date_to_calendar_event(task):
 def serialize_dashboard_task(task):
     return {
         "id": task.id,
+        "url": url_for("tasks.task_edit", task_id=task.id),
         "name": task.name,
         "status": task.status,
         "priority": task.priority,
@@ -127,6 +128,7 @@ def serialize_dashboard_task(task):
 def serialize_dashboard_event(event):
     return {
         "id": event.id,
+        "url": url_for("calendar.calendar_edit", event_id=event.id),
         "title": event.title,
         "event_type": event.event_type,
         "start_datetime": (
@@ -148,6 +150,7 @@ def serialize_dashboard_event(event):
 def serialize_dashboard_quote(preventivo):
     return {
         "id": preventivo.id,
+        "url": url_for("visualizza_preventivo", id=preventivo.id),
         "descrizione": preventivo.descrizione,
         "stato": preventivo.stato,
         "data_creazione": (

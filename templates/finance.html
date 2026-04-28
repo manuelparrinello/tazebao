@@ -3,12 +3,12 @@
 {% block title %}Finanze{% endblock %}
 
 {% macro euro(value) -%}
-{{ "%.2f"|format(value or 0)|replace(".", ",") }}€
+{{ "%.2f"|format(value or 0)|replace(".", ",") }} &euro;
 {%- endmacro %}
 
 {% macro signed_euro(value) -%}
 {% set amount = value or 0 %}
-{% if amount > 0 %}+{{ "%.2f"|format(amount)|replace(".", ",") }}€{% elif amount < 0 %}-{{ "%.2f"|format(amount|abs)|replace(".", ",") }}€{% else %}{{ "%.2f"|format(0)|replace(".", ",") }}€{% endif %}
+{% if amount > 0 %}+{{ "%.2f"|format(amount)|replace(".", ",") }} &euro;{% elif amount < 0 %}-{{ "%.2f"|format(amount|abs)|replace(".", ",") }} &euro;{% else %}{{ "%.2f"|format(0)|replace(".", ",") }} &euro;{% endif %}
 {%- endmacro %}
 
 {% macro balance_class(value) -%}
@@ -22,9 +22,9 @@
 
 {% macro income_status_badge(status) -%}
 {% if status == "effettiva" %}
-<span class="badge rounded-pill text-bg-success">{{ labelize(status) }}</span>
+<span class="badge rounded-pill text-bg-success finance-status-badge"><i class="bi bi-check-circle-fill"></i> Effettiva</span>
 {% else %}
-<span class="badge rounded-pill text-bg-warning">{{ labelize(status) }}</span>
+<span class="badge rounded-pill text-bg-warning finance-status-badge"><i class="bi bi-hourglass-split"></i> Prevista</span>
 {% endif %}
 {%- endmacro %}
 

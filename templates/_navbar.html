@@ -158,16 +158,25 @@
         <ul class="nav nav-pills flex-column gap-1">
             <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.app_shell' %}active{% endif %}" href="{{ url_for('main.app_shell') }}"><i class="bi bi-grid-1x2"></i> Dashboard ERP</a>
             </li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('clienti') }}"><i class="bi bi-people"></i> Clienti</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('lavori') }}"><i class="bi bi-briefcase"></i> Lavori</a></li>
+
+            <li class="nav-item mt-3 pt-3 border-top"><span class="small fw-bold text-secondary px-3">Preventivi</span></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'nuovo_preventivo' %}active{% endif %}" href="{{ url_for('nuovo_preventivo') }}"><i class="bi bi-plus"></i> Nuovo preventivo</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'preventivi' %}active{% endif %}" href="{{ url_for('preventivi') }}"><i class="bi bi-list-ul"></i> Tutti</a></li>
+
+            <li class="nav-item mt-3 pt-3 border-top"><span class="small fw-bold text-secondary px-3">Clienti</span></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'nuovo_cliente' %}active{% endif %}" href="{{ url_for('nuovo_cliente') }}"><i class="bi bi-person-plus"></i> Nuovo cliente</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'clienti' %}active{% endif %}" href="{{ url_for('clienti') }}"><i class="bi bi-list-ul"></i> Tutti</a></li>
+
+            <li class="nav-item mt-3 pt-3 border-top"><span class="small fw-bold text-secondary px-3">Lavori & Task</span></li>
             <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('tasks.') %}active{% endif %}" href="{{ url_for('tasks.tasks') }}"><i class="bi bi-list-check"></i> Task</a></li>
             <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('calendar.') %}active{% endif %}" href="{{ url_for('calendar.calendar_index') }}"><i class="bi bi-calendar3"></i> Calendario</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'lavori' %}active{% endif %}" href="{{ url_for('lavori') }}"><i class="bi bi-briefcase"></i> Lavori</a></li>
+
             <li class="nav-item mt-3 pt-3 border-top"><span class="small fw-bold text-secondary px-3">Finanze</span></li>
             <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('finance.') %}active{% endif %}" href="{{ url_for('finance.finance_index') }}"><i class="bi bi-cash-coin"></i> Finanze</a></li>
+
             <li class="nav-item mt-3 pt-3 border-top"><span class="small fw-bold text-secondary px-3">Comunicazioni</span></li>
             <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('emails.') %}active{% endif %}" href="{{ url_for('emails.emails_index') }}"><i class="bi bi-envelope"></i> Comunicazioni</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('preventivi') }}"><i class="bi bi-receipt"></i> Preventivi</a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear"></i> Impostazioni</a></li>
         </ul>
 
         <div class="mt-3 pt-3 border-top">

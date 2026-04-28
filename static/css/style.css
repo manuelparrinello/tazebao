@@ -441,6 +441,17 @@ body.loaded {
   padding: 2px 10px;
 }
 
+.finance-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+}
+
+.finance-status-badge .bi {
+  font-size: 0.9rem;
+}
+
 .prio-pill {
   font-size: 0.7rem;
   font-weight: 700;

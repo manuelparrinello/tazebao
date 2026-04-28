@@ -43,6 +43,10 @@
 </head>
 
 <body>
+    <div class="d-print-none position-fixed top-0 end-0 m-3">
+        <a class="btn btn-primary" href="{{ url_for('preventivi.preventivo_edit', id=preventivo.id) }}">Modifica</a>
+    </div>
+
     <div class="page" id="preventivoView" v-cloak>
         <div class="row">
 

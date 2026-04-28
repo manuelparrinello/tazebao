@@ -33,6 +33,10 @@ const preventivi = Vue.createApp({
         console.log(err);
       }
     },
+    openPreventivo(id) {
+      if (!id) return;
+      window.location.href = `/preventivi/visualizza/${id}`;
+    },
   },
   delimiters: ["[[", "]]"],
   mounted() {

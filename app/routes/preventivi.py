@@ -1,13 +1,55 @@
-from flask import Blueprint, jsonify, render_template, request
+from decimal import Decimal
 
+from flask import Blueprint, jsonify, redirect, render_template, request, url_for
+
+from ..auth import login_required
 from ..extensions import db
 from ..models import Cliente, Preventivo, RigaPreventivo
 
 
 bp = Blueprint("preventivi", __name__)
 
+IVA = Decimal("1.22")
+TASSE_VARIE = Decimal("8.18")
+PREVENTIVO_STATUSES = ("bozza", "inviato", "accettato", "rifiutato")
+
+
+def decimal_from_form(value, default="0"):
+    normalized = (value or default).replace(",", ".")
+    return Decimal(normalized)
+
+
+def recalculate_preventivo(preventivo, righe_data):
+    righe = []
+    totale_preventivo = Decimal("0")
+
+    for riga_data in righe_data:
+        qty = decimal_from_form(riga_data.get("qty"), "1")
+        prezzo_ie = decimal_from_form(riga_data.get("prezzo_ie"), "0")
+        descrizione = (riga_data.get("descrizione") or "").strip()
+
+        if qty <= 0 or not descrizione:
+            continue
+
+        prezzo_ii = prezzo_ie * IVA
+        totale_riga = prezzo_ii * qty
+        totale_preventivo += totale_riga
+        righe.append(
+            RigaPreventivo(
+                qty=qty,
+                descrizione=descrizione,
+                prezzo_ie=prezzo_ie,
+                prezzo_ii=prezzo_ii,
+                totale_riga=totale_riga,
+            )
+        )
+
+    preventivo.righe = righe
+    preventivo.totale_preventivo = float(totale_preventivo + TASSE_VARIE)
+
 
 @bp.route("/preventivi/nuovo", methods=["POST", "GET"])
+@login_required
 def nuovo_preventivo():
     if request.method == "POST":
         iva = 1.22
@@ -78,6 +120,7 @@ def nuovo_preventivo():
 
 
 @bp.get("/preventivi")
+@login_required
 def preventivi():
     return render_template("preventivi.html")
 
@@ -95,6 +138,58 @@ def render_row():
 
 
 @bp.get("/preventivi/visualizza/<int:id>")
+@login_required
 def visualizza_preventivo(id):
     preventivo = Preventivo.query.filter_by(id=id).first_or_404()
     return render_template("_preventivo.html", preventivo=preventivo)
+
+
+@bp.route("/preventivi/<int:id>/edit", methods=["GET", "POST"])
+@login_required
+def preventivo_edit(id):
+    preventivo = Preventivo.query.filter_by(id=id).first_or_404()
+    clienti = Cliente.query.order_by(Cliente.name.asc()).all()
+    status_values = sorted(
+        {
+            *PREVENTIVO_STATUSES,
+            *[
+                stato
+                for (stato,) in db.session.query(Preventivo.stato).distinct().all()
+                if stato
+            ],
+        }
+    )
+
+    if request.method == "POST":
+        preventivo.cliente_id = int(request.form.get("cliente_id"))
+        preventivo.stato = request.form.get("stato") or "bozza"
+        preventivo.descrizione = (
+            request.form.get("descrizione") or preventivo.descrizione or ""
+        ).strip()
+
+        righe_data = []
+        qty_values = request.form.getlist("qty[]")
+        descrizioni = request.form.getlist("riga_descrizione[]")
+        prezzi = request.form.getlist("prezzo_ie[]")
+
+        for index, qty in enumerate(qty_values):
+            righe_data.append(
+                {
+                    "qty": qty,
+                    "descrizione": descrizioni[index] if index < len(descrizioni) else "",
+                    "prezzo_ie": prezzi[index] if index < len(prezzi) else "0",
+                }
+            )
+
+        recalculate_preventivo(preventivo, righe_data)
+        db.session.commit()
+        return redirect(url_for("preventivi.visualizza_preventivo", id=preventivo.id))
+
+    return render_template(
+        "preventivo_edit.html",
+        preventivo=preventivo,
+        clienti=clienti,
+        status_values=status_values,
+        iva=IVA,
+        tasse_varie=TASSE_VARIE,
+    )

@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Modifica preventivo {{ preventivo.id }}{% endblock %}
+
+{% block content %}
+<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+    <div class="col-12 col-lg-6 px-0">
+        <h3 class="fw-bolder">Modifica preventivo {{ preventivo.id }}</h3>
+        <p>Aggiorna cliente, stato e righe del preventivo.</p>
+    </div>
+    <div class="col-12 col-lg-6 d-inline-flex justify-content-lg-end gap-2 px-0">
+        <a href="{{ url_for('preventivi.visualizza_preventivo', id=preventivo.id) }}" class="btn btn-outline-secondary">
+            <i class="bi bi-eye"></i>&nbsp;Visualizza
+        </a>
+        <a href="{{ url_for('preventivi.preventivi') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>&nbsp;Tutti i preventivi
+        </a>
+    </div>
+</div>
+<hr>
+
+<form method="post" class="mt-5" id="preventivoEditForm">
+    <div class="row g-4">
+        <div class="col-12 col-lg-4">
+            <div class="card rounded-3 border border-light-subtle">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label for="cliente_id" class="form-label fw-bold">Cliente</label>
+                        <select class="form-control form-select" id="cliente_id" name="cliente_id" required>
+                            {% for cliente in clienti %}
+                            <option value="{{ cliente.id }}" {% if cliente.id == preventivo.cliente_id %}selected{% endif %}>{{ cliente.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="stato" class="form-label fw-bold">Stato</label>
+                        <select class="form-control form-select" id="stato" name="stato">
+                            {% for stato in status_values %}
+                            <option value="{{ stato }}" {% if stato == preventivo.stato %}selected{% endif %}>{{ stato.replace("_", " ").title() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="descrizione" class="form-label fw-bold">Titolo</label>
+                        <input type="text" class="form-control" id="descrizione" name="descrizione" value="{{ preventivo.descrizione or '' }}" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-8">
+            <div class="card rounded-3 border border-light-subtle">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="fw-bold mb-0">Righe preventivo</h5>
+                        <button type="button" class="btn btn-outline-primary" id="addRowButton">
+                            <i class="bi bi-plus-lg"></i>&nbsp;Aggiungi riga
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th style="width: 90px;">Qta</th>
+                                    <th>Descrizione</th>
+                                    <th style="width: 160px;">Prezzo</th>
+                                    <th style="width: 70px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="righePreventivoBody">
+                                {% for riga in preventivo.righe %}
+                                <tr>
+                                    <td>
+                                        <input type="number" min="0.01" step="0.01" class="form-control" name="qty[]" value="{{ riga.qty }}" required>
+                                    </td>
+                                    <td>
+                                        <textarea class="form-control" rows="2" name="riga_descrizione[]" required>{{ riga.descrizione }}</textarea>
+                                    </td>
+                                    <td>
+                                        <div class="input-group">
+                                            <input type="number" min="0" step="0.01" class="form-control" name="prezzo_ie[]" value="{{ riga.prezzo_ie }}" required>
+                                            <span class="input-group-text">€</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-row-button">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-secondary small mb-4">
+                        Il salvataggio ricalcola automaticamente totale riga, IVA 22% e totale preventivo.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-floppy"></i>&nbsp;Salva modifiche
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const tbody = document.getElementById("righePreventivoBody");
+  const addButton = document.getElementById("addRowButton");
+
+  function bindRemoveButtons() {
+    document.querySelectorAll(".remove-row-button").forEach(function (button) {
+      button.onclick = function () {
+        const rows = tbody.querySelectorAll("tr");
+        if (rows.length <= 1) {
+          return;
+        }
+        button.closest("tr").remove();
+      };
+    });
+  }
+
+  addButton.addEventListener("click", function () {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td><input type="number" min="0.01" step="0.01" class="form-control" name="qty[]" value="1" required></td>
+      <td><textarea class="form-control" rows="2" name="riga_descrizione[]" required></textarea></td>
+      <td>
+        <div class="input-group">
+          <input type="number" min="0" step="0.01" class="form-control" name="prezzo_ie[]" value="0" required>
+          <span class="input-group-text">€</span>
+        </div>
+      </td>
+      <td class="text-end">
+        <button type="button" class="btn btn-sm btn-outline-danger remove-row-button">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(row);
+    bindRemoveButtons();
+  });
+
+  bindRemoveButtons();
+});
+</script>
+{% endblock %}

@@ -29,9 +29,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="preventivo in preventivi">
+                        <tr v-for="preventivo in preventivi" class="pointer" @click="openPreventivo(preventivo.id)">
                             <td>[[ preventivo.id ]]</td>
-                            <td>[[ preventivo.descrizione ]]</td>
+                            <td>
+                                <a :href="'/preventivi/visualizza/' + preventivo.id" class="a-no-color fw-bold" @click.stop>
+                                    [[ preventivo.descrizione ]]
+                                </a>
+                            </td>
                             <td>[[ preventivo.cliente]]</td>
                             <td>[[ preventivo.data_creazione]]</td>
                             <td>[[ preventivo.totale_preventivo ]]€</td>

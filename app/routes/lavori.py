@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, render_template, request, url_for
 
 from ..extensions import db
-from ..models import Cliente, Lavoro
+from ..models import CalendarEvent, Cliente, FinancialMovement, Lavoro, Preventivo, Task
 
 
 bp = Blueprint("lavori", __name__)
@@ -100,7 +100,61 @@ def lavori():
 @bp.get("/lavori/<int:lavoro_id>")
 def lavoro_page(lavoro_id):
     lavoro = Lavoro.query.get_or_404(lavoro_id)
-    return render_template("lavoro.html", lavoro=lavoro)
+    tasks = (
+        Task.query.filter_by(lavoro_id=lavoro_id)
+        .order_by(Task.updated_at.desc(), Task.created_at.desc())
+        .limit(10)
+        .all()
+    )
+    legacy_tasks = (
+        sorted(lavoro.tasks, key=lambda task: task.timestamp or datetime.min, reverse=True)[:10]
+        if lavoro.tasks
+        else []
+    )
+    preventivi = (
+        Preventivo.query.filter_by(lavoro_id=lavoro_id)
+        .order_by(Preventivo.data_creazione.desc())
+        .limit(10)
+        .all()
+    )
+    eventi = (
+        CalendarEvent.query.filter_by(lavoro_id=lavoro_id)
+        .order_by(CalendarEvent.start_datetime.desc())
+        .limit(10)
+        .all()
+    )
+    movimenti = (
+        FinancialMovement.query.filter_by(lavoro_id=lavoro_id)
+        .order_by(FinancialMovement.movement_date.desc(), FinancialMovement.id.desc())
+        .limit(10)
+        .all()
+    )
+
+    quick_params = {"lavoro_id": lavoro.id}
+    if lavoro.cliente_id:
+        quick_params["cliente_id"] = lavoro.cliente_id
+    quick_actions = {
+        "nuovo_task": url_for("tasks.task_new", **quick_params),
+        "nuovo_preventivo": url_for("nuovo_preventivo", **quick_params),
+        "nuovo_evento": url_for("calendar.calendar_new", **quick_params),
+        "nuovo_movimento": url_for("finance.finance_new", **quick_params),
+        "cliente": (
+            url_for("cliente_page", cliente_id=lavoro.cliente_id)
+            if lavoro.cliente_id
+            else None
+        ),
+    }
+
+    return render_template(
+        "lavoro.html",
+        lavoro=lavoro,
+        tasks=tasks,
+        legacy_tasks=legacy_tasks,
+        preventivi=preventivi,
+        eventi=eventi,
+        movimenti=movimenti,
+        quick_actions=quick_actions,
+    )
 
 
 @bp.delete("/lavori/<int:lavoro_id>")

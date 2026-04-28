@@ -69,9 +69,17 @@ def finance_index():
 @bp.route("/finance/new", methods=["GET", "POST"])
 @login_required
 def finance_new():
+    lavoro_id = request.args.get("lavoro_id", type=int)
+    cliente_id = request.args.get("cliente_id", type=int)
+    lavoro = Lavoro.query.get(lavoro_id) if lavoro_id else None
+    if lavoro_id and not lavoro:
+        lavoro_id = None
+    if lavoro and not cliente_id:
+        cliente_id = lavoro.cliente_id
     movement = FinancialMovement(
         movement_date=date.today(),
-        cliente_id=request.args.get("cliente_id", type=int),
+        cliente_id=cliente_id,
+        lavoro_id=lavoro_id,
     )
     error = None
 

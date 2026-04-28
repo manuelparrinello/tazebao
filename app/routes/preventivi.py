@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, redirect, render_template, request, url_fo
 
 from ..auth import login_required
 from ..extensions import db
-from ..models import Cliente, Preventivo, RigaPreventivo
+from ..models import Cliente, Lavoro, Preventivo, RigaPreventivo
 
 
 bp = Blueprint("preventivi", __name__)
@@ -56,6 +56,7 @@ def nuovo_preventivo():
         tasse_varie = 8.18
         data = request.get_json()
         cliente_id = data["cliente_id"]
+        lavoro_id = data.get("lavoro_id")
         descrizione = data["titolo_preventivo"]
         cliente = Cliente.query.filter_by(id=cliente_id).first()
         print("Cliente: " + cliente.name + ", ID: " + str(cliente.id))
@@ -72,6 +73,7 @@ def nuovo_preventivo():
         nuovo_preventivo = Preventivo(
             descrizione=descrizione,
             cliente_id=cliente_id,
+            lavoro_id=lavoro_id,
             righe=[
                 RigaPreventivo(
                     qty=riga["qty"],
@@ -116,9 +118,18 @@ def nuovo_preventivo():
             ),
             200,
         )
+    lavoro_id = request.args.get("lavoro_id", type=int)
+    cliente_id = request.args.get("cliente_id", type=int)
+    lavoro = Lavoro.query.get(lavoro_id) if lavoro_id else None
+    if lavoro_id and not lavoro:
+        lavoro_id = None
+    if lavoro and not cliente_id:
+        cliente_id = lavoro.cliente_id
+
     return render_template(
         "preventivo_new.html",
-        selected_cliente_id=request.args.get("cliente_id", type=int),
+        selected_cliente_id=cliente_id,
+        selected_lavoro_id=lavoro_id,
     )
 
 

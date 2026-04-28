@@ -1,107 +1,318 @@
-{% extends "base.html" %} {% block title %}{{ lavoro.descrizione }}{% endblock %} {% block content %}
-<div id="lavoroPage" data-lavoro-id="{{ lavoro.id }}" v-cloak>
-    <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between mb-3">
-        <div class="col-4 px-0 mb-5">
-            <div class="breadcrumbs mb-3">
-                <h6 class="text-primary" style="letter-spacing: 1.2px">
-                    <span class="text-muted me-2"><a class="a-no-color" href="/lavori">LAVORI</a></span> / <span class="text-uppercase fw-bold">{{ lavoro.descrizione }}</span>
-                </h6>
-            </div>
-            <h4 class="fw-bold">{{ lavoro.descrizione }}</h4>
-        </div>
+{% extends "base.html" %}
 
-        <!-- PULSANTI AZIONI -->
-        <div class="col-8 d-inline-flex justify-content-end">
-            <a href="">
-                <button class="button-61 button-61-warning me-2">
-                    <span><i class="bi bi-pencil"></i></span>&nbsp;Modifica
-                </button>
-            </a>
-            <button onclick="" class="button-61 button-61-danger">
-                <span><i class="bi bi-trash3"></i></span>&nbsp;Elimina cliente
-            </button>
-        </div>
-        <!-- <hr /> -->
+{% block title %}{{ lavoro.descrizione }}{% endblock %}
 
+{% macro labelize(value) -%}
+{{ value.replace("_", " ").title() if value else "-" }}
+{%- endmacro %}
+
+{% macro euro(value) -%}
+{{ "%.2f"|format(value or 0)|replace(".", ",") }} &euro;
+{%- endmacro %}
+
+{% macro date_value(value) -%}
+{{ value.strftime("%d/%m/%Y") if value else "-" }}
+{%- endmacro %}
+
+{% macro datetime_value(value) -%}
+{{ value.strftime("%d/%m/%Y %H:%M") if value else "-" }}
+{%- endmacro %}
+
+{% macro empty_state(text, action_url=None, action_label=None) -%}
+<div class="border rounded-3 bg-light px-3 py-4 text-secondary">
+    <div>{{ text }}</div>
+    {% if action_url and action_label %}
+    <a class="btn btn-sm btn-outline-primary mt-3" href="{{ action_url }}">{{ action_label }}</a>
+    {% endif %}
+</div>
+{%- endmacro %}
+
+{% macro section_title(title) -%}
+<div class="mb-3">
+    <h5 class="fw-bolder mb-1">{{ title }}</h5>
+    <div class="small text-secondary">Mostrati gli ultimi 10 elementi collegati.</div>
+</div>
+{%- endmacro %}
+
+{% macro status_badge(status) -%}
+{% set normalized = (status or "")|lower %}
+{% if normalized == "completato" %}
+<span class="badge rounded-pill text-bg-success">{{ status }}</span>
+{% elif normalized == "in corso" %}
+<span class="badge rounded-pill text-bg-warning">{{ status }}</span>
+{% elif normalized == "in attesa" %}
+<span class="badge rounded-pill text-bg-secondary">{{ status }}</span>
+{% elif normalized == "da iniziare" %}
+<span class="badge rounded-pill text-bg-info">{{ status }}</span>
+{% else %}
+<span class="badge rounded-pill text-bg-light border">{{ status or "-" }}</span>
+{% endif %}
+{%- endmacro %}
+
+{% macro priority_badge(priority) -%}
+{% set normalized = (priority or "")|lower %}
+{% if normalized == "alta" or normalized == "urgente" %}
+<span class="badge rounded-pill text-bg-danger">{{ priority }}</span>
+{% elif normalized == "media" %}
+<span class="badge rounded-pill text-bg-warning">{{ priority }}</span>
+{% elif normalized == "bassa" %}
+<span class="badge rounded-pill text-bg-success">{{ priority }}</span>
+{% else %}
+<span class="badge rounded-pill text-bg-light border">{{ priority or "-" }}</span>
+{% endif %}
+{%- endmacro %}
+
+{% macro finance_badge(movement) -%}
+{% if movement.movement_type == "entrata" and movement.movement_status == "effettiva" %}
+<span class="badge rounded-pill text-bg-success">Entrata effettiva</span>
+{% elif movement.movement_type == "entrata" %}
+<span class="badge rounded-pill text-bg-warning">Entrata prevista</span>
+{% else %}
+<span class="badge rounded-pill text-bg-danger">Uscita</span>
+{% endif %}
+{%- endmacro %}
+
+{% block content %}
+<div class="row mx-auto w-100 align-items-start g-3">
+    <div class="col-12 col-xl-5 px-0">
+        <div class="breadcrumbs mb-3">
+            <h6 class="text-primary mb-0" style="letter-spacing: 1.2px">
+                <span class="text-muted me-2"><a class="a-no-color" href="{{ url_for('lavori') }}">LAVORI</a></span>
+                /
+                <span class="text-uppercase fw-bold">{{ lavoro.descrizione }}</span>
+            </h6>
+        </div>
+        <h2 class="fw-bold mb-2">{{ lavoro.descrizione }}</h2>
+        <div class="d-inline-flex flex-wrap gap-2">
+            {{ status_badge(lavoro.stato) }}
+            {{ priority_badge(lavoro.priorita) }}
+        </div>
     </div>
 
+    <div class="col-12 col-xl-7 d-inline-flex flex-wrap justify-content-xl-end gap-2 px-0">
+        <a href="{{ quick_actions.nuovo_task }}" class="btn btn-outline-primary"><i class="bi bi-list-check"></i>&nbsp;Nuova task</a>
+        <a href="{{ quick_actions.nuovo_preventivo }}" class="btn btn-outline-primary"><i class="bi bi-receipt"></i>&nbsp;Nuovo preventivo</a>
+        <a href="{{ quick_actions.nuovo_evento }}" class="btn btn-outline-primary"><i class="bi bi-calendar-plus"></i>&nbsp;Nuovo evento</a>
+        <a href="{{ quick_actions.nuovo_movimento }}" class="btn btn-outline-primary"><i class="bi bi-cash-coin"></i>&nbsp;Nuovo movimento</a>
+        {% if quick_actions.cliente %}
+        <a href="{{ quick_actions.cliente }}" class="btn btn-outline-secondary"><i class="bi bi-person"></i>&nbsp;Torna al cliente</a>
+        {% endif %}
+    </div>
+</div>
+<hr>
 
-    <!-- ANAGRAFICA LAVORO -->
-    <div class="mb-3 mt-2" id="anagraficaLavoro">
-        <div class="row w-100">
-            <div class="col-auto me-3">
-                <div class="d-flex flex-column">
-                    <span class="data-label">Prezzo</span>
-                    <h6 class="fw-bold mt-1">[[ lavoro.preventivato ]]€</h6>
+<div class="row g-4 mt-1">
+    <div class="col-12 col-xl-7">
+        <section class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="fw-bolder mb-3">Dati principali lavoro</h5>
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <div class="text-secondary small">Data inizio</div>
+                        <div class="fw-bold">{{ date_value(lavoro.data_inizio) }}</div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="text-secondary small">Data fine</div>
+                        <div class="fw-bold">{{ date_value(lavoro.data_fine) }}</div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="text-secondary small">Data pagamento</div>
+                        <div class="fw-bold">{{ date_value(lavoro.data_pagamento) }}</div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="text-secondary small">Stato</div>
+                        <div>{{ status_badge(lavoro.stato) }}</div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="text-secondary small">Priorita</div>
+                        <div>{{ priority_badge(lavoro.priorita) }}</div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="text-secondary small">Preventivato</div>
+                        <div class="fw-bold">{{ euro(lavoro.preventivato|default(0)) }}</div>
+                    </div>
+                    <div class="col-12">
+                        <div class="text-secondary small">Note</div>
+                        <div class="descrizione-preventivo">{{ lavoro.note|default("-", true) }}</div>
+                    </div>
                 </div>
             </div>
+        </section>
+    </div>
 
-            <div class="col-auto me-3">
-                <div class="d-flex flex-column">
-                    <span class="data-label text-muted">Cliente</span>
-                    <div class="d-inline-flex">
-                        <a :href="'/clienti/' + lavoro.cliente?.id">
-                            <div class="d-flex align-items-center">
-                                <h6 class="fw-bold mb-0 mt-1 text-dark a-no-color">
-                                    [[ lavoro.cliente?.nome ]]
-                                </h6>
+    <div class="col-12 col-xl-5">
+        <section class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="fw-bolder mb-3">Cliente collegato</h5>
+                {% if lavoro.cliente %}
+                <div class="d-flex align-items-start justify-content-between gap-3">
+                    <div>
+                        <div class="fw-bold h5 mb-1">{{ lavoro.cliente.name }}</div>
+                        <div class="text-secondary">{{ lavoro.cliente.ragsoc or "-" }}</div>
+                        <div class="small text-secondary mt-2">
+                            {% if lavoro.cliente.email %}<div>{{ lavoro.cliente.email }}</div>{% endif %}
+                            {% if lavoro.cliente.telefono %}<div>{{ lavoro.cliente.telefono }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <a href="{{ url_for('cliente_page', cliente_id=lavoro.cliente.id) }}" class="btn btn-sm btn-outline-primary">Apri</a>
+                </div>
+                {% else %}
+                {{ empty_state("Nessun cliente collegato a questo lavoro.") }}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <div class="col-12 col-xl-6">
+        <section class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                {{ section_title("Task ERP recenti") }}
+                {% if tasks %}
+                <div class="list-group list-group-flush">
+                    {% for task in tasks %}
+                    <a href="{{ url_for('tasks.task_edit', task_id=task.id) }}" class="list-group-item list-group-item-action px-0">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div>
+                                <div class="fw-bold">{{ task.name }}</div>
+                                <div class="small text-secondary">
+                                    {{ labelize(task.status) }} &middot; {{ labelize(task.priority) }}{% if task.due_date %} &middot; Scadenza {{ task.due_date.strftime("%d/%m/%Y") }}{% endif %}
+                                </div>
                             </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-auto me-3">
-                <div class="d-flex flex-column">
-                    <span class="data-label text-muted">Priorità</span>
-                    <div class="d-inline-flex">
-                        <div class="d-flex align-items-center">
-                            <h6 class="fw-bold mb-0 mt-1">
-                                <!-- <i class="me-1" :class="renderPrioIcon(lavoro.priorita)"></i> -->
-                                [[ lavoro.priorita ]]
-                            </h6>
+                            <span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span>
                         </div>
-                    </div>
+                    </a>
+                    {% endfor %}
                 </div>
+                {% else %}
+                {{ empty_state("Nessuna task ERP collegata a questo lavoro.", quick_actions.nuovo_task, "Crea task") }}
+                {% endif %}
             </div>
+        </section>
+    </div>
 
-            <div class="col-auto me-3">
-                <div class="d-flex flex-column">
-                    <span class="data-label text-muted">Stato</span>
-                    <div class="d-inline-flex">
-                        <div class="d-flex align-items-center">
-                            <h6 class="fw-bold mb-0 mt-1" :class="statoColorText(lavoro.stato)">
-                                <!-- <i class="me-1" :class="renderPrioIcon(lavoro.priorita)"></i> -->
-                                [[ lavoro.stato ]]
-                            </h6>
+    <div class="col-12 col-xl-6">
+        <section class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                {{ section_title("Task legacy recenti") }}
+                {% if legacy_tasks %}
+                <div class="list-group list-group-flush">
+                    {% for task in legacy_tasks %}
+                    <div class="list-group-item px-0">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div>
+                                <div class="fw-bold">{{ task.name }}</div>
+                                <div class="small text-secondary">
+                                    {{ task.tipo or "-" }} &middot; {{ datetime_value(task.timestamp) }}
+                                </div>
+                                {% if task.note %}
+                                <div class="small mt-2">{{ task.note }}</div>
+                                {% endif %}
+                            </div>
                         </div>
+                        {% if task.files %}
+                        <div class="mt-3">
+                            <div class="small fw-bold text-secondary mb-2">File collegati</div>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for file in task.files %}
+                                <span class="badge rounded-pill text-bg-light border">
+                                    <i class="bi bi-paperclip"></i> {{ file.filename }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
+                    {% endfor %}
                 </div>
+                {% else %}
+                {{ empty_state("Nessuna task legacy collegata a questo lavoro.") }}
+                {% endif %}
             </div>
-
-        </div>
+        </section>
     </div>
 
-
-    <hr />
-    <div class="row w-100">
-        <div class="col">
-            <h5 class="fw-bold"></h5><strong>Note: </strong>[[ lavoro?.note ]]
-        </div>
+    <div class="col-12 col-xl-6">
+        <section class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                {{ section_title("Preventivi recenti") }}
+                {% if preventivi %}
+                <div class="list-group list-group-flush">
+                    {% for preventivo in preventivi %}
+                    <a href="{{ url_for('visualizza_preventivo', id=preventivo.id) }}" class="list-group-item list-group-item-action px-0">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div>
+                                <div class="fw-bold">{{ preventivo.descrizione }}</div>
+                                <div class="small text-secondary">
+                                    {{ labelize(preventivo.stato) }} &middot; {{ preventivo.data_creazione.strftime("%d/%m/%Y") }}
+                                </div>
+                            </div>
+                            <div class="fw-bold text-end">{{ euro(preventivo.totale_preventivo) }}</div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ empty_state("Nessun preventivo collegato a questo lavoro.", quick_actions.nuovo_preventivo, "Crea preventivo") }}
+                {% endif %}
+            </div>
+        </section>
     </div>
-    <hr />
-    <div class="row w-100">
 
+    <div class="col-12 col-xl-6">
+        <section class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                {{ section_title("Eventi calendario recenti") }}
+                {% if eventi %}
+                <div class="list-group list-group-flush">
+                    {% for evento in eventi %}
+                    <a href="{{ url_for('calendar.calendar_edit', event_id=evento.id) }}" class="list-group-item list-group-item-action px-0">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div>
+                                <div class="fw-bold">{{ evento.title }}</div>
+                                <div class="small text-secondary">
+                                    {{ labelize(evento.event_type) }} &middot; {{ datetime_value(evento.start_datetime) }}
+                                </div>
+                            </div>
+                            <i class="bi bi-calendar-event text-secondary"></i>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ empty_state("Nessun evento calendario collegato a questo lavoro.", quick_actions.nuovo_evento, "Crea evento") }}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <div class="col-12">
+        <section class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                {{ section_title("Movimenti economici recenti") }}
+                {% if movimenti %}
+                <div class="list-group list-group-flush">
+                    {% for movimento in movimenti %}
+                    <a href="{{ url_for('finance.finance_edit', movement_id=movimento.id) }}" class="list-group-item list-group-item-action px-0">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div>
+                                <div class="fw-bold">{{ movimento.title }}</div>
+                                <div class="small text-secondary">
+                                    {{ labelize(movimento.category) }} &middot; {{ movimento.movement_date.strftime("%d/%m/%Y") }}
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                {{ finance_badge(movimento) }}
+                                <div class="fw-bold mt-1">{{ euro(movimento.amount|float) }}</div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ empty_state("Nessun movimento economico collegato a questo lavoro.", quick_actions.nuovo_movimento, "Crea movimento") }}
+                {% endif %}
+            </div>
+        </section>
     </div>
 </div>
-<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-    QUI ANDRANNO I TASK UPDATES
-</div>
-<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-    QUI ANDRANNO I TASK UPDATES
-</div>
-</div>
-{% endblock %} {% block scripts %}
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>
-<script src="{{ url_for('static', filename='js/lavoro.js') }}"></script>
 {% endblock %}

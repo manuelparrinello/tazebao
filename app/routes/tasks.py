@@ -78,7 +78,14 @@ def tasks():
 @bp.route("/tasks/new", methods=["GET", "POST"])
 @login_required
 def task_new():
-    task = Task(cliente_id=request.args.get("cliente_id", type=int))
+    lavoro_id = request.args.get("lavoro_id", type=int)
+    cliente_id = request.args.get("cliente_id", type=int)
+    lavoro = Lavoro.query.get(lavoro_id) if lavoro_id else None
+    if lavoro_id and not lavoro:
+        lavoro_id = None
+    if lavoro and not cliente_id:
+        cliente_id = lavoro.cliente_id
+    task = Task(cliente_id=cliente_id, lavoro_id=lavoro_id)
     error = None
 
     if request.method == "POST":

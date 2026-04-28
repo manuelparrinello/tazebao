@@ -1,5 +1,7 @@
 const selectedPreventivoClienteId =
   document.querySelector("#nuovoPreventivo")?.dataset.selectedClienteId || "";
+const selectedPreventivoLavoroId =
+  document.querySelector("#nuovoPreventivo")?.dataset.selectedLavoroId || "";
 
 const preventivo = Vue.createApp({
   data() {
@@ -142,6 +144,7 @@ const preventivo = Vue.createApp({
       const dataToSend_raw = {
         titolo_preventivo: this.titoloPreventivo,
         cliente_id: this.clienteData.id,
+        lavoro_id: selectedPreventivoLavoroId ? Number(selectedPreventivoLavoroId) : null,
         righe: this.righe,
       };
       const dataToSend = JSON.stringify(dataToSend_raw);

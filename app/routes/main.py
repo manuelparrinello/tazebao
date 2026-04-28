@@ -1,5 +1,7 @@
 from flask import Blueprint, current_app, render_template
 
+from ..auth import login_required
+
 
 bp = Blueprint("main", __name__)
 
@@ -12,6 +14,12 @@ def index():
         description="Welcome to the Home Page",
         path=current_app.config["DB_PATH"],
     )
+
+
+@bp.route("/app")
+@login_required
+def app_shell():
+    return render_template("app_shell.html")
 
 
 @bp.route("/test")

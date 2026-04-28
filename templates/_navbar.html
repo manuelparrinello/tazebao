@@ -15,6 +15,14 @@
         <ul class="nav nav-pills flex-column gap-1">
 
             <li class="nav-item mt-4">
+                <a class="nav-link {% if request.endpoint == 'main.app_shell' %}active{% endif %}"
+                    href="{{ url_for('main.app_shell') }}">
+                    <i class="bi bi-grid-1x2"></i>
+                    <span class="nav-label">Dashboard ERP</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}"
                     href="{{ url_for('index') }}">
                     <i class="bi bi-speedometer2"></i>
@@ -125,7 +133,9 @@
 
     <div class="offcanvas-body p-2">
         <ul class="nav nav-pills flex-column gap-1">
-            <li class="nav-item"><a class="nav-link active" href="#"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.app_shell' %}active{% endif %}" href="{{ url_for('main.app_shell') }}"><i class="bi bi-grid-1x2"></i> Dashboard ERP</a>
+            </li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
             </li>
             <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-people"></i> Clienti</a></li>
             <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-briefcase"></i> Lavori</a></li>

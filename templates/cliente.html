@@ -2,8 +2,13 @@
 
 {% block title %}{{ cliente.name }}{% endblock %}
 
-{% macro empty_state(text) -%}
-<div class="text-secondary py-3">{{ text }}</div>
+{% macro empty_state(text, action_url=None, action_label=None) -%}
+<div class="border rounded-3 bg-light px-3 py-4 text-secondary">
+    <div>{{ text }}</div>
+    {% if action_url and action_label %}
+    <a class="btn btn-sm btn-outline-primary mt-3" href="{{ action_url }}">{{ action_label }}</a>
+    {% endif %}
+</div>
 {%- endmacro %}
 
 {% macro labelize(value) -%}
@@ -11,23 +16,41 @@
 {%- endmacro %}
 
 {% macro euro(value) -%}
-{{ "%.2f"|format(value or 0)|replace(".", ",") }}€
+{{ "%.2f"|format(value or 0)|replace(".", ",") }} &euro;
+{%- endmacro %}
+
+{% macro section_title(title, count) -%}
+<div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+    <div>
+        <h5 class="fw-bolder mb-1">{{ title }}</h5>
+        <div class="small text-secondary">Mostrati gli ultimi {{ count }} elementi collegati.</div>
+    </div>
+</div>
+{%- endmacro %}
+
+{% macro finance_badge(movement) -%}
+{% if movement.movement_type == "entrata" and movement.movement_status == "effettiva" %}
+<span class="badge rounded-pill text-bg-success">Entrata effettiva</span>
+{% elif movement.movement_type == "entrata" %}
+<span class="badge rounded-pill text-bg-warning">Entrata prevista</span>
+{% else %}
+<span class="badge rounded-pill text-bg-danger">Uscita</span>
+{% endif %}
 {%- endmacro %}
 
 {% block content %}
-<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+<div class="row mx-auto w-100 align-items-start g-3">
     <div class="col-12 col-xl-5 px-0">
-        <h6 class="text-primary fw-bold" style="letter-spacing: 1.2px">SCHEDA CLIENTE</h6>
-        <h2>{{ cliente.name }}</h2>
-        <p class="text-secondary mb-0">{{ cliente.ragsoc }}</p>
+        <h6 class="text-primary fw-bold mb-2" style="letter-spacing: 1.2px">SCHEDA CLIENTE ERP</h6>
+        <h2 class="mb-1">{{ cliente.name }}</h2>
+        <p class="text-secondary mb-0">{{ cliente.ragsoc or "Ragione sociale non indicata" }}</p>
     </div>
     <div class="col-12 col-xl-7 d-inline-flex flex-wrap justify-content-xl-end gap-2 px-0">
         <a href="{{ quick_actions.nuovo_lavoro }}" class="btn btn-outline-primary"><i class="bi bi-briefcase"></i>&nbsp;Nuovo lavoro</a>
         <a href="{{ quick_actions.nuovo_task }}" class="btn btn-outline-primary"><i class="bi bi-list-check"></i>&nbsp;Nuova task</a>
-        <a href="{{ quick_actions.nuovo_evento }}" class="btn btn-outline-primary"><i class="bi bi-calendar-plus"></i>&nbsp;Nuovo evento</a>
         <a href="{{ quick_actions.nuovo_preventivo }}" class="btn btn-outline-primary"><i class="bi bi-receipt"></i>&nbsp;Nuovo preventivo</a>
+        <a href="{{ quick_actions.nuovo_evento }}" class="btn btn-outline-primary"><i class="bi bi-calendar-plus"></i>&nbsp;Nuovo evento</a>
         <a href="{{ quick_actions.nuovo_movimento }}" class="btn btn-outline-primary"><i class="bi bi-cash-coin"></i>&nbsp;Nuovo movimento</a>
-        <a href="{{ quick_actions.nuova_comunicazione }}" class="btn btn-outline-primary"><i class="bi bi-envelope-plus"></i>&nbsp;Nuova comunicazione</a>
         <a href="{{ url_for('cliente_edit', cliente_id=cliente.id) }}" class="btn btn-warning"><i class="bi bi-pencil"></i>&nbsp;Modifica</a>
     </div>
 </div>
@@ -36,35 +59,63 @@
 <section class="mt-4">
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <h5 class="fw-bolder mb-3">Anagrafica cliente</h5>
+            <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                <div>
+                    <h5 class="fw-bolder mb-1">Dati anagrafici</h5>
+                    <div class="small text-secondary">Informazioni fiscali e contatti principali del cliente.</div>
+                </div>
+            </div>
             <div class="row g-3">
                 <div class="col-12 col-md-4">
+                    <div class="text-secondary small">Nome cliente</div>
+                    <div class="fw-bold">{{ cliente.name or "-" }}</div>
+                </div>
+                <div class="col-12 col-md-4">
                     <div class="text-secondary small">Ragione sociale</div>
-                    <div class="fw-bold">{{ cliente.ragsoc }}</div>
+                    <div class="fw-bold">{{ cliente.ragsoc or "-" }}</div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="text-secondary small">Colore</div>
+                    <div>
+                        {% if cliente.colore %}
+                        <span class="cliente-bullet align-middle" style="background-color: {{ cliente.colore }}"></span>{{ cliente.colore }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="col-12 col-md-4">
                     <div class="text-secondary small">Email</div>
-                    <div>{{ cliente.email or "-" }}</div>
+                    <div>{% if cliente.email %}<a href="mailto:{{ cliente.email }}">{{ cliente.email }}</a>{% else %}-{% endif %}</div>
                 </div>
                 <div class="col-12 col-md-4">
                     <div class="text-secondary small">Telefono</div>
-                    <div>{{ cliente.telefono or "-" }}</div>
+                    <div>{% if cliente.telefono %}<a href="tel:{{ cliente.telefono }}">{{ cliente.telefono }}</a>{% else %}-{% endif %}</div>
                 </div>
-                <div class="col-12 col-md-6">
-                    <div class="text-secondary small">Indirizzo</div>
-                    <div>{{ cliente.indirizzo or "-" }}{% if cliente.cap or cliente.citta or cliente.provincia %}, {{ cliente.cap }} {{ cliente.citta }} {{ cliente.provincia }}{% endif %}</div>
-                </div>
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-4">
                     <div class="text-secondary small">P.IVA</div>
                     <div>{{ cliente.p_iva or "-" }}</div>
                 </div>
+                <div class="col-12 col-md-6">
+                    <div class="text-secondary small">Indirizzo</div>
+                    <div>
+                        {{ cliente.indirizzo or "-" }}
+                        {% if cliente.cap or cliente.citta or cliente.provincia %}
+                        <br>{{ cliente.cap or "" }} {{ cliente.citta or "" }} {{ cliente.provincia or "" }}
+                        {% endif %}
+                    </div>
+                </div>
                 <div class="col-12 col-md-3">
-                    <div class="text-secondary small">SDI / PEC</div>
-                    <div>{{ cliente.sdi or "-" }} / {{ cliente.pec or "-" }}</div>
+                    <div class="text-secondary small">SDI</div>
+                    <div>{{ cliente.sdi or "-" }}</div>
+                </div>
+                <div class="col-12 col-md-3">
+                    <div class="text-secondary small">PEC</div>
+                    <div>{{ cliente.pec or "-" }}</div>
                 </div>
                 <div class="col-12">
                     <div class="text-secondary small">Note</div>
-                    <div>{{ cliente.note or "-" }}</div>
+                    <div class="descrizione-preventivo">{{ cliente.note or "-" }}</div>
                 </div>
             </div>
         </div>
@@ -75,103 +126,106 @@
     <div class="col-12 col-xl-6">
         <section class="card h-100 border-0 shadow-sm">
             <div class="card-body p-4">
-                <h5 class="fw-bolder mb-3">Lavori del cliente</h5>
+                {{ section_title("Lavori recenti", 10) }}
                 {% if lavori %}
                 <div class="list-group list-group-flush">
                     {% for lavoro in lavori %}
                     <a href="{{ url_for('lavoro_page', lavoro_id=lavoro.id) }}" class="list-group-item list-group-item-action px-0">
-                        <div class="fw-bold">{{ lavoro.descrizione }}</div>
-                        <div class="small text-secondary">{{ lavoro.stato or "-" }} · {{ lavoro.priorita or "-" }}</div>
-                    </a>
-                    {% endfor %}
-                </div>
-                {% else %}
-                {{ empty_state("Nessun lavoro collegato.") }}
-                {% endif %}
-            </div>
-        </section>
-    </div>
-
-    <div class="col-12 col-xl-6">
-        <section class="card h-100 border-0 shadow-sm">
-            <div class="card-body p-4">
-                <h5 class="fw-bolder mb-3">Task del cliente</h5>
-                {% if tasks %}
-                <div class="list-group list-group-flush">
-                    {% for task in tasks %}
-                    <a href="{{ url_for('tasks.task_edit', task_id=task.id) }}" class="list-group-item list-group-item-action px-0">
-                        <div class="fw-bold">{{ task.name }}</div>
-                        <div class="small text-secondary">{{ labelize(task.status) }} · {{ labelize(task.priority) }}{% if task.due_date %} · Scadenza {{ task.due_date.strftime("%d/%m/%Y") }}{% endif %}</div>
-                    </a>
-                    {% endfor %}
-                </div>
-                {% else %}
-                {{ empty_state("Nessuna task collegata.") }}
-                {% endif %}
-            </div>
-        </section>
-    </div>
-
-    <div class="col-12 col-xl-6">
-        <section class="card h-100 border-0 shadow-sm">
-            <div class="card-body p-4">
-                <h5 class="fw-bolder mb-3">Eventi calendario del cliente</h5>
-                {% if eventi %}
-                <div class="list-group list-group-flush">
-                    {% for evento in eventi %}
-                    <a href="{{ url_for('calendar.calendar_edit', event_id=evento.id) }}" class="list-group-item list-group-item-action px-0">
-                        <div class="fw-bold">{{ evento.title }}</div>
-                        <div class="small text-secondary">{{ labelize(evento.event_type) }} · {{ evento.start_datetime.strftime("%d/%m/%Y %H:%M") }}</div>
-                    </a>
-                    {% endfor %}
-                </div>
-                {% else %}
-                {{ empty_state("Nessun evento collegato.") }}
-                {% endif %}
-            </div>
-        </section>
-    </div>
-
-    <div class="col-12 col-xl-6">
-        <section class="card h-100 border-0 shadow-sm">
-            <div class="card-body p-4">
-                <h5 class="fw-bolder mb-3">Preventivi del cliente</h5>
-                {% if preventivi %}
-                <div class="list-group list-group-flush">
-                    {% for preventivo in preventivi %}
-                    <a href="{{ url_for('visualizza_preventivo', id=preventivo.id) }}" class="list-group-item list-group-item-action px-0">
-                        <div class="fw-bold">{{ preventivo.descrizione }}</div>
-                        <div class="small text-secondary">{{ labelize(preventivo.stato) }} · {{ preventivo.data_creazione.strftime("%d/%m/%Y") }} · {{ euro(preventivo.totale_preventivo) }}</div>
-                    </a>
-                    {% endfor %}
-                </div>
-                {% else %}
-                {{ empty_state("Nessun preventivo collegato.") }}
-                {% endif %}
-            </div>
-        </section>
-    </div>
-
-    <div class="col-12">
-        <section class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <h5 class="fw-bolder mb-3">Movimenti economici del cliente</h5>
-                {% if movimenti %}
-                <div class="list-group list-group-flush">
-                    {% for movimento in movimenti %}
-                    <a href="{{ url_for('finance.finance_edit', movement_id=movimento.id) }}" class="list-group-item list-group-item-action px-0">
-                        <div class="d-flex align-items-center justify-content-between gap-3">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
                             <div>
-                                <div class="fw-bold">{{ movimento.title }}</div>
-                                <div class="small text-secondary">{{ labelize(movimento.movement_type) }} · {{ labelize(movimento.category) }} · {{ movimento.movement_date.strftime("%d/%m/%Y") }}</div>
+                                <div class="fw-bold">{{ lavoro.descrizione }}</div>
+                                <div class="small text-secondary">
+                                    Stato {{ lavoro.stato or "-" }} &middot; Priorita {{ lavoro.priorita or "-" }}
+                                </div>
                             </div>
-                            <div class="fw-bold">{{ euro(movimento.amount|float) }}</div>
+                            <i class="bi bi-chevron-right text-secondary"></i>
                         </div>
                     </a>
                     {% endfor %}
                 </div>
                 {% else %}
-                {{ empty_state("Nessun movimento economico collegato.") }}
+                {{ empty_state("Nessun lavoro collegato a questo cliente.", quick_actions.nuovo_lavoro, "Crea lavoro") }}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <div class="col-12 col-xl-6">
+        <section class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                {{ section_title("Task ERP recenti", 10) }}
+                {% if tasks %}
+                <div class="list-group list-group-flush">
+                    {% for task in tasks %}
+                    <a href="{{ url_for('tasks.task_edit', task_id=task.id) }}" class="list-group-item list-group-item-action px-0">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div>
+                                <div class="fw-bold">{{ task.name }}</div>
+                                <div class="small text-secondary">
+                                    {{ labelize(task.status) }} &middot; {{ labelize(task.priority) }}{% if task.due_date %} &middot; Scadenza {{ task.due_date.strftime("%d/%m/%Y") }}{% endif %}
+                                </div>
+                            </div>
+                            <span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ empty_state("Nessuna task ERP collegata a questo cliente.", quick_actions.nuovo_task, "Crea task") }}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <div class="col-12 col-xl-6">
+        <section class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                {{ section_title("Preventivi recenti", 10) }}
+                {% if preventivi %}
+                <div class="list-group list-group-flush">
+                    {% for preventivo in preventivi %}
+                    <a href="{{ url_for('visualizza_preventivo', id=preventivo.id) }}" class="list-group-item list-group-item-action px-0">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div>
+                                <div class="fw-bold">{{ preventivo.descrizione }}</div>
+                                <div class="small text-secondary">
+                                    {{ labelize(preventivo.stato) }} &middot; {{ preventivo.data_creazione.strftime("%d/%m/%Y") }}
+                                </div>
+                            </div>
+                            <div class="fw-bold text-end">{{ euro(preventivo.totale_preventivo) }}</div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ empty_state("Nessun preventivo collegato a questo cliente.", quick_actions.nuovo_preventivo, "Crea preventivo") }}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <div class="col-12 col-xl-6">
+        <section class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                {{ section_title("Eventi calendario recenti", 10) }}
+                {% if eventi %}
+                <div class="list-group list-group-flush">
+                    {% for evento in eventi %}
+                    <a href="{{ url_for('calendar.calendar_edit', event_id=evento.id) }}" class="list-group-item list-group-item-action px-0">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div>
+                                <div class="fw-bold">{{ evento.title }}</div>
+                                <div class="small text-secondary">
+                                    {{ labelize(evento.event_type) }} &middot; {{ evento.start_datetime.strftime("%d/%m/%Y %H:%M") }}
+                                </div>
+                            </div>
+                            <i class="bi bi-calendar-event text-secondary"></i>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ empty_state("Nessun evento calendario collegato a questo cliente.", quick_actions.nuovo_evento, "Crea evento") }}
                 {% endif %}
             </div>
         </section>
@@ -180,12 +234,47 @@
     <div class="col-12">
         <section class="card border-0 shadow-sm">
             <div class="card-body p-4">
-                <h5 class="fw-bolder mb-3">Comunicazioni Email</h5>
+                {{ section_title("Movimenti economici recenti", 10) }}
+                {% if movimenti %}
+                <div class="list-group list-group-flush">
+                    {% for movimento in movimenti %}
+                    <a href="{{ url_for('finance.finance_edit', movement_id=movimento.id) }}" class="list-group-item list-group-item-action px-0">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div>
+                                <div class="fw-bold">{{ movimento.title }}</div>
+                                <div class="small text-secondary">
+                                    {{ labelize(movimento.category) }} &middot; {{ movimento.movement_date.strftime("%d/%m/%Y") }}
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                {{ finance_badge(movimento) }}
+                                <div class="fw-bold mt-1">{{ euro(movimento.amount|float) }}</div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ empty_state("Nessun movimento economico collegato a questo cliente.", quick_actions.nuovo_movimento, "Crea movimento") }}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <div class="col-12">
+        <section class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                    <div>
+                        <h5 class="fw-bolder mb-1">Comunicazioni email recenti</h5>
+                        <div class="small text-secondary">Mostrate le ultime 5 comunicazioni collegate.</div>
+                    </div>
+                </div>
                 {% if email_logs %}
                 <div class="list-group list-group-flush">
                     {% for email_log in email_logs %}
                     <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) }}" class="list-group-item list-group-item-action px-0">
-                        <div class="d-flex align-items-center justify-content-between gap-3">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
                             <div>
                                 <div class="fw-bold">{{ email_log.subject }}</div>
                                 <div class="small text-secondary">
@@ -202,14 +291,10 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                {{ empty_state("Nessuna comunicazione email collegata.") }}
+                {{ empty_state("Nessuna comunicazione email collegata a questo cliente.", quick_actions.nuova_comunicazione, "Crea comunicazione") }}
                 {% endif %}
             </div>
         </section>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% endblock %}

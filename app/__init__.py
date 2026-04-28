@@ -1,8 +1,11 @@
 import locale
 import os
+import sys
 
 from flask import Flask
 
+from .auth import register_auth_guards
+from .cli import register_cli
 from .extensions import cors, db, migrate
 
 
@@ -20,6 +23,8 @@ def create_app():
     app.config["DB_PATH"] = db_path
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    # In produzione impostare SECRET_KEY da variabile d'ambiente.
+    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
@@ -28,21 +33,26 @@ def create_app():
     migrate.init_app(app, db, render_as_batch=True)
 
     register_template_filters(app)
+    register_cli(app)
 
     from . import models  # noqa: F401
-    from .routes import api, clienti, lavori, main, preventivi
+    from .routes import api, auth, clienti, lavori, main, preventivi
 
+    register_auth_endpoint_aliases(app)
     register_legacy_endpoint_aliases(app)
+    app.register_blueprint(auth.bp)
     app.register_blueprint(main.bp)
     app.register_blueprint(clienti.bp)
     app.register_blueprint(lavori.bp)
     app.register_blueprint(preventivi.bp)
     app.register_blueprint(api.bp)
+    register_auth_guards(app)
 
     # Compatibilita temporanea con il comportamento storico del monolite.
     # Da rimuovere quando il progetto usera esclusivamente Flask-Migrate.
-    with app.app_context():
-        db.create_all()
+    if "db" not in sys.argv:
+        with app.app_context():
+            db.create_all()
 
     return app
 
@@ -58,6 +68,23 @@ def register_template_filters(app):
         if text:
             return text.replace("\n", "<br>\n")
         return ""
+
+
+def register_auth_endpoint_aliases(app):
+    from .routes import auth
+
+    app.add_url_rule(
+        "/login",
+        endpoint="login",
+        view_func=auth.login,
+        methods=["GET", "POST"],
+    )
+    app.add_url_rule(
+        "/logout",
+        endpoint="logout",
+        view_func=auth.logout,
+        methods=["POST"],
+    )
 
 
 def register_legacy_endpoint_aliases(app):

@@ -99,12 +99,16 @@
         <div class="d-flex align-items-center gap-2">
             <img src="{{ url_for('static', filename='img/Logo_Purple.png') }}" class="rounded-circle" width="40">
             <div>
-                <div class="fw-semibold">NOMEUTENTE</div>
-                <div class="text-secondary small">Ruolo utente}</div>
+                <div class="fw-semibold">{{ current_user.name if current_user else 'Utente' }}</div>
+                <div class="text-secondary small">{{ current_user.role if current_user else '' }}</div>
             </div>
-            <a href="#" class="btn btn-sm btn-outline-danger ms-auto">
-                <i class="bi bi-box-arrow-right"></i>
-            </a>
+            {% if current_user %}
+            <form action="{{ url_for('logout') }}" method="post" class="ms-auto">
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+            </form>
+            {% endif %}
         </div>
     </div>
 
@@ -130,9 +134,13 @@
         </ul>
 
         <div class="mt-3 pt-3 border-top">
-            <a class="btn btn-outline-danger w-100" href="/logout">
-                <i class="bi bi-box-arrow-right me-2"></i> Logout
-            </a>
+            {% if current_user %}
+            <form action="{{ url_for('logout') }}" method="post">
+                <button type="submit" class="btn btn-outline-danger w-100">
+                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                </button>
+            </form>
+            {% endif %}
         </div>
     </div>
 </div>

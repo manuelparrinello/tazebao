@@ -28,6 +28,13 @@ TASK_PRIORITIES = (
     "alta",
     "urgente",
 )
+CALENDAR_EVENT_TYPES = (
+    "appuntamento",
+    "scadenza",
+    "impegno_cliente",
+    "promemoria",
+    "generale",
+)
 
 
 class User(db.Model):
@@ -179,6 +186,72 @@ class Task(db.Model):
             "assignee": (
                 {"id": self.assignee.id, "name": self.assignee.name, "email": self.assignee.email}
                 if self.assignee
+                else None
+            ),
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
+class CalendarEvent(db.Model):
+    __tablename__ = "erp_calendar_events"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(160), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    event_type = db.Column(db.String(40), nullable=False, default="generale")
+    start_datetime = db.Column(db.DateTime, nullable=False)
+    end_datetime = db.Column(db.DateTime, nullable=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=True)
+    lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=True)
+    task_id = db.Column(db.Integer, db.ForeignKey("erp_tasks.id"), nullable=True)
+    assigned_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+    cliente = db.relationship("Cliente", backref="calendar_events")
+    lavoro = db.relationship("Lavoro", backref="calendar_events")
+    task = db.relationship("Task", backref="calendar_events")
+    assigned_user = db.relationship("User", backref="calendar_events")
+
+    def to_dict(self):
+        return {
+            "source": "calendar_event",
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "event_type": self.event_type,
+            "start_datetime": (
+                self.start_datetime.isoformat() if self.start_datetime else None
+            ),
+            "end_datetime": self.end_datetime.isoformat() if self.end_datetime else None,
+            "cliente_id": self.cliente_id,
+            "cliente": (
+                {"id": self.cliente.id, "name": self.cliente.name}
+                if self.cliente
+                else None
+            ),
+            "lavoro_id": self.lavoro_id,
+            "lavoro": (
+                {"id": self.lavoro.id, "descrizione": self.lavoro.descrizione}
+                if self.lavoro
+                else None
+            ),
+            "task_id": self.task_id,
+            "task": self.task.to_dict() if self.task else None,
+            "assigned_user_id": self.assigned_user_id,
+            "assigned_user": (
+                {
+                    "id": self.assigned_user.id,
+                    "name": self.assigned_user.name,
+                    "email": self.assigned_user.email,
+                }
+                if self.assigned_user
                 else None
             ),
             "created_at": self.created_at.isoformat() if self.created_at else None,

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Calendario{% endblock %}
+
+{% macro labelize(value) -%}
+{{ value.replace("_", " ").title() }}
+{%- endmacro %}
+
+{% block content %}
+<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
+    <div class="col-12 col-lg-5 px-0">
+        <h3 class="fw-bolder">Calendario</h3>
+        <p>Scadenziario ERP ordinato per data.</p>
+    </div>
+    <div class="col-12 col-lg-7 d-inline-flex justify-content-lg-end px-0">
+        <a href="{{ url_for('calendar.calendar_new') }}">
+            <button class="button-61">
+                <span><i class="bi bi-calendar-plus"></i></span>&nbsp;Nuovo evento
+            </button>
+        </a>
+    </div>
+</div>
+<hr>
+
+<div class="mt-5">
+    <div class="card rounded-3 border border-light-subtle">
+        <div class="card-body p-4">
+            {% if events %}
+            <div class="table-responsive">
+                <table class="table table-hover my-0">
+                    <thead>
+                        <tr>
+                            <th class="fw-bold">Data</th>
+                            <th class="fw-bold">Evento</th>
+                            <th class="fw-bold">Tipo</th>
+                            <th class="fw-bold">Cliente</th>
+                            <th class="fw-bold">Lavoro</th>
+                            <th class="fw-bold">Task</th>
+                            <th class="fw-bold">Assegnato a</th>
+                            <th class="fw-bold text-end">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold">{{ event.start_datetime.strftime("%d/%m/%Y") }}</div>
+                                <div class="small text-secondary">{{ event.start_datetime.strftime("%H:%M") }}</div>
+                            </td>
+                            <td>
+                                <a class="fw-bold a-no-color" href="{{ url_for('calendar.calendar_edit', event_id=event.id) }}">{{ event.title }}</a>
+                                {% if event.description %}
+                                <div class="small text-secondary">{{ event.description }}</div>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge rounded-pill bg-primary">{{ labelize(event.event_type) }}</span></td>
+                            <td>{{ event.cliente.name if event.cliente else "-" }}</td>
+                            <td>{{ event.lavoro.descrizione if event.lavoro else "-" }}</td>
+                            <td>{{ event.task.name if event.task else "-" }}</td>
+                            <td>{{ event.assigned_user.name or event.assigned_user.email if event.assigned_user else "-" }}</td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('calendar.calendar_edit', event_id=event.id) }}">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form action="{{ url_for('calendar.calendar_delete', event_id=event.id) }}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="mb-0 text-secondary">Nessun evento presente.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

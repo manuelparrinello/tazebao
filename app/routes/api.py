@@ -1,11 +1,11 @@
-from datetime import datetime
+from datetime import datetime, time
 
 from flask import Blueprint, jsonify, request
 
 from ..auth import login_required
 from ..extensions import db
-from ..models import Cliente, Lavoro, Preventivo
-from ..models import TASK_CATEGORIES, TASK_PRIORITIES, TASK_STATUSES, Task
+from ..models import CalendarEvent, Cliente, Lavoro, Preventivo
+from ..models import CALENDAR_EVENT_TYPES, TASK_CATEGORIES, TASK_PRIORITIES, TASK_STATUSES, Task
 
 
 bp = Blueprint("api", __name__)
@@ -21,10 +21,87 @@ def parse_optional_date(value):
     return datetime.strptime(value, "%Y-%m-%d").date()
 
 
+def parse_optional_datetime(value):
+    if not value:
+        return None
+    if value.endswith("Z"):
+        value = value[:-1] + "+00:00"
+    return datetime.fromisoformat(value)
+
+
 def parse_optional_id(value):
     if value in (None, ""):
         return None
     return int(value)
+
+
+def apply_calendar_payload(event, data, partial=False):
+    if not partial or "title" in data:
+        event.title = (data.get("title") or "").strip()
+    if not partial or "description" in data:
+        event.description = (data.get("description") or "").strip() or None
+    if not partial or "event_type" in data:
+        event.event_type = data.get("event_type") or "generale"
+    if not partial or "start_datetime" in data:
+        event.start_datetime = parse_optional_datetime(data.get("start_datetime"))
+    if not partial or "end_datetime" in data:
+        event.end_datetime = parse_optional_datetime(data.get("end_datetime"))
+    if not partial or "cliente_id" in data:
+        event.cliente_id = parse_optional_id(data.get("cliente_id"))
+    if not partial or "lavoro_id" in data:
+        event.lavoro_id = parse_optional_id(data.get("lavoro_id"))
+    if not partial or "task_id" in data:
+        event.task_id = parse_optional_id(data.get("task_id"))
+    if not partial or "assigned_user_id" in data:
+        event.assigned_user_id = parse_optional_id(data.get("assigned_user_id"))
+
+    if not event.title:
+        raise ValueError("Il titolo evento e obbligatorio.")
+    if event.event_type not in CALENDAR_EVENT_TYPES:
+        raise ValueError("Tipo evento non valido.")
+    if event.start_datetime is None:
+        raise ValueError("La data inizio evento e obbligatoria.")
+    if event.end_datetime and event.end_datetime < event.start_datetime:
+        raise ValueError("La data fine non puo precedere la data inizio.")
+
+
+def task_due_date_to_calendar_event(task):
+    start_datetime = datetime.combine(task.due_date, time.min)
+    return {
+        "source": "task_due_date",
+        "id": f"task-{task.id}",
+        "title": f"Scadenza task: {task.name}",
+        "description": task.note,
+        "event_type": "scadenza",
+        "start_datetime": start_datetime.isoformat(),
+        "end_datetime": None,
+        "cliente_id": task.cliente_id,
+        "cliente": (
+            {"id": task.cliente.id, "name": task.cliente.name}
+            if task.cliente
+            else None
+        ),
+        "lavoro_id": task.lavoro_id,
+        "lavoro": (
+            {"id": task.lavoro.id, "descrizione": task.lavoro.descrizione}
+            if task.lavoro
+            else None
+        ),
+        "task_id": task.id,
+        "task": task.to_dict(),
+        "assigned_user_id": task.assignee_id,
+        "assigned_user": (
+            {
+                "id": task.assignee.id,
+                "name": task.assignee.name,
+                "email": task.assignee.email,
+            }
+            if task.assignee
+            else None
+        ),
+        "created_at": task.created_at.isoformat() if task.created_at else None,
+        "updated_at": task.updated_at.isoformat() if task.updated_at else None,
+    }
 
 
 def apply_task_payload(task, data, partial=False):
@@ -136,6 +213,75 @@ def delete_task(task_id):
     task.status = "annullata"
     db.session.commit()
     return api_response(data=task.to_dict())
+
+
+@bp.get("/api/calendar/events")
+@login_required
+def get_calendar_events():
+    events = [event.to_dict() for event in CalendarEvent.query.all()]
+    task_events = [
+        task_due_date_to_calendar_event(task)
+        for task in Task.query.filter(Task.due_date.isnot(None)).all()
+    ]
+    all_events = events + task_events
+    all_events.sort(key=lambda event: event["start_datetime"] or "")
+    return api_response(data=all_events)
+
+
+@bp.get("/api/calendar/events/<int:event_id>")
+@login_required
+def get_calendar_event(event_id):
+    event = db.session.get(CalendarEvent, event_id)
+    if event is None:
+        return api_response(False, None, "Evento non trovato.", 404)
+    return api_response(data=event.to_dict())
+
+
+@bp.post("/api/calendar/events")
+@login_required
+def create_calendar_event():
+    data = request.get_json(silent=True) or {}
+    event = CalendarEvent()
+
+    try:
+        apply_calendar_payload(event, data)
+        db.session.add(event)
+        db.session.commit()
+    except ValueError as exc:
+        db.session.rollback()
+        return api_response(False, None, str(exc), 400)
+
+    return api_response(data=event.to_dict(), status=201)
+
+
+@bp.patch("/api/calendar/events/<int:event_id>")
+@login_required
+def update_calendar_event(event_id):
+    event = db.session.get(CalendarEvent, event_id)
+    if event is None:
+        return api_response(False, None, "Evento non trovato.", 404)
+    data = request.get_json(silent=True) or {}
+
+    try:
+        apply_calendar_payload(event, data, partial=True)
+        db.session.commit()
+    except ValueError as exc:
+        db.session.rollback()
+        return api_response(False, None, str(exc), 400)
+
+    return api_response(data=event.to_dict())
+
+
+@bp.delete("/api/calendar/events/<int:event_id>")
+@login_required
+def delete_calendar_event(event_id):
+    event = db.session.get(CalendarEvent, event_id)
+    if event is None:
+        return api_response(False, None, "Evento non trovato.", 404)
+    deleted = event.to_dict()
+    db.session.delete(event)
+    db.session.commit()
+    return api_response(data=deleted)
 
 
 @bp.get("/api/lavori/getall")

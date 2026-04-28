@@ -6,11 +6,19 @@
 {{ value.replace("_", " ").title() }}
 {%- endmacro %}
 
+{% macro event_badge(event) -%}
+{% if event.source == "task_due_date" %}
+<span class="badge rounded-pill text-bg-warning">Task</span>
+{% else %}
+<span class="badge rounded-pill bg-primary">{{ labelize(event.event_type) }}</span>
+{% endif %}
+{%- endmacro %}
+
 {% block content %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
     <div class="col-12 col-lg-5 px-0">
         <h3 class="fw-bolder">Calendario</h3>
-        <p>Scadenziario ERP ordinato per data.</p>
+        <p>Agenda mensile ERP con eventi e scadenze task.</p>
     </div>
     <div class="col-12 col-lg-7 d-inline-flex justify-content-lg-end px-0">
         <a href="{{ url_for('calendar.calendar_new') }}">
@@ -23,8 +31,72 @@
 <hr>
 
 <div class="mt-5">
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-3">
+        <div>
+            <h4 class="fw-bolder mb-1">{{ month_name }} {{ current_year }}</h4>
+            <div class="d-flex align-items-center gap-3 small">
+                <span><span class="badge rounded-pill bg-primary">Evento</span></span>
+                <span><span class="badge rounded-pill text-bg-warning">Task</span></span>
+            </div>
+        </div>
+        <div class="d-inline-flex gap-2">
+            <a class="btn btn-outline-primary" href="{{ prev_month_url }}">
+                <i class="bi bi-chevron-left"></i>&nbsp;Mese precedente
+            </a>
+            <a class="btn btn-outline-primary" href="{{ next_month_url }}">
+                Mese successivo&nbsp;<i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="card rounded-3 border border-light-subtle">
+        <div class="card-body p-0">
+            <div class="d-grid border-bottom text-center bg-light" style="grid-template-columns: repeat(7, minmax(0, 1fr));">
+                {% for day_name in ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"] %}
+                <div class="py-2 fw-bold small border-end">{{ day_name }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="d-grid" style="grid-template-columns: repeat(7, minmax(0, 1fr));">
+                {% for week in weeks %}
+                    {% for day in week %}
+                    <div class="p-2 border-end border-bottom {% if not day.in_month %}bg-light text-secondary{% endif %}" style="min-height: 145px;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold {% if day.is_today %}text-primary{% endif %}">{{ day.day }}</span>
+                            {% if day.is_today %}
+                            <span class="badge rounded-pill bg-primary">Oggi</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex flex-column gap-1">
+                            {% for event in day.events %}
+                            <a class="d-block rounded-2 border p-2 bg-white text-dark small" href="{{ event.edit_url }}">
+                                <div class="d-flex align-items-center justify-content-between gap-2">
+                                    <span class="fw-bold text-truncate">{{ event.title }}</span>
+                                    {{ event_badge(event) }}
+                                </div>
+                                {% if event.time %}
+                                <div class="text-secondary">{{ event.time }}</div>
+                                {% endif %}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-5">
     <div class="card rounded-3 border border-light-subtle">
         <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bolder mb-0">Eventi del mese</h5>
+                <span class="text-secondary small">{{ events|length }} elementi</span>
+            </div>
+
             {% if events %}
             <div class="table-responsive">
                 <table class="table table-hover my-0">
@@ -37,44 +109,35 @@
                             <th class="fw-bold">Lavoro</th>
                             <th class="fw-bold">Task</th>
                             <th class="fw-bold">Assegnato a</th>
-                            <th class="fw-bold text-end">Azioni</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for event in events %}
                         <tr>
                             <td>
-                                <div class="fw-bold">{{ event.start_datetime.strftime("%d/%m/%Y") }}</div>
-                                <div class="small text-secondary">{{ event.start_datetime.strftime("%H:%M") }}</div>
+                                <div class="fw-bold">{{ event.date.strftime("%d/%m/%Y") }}</div>
+                                {% if event.time %}
+                                <div class="small text-secondary">{{ event.time }}</div>
+                                {% endif %}
                             </td>
                             <td>
-                                <a class="fw-bold a-no-color" href="{{ url_for('calendar.calendar_edit', event_id=event.id) }}">{{ event.title }}</a>
+                                <a class="fw-bold a-no-color" href="{{ event.edit_url }}">{{ event.title }}</a>
                                 {% if event.description %}
                                 <div class="small text-secondary">{{ event.description }}</div>
                                 {% endif %}
                             </td>
-                            <td><span class="badge rounded-pill bg-primary">{{ labelize(event.event_type) }}</span></td>
+                            <td>{{ event_badge(event) }}</td>
                             <td>{{ event.cliente.name if event.cliente else "-" }}</td>
                             <td>{{ event.lavoro.descrizione if event.lavoro else "-" }}</td>
                             <td>{{ event.task.name if event.task else "-" }}</td>
                             <td>{{ event.assigned_user.name or event.assigned_user.email if event.assigned_user else "-" }}</td>
-                            <td class="text-end">
-                                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('calendar.calendar_edit', event_id=event.id) }}">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form action="{{ url_for('calendar.calendar_delete', event_id=event.id) }}" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash3"></i>
-                                    </button>
-                                </form>
-                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
             {% else %}
-            <p class="mb-0 text-secondary">Nessun evento presente.</p>
+            <p class="mb-0 text-secondary">Nessun evento presente nel mese.</p>
             {% endif %}
         </div>
     </div>

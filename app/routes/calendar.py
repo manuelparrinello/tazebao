@@ -1,4 +1,5 @@
-from datetime import datetime
+from calendar import monthrange
+from datetime import date, datetime, time, timedelta
 
 from flask import Blueprint, redirect, render_template, request, url_for
 
@@ -15,6 +16,22 @@ from ..models import (
 
 
 bp = Blueprint("calendar", __name__)
+
+MONTH_NAMES = (
+    "",
+    "Gennaio",
+    "Febbraio",
+    "Marzo",
+    "Aprile",
+    "Maggio",
+    "Giugno",
+    "Luglio",
+    "Agosto",
+    "Settembre",
+    "Ottobre",
+    "Novembre",
+    "Dicembre",
+)
 
 
 def parse_optional_datetime(value):
@@ -60,14 +77,134 @@ def apply_calendar_form(event):
         raise ValueError("La data fine non puo precedere la data inizio.")
 
 
+def month_bounds(year, month):
+    first_day = date(year, month, 1)
+    last_day = date(year, month, monthrange(year, month)[1])
+    next_month = last_day + timedelta(days=1)
+    return first_day, last_day, next_month
+
+
+def adjacent_month_urls(year, month):
+    first_day = date(year, month, 1)
+    prev_day = first_day - timedelta(days=1)
+    next_day = month_bounds(year, month)[2]
+    return (
+        url_for("calendar.calendar_index", year=prev_day.year, month=prev_day.month),
+        url_for("calendar.calendar_index", year=next_day.year, month=next_day.month),
+    )
+
+
+def calendar_event_item(event):
+    return {
+        "source": "calendar_event",
+        "id": event.id,
+        "title": event.title,
+        "description": event.description,
+        "event_type": event.event_type,
+        "date": event.start_datetime.date(),
+        "time": event.start_datetime.strftime("%H:%M"),
+        "cliente": event.cliente,
+        "lavoro": event.lavoro,
+        "task": event.task,
+        "assigned_user": event.assigned_user,
+        "edit_url": url_for("calendar.calendar_edit", event_id=event.id),
+    }
+
+
+def task_due_date_item(task):
+    return {
+        "source": "task_due_date",
+        "id": f"task-{task.id}",
+        "title": task.name,
+        "description": task.note,
+        "event_type": "scadenza",
+        "date": task.due_date,
+        "time": None,
+        "cliente": task.cliente,
+        "lavoro": task.lavoro,
+        "task": task,
+        "assigned_user": task.assignee,
+        "edit_url": url_for("tasks.task_edit", task_id=task.id),
+    }
+
+
+def build_month_weeks(year, month, items):
+    first_day, last_day, _ = month_bounds(year, month)
+    grid_start = first_day - timedelta(days=first_day.weekday())
+    grid_end = last_day + timedelta(days=(6 - last_day.weekday()))
+    items_by_date = {}
+
+    for item in items:
+        items_by_date.setdefault(item["date"], []).append(item)
+
+    weeks = []
+    current_day = grid_start
+    while current_day <= grid_end:
+        week = []
+        for _ in range(7):
+            day_events = sorted(
+                items_by_date.get(current_day, []),
+                key=lambda item: (item["time"] or "00:00", item["title"]),
+            )
+            week.append(
+                {
+                    "date": current_day,
+                    "day": current_day.day,
+                    "in_month": current_day.month == month,
+                    "is_today": current_day == date.today(),
+                    "events": day_events,
+                }
+            )
+            current_day += timedelta(days=1)
+        weeks.append(week)
+
+    return weeks
+
+
 @bp.get("/calendar")
 @login_required
 def calendar_index():
-    events = CalendarEvent.query.order_by(CalendarEvent.start_datetime.asc()).all()
+    today = date.today()
+    current_year = request.args.get("year", today.year, type=int)
+    current_month = request.args.get("month", today.month, type=int)
+
+    if current_month < 1 or current_month > 12:
+        current_year = today.year
+        current_month = today.month
+
+    first_day, last_day, next_month = month_bounds(current_year, current_month)
+    range_start = datetime.combine(first_day, time.min)
+    range_end = datetime.combine(next_month, time.min)
+
+    events = (
+        CalendarEvent.query.filter(CalendarEvent.start_datetime >= range_start)
+        .filter(CalendarEvent.start_datetime < range_end)
+        .order_by(CalendarEvent.start_datetime.asc())
+        .all()
+    )
+    due_tasks = (
+        Task.query.filter(Task.due_date >= first_day)
+        .filter(Task.due_date <= last_day)
+        .order_by(Task.due_date.asc(), Task.created_at.asc())
+        .all()
+    )
+
+    calendar_items = [calendar_event_item(event) for event in events]
+    calendar_items.extend(task_due_date_item(task) for task in due_tasks)
+    calendar_items.sort(key=lambda item: (item["date"], item["time"] or "00:00", item["title"]))
+    weeks = build_month_weeks(current_year, current_month, calendar_items)
+    prev_month_url, next_month_url = adjacent_month_urls(current_year, current_month)
+
     return render_template(
         "calendar.html",
-        events=events,
+        events=calendar_items,
         event_types=CALENDAR_EVENT_TYPES,
+        weeks=weeks,
+        current_month=current_month,
+        current_year=current_year,
+        month_name=MONTH_NAMES[current_month],
+        prev_month_url=prev_month_url,
+        next_month_url=next_month_url,
     )
 
 

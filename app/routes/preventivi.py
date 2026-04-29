@@ -162,6 +162,9 @@ def preventivo_edit(id):
             ],
         }
     )
+    totale_imponibile = sum((Decimal(str(riga.totale_riga)) for riga in preventivo.righe), Decimal("0"))
+    totale_iva = totale_imponibile * (IVA - Decimal("1"))
+    totale_finale = totale_imponibile * IVA
 
     if request.method == "POST":
         preventivo.cliente_id = int(request.form.get("cliente_id"))
@@ -194,4 +197,7 @@ def preventivo_edit(id):
         clienti=clienti,
         status_values=status_values,
         iva=IVA,
+        totale_imponibile=totale_imponibile,
+        totale_iva=totale_iva,
+        totale_finale=totale_finale,
     )

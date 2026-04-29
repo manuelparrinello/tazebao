@@ -3,28 +3,40 @@
 {% block title %}Modifica preventivo {{ preventivo.id }}{% endblock %}
 
 {% block content %}
-<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-    <div class="col-12 col-lg-6 px-0">
-        <h3 class="fw-bolder">Modifica preventivo {{ preventivo.id }}</h3>
-        <p>Aggiorna cliente, stato e righe del preventivo.</p>
+<div class="row mx-auto w-100 align-items-start g-3">
+    <div class="col-12 col-xl-6 px-0">
+        <h6 class="text-primary fw-bold text-uppercase mb-2" style="letter-spacing: 1.2px">Modifica preventivo</h6>
+        <h3 class="fw-bolder mb-2 text-break">Preventivo #{{ preventivo.id }}</h3>
+        <div class="text-secondary text-break">
+            Cliente: <span class="fw-semibold text-dark">{{ preventivo.cliente.name }}</span>
+            {% if preventivo.descrizione %}&middot; {{ preventivo.descrizione }}{% endif %}
+        </div>
+        <div class="mt-2 d-inline-flex flex-wrap gap-2">
+            <span class="badge rounded-pill text-bg-primary">{{ preventivo.stato.replace("_", " ").title() if preventivo.stato else "Sconosciuto" }}</span>
+        </div>
     </div>
-    <div class="col-12 col-lg-6 d-inline-flex justify-content-lg-end gap-2 px-0">
-        <a href="{{ url_for('preventivi.visualizza_preventivo', id=preventivo.id) }}" class="btn btn-outline-secondary">
-            <i class="bi bi-eye"></i>&nbsp;Visualizza
-        </a>
-        <a href="{{ url_for('preventivi.preventivi') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i>&nbsp;Tutti i preventivi
-        </a>
+    <div class="col-12 col-xl-6 px-0">
+        <div class="preventivo-action-bar d-flex flex-wrap justify-content-xl-end align-items-stretch gap-2">
+            <a href="{{ url_for('preventivi.visualizza_preventivo', id=preventivo.id) }}" class="btn btn-outline-secondary preventivo-action-secondary">
+                <i class="bi bi-eye"></i>&nbsp;Visualizza
+            </a>
+            <a href="{{ url_for('preventivi.preventivi') }}" class="btn btn-outline-secondary preventivo-action-secondary">
+                <i class="bi bi-arrow-left"></i>&nbsp;Tutti i preventivi
+            </a>
+            <button type="submit" form="preventivoEditForm" class="btn btn-primary preventivo-action-primary">
+                <i class="bi bi-floppy"></i>&nbsp;Salva modifiche
+            </button>
+        </div>
     </div>
 </div>
 <hr>
 
-<form method="post" class="mt-5" id="preventivoEditForm">
+<form method="post" class="mt-4" id="preventivoEditForm">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="row g-4">
         <div class="col-12 col-lg-4">
             <div class="card rounded-3 border border-light-subtle">
-                <div class="card-body p-4">
+                <div class="card-body p-3 p-md-4">
                     <div class="mb-3">
                         <label for="cliente_id" class="form-label fw-bold">Cliente</label>
                         <select class="form-control form-select" id="cliente_id" name="cliente_id" required>
@@ -53,58 +65,146 @@
 
         <div class="col-12 col-lg-8">
             <div class="card rounded-3 border border-light-subtle">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h5 class="fw-bold mb-0">Righe preventivo</h5>
+                <div class="card-body p-3 p-md-4">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-1">Righe preventivo</h5>
+                            <div class="text-secondary small">Modifica quantità, descrizione e prezzo imponibile di ogni riga.</div>
+                        </div>
                         <button type="button" class="btn btn-outline-primary" id="addRowButton">
                             <i class="bi bi-plus-lg"></i>&nbsp;Aggiungi riga
                         </button>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="table align-middle">
-                            <thead>
-                                <tr>
-                                    <th style="width: 90px;">Qta</th>
-                                    <th>Descrizione</th>
-                                    <th style="width: 180px;">Prezzo imponibile</th>
-                                    <th style="width: 70px;"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="righePreventivoBody">
-                                {% for riga in preventivo.righe %}
-                                <tr>
-                                    <td>
+                    <div class="d-none d-lg-block">
+                        <div class="table-responsive">
+                            <table class="table align-middle erp-table preventivo-lines-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-qta">Qta</th>
+                                        <th>Descrizione</th>
+                                        <th class="col-prezzo">Prezzo imponibile</th>
+                                        <th class="col-prezzo">Prezzo ivato</th>
+                                        <th class="col-prezzo">Totale riga</th>
+                                        <th class="col-actions text-end">Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="righePreventivoBody">
+                                    {% for riga in preventivo.righe %}
+                                    <tr data-row-id="row-{{ loop.index0 }}">
+                                        <td>
+                                            <input type="number" min="0.01" step="0.01" class="form-control" name="qty[]" value="{{ riga.qty }}" required>
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control" rows="2" name="riga_descrizione[]" required>{{ riga.descrizione }}</textarea>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="number" min="0" step="0.01" class="form-control" name="prezzo_ie[]" value="{{ riga.prezzo_ie }}" required>
+                                                <span class="input-group-text">&euro;</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-control bg-light text-secondary">{{ "%.2f"|format((riga.prezzo_ie|float * 1.22))|replace(".", ",") }} &euro;</div>
+                                        </td>
+                                        <td>
+                                            <div class="form-control bg-light fw-bold">{{ "%.2f"|format(riga.totale_riga|float)|replace(".", ",") }} &euro;</div>
+                                        </td>
+                                        <td class="text-end">
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-row-button">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="d-lg-none mobile-list preventivo-lines-mobile">
+                        <div id="righePreventivoMobileBody" class="mobile-list">
+                            {% for riga in preventivo.righe %}
+                            <div class="mobile-list-item preventivo-row-card" data-row-id="row-{{ loop.index0 }}">
+                                <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                                    <div>
+                                        <div class="fw-bold">Riga</div>
+                                        <div class="small text-secondary">Compila i campi qui sotto.</div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-row-button">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-12 col-sm-4">
+                                        <label class="form-label fw-bold">Qta</label>
                                         <input type="number" min="0.01" step="0.01" class="form-control" name="qty[]" value="{{ riga.qty }}" required>
-                                    </td>
-                                    <td>
-                                        <textarea class="form-control" rows="2" name="riga_descrizione[]" required>{{ riga.descrizione }}</textarea>
-                                    </td>
-                                    <td>
+                                    </div>
+                                    <div class="col-12 col-sm-8">
+                                        <label class="form-label fw-bold">Descrizione</label>
+                                        <textarea class="form-control" rows="3" name="riga_descrizione[]" required>{{ riga.descrizione }}</textarea>
+                                    </div>
+                                    <div class="col-12 col-sm-4">
+                                        <label class="form-label fw-bold">Prezzo imponibile</label>
                                         <div class="input-group">
                                             <input type="number" min="0" step="0.01" class="form-control" name="prezzo_ie[]" value="{{ riga.prezzo_ie }}" required>
                                             <span class="input-group-text">&euro;</span>
                                         </div>
-                                    </td>
-                                    <td class="text-end">
-                                        <button type="button" class="btn btn-sm btn-outline-danger remove-row-button">
-                                            <i class="bi bi-trash3"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                    </div>
+                                    <div class="col-6 col-sm-4">
+                                        <label class="form-label fw-bold">Prezzo ivato</label>
+                                        <div class="form-control bg-light text-secondary">{{ "%.2f"|format((riga.prezzo_ie|float * 1.22))|replace(".", ",") }} &euro;</div>
+                                    </div>
+                                    <div class="col-6 col-sm-4">
+                                        <label class="form-label fw-bold">Totale riga</label>
+                                        <div class="form-control bg-light fw-bold">{{ "%.2f"|format(riga.totale_riga|float)|replace(".", ",") }} &euro;</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
 
-                    <div class="text-secondary small mb-4">
+                    <div class="text-secondary small mt-3">
                         Il salvataggio ricalcola automaticamente totale imponibile riga, IVA 22% e totale preventivo.
                     </div>
-
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-floppy"></i>&nbsp;Salva modifiche
-                    </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+        <div class="col-12 col-lg-4 order-lg-2">
+            <div class="card rounded-3 border border-light-subtle preventivo-summary-card">
+                <div class="card-body p-3 p-md-4">
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary">Totale imponibile</span>
+                            <span class="fw-bold">&euro; <span id="totaleImponibile">{{ "%.2f"|format(totale_imponibile|float)|replace(".", ",") }}</span></span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary">IVA 22%</span>
+                            <span class="fw-bold">&euro; <span id="totaleIva">{{ "%.2f"|format(totale_iva|float)|replace(".", ",") }}</span></span>
+                        </div>
+                        <div class="border-top pt-3 d-flex align-items-center justify-content-between">
+                            <span class="fw-bolder">Totale preventivo</span>
+                            <span class="display-6 fw-bold text-primary mb-0">&euro; <span id="totalePreventivo">{{ "%.2f"|format(totale_finale|float)|replace(".", ",") }}</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+        <div class="col-12 col-lg-8 order-lg-1">
+            <div class="d-flex flex-column flex-md-row gap-2">
+                <button type="submit" class="btn btn-primary flex-fill">
+                    <i class="bi bi-floppy"></i>&nbsp;Salva modifiche
+                </button>
+                <a href="{{ url_for('preventivi.visualizza_preventivo', id=preventivo.id) }}" class="btn btn-outline-secondary flex-fill">
+                    <i class="bi bi-x-lg"></i>&nbsp;Annulla
+                </a>
             </div>
         </div>
     </div>
@@ -115,23 +215,49 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   const tbody = document.getElementById("righePreventivoBody");
+  const mobileBody = document.getElementById("righePreventivoMobileBody");
   const addButton = document.getElementById("addRowButton");
+  const form = document.getElementById("preventivoEditForm");
+  let rowIndex = tbody ? tbody.querySelectorAll("tr").length : 0;
+
+  function syncLayoutState() {
+    const desktopInputs = document.querySelectorAll("#righePreventivoBody input, #righePreventivoBody textarea");
+    const mobileInputs = document.querySelectorAll("#righePreventivoMobileBody input, #righePreventivoMobileBody textarea");
+    const desktopActive = window.matchMedia("(min-width: 992px)").matches;
+
+    desktopInputs.forEach(function (input) {
+      input.disabled = !desktopActive;
+    });
+
+    mobileInputs.forEach(function (input) {
+      input.disabled = desktopActive;
+    });
+  }
 
   function bindRemoveButtons() {
     document.querySelectorAll(".remove-row-button").forEach(function (button) {
       button.onclick = function () {
-        const rows = tbody.querySelectorAll("tr");
-        if (rows.length <= 1) {
+        const rowCount = tbody ? tbody.querySelectorAll("tr").length : 0;
+        if (rowCount <= 1) {
           return;
         }
-        button.closest("tr").remove();
+        const container = button.closest("[data-row-id]");
+        if (!container) return;
+        const rowId = container.getAttribute("data-row-id");
+        document.querySelectorAll(`[data-row-id="${rowId}"]`).forEach(function (element) {
+          element.remove();
+        });
+        syncLayoutState();
       };
     });
   }
 
   addButton.addEventListener("click", function () {
-    const row = document.createElement("tr");
-    row.innerHTML = `
+    const rowId = `row-new-${rowIndex++}`;
+
+    const desktopRow = document.createElement("tr");
+    desktopRow.setAttribute("data-row-id", rowId);
+    desktopRow.innerHTML = `
       <td><input type="number" min="0.01" step="0.01" class="form-control" name="qty[]" value="1" required></td>
       <td><textarea class="form-control" rows="2" name="riga_descrizione[]" required></textarea></td>
       <td>
@@ -140,17 +266,69 @@ document.addEventListener("DOMContentLoaded", function () {
           <span class="input-group-text">&euro;</span>
         </div>
       </td>
+      <td><div class="form-control bg-light text-secondary">0,00 &euro;</div></td>
+      <td><div class="form-control bg-light fw-bold">0,00 &euro;</div></td>
       <td class="text-end">
         <button type="button" class="btn btn-sm btn-outline-danger remove-row-button">
           <i class="bi bi-trash3"></i>
         </button>
       </td>
     `;
-    tbody.appendChild(row);
+    tbody.appendChild(desktopRow);
+
+    if (mobileBody) {
+      const mobileCard = document.createElement("div");
+      mobileCard.className = "mobile-list-item preventivo-row-card";
+      mobileCard.setAttribute("data-row-id", rowId);
+      mobileCard.innerHTML = `
+        <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+          <div>
+            <div class="fw-bold">Riga</div>
+            <div class="small text-secondary">Compila i campi qui sotto.</div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-danger remove-row-button">
+            <i class="bi bi-trash3"></i>
+          </button>
+        </div>
+        <div class="row g-3">
+          <div class="col-12 col-sm-4">
+            <label class="form-label fw-bold">Qta</label>
+            <input type="number" min="0.01" step="0.01" class="form-control" name="qty[]" value="1" required>
+          </div>
+          <div class="col-12 col-sm-8">
+            <label class="form-label fw-bold">Descrizione</label>
+            <textarea class="form-control" rows="3" name="riga_descrizione[]" required></textarea>
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="form-label fw-bold">Prezzo imponibile</label>
+            <div class="input-group">
+              <input type="number" min="0" step="0.01" class="form-control" name="prezzo_ie[]" value="0" required>
+              <span class="input-group-text">&euro;</span>
+            </div>
+          </div>
+          <div class="col-6 col-sm-4">
+            <label class="form-label fw-bold">Prezzo ivato</label>
+            <div class="form-control bg-light text-secondary">0,00 &euro;</div>
+          </div>
+          <div class="col-6 col-sm-4">
+            <label class="form-label fw-bold">Totale riga</label>
+            <div class="form-control bg-light fw-bold">0,00 &euro;</div>
+          </div>
+        </div>
+      `;
+      mobileBody.appendChild(mobileCard);
+    }
+
     bindRemoveButtons();
+    syncLayoutState();
   });
 
   bindRemoveButtons();
+  syncLayoutState();
+  window.addEventListener("resize", syncLayoutState);
+  if (form) {
+    form.addEventListener("submit", syncLayoutState);
+  }
 });
 </script>
 {% endblock %}

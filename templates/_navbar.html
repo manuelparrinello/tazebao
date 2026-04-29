@@ -117,9 +117,16 @@
             </div>
 
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint and request.endpoint.startswith('emails.') %}active{% endif %}" href="{{ url_for('emails.emails_index') }}">
+                <a class="nav-link {% if request.endpoint and request.endpoint.startswith('mail.') %}active{% endif %}" href="{{ url_for('mail.mail_index') }}">
                     <i class="bi bi-envelope"></i>
-                    <span class="nav-label">Comunicazioni</span>
+                    <span class="nav-label">Client email</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint and request.endpoint.startswith('emails.') %}active{% endif %}" href="{{ url_for('emails.emails_index') }}">
+                    <i class="bi bi-journal-text"></i>
+                    <span class="nav-label">Registro email</span>
                 </a>
             </li>
 
@@ -176,7 +183,8 @@
             <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('finance.') %}active{% endif %}" href="{{ url_for('finance.finance_index') }}"><i class="bi bi-cash-coin"></i> Finanze</a></li>
 
             <li class="nav-item mt-3 pt-3 border-top"><span class="small fw-bold text-secondary px-3">Comunicazioni</span></li>
-            <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('emails.') %}active{% endif %}" href="{{ url_for('emails.emails_index') }}"><i class="bi bi-envelope"></i> Comunicazioni</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('mail.') %}active{% endif %}" href="{{ url_for('mail.mail_index') }}"><i class="bi bi-envelope"></i> Client email</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('emails.') %}active{% endif %}" href="{{ url_for('emails.emails_index') }}"><i class="bi bi-journal-text"></i> Registro email</a></li>
         </ul>
 
         <div class="mt-3 pt-3 border-top">

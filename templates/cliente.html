@@ -266,8 +266,45 @@
             <div class="card-body p-4">
                 <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
                     <div>
-                        <h5 class="fw-bolder mb-1">Comunicazioni email recenti</h5>
-                        <div class="small text-secondary">Mostrate le ultime 5 comunicazioni collegate.</div>
+                        <h5 class="fw-bolder mb-1">Email reali recenti</h5>
+                        <div class="small text-secondary">Mostrate le ultime 10 email IMAP/SMTP collegate.</div>
+                    </div>
+                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('mail.mail_index', cliente_id=cliente.id) }}">Apri client email</a>
+                </div>
+                {% if mail_messages %}
+                <div class="list-group list-group-flush">
+                    {% for mail_message in mail_messages %}
+                    <a href="{{ url_for('mail.mail_detail', message_id=mail_message.id) }}" class="list-group-item list-group-item-action px-0">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div>
+                                <div class="fw-bold">{{ mail_message.subject or "(senza oggetto)" }}</div>
+                                <div class="small text-secondary">
+                                    {{ "Ricevuta" if mail_message.direction == "inbound" else "Inviata" }}
+                                    &middot; {{ mail_message.from_address if mail_message.direction == "inbound" else mail_message.to_addresses }}
+                                    &middot; {{ (mail_message.received_at or mail_message.sent_at or mail_message.created_at).strftime("%d/%m/%Y %H:%M") }}
+                                </div>
+                            </div>
+                            <span class="badge {{ 'text-bg-info' if mail_message.direction == 'inbound' else 'text-bg-success' }}">
+                                {{ "Inbound" if mail_message.direction == "inbound" else "Outbound" }}
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ empty_state("Nessuna email reale collegata a questo cliente.", url_for('mail.mail_index'), "Apri client email") }}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <div class="col-12">
+        <section class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                    <div>
+                        <h5 class="fw-bolder mb-1">Registro email manuale recente</h5>
+                        <div class="small text-secondary">Mostrate le ultime 5 comunicazioni registrate manualmente.</div>
                     </div>
                 </div>
                 {% if email_logs %}

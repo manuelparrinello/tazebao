@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}{{ message.subject or "Email" }}{% endblock %}
+
+{% macro direction_badge(direction) -%}
+{% if direction == "inbound" %}
+<span class="badge rounded-pill text-bg-info">Ricevuta</span>
+{% else %}
+<span class="badge rounded-pill text-bg-success">Inviata</span>
+{% endif %}
+{%- endmacro %}
+
+{% block content %}
+<div class="row mx-auto w-100 align-items-start g-3">
+    <div class="col-12 col-lg-7 px-0">
+        <h6 class="text-primary fw-bold" style="letter-spacing: 1.2px">EMAIL</h6>
+        <h3 class="fw-bolder">{{ message.subject or "(senza oggetto)" }}</h3>
+        <div class="d-flex flex-wrap gap-2 mt-2">
+            {{ direction_badge(message.direction) }}
+            <span class="badge rounded-pill text-bg-light border">{{ message.folder }}</span>
+        </div>
+    </div>
+    <div class="col-12 col-lg-5 d-inline-flex flex-wrap justify-content-lg-end gap-2 px-0">
+        <a href="{{ url_for('mail.mail_index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i>&nbsp;Inbox</a>
+        <a href="{{ url_for('mail.mail_reply', message_id=message.id) }}" class="btn btn-primary"><i class="bi bi-reply"></i>&nbsp;Rispondi</a>
+    </div>
+</div>
+<hr>
+
+<div class="row g-4">
+    <div class="col-12 col-xl-8">
+        <section class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="row g-3 small mb-4">
+                    <div class="col-12">
+                        <span class="text-secondary">Da:</span> <span class="fw-bold">{{ message.from_address or "-" }}</span>
+                    </div>
+                    <div class="col-12">
+                        <span class="text-secondary">A:</span> {{ message.to_addresses or "-" }}
+                    </div>
+                    {% if message.cc_addresses %}
+                    <div class="col-12">
+                        <span class="text-secondary">Cc:</span> {{ message.cc_addresses }}
+                    </div>
+                    {% endif %}
+                    <div class="col-12">
+                        <span class="text-secondary">Data:</span> {{ (message.received_at or message.sent_at or message.created_at).strftime("%d/%m/%Y %H:%M") }}
+                    </div>
+                </div>
+
+                <div class="border-top pt-4">
+                    {% if message.body_text %}
+                    <pre class="mb-0" style="white-space: pre-wrap; font-family: inherit !important;">{{ message.body_text }}</pre>
+                    {% else %}
+                    <p class="text-secondary mb-0">Nessun corpo testuale disponibile per questa email. Il contenuto HTML non viene renderizzato nella v1.</p>
+                    {% endif %}
+                </div>
+
+                {% if message.attachments %}
+                <div class="border-top mt-4 pt-4">
+                    <h6 class="fw-bold">Allegati</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for attachment in message.attachments %}
+                        <span class="badge rounded-pill text-bg-light border">
+                            <i class="bi bi-paperclip"></i> {{ attachment.filename or "allegato" }}{% if attachment.size %} &middot; {{ attachment.size }} byte{% endif %}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <div class="col-12 col-xl-4">
+        <section class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="fw-bolder mb-3">Collegamenti ERP</h5>
+                <form action="{{ url_for('mail.mail_link', message_id=message.id) }}" method="post">
+                    <div class="mb-3">
+                        <label for="cliente_id" class="form-label fw-bold">Cliente</label>
+                        <select class="form-control form-select" id="cliente_id" name="cliente_id">
+                            <option value="">Nessun cliente</option>
+                            {% for cliente in clienti %}
+                            <option value="{{ cliente.id }}" {% if message.cliente_id == cliente.id %}selected{% endif %}>{{ cliente.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="lavoro_id" class="form-label fw-bold">Lavoro</label>
+                        <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
+                            <option value="">Nessun lavoro</option>
+                            {% for lavoro in lavori %}
+                            <option value="{{ lavoro.id }}" {% if message.lavoro_id == lavoro.id %}selected{% endif %}>{{ lavoro.descrizione }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Salva collegamenti</button>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

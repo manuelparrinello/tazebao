@@ -10,18 +10,17 @@ from ..models import Cliente, Lavoro, Preventivo, RigaPreventivo
 bp = Blueprint("preventivi", __name__)
 
 IVA = Decimal("1.22")
-TASSE_VARIE = Decimal("8.18")
 PREVENTIVO_STATUSES = ("bozza", "inviato", "accettato", "rifiutato")
 
 
 def decimal_from_form(value, default="0"):
-    normalized = (value or default).replace(",", ".")
+    normalized = str(value if value is not None and value != "" else default).replace(",", ".")
     return Decimal(normalized)
 
 
 def recalculate_preventivo(preventivo, righe_data):
     righe = []
-    totale_preventivo = Decimal("0")
+    totale_imponibile = Decimal("0")
 
     for riga_data in righe_data:
         qty = decimal_from_form(riga_data.get("qty"), "1")
@@ -32,8 +31,8 @@ def recalculate_preventivo(preventivo, righe_data):
             continue
 
         prezzo_ii = prezzo_ie * IVA
-        totale_riga = prezzo_ii * qty
-        totale_preventivo += totale_riga
+        totale_riga = prezzo_ie * qty
+        totale_imponibile += totale_riga
         righe.append(
             RigaPreventivo(
                 qty=qty,
@@ -45,28 +44,24 @@ def recalculate_preventivo(preventivo, righe_data):
         )
 
     preventivo.righe = righe
-    preventivo.totale_preventivo = float(totale_preventivo + TASSE_VARIE)
+    preventivo.totale_preventivo = float(totale_imponibile * IVA)
 
 
 @bp.route("/preventivi/nuovo", methods=["POST", "GET"])
 @login_required
 def nuovo_preventivo():
     if request.method == "POST":
-        iva = 1.22
-        tasse_varie = 8.18
         data = request.get_json()
         cliente_id = data["cliente_id"]
         lavoro_id = data.get("lavoro_id")
         descrizione = data["titolo_preventivo"]
         cliente = Cliente.query.filter_by(id=cliente_id).first()
         print("Cliente: " + cliente.name + ", ID: " + str(cliente.id))
-        righe = [
+        righe_data = [
             {
                 "qty": riga["qty"],
                 "descrizione": riga["descrizione"],
-                "prezzo_ie": float(riga["prezzo"]),
-                "prezzo_ii": float(riga["prezzo"]) * iva,
-                "totale": (float(riga["prezzo"]) * iva) * float(riga["qty"]),
+                "prezzo_ie": riga["prezzo"],
             }
             for riga in data["righe"]
         ]
@@ -74,24 +69,9 @@ def nuovo_preventivo():
             descrizione=descrizione,
             cliente_id=cliente_id,
             lavoro_id=lavoro_id,
-            righe=[
-                RigaPreventivo(
-                    qty=riga["qty"],
-                    descrizione=riga["descrizione"],
-                    prezzo_ie=float(riga["prezzo_ie"]),
-                    prezzo_ii=float(riga["prezzo_ie"]) * iva,
-                    totale_riga=float(riga["prezzo_ii"]) * float(riga["qty"]),
-                )
-                for riga in righe
-            ],
-            totale_preventivo=sum((riga["totale"]) for riga in righe) + tasse_varie,
         )
-        subtotale = 0
-
-        for riga in data["righe"]:
-            subtotale += riga["totaleRiga"]
-            print(f"TOTALE RIGA: {riga['totaleRiga']}")
-            print(f"SUBTOTALE: {subtotale}")
+        recalculate_preventivo(nuovo_preventivo, righe_data)
+        subtotale = sum(float(riga.totale_riga) for riga in nuovo_preventivo.righe)
 
         db.session.add(nuovo_preventivo)
         db.session.commit()
@@ -112,7 +92,16 @@ def nuovo_preventivo():
                     "sdi": cliente.sdi,
                     "pec": cliente.pec,
                     "preventivo_id": nuovo_preventivo.id,
-                    "righe": [riga for riga in righe],
+                    "righe": [
+                        {
+                            "qty": float(riga.qty),
+                            "descrizione": riga.descrizione,
+                            "prezzo_ie": float(riga.prezzo_ie),
+                            "prezzo_ii": float(riga.prezzo_ii),
+                            "totale": float(riga.totale_riga),
+                        }
+                        for riga in nuovo_preventivo.righe
+                    ],
                     "subtotale": subtotale,
                 }
             ),
@@ -205,5 +194,4 @@ def preventivo_edit(id):
         clienti=clienti,
         status_values=status_values,
         iva=IVA,
-        tasse_varie=TASSE_VARIE,
     )

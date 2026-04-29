@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, render_template, request, url_for
 
 from ..auth import login_required
 from ..extensions import db
-from ..models import CalendarEvent, Cliente, EmailLog, FinancialMovement, Lavoro, Preventivo, Task
+from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Preventivo, Task
 
 
 bp = Blueprint("clienti", __name__)
@@ -109,6 +109,16 @@ def cliente_page(cliente_id):
         .limit(5)
         .all()
     )
+    mail_messages = (
+        EmailMessage.query.filter_by(cliente_id=cliente_id)
+        .order_by(
+            EmailMessage.received_at.desc().nullslast(),
+            EmailMessage.sent_at.desc().nullslast(),
+            EmailMessage.id.desc(),
+        )
+        .limit(10)
+        .all()
+    )
 
     quick_actions = {
         "nuovo_lavoro": url_for("nuovo_lavoro", cliente_id=cliente.id),
@@ -128,6 +138,7 @@ def cliente_page(cliente_id):
         preventivi=preventivi,
         movimenti=movimenti,
         email_logs=email_logs,
+        mail_messages=mail_messages,
         quick_actions=quick_actions,
     )
 

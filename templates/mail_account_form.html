@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% macro checked(value) -%}
+{% if value %}checked{% endif %}
+{%- endmacro %}
+
+{% block content %}
+<div class="row mx-auto w-100 align-items-center g-3">
+    <div class="col-12 col-lg-6 px-0">
+        <h3 class="fw-bolder">{{ page_title }}</h3>
+        <p>Configura una casella IMAP/SMTP. La password viene cifrata e non viene mai mostrata.</p>
+    </div>
+    <div class="col-12 col-lg-6 d-inline-flex justify-content-lg-end px-0">
+        <a href="{{ url_for('mail.mail_accounts') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i>&nbsp;Account</a>
+    </div>
+</div>
+<hr>
+
+{% if error %}
+<div class="alert alert-danger mt-4">{{ error }}</div>
+{% endif %}
+
+<form action="{{ form_action }}" method="post" class="mt-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-12 col-lg-4">
+                    <label for="label" class="form-label fw-bold">Nome account</label>
+                    <input type="text" class="form-control" id="label" name="label" value="{{ account.label or '' }}" required>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <label for="email_address" class="form-label fw-bold">Indirizzo email</label>
+                    <input type="email" class="form-control" id="email_address" name="email_address" value="{{ account.email_address or '' }}" required>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <label for="username" class="form-label fw-bold">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" value="{{ account.username or '' }}" required>
+                </div>
+
+                <div class="col-12 col-lg-5">
+                    <label for="imap_host" class="form-label fw-bold">IMAP host</label>
+                    <input type="text" class="form-control" id="imap_host" name="imap_host" value="{{ account.imap_host or '' }}" required>
+                </div>
+                <div class="col-12 col-lg-2">
+                    <label for="imap_port" class="form-label fw-bold">Porta IMAP</label>
+                    <input type="number" class="form-control" id="imap_port" name="imap_port" value="{{ account.imap_port or 993 }}" required>
+                </div>
+                <div class="col-12 col-lg-5 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="imap_use_ssl" name="imap_use_ssl" {{ checked(account.imap_use_ssl) }}>
+                        <label class="form-check-label fw-bold" for="imap_use_ssl">Usa SSL IMAP</label>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-5">
+                    <label for="smtp_host" class="form-label fw-bold">SMTP host</label>
+                    <input type="text" class="form-control" id="smtp_host" name="smtp_host" value="{{ account.smtp_host or '' }}" required>
+                </div>
+                <div class="col-12 col-lg-2">
+                    <label for="smtp_port" class="form-label fw-bold">Porta SMTP</label>
+                    <input type="number" class="form-control" id="smtp_port" name="smtp_port" value="{{ account.smtp_port or 587 }}" required>
+                </div>
+                <div class="col-12 col-lg-5 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="smtp_use_tls" name="smtp_use_tls" {{ checked(account.smtp_use_tls) }}>
+                        <label class="form-check-label fw-bold" for="smtp_use_tls">Usa STARTTLS SMTP</label>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <label for="password" class="form-label fw-bold">Password / app password</label>
+                    <input type="password" class="form-control" id="password" name="password" value="" autocomplete="new-password" {% if not account.id %}required{% endif %}>
+                    <div class="form-text">In modifica lascia vuoto per mantenere la password esistente.</div>
+                </div>
+                <div class="col-12 col-lg-6 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {{ checked(account.is_active) }}>
+                        <label class="form-check-label fw-bold" for="is_active">Account attivo</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

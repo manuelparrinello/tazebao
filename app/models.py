@@ -53,6 +53,7 @@ FINANCE_CATEGORIES = (
     "generale",
 )
 EMAIL_DIRECTIONS = ("inbound", "outbound")
+MAIL_DIRECTIONS = ("inbound", "outbound")
 
 
 class User(db.Model):
@@ -413,6 +414,96 @@ class EmailLog(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
+
+
+class EmailAccount(db.Model):
+    __tablename__ = "erp_email_accounts"
+
+    id = db.Column(db.Integer, primary_key=True)
+    label = db.Column(db.String(120), nullable=False)
+    email_address = db.Column(db.String(255), nullable=False, index=True)
+    imap_host = db.Column(db.String(255), nullable=False)
+    imap_port = db.Column(db.Integer, nullable=False, default=993)
+    imap_use_ssl = db.Column(db.Boolean, nullable=False, default=True)
+    smtp_host = db.Column(db.String(255), nullable=False)
+    smtp_port = db.Column(db.Integer, nullable=False, default=587)
+    smtp_use_tls = db.Column(db.Boolean, nullable=False, default=True)
+    username = db.Column(db.String(255), nullable=False)
+    password_encrypted = db.Column(db.Text, nullable=True)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+    last_sync_at = db.Column(db.DateTime, nullable=True)
+    created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+    creator = db.relationship("User", backref="email_accounts")
+
+
+class EmailMessage(db.Model):
+    __tablename__ = "erp_email_messages"
+    __table_args__ = (
+        db.UniqueConstraint(
+            "account_id",
+            "folder",
+            "imap_uid",
+            name="uq_erp_email_messages_account_folder_uid",
+        ),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    account_id = db.Column(db.Integer, db.ForeignKey("erp_email_accounts.id"), nullable=False)
+    message_id = db.Column(db.String(512), nullable=True, index=True)
+    imap_uid = db.Column(db.String(120), nullable=True)
+    folder = db.Column(db.String(120), nullable=False, default="INBOX")
+    subject = db.Column(db.String(500), nullable=True)
+    from_address = db.Column(db.String(500), nullable=True)
+    to_addresses = db.Column(db.Text, nullable=True)
+    cc_addresses = db.Column(db.Text, nullable=True)
+    reply_to = db.Column(db.String(500), nullable=True)
+    body_text = db.Column(db.Text, nullable=True)
+    body_html = db.Column(db.Text, nullable=True)
+    direction = db.Column(db.String(20), nullable=False, default="inbound")
+    is_read = db.Column(db.Boolean, nullable=False, default=False)
+    sent_at = db.Column(db.DateTime, nullable=True)
+    received_at = db.Column(db.DateTime, nullable=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=True)
+    lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+    account = db.relationship("EmailAccount", backref="messages")
+    cliente = db.relationship("Cliente", backref="mail_messages")
+    lavoro = db.relationship("Lavoro", backref="mail_messages")
+    attachments = db.relationship(
+        "EmailAttachment",
+        back_populates="message",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
+
+class EmailAttachment(db.Model):
+    __tablename__ = "erp_email_attachments"
+
+    id = db.Column(db.Integer, primary_key=True)
+    message_id = db.Column(db.Integer, db.ForeignKey("erp_email_messages.id"), nullable=False)
+    filename = db.Column(db.String(500), nullable=True)
+    content_type = db.Column(db.String(255), nullable=True)
+    size = db.Column(db.Integer, nullable=True)
+    storage_path = db.Column(db.String(1000), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    message = db.relationship("EmailMessage", back_populates="attachments")
 
 
 class Preventivo(db.Model):

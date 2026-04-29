@@ -100,9 +100,9 @@
                         <tr class="tr-thickborder">
                             <th style="width: 40px;" scope="col">QTY</th>
                             <th style="width: auto" scope="col">Descrizione</th>
-                            <th class="text-end" style="width: 90px;" scope="col">Imponibile</th>
-                            <th class="text-end" style="width: 90px;" scope="col">Ivato</th>
-                            <th class="text-end" style="width: 100px;" scope="col">Totale ivato</th>
+                            <th class="text-end" style="width: 90px;" scope="col">Prezzo imponibile</th>
+                            <th class="text-end" style="width: 90px;" scope="col">Prezzo ivato</th>
+                            <th class="text-end" style="width: 120px;" scope="col">Totale imponibile</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -110,9 +110,9 @@
                             <th scope="row">[[ riga?.qty ]]</th>
                             <td style="white-space: pre-wrap; word-wrap: break-word;">[[ riga?.descrizione ]]
                             </td>
-                            <td class="text-end">[[ riga?.prezzo_ie ]]€</td>
-                            <td class="text-end">[[ riga?.prezzo_ii ]]€</td>
-                            <td class="text-end">[[ riga?.totale_riga ]]€</td>
+                            <td class="text-end">[[ euroFormat(riga?.prezzo_ie) ]]&euro;</td>
+                            <td class="text-end">[[ euroFormat(riga?.prezzo_ii) ]]&euro;</td>
+                            <td class="text-end">[[ euroFormat(riga?.totale_riga) ]]&euro;</td>
                         </tr>
                     </tbody>
                 </table>
@@ -128,16 +128,16 @@
             <div class="col-5 px-0">
                 <table class="table">
                     <tr>
-                        <th class="text-start">Subtotale</th>
-                        <th class="text-end">[[ subtotale ]]€</th>
+                        <th class="text-start">Totale imponibile</th>
+                        <th class="text-end">[[ euroFormat(subtotale) ]]&euro;</th>
                     </tr>
                     <tr>
-                        <td class="text-start">Tasse varie</td>
-                        <td class="text-end">[[ 8 ]]€</td>
+                        <td class="text-start">IVA 22%</td>
+                        <td class="text-end">[[ euroFormat(subtotale * 0.22) ]]&euro;</td>
                     </tr>
                     <tr class="tr-thickborder">
-                        <th class="text-start">TOTALE</th>
-                        <th class="text-end">[[ preventivoData?.totale_preventivo ]]€</th>
+                        <th class="text-start">Totale preventivo</th>
+                        <th class="text-end">[[ euroFormat(preventivoData?.totale_preventivo) ]]&euro;</th>
                     </tr>
 
                 </table>

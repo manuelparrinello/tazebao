@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Client email{% endblock %}
+
+{% macro direction_badge(direction) -%}
+{% if direction == "inbound" %}
+<span class="badge rounded-pill text-bg-info">Ricevuta</span>
+{% else %}
+<span class="badge rounded-pill text-bg-success">Inviata</span>
+{% endif %}
+{%- endmacro %}
+
+{% block content %}
+<div class="row mx-auto w-100 align-items-center g-3">
+    <div class="col-12 col-lg-6 px-0">
+        <h6 class="text-primary fw-bold" style="letter-spacing: 1.2px">EMAIL ERP</h6>
+        <h3 class="fw-bolder">Client email</h3>
+        <p>Inbox e invio email tramite account IMAP/SMTP configurati.</p>
+    </div>
+    <div class="col-12 col-lg-6 d-inline-flex flex-wrap justify-content-lg-end gap-2 px-0">
+        <a href="{{ url_for('mail.mail_new') }}" class="btn btn-primary"><i class="bi bi-pencil-square"></i>&nbsp;Nuova email</a>
+        <a href="{{ url_for('mail.mail_accounts') }}" class="btn btn-outline-secondary"><i class="bi bi-gear"></i>&nbsp;Account</a>
+        <a href="{{ url_for('emails.emails_index') }}" class="btn btn-outline-secondary"><i class="bi bi-journal-text"></i>&nbsp;Registro email</a>
+    </div>
+</div>
+<hr>
+
+<form method="get" action="{{ url_for('mail.mail_index') }}" class="row g-2 align-items-end mt-4">
+    <div class="col-12 col-md-3">
+        <label for="account_id" class="form-label fw-bold">Account</label>
+        <select class="form-control form-select" id="account_id" name="account_id">
+            <option value="">Tutti</option>
+            {% for account in accounts %}
+            <option value="{{ account.id }}" {% if selected_account_id == account.id %}selected{% endif %}>{{ account.label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-12 col-md-3">
+        <label for="cliente_id" class="form-label fw-bold">Cliente</label>
+        <select class="form-control form-select" id="cliente_id" name="cliente_id">
+            <option value="">Tutti</option>
+            {% for cliente in clienti %}
+            <option value="{{ cliente.id }}" {% if selected_cliente_id == cliente.id %}selected{% endif %}>{{ cliente.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-12 col-md-4">
+        <label for="q" class="form-label fw-bold">Cerca</label>
+        <input type="search" class="form-control" id="q" name="q" value="{{ q }}" placeholder="Oggetto, mittente, destinatario">
+    </div>
+    <div class="col-12 col-md-auto">
+        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i>&nbsp;Filtra</button>
+        <a href="{{ url_for('mail.mail_index') }}" class="btn btn-outline-secondary">Reset</a>
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm mt-4">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Email</th>
+                    <th>Direzione</th>
+                    <th>Account</th>
+                    <th>Collegamenti</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for message in messages %}
+                <tr>
+                    <td class="text-nowrap">
+                        {{ (message.received_at or message.sent_at or message.created_at).strftime("%d/%m/%Y %H:%M") }}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('mail.mail_detail', message_id=message.id) }}" class="fw-bold text-decoration-none">{{ message.subject or "(senza oggetto)" }}</a>
+                        <div class="small text-secondary">{{ message.from_address if message.direction == "inbound" else message.to_addresses }}</div>
+                    </td>
+                    <td>{{ direction_badge(message.direction) }}</td>
+                    <td>{{ message.account.label if message.account else "-" }}</td>
+                    <td class="small">
+                        {% if message.cliente %}<a href="{{ url_for('cliente_page', cliente_id=message.cliente.id) }}">{{ message.cliente.name }}</a>{% endif %}
+                        {% if message.lavoro %}<span class="text-secondary">/</span> <a href="{{ url_for('lavoro_page', lavoro_id=message.lavoro.id) }}">{{ message.lavoro.descrizione }}</a>{% endif %}
+                        {% if not message.cliente and not message.lavoro %}<span class="text-secondary">Nessun collegamento</span>{% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-secondary py-5">Nessuna email sincronizzata.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

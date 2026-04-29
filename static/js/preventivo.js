@@ -26,7 +26,6 @@ const preventivo = Vue.createApp({
       clienteSelezionato: selectedPreventivoClienteId
         ? Number(selectedPreventivoClienteId)
         : "Seleziona cliente",
-      tassa: 8.18,
     };
   },
   methods: {

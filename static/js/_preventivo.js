@@ -7,7 +7,12 @@ const _preventivo = Vue.createApp({
     };
   },
   methods: {
+    euroFormat(value) {
+      const n = Number(value) || 0;
+      return n.toFixed(2).replace(".", ",");
+    },
     calcSubtotale() {
+        this.subtotale = 0;
         for (const riga of this.preventivoData.righe) {
             const totale = Number(String(riga.totale_riga).replace(",", "."));
             this.subtotale += Number.isFinite(totale) ? totale : 0;

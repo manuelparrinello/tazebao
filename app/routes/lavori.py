@@ -11,6 +11,12 @@ bp = Blueprint("lavori", __name__)
 status_lavori = ["Completato", "In corso", "In attesa", "Da iniziare"]
 
 
+def parse_optional_float(value):
+    if value in (None, ""):
+        return 0
+    return float(str(value).replace(",", "."))
+
+
 @bp.route("/lavori/new", methods=["GET", "POST"])
 def nuovo_lavoro():
     if request.method == "POST":
@@ -21,7 +27,7 @@ def nuovo_lavoro():
         cliente_id = request.form.get("cliente_id")
         priorita = request.form.get("priorita")
         stato = request.form.get("stato")
-        preventivato = request.form.get("preventivato")
+        preventivato = parse_optional_float(request.form.get("preventivato"))
         note = request.form.get("note")
 
         def convertToDate(data_string):

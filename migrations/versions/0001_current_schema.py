@@ -57,6 +57,8 @@ def upgrade():
         sa.Column("data_pagamento", sa.Date(), nullable=True),
         sa.Column("stato", sa.String(length=50), nullable=True),
         sa.Column("priorita", sa.String(length=50), nullable=True),
+        sa.Column("note", sa.Text(), nullable=True),
+        sa.Column("preventivato", sa.Float(), nullable=True),
         sa.Column("cliente_id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["cliente_id"],

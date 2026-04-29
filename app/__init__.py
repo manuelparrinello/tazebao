@@ -1,6 +1,5 @@
 import locale
 import os
-import sys
 
 from flask import Flask
 
@@ -52,12 +51,6 @@ def create_app():
     app.register_blueprint(mail.bp)
     app.register_blueprint(api.bp)
     register_auth_guards(app)
-
-    # Compatibilita temporanea con il comportamento storico del monolite.
-    # Da rimuovere quando il progetto usera esclusivamente Flask-Migrate.
-    if "db" not in sys.argv:
-        with app.app_context():
-            db.create_all()
 
     return app
 

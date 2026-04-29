@@ -14,8 +14,12 @@
   --app-primary: #20e37f !important;
   --bs-primary: #20e37f !important;
   --bs-btn-primary: #20e37f !important;
-  --sidebar-expanded: 280px;
-  --sidebar-collapsed: 84px;
+  --sidebar-expanded: 236px;
+  --sidebar-collapsed: 72px;
+  --sidebar-border: rgba(17, 17, 17, 0.08);
+  --sidebar-muted: #6c757d;
+  --sidebar-hover: rgba(17, 17, 17, 0.04);
+  --sidebar-active: rgba(32, 227, 127, 0.12);
 }
 
 /* =========================
@@ -39,12 +43,14 @@
     left: 0;
     height: 100vh;
     width: var(--sidebar-expanded);
-    background: var(--bs-body-bg);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
     display: flex;
     flex-direction: column;
     z-index: 1030;
     transition: width 0.2s ease;
     color: #111 !important;
+    border-right: 1px solid var(--sidebar-border);
   }
 
   .app-content {
@@ -84,83 +90,185 @@
   color: #111!important;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.2rem 0.75rem;
-  border-radius: 8px;
+  gap: 0.7rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
   color: var(--bs-body-color);
   transition:
     background 0.15s ease,
     color 0.15s ease;
 }
 
+.app-sidebar .nav-link {
+  min-height: 44px;
+}
+
+.app-sidebar-mobile .nav-link {
+  min-height: 48px;
+  padding: 0.8rem 0.9rem;
+  font-size: 0.98rem;
+}
+
 .app-sidebar .nav-link:hover,
 .app-sidebar-mobile .nav-link:hover {
-  background: white!important;
+  background: var(--sidebar-hover) !important;
   color: var(--app-primary)!important;
 }
 
 .app-sidebar .nav-link.active,
 .app-sidebar-mobile .nav-link.active {
-  background: white!important;
+  background: var(--sidebar-active) !important;
   color: var(--app-primary)!important;
   font-weight: 600;
 }
 
-.nav-sublink {
-  padding: 0.45rem 0.6rem;
-  border-radius: 0.6rem;
+.sidebar-brand {
+  padding: 2em 0 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* =========================
-   SUBMENU BUTTON
-========================= */
-
-.submenu {
-  margin-left: 2.5rem !important;
-}
-
-.title-menu-divider {
-  margin-left: 15.75px;
-}
-
-.hr-sidebar {
-  width: auto !important;
-}
-
-.sidebar-collapse-btn {
-  background: transparent;
-  border: none;
-  text-align: left;
+.sidebar-brand-logo {
   width: 100%;
+  max-width: 150px;
+  height: auto;
 }
 
-/* =========================
-   USER AREA
-========================= */
+.sidebar-brand-logo-mobile {
+  width: 90px;
+}
+
+.sidebar-nav {
+  padding: 0.5rem 0.75rem 0.75rem 0.75rem;
+}
+
+.sidebar-nav .nav {
+  gap: 0.2rem;
+}
+
+.nav-section {
+  list-style: none;
+  margin-top: 0.85rem;
+  padding: 0.4rem 0.7rem 0.2rem 0.7rem;
+}
+
+.nav-section:first-of-type {
+  margin-top: 0.35rem;
+}
+
+.nav-section-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sidebar-muted);
+}
+
+.app-sidebar .nav-link i.bi,
+.app-sidebar-mobile .nav-link i.bi {
+  width: 1.2rem;
+  text-align: center;
+  flex: 0 0 1.2rem;
+}
+
+.sidebar-footer,
+.sidebar-mobile-footer {
+  padding: 0.75rem;
+  border-top: 1px solid var(--sidebar-border);
+}
 
 .sidebar-user {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
 }
 
-/* =========================
-   LOGO DOT
-========================= */
-
-.brand-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: var(--app-primary);
-  box-shadow: 0 0 0 4px rgba(150, 0, 255, 0.12);
+.sidebar-user-avatar {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
 }
 
-/* =========================
-   MOBILE OFFCANVAS
-========================= */
+.sidebar-user-meta {
+  min-width: 0;
+}
+
+.sidebar-user-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.sidebar-user-role {
+  font-size: 0.74rem;
+  color: var(--sidebar-muted);
+  line-height: 1.1;
+}
+
+.sidebar-mobile-header {
+  padding: 1rem 1rem 0.9rem 1rem;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.sidebar-mobile-body {
+  padding: 0.9rem;
+}
 
 .app-sidebar-mobile {
-  width: 270px;
+  width: min(92vw, 320px);
+  background: rgba(255, 255, 255, 0.98);
+  border-right: 1px solid var(--sidebar-border);
+}
+
+.app-sidebar-mobile .sidebar-brand-logo-mobile {
+  width: 84px;
+  max-width: 84px;
+}
+
+.app-sidebar-mobile .nav-section {
+  margin-top: 0.7rem;
+  padding: 0.35rem 0.55rem 0.15rem 0.55rem;
+}
+
+.app-sidebar-mobile .nav-section-label {
+  font-size: 0.66rem;
+}
+
+.sidebar-mobile-footer {
+  margin-top: 0.85rem;
+  padding: 0.9rem 0.2rem 0 0.2rem;
+}
+
+.sidebar-user-mobile {
+  padding: 0.4rem 0.25rem;
+}
+
+.app-sidebar-mobile .nav-item + .nav-item .nav-link {
+  margin-top: 0.1rem;
+}
+
+.app-sidebar-mobile .nav-link i.bi {
+  font-size: 1rem;
+}
+
+.app-sidebar-mobile .nav-label {
+  font-size: 0.98rem;
+}
+
+.btn-logout-icon {
+  min-height: 36px;
+  min-width: 36px;
+  padding: 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* FINE SIDEBAR */
@@ -634,11 +742,6 @@ body.loaded {
 .mobile-nav-logo {
   max-width: 160px;
   height: auto;
-}
-
-.nav-link {
-  margin-left: 15px;
-  margin-right: 15px;
 }
 
 .p-small {

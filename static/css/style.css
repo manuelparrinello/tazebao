@@ -32,6 +32,12 @@
   padding: 80px !important;
 }
 
+@media (max-width: 991.98px) {
+  .app-content {
+    padding: 4.5rem 1rem 1.25rem 1rem !important;
+  }
+}
+
 /* =========================
    SIDEBAR DESKTOP
 ========================= */
@@ -317,6 +323,82 @@ body {
   min-width: 760px;
 }
 
+@media (max-width: 767.98px) {
+  .app-content .card-body,
+  .app-content .card-header {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .erp-table {
+    min-width: 100%;
+  }
+
+  .erp-table th,
+  .erp-table td {
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+  }
+
+  .mobile-hide,
+  .mobile-priority-low {
+    display: none !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .mobile-hide-sm {
+    display: none !important;
+  }
+}
+
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mobile-list-item {
+  display: block;
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+}
+
+.mobile-list-item:hover {
+  background: var(--sidebar-hover);
+  text-decoration: none !important;
+}
+
+.mobile-row-link {
+  display: block;
+  min-width: 0;
+  color: inherit;
+}
+
+.mobile-row-title {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  min-width: 0;
+}
+
+.mobile-row-muted {
+  color: var(--sidebar-muted);
+  font-size: 0.82rem;
+}
+
 .users-table {
   width: 100%;
   min-width: 0;
@@ -486,6 +568,10 @@ i.bi {
 
 .pointer {
   cursor: pointer !important;
+}
+
+.min-w-0 {
+  min-width: 0 !important;
 }
 
 .container {
@@ -742,6 +828,30 @@ body.loaded {
 .mobile-nav-logo {
   max-width: 160px;
   height: auto;
+}
+
+@media (max-width: 767.98px) {
+  .btn {
+    min-height: 38px;
+  }
+
+  .btn-sm {
+    min-height: 30px;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .erp-actions .btn,
+  .erp-actions button {
+    min-height: 30px;
+    padding: 0.2rem 0.45rem;
+  }
+
+  .row.mx-auto.w-100.display-flex.align-items-center.justify-content-space-between > [class*="col-"],
+  .row.mx-auto.w-100.align-items-center.g-3 > [class*="col-"],
+  .row.mx-auto.w-100.align-items-start.g-3 > [class*="col-"] {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 .p-small {

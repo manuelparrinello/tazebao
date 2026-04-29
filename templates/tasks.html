@@ -26,34 +26,34 @@
     <div class="card rounded-3 border border-light-subtle">
         <div class="card-body p-4">
             {% if tasks %}
-            <div class="table-responsive">
-                <table class="table table-hover my-0 erp-table">
-                    <thead>
-                        <tr>
-                            <th class="fw-bold">Task</th>
-                            <th class="fw-bold col-status">Categoria</th>
-                            <th class="fw-bold col-status">Stato</th>
-                            <th class="fw-bold col-prio">Priorita</th>
-                            <th class="fw-bold col-date">Scadenza</th>
-                            <th class="fw-bold">Cliente</th>
-                            <th class="fw-bold">Lavoro</th>
-                            <th class="fw-bold">Assegnata a</th>
-                            <th class="fw-bold text-end col-actions">Azioni</th>
-                        </tr>
-                    </thead>
+            <div class="table-responsive d-none d-md-block">
+                    <table class="table table-hover my-0 erp-table">
+                        <thead>
+                            <tr>
+                                <th class="fw-bold">Task</th>
+                                <th class="fw-bold col-status mobile-priority-low">Categoria</th>
+                                <th class="fw-bold col-status">Stato</th>
+                                <th class="fw-bold col-prio mobile-priority-low">Priorita</th>
+                                <th class="fw-bold col-date">Scadenza</th>
+                                <th class="fw-bold mobile-hide">Cliente</th>
+                                <th class="fw-bold mobile-hide">Lavoro</th>
+                                <th class="fw-bold mobile-hide">Assegnata a</th>
+                                <th class="fw-bold text-end col-actions">Azioni</th>
+                            </tr>
+                        </thead>
                     <tbody>
                         {% for task in tasks %}
                         <tr>
                             <td>
                                 <a class="fw-bold a-no-color" href="{{ url_for('tasks.task_edit', task_id=task.id) }}">{{ task.name }}</a>
                             </td>
-                            <td><span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span></td>
+                            <td class="mobile-priority-low"><span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span></td>
                             <td><span class="badge rounded-pill bg-primary">{{ labelize(task.status) }}</span></td>
-                            <td><span class="badge rounded-pill text-bg-warning">{{ labelize(task.priority) }}</span></td>
+                            <td class="mobile-priority-low"><span class="badge rounded-pill text-bg-warning">{{ labelize(task.priority) }}</span></td>
                             <td>{{ task.due_date.strftime("%d/%m/%Y") if task.due_date else "-" }}</td>
-                            <td>{{ task.cliente.name if task.cliente else "-" }}</td>
-                            <td>{{ task.lavoro.descrizione if task.lavoro else "-" }}</td>
-                            <td>{{ task.assignee.name or task.assignee.email if task.assignee else "-" }}</td>
+                            <td class="mobile-hide">{{ task.cliente.name if task.cliente else "-" }}</td>
+                            <td class="mobile-hide">{{ task.lavoro.descrizione if task.lavoro else "-" }}</td>
+                            <td class="mobile-hide">{{ task.assignee.name or task.assignee.email if task.assignee else "-" }}</td>
                             <td class="text-end">
                                 <div class="erp-actions">
                                     <a class="btn btn-sm btn-outline-primary" href="{{ url_for('tasks.task_edit', task_id=task.id) }}">
@@ -71,8 +71,27 @@
                             </td>
                         </tr>
                         {% endfor %}
-                    </tbody>
+                        </tbody>
                 </table>
+            </div>
+            <div class="d-md-none mobile-list">
+                {% for task in tasks %}
+                <a class="mobile-list-item mobile-row-link" href="{{ url_for('tasks.task_edit', task_id=task.id) }}">
+                    <div class="d-flex align-items-start justify-content-between gap-3">
+                        <div class="min-w-0">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="fw-bold mobile-row-title">{{ task.name }}</span>
+                                <span class="badge rounded-pill bg-primary flex-shrink-0">{{ labelize(task.status) }}</span>
+                                <span class="badge rounded-pill text-bg-warning flex-shrink-0">{{ labelize(task.priority) }}</span>
+                            </div>
+                            <div class="mobile-row-muted">
+                                {% if task.due_date %}Scadenza {{ task.due_date.strftime("%d/%m/%Y") }}{% else %}Nessuna scadenza{% endif %}
+                            </div>
+                        </div>
+                        <i class="bi bi-chevron-right text-secondary flex-shrink-0"></i>
+                    </div>
+                </a>
+                {% endfor %}
             </div>
             {% else %}
             <p class="mb-0 text-secondary">Nessuna task presente.</p>

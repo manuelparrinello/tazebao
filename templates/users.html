@@ -51,7 +51,7 @@
                 <thead>
                     <tr>
                         <th class="fw-bold col-user">Utente</th>
-                        <th class="fw-bold col-email">Email</th>
+                        <th class="fw-bold col-email mobile-hide">Email</th>
                         <th class="fw-bold col-status">Ruolo</th>
                         <th class="fw-bold col-status">Stato</th>
                         <th class="fw-bold text-end col-actions">Azioni</th>
@@ -64,7 +64,7 @@
                             <div class="fw-bold users-truncate" title="{{ user.name or '-' }}">{{ user.name or "-" }}</div>
                             <div class="small text-secondary">ID {{ user.id }}</div>
                         </td>
-                        <td>
+                        <td class="mobile-hide">
                             <div class="users-truncate" title="{{ user.email }}">{{ user.email }}</div>
                         </td>
                         <td class="text-nowrap">{{ role_badge(user.role) }}</td>

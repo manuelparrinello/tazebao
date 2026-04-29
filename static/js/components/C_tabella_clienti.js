@@ -1,12 +1,12 @@
 const TabellaClienti = {
   props: ["clienti_data"],
   template: `
-    <table class="table my-0 sortable table-hover rounded-3 p-2 no-last-border erp-table">
+    <table class="table my-0 sortable table-hover rounded-3 p-2 no-last-border erp-table d-none d-md-table">
       <thead>
         <tr>
           <th class="fw-bold pointer col-nominativo" scope="col">Nominativo</th>
-          <th class="fw-bold pointer col-email" scope="col">Email</th>
-          <th class="fw-bold pointer col-date" scope="col">Telefono</th>
+          <th class="fw-bold pointer col-email mobile-hide" scope="col">Email</th>
+          <th class="fw-bold pointer col-date mobile-hide" scope="col">Telefono</th>
           <th class="fw-bold pointer text-center col-note" scope="col">Note</th>
         </tr>
       </thead>
@@ -14,12 +14,12 @@ const TabellaClienti = {
         <template v-if="clienti_data.length > 0">
           <tr v-for="cliente in clienti_data">
             <td>
-              <a class="fw-bold text-decoration-none" :href="'/clienti/' + cliente.id">
+              <a class="fw-bold text-decoration-none d-block text-truncate" :href="'/clienti/' + cliente.id" :title="cliente.nome">
                 <i :style="{ color: cliente.colore }" class="bi bi-person-circle me-2"></i>[[ cliente.nome ]]
               </a>
             </td>
-            <td class="text-nowrap">[[ cliente.email ]]</td>
-            <td>[[ cliente.telefono ]]</td>
+            <td class="text-nowrap mobile-hide">[[ cliente.email ]]</td>
+            <td class="mobile-hide">[[ cliente.telefono ]]</td>
             <td class="text-center" v-html="renderNoteIcon(cliente.note)"></td>
           </tr>
         </template>
@@ -28,6 +28,22 @@ const TabellaClienti = {
         </tr>
       </tbody>
     </table>
+    <div class="mobile-list d-md-none">
+      <template v-if="clienti_data.length > 0">
+        <a v-for="cliente in clienti_data" :key="cliente.id" class="mobile-list-item mobile-row-link" :href="'/clienti/' + cliente.id">
+          <div class="d-flex align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-2 min-w-0">
+              <i :style="{ color: cliente.colore }" class="bi bi-person-circle flex-shrink-0"></i>
+              <span class="fw-bold mobile-row-title" :title="cliente.nome">[[ cliente.nome ]]</span>
+            </div>
+            <i class="bi bi-chevron-right text-secondary flex-shrink-0"></i>
+          </div>
+        </a>
+      </template>
+      <div v-else class="text-center text-secondary py-4">
+        Nessun cliente trovato.
+      </div>
+    </div>
   `,
   methods: {
     initTooltips() {

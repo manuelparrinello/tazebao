@@ -21,6 +21,7 @@ export function submitFormNewCliente(e) {
   fetch("/clienti/new", {
     method: "POST",
     body: formData,
+    headers: csrfHeaders(),
   }).then((response) => {
     if (response.ok) {
       // Reindirizzamento alla pagina dei clienti dopo il successo

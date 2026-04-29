@@ -37,7 +37,8 @@ const getAllClienti = Vue.createApp({
       if (window.confirm('Vuoi davvero cancellare il cliente?')) {
         try {
           const response = await fetch(url, {
-            method: 'delete'
+            method: 'delete',
+            headers: csrfHeaders(),
           })
           if (!response.ok) {
             throw new Error(`Errore richiesta! HTTP(${response.status})`)

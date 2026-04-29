@@ -9,6 +9,7 @@
 </div>
 
 <form id="nuovoLavoro">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
     <div class="mt-5" id="formLavoro" data-selected-cliente-id="{{ selected_cliente_id or '' }}">
 

@@ -48,7 +48,8 @@ const nuovoClienteApp = Vue.createApp({
             try {
                 const response = await fetch(`/clienti/new`, {
                     method: 'post',
-                    body: formData
+                    body: formData,
+                    headers: csrfHeaders(),
                 })
                 if (!response.ok) {
                     throw new Error('Errore richiesta! HTTP' + response.status);

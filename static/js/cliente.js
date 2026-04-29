@@ -84,6 +84,7 @@ const getSingleCliente = Vue.createApp({
                     headers: {
                         Accept: "application/json",
                         "Content-Type": "application/json",
+                        ...csrfHeaders(),
                     },
                     method: "patch",
                     body: JSON.stringify({

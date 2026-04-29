@@ -20,6 +20,7 @@
 <hr>
 
 <form method="post" class="mt-5" id="preventivoEditForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="row g-4">
         <div class="col-12 col-lg-4">
             <div class="card rounded-3 border border-light-subtle">

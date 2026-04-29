@@ -1,12 +1,21 @@
 /*--------------------*/
 /*  CANCELLA CLIENTE  */
 /*--------------------*/
+function getCSRFToken() {
+  return document.querySelector('meta[name="csrf-token"]')?.content || "";
+}
+
+function csrfHeaders(headers = {}) {
+  const token = getCSRFToken();
+  return token ? { ...headers, "X-CSRFToken": token } : headers;
+}
+
 function deleteCliente(id) {
   return fetch(`/clienti/${id}`, {
     method: "delete",
-    headers: {
+    headers: csrfHeaders({
       Accept: "application/json",
-    },
+    }),
   });
 }
 
@@ -43,9 +52,9 @@ async function clickForDeleteCliente(event, idCliente) {
 function deleteLavoro(id) {
   return fetch(`/lavori/${id}`, {
     method: "delete",
-    headers: {
+    headers: csrfHeaders({
       Accept: "application/json",
-    },
+    }),
   });
 }
 

@@ -82,6 +82,7 @@ const getSingleCliente = Vue.createApp({
           headers: {
             "Content-Type": "application/json",
             "X-Requested-With": "XMLHttpRequest",
+            ...csrfHeaders(),
           },
         });
         if (!response.ok) {

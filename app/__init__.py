@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 from .auth import register_auth_guards
 from .cli import register_cli
-from .extensions import cors, db, migrate
+from .extensions import cors, csrf, db, migrate
 
 
 def configure_environment(app):
@@ -50,6 +50,7 @@ def create_app():
 
     db.init_app(app)
     cors.init_app(app)
+    csrf.init_app(app)
     migrate.init_app(app, db, render_as_batch=True)
 
     register_template_filters(app)
@@ -71,6 +72,7 @@ def create_app():
     app.register_blueprint(emails.bp)
     app.register_blueprint(mail.bp)
     app.register_blueprint(api.bp)
+    csrf.exempt(api.bp)
     register_auth_guards(app)
 
     return app

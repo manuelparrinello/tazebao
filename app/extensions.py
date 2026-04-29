@@ -1,6 +1,7 @@
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import CSRFProtect
 from sqlalchemy import MetaData
 
 
@@ -17,3 +18,4 @@ metadata = MetaData(naming_convention=convention)
 db = SQLAlchemy(metadata=metadata)
 migrate = Migrate()
 cors = CORS()
+csrf = CSRFProtect()

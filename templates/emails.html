@@ -87,6 +87,7 @@
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <form action="{{ url_for('emails.emails_delete', email_id=email_log.id) }}" method="post" onsubmit="return confirm('Eliminare questa comunicazione?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
                                     <i class="bi bi-trash"></i>
                                 </button>

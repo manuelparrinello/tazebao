@@ -14,6 +14,7 @@
 
 <div class="mt-5" id="nuovoPreventivo" data-selected-cliente-id="{{ selected_cliente_id or '' }}" data-selected-lavoro-id="{{ selected_lavoro_id or '' }}">
     <form action="" id="formNuovoPreventivo">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="row g-4">
             <div class="col-md-3 col-sm">
                 <h5 class="fw-bold">Cliente*</h5>

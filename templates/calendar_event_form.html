@@ -33,6 +33,7 @@
 {% endif %}
 
 <form action="{{ form_action }}" method="post" class="mt-5">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="card rounded-3 border border-light-subtle">
         <div class="card-body p-4">
             <div class="row g-3">

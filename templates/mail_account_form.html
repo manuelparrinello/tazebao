@@ -23,6 +23,7 @@
 {% endif %}
 
 <form action="{{ form_action }}" method="post" class="mt-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
             <div class="row g-3">

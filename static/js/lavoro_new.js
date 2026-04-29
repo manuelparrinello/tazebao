@@ -34,6 +34,7 @@ const nuovoLavoroApp = Vue.createApp({
         const response = await fetch("/lavori/new", {
           method: "POST",
           body: formData,
+          headers: csrfHeaders(),
         })
         if (!response.ok) {
           throw new Error('Errore improvviso: HTTP' + response.status);

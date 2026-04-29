@@ -152,6 +152,7 @@ const preventivo = Vue.createApp({
         body: dataToSend,
         headers: {
           "Content-Type": "application/json",
+          ...csrfHeaders(),
         },
       });
       if (!response.ok) {

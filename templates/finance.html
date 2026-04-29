@@ -31,15 +31,15 @@
 {% macro movement_table(movements, kind) -%}
 {% if movements %}
 <div class="table-responsive">
-    <table class="table table-hover my-0">
+    <table class="table table-hover my-0 erp-table">
         <thead>
             <tr>
-                <th class="fw-bold">Data</th>
+                <th class="fw-bold col-date">Data</th>
                 <th class="fw-bold">Titolo</th>
                 <th class="fw-bold">Categoria</th>
-                <th class="fw-bold">{{ "Stato" if kind == "entrata" else "Tipo" }}</th>
-                <th class="fw-bold text-end">Importo</th>
-                <th class="fw-bold text-end">Azioni</th>
+                <th class="fw-bold col-status">{{ "Stato" if kind == "entrata" else "Tipo" }}</th>
+                <th class="fw-bold text-end col-money">Importo</th>
+                <th class="fw-bold text-end col-actions">Azioni</th>
             </tr>
         </thead>
         <tbody>

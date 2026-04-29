@@ -205,32 +205,51 @@ body {
   display: block !important;
 }
 
-.col-desc {
-  width: 300px !important;
+.erp-table {
+  min-width: 760px;
 }
 
+.col-id {
+  width: 64px !important;
+}
+
+.col-date {
+  width: 150px !important;
+}
+
+.col-datetime {
+  width: 180px !important;
+}
+
+.col-status,
 .col-prio {
-  width: 55px;
-}
-
-.col-cliente {
-  width: 300px !important;
+  width: 120px !important;
 }
 
 .col-actions {
-  width: 70px !important;
+  width: 104px !important;
+}
+
+.col-money,
+.col-prezzo {
+  width: 120px !important;
 }
 
 .col-note {
-  width: 80px !important;
+  width: 90px !important;
 }
 
-.col-prezzo {
-  width: 100px !important;
-}
-
+.col-payment,
 .col-pagamento {
-  width: 200px !important;
+  width: 150px !important;
+}
+
+.col-cliente {
+  width: 220px !important;
+}
+
+.col-desc {
+  width: 280px !important;
 }
 
 .font-size-md-sm {

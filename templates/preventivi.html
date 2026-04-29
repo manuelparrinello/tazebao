@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% block title %}Preventivi{% endblock %}
+{% extends "base.html" %}
+{% block title %}Preventivi{% endblock %}
 
 {% block content %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
@@ -14,35 +15,34 @@
 <hr>
 <div class="mt-5" id="preventivi" v-cloak>
     <div v-if="preventivi.length > 0">
-
         <div class="card rounded-3 border border-light-subtle">
             <div class="card-body p-4">
-
-                <table class="table my-0 sortable table-hover rounded-3 p-2 no-last-border">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;" class="fw-bold">ID</th>
-                            <th class="fw-bold">Descrizione</th>
-                            <th class="fw-bold">Cliente</th>
-                            <th class="fw-bold">Data creazione</th>
-                            <th class="fw-bold">Totale</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="preventivo in preventivi" class="pointer" @click="openPreventivo(preventivo.id)">
-                            <td>[[ preventivo.id ]]</td>
-                            <td>
-                                <a :href="'/preventivi/visualizza/' + preventivo.id" class="a-no-color fw-bold" @click.stop>
-                                    [[ preventivo.descrizione ]]
-                                </a>
-                            </td>
-                            <td>[[ preventivo.cliente]]</td>
-                            <td>[[ preventivo.data_creazione]]</td>
-                            <td>[[ preventivo.totale_preventivo ]]€</td>
-                        </tr>
-                    </tbody>
-                </table>
-
+                <div class="table-responsive">
+                    <table class="table my-0 sortable table-hover rounded-3 p-2 no-last-border erp-table">
+                        <thead>
+                            <tr>
+                                <th class="fw-bold col-id">ID</th>
+                                <th class="fw-bold">Descrizione</th>
+                                <th class="fw-bold">Cliente</th>
+                                <th class="fw-bold col-date">Data creazione</th>
+                                <th class="fw-bold col-money text-end">Totale</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="preventivo in preventivi" class="pointer" @click="openPreventivo(preventivo.id)">
+                                <td>[[ preventivo.id ]]</td>
+                                <td>
+                                    <a :href="'/preventivi/visualizza/' + preventivo.id" class="a-no-color fw-bold" @click.stop>
+                                        [[ preventivo.descrizione ]]
+                                    </a>
+                                </td>
+                                <td>[[ preventivo.cliente ]]</td>
+                                <td>[[ preventivo.data_creazione ]]</td>
+                                <td class="text-end">[[ preventivo.totale_preventivo ]] &euro;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -53,6 +53,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 <script src="{{ url_for('static', filename='js/preventivi.js') }}"></script>
 {% endblock %}

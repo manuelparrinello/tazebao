@@ -27,18 +27,18 @@
         <div class="card-body p-4">
             {% if tasks %}
             <div class="table-responsive">
-                <table class="table table-hover my-0">
+                <table class="table table-hover my-0 erp-table">
                     <thead>
                         <tr>
                             <th class="fw-bold">Task</th>
-                            <th class="fw-bold">Categoria</th>
-                            <th class="fw-bold">Stato</th>
-                            <th class="fw-bold">Priorita</th>
-                            <th class="fw-bold">Scadenza</th>
+                            <th class="fw-bold col-status">Categoria</th>
+                            <th class="fw-bold col-status">Stato</th>
+                            <th class="fw-bold col-prio">Priorita</th>
+                            <th class="fw-bold col-date">Scadenza</th>
                             <th class="fw-bold">Cliente</th>
                             <th class="fw-bold">Lavoro</th>
                             <th class="fw-bold">Assegnata a</th>
-                            <th class="fw-bold text-end">Azioni</th>
+                            <th class="fw-bold text-end col-actions">Azioni</th>
                         </tr>
                     </thead>
                     <tbody>

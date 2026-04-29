@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{ "Modifica utente" if user else "Nuovo utente" }}{% endblock %}
+
+{% set is_edit = user is not none %}
+{% set action_url = url_for('users.users_edit', user_id=user.id) if is_edit else url_for('users.users_new') %}
+
+{% block content %}
+<div class="row mx-auto w-100 align-items-center g-3">
+    <div class="col-12 col-lg-6 px-0">
+        <h3 class="fw-bolder">{{ "Modifica utente" if is_edit else "Nuovo utente" }}</h3>
+        <p>Gestisci anagrafica, ruolo e stato accesso.</p>
+    </div>
+    <div class="col-12 col-lg-6 d-inline-flex justify-content-lg-end px-0">
+        <a href="{{ url_for('users.users_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>&nbsp;Torna agli utenti
+        </a>
+    </div>
+</div>
+<hr>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="mt-4">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} mb-2">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<form action="{{ action_url }}" method="post" class="mt-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold" for="name">Nome</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ form_data.name if form_data else '' }}">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold" for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ form_data.email if form_data else '' }}" required>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label fw-bold" for="role">Ruolo</label>
+                    <select class="form-control form-select" id="role" name="role">
+                        {% for role in roles %}
+                        <option value="{{ role }}" {% if form_data and form_data.role == role %}selected{% endif %}>{{ role.replace("_", " ").title() }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {% if form_data and form_data.is_active %}checked{% endif %}>
+                        <label class="form-check-label fw-bold" for="is_active">Utente attivo</label>
+                    </div>
+                </div>
+            </div>
+
+            {% if not is_edit %}
+            <hr class="my-4">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold" for="password">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold" for="password_confirm">Conferma password</label>
+                    <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-floppy"></i>&nbsp;Salva
+                </button>
+                {% if is_edit %}
+                <a class="btn btn-outline-secondary" href="{{ url_for('users.users_password', user_id=user.id) }}">
+                    <i class="bi bi-key"></i>&nbsp;Reset password
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

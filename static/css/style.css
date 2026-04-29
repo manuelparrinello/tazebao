@@ -209,6 +209,26 @@ body {
   min-width: 760px;
 }
 
+.users-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.erp-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.erp-actions .btn,
+.erp-actions button {
+  flex-shrink: 0;
+}
+
 .col-id {
   width: 64px !important;
 }
@@ -248,6 +268,38 @@ body {
   width: 220px !important;
 }
 
+.col-nominativo {
+  width: 320px !important;
+}
+
+.col-email {
+  width: 220px !important;
+}
+
+.users-table .col-user {
+  width: 34% !important;
+}
+
+.users-table .col-email {
+  width: 24% !important;
+}
+
+.users-table .col-status {
+  width: 12% !important;
+}
+
+.users-table .col-actions {
+  width: 128px !important;
+}
+
+.users-truncate {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .col-desc {
   width: 280px !important;
 }
@@ -257,7 +309,43 @@ body {
 }
 
 i.bi {
-  font-size: 1.2rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.btn:not(.btn-close),
+.button-61,
+.button-61-p0 {
+  border-radius: 8px;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.btn:not(.btn-close) {
+  min-height: 36px;
+  padding: 0.375rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.btn-sm {
+  min-height: 32px;
+  padding: 0.25rem 0.65rem;
+}
+
+.erp-actions .btn,
+.erp-actions button {
+  min-height: 32px;
+  padding: 0.25rem 0.55rem;
+}
+
+.erp-actions i.bi,
+.btn i.bi,
+.button-61 i.bi,
+.button-61-p0 i.bi {
+  font-size: 0.95rem;
 }
 
 .action-icon.edit-icon {

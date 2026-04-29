@@ -48,7 +48,7 @@
                     <td>{{ account.smtp_host }}:{{ account.smtp_port }}</td>
                     <td>{{ account.last_sync_at.strftime("%d/%m/%Y %H:%M") if account.last_sync_at else "Mai" }}</td>
                     <td class="text-end">
-                        <div class="d-inline-flex gap-2">
+                        <div class="erp-actions">
                             <form action="{{ url_for('mail.mail_account_sync', account_id=account.id) }}" method="post">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn btn-sm btn-outline-primary">

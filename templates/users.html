@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Utenti{% endblock %}
+
+{% macro role_badge(role) -%}
+{% if role == "admin" %}
+<span class="badge rounded-pill text-bg-danger">Admin</span>
+{% elif role == "operatore" %}
+<span class="badge rounded-pill text-bg-primary">Operatore</span>
+{% else %}
+<span class="badge rounded-pill text-bg-secondary">Readonly</span>
+{% endif %}
+{%- endmacro %}
+
+{% macro state_badge(user) -%}
+{% if user.is_active %}
+<span class="badge rounded-pill text-bg-success">Attivo</span>
+{% else %}
+<span class="badge rounded-pill text-bg-secondary">Non attivo</span>
+{% endif %}
+{%- endmacro %}
+
+{% block content %}
+<div class="row mx-auto w-100 align-items-center g-3">
+    <div class="col-12 col-lg-6 px-0">
+        <h3 class="fw-bolder">Utenti</h3>
+        <p>Gestione base degli utenti e dei ruoli ERP.</p>
+    </div>
+    <div class="col-12 col-lg-6 d-inline-flex justify-content-lg-end px-0">
+        <a href="{{ url_for('users.users_new') }}" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i>&nbsp;Nuovo utente
+        </a>
+    </div>
+</div>
+<hr>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="mt-4">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} mb-2">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="card rounded-3 border border-light-subtle mt-4">
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table class="table table-hover my-0 erp-table users-table">
+                <thead>
+                    <tr>
+                        <th class="fw-bold col-user">Utente</th>
+                        <th class="fw-bold col-email">Email</th>
+                        <th class="fw-bold col-status">Ruolo</th>
+                        <th class="fw-bold col-status">Stato</th>
+                        <th class="fw-bold text-end col-actions">Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <div class="fw-bold users-truncate" title="{{ user.name or '-' }}">{{ user.name or "-" }}</div>
+                            <div class="small text-secondary">ID {{ user.id }}</div>
+                        </td>
+                        <td>
+                            <div class="users-truncate" title="{{ user.email }}">{{ user.email }}</div>
+                        </td>
+                        <td class="text-nowrap">{{ role_badge(user.role) }}</td>
+                        <td class="text-nowrap">{{ state_badge(user) }}</td>
+                        <td class="text-end">
+                            <div class="erp-actions">
+                                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('users.users_edit', user_id=user.id) }}">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('users.users_password', user_id=user.id) }}">
+                                    <i class="bi bi-key"></i>
+                                </a>
+                                {% if user.is_active %}
+                                <form action="{{ url_for('users.users_deactivate', user_id=user.id) }}" method="post" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" {% if current_user and current_user.id == user.id %}disabled{% endif %}>
+                                        <i class="bi bi-person-x"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <form action="{{ url_for('users.users_activate', user_id=user.id) }}" method="post" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-person-check"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-secondary py-5">Nessun utente presente.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</div>
+</div>
+{% endblock %}

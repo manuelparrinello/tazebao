@@ -55,17 +55,19 @@
                             <td>{{ task.lavoro.descrizione if task.lavoro else "-" }}</td>
                             <td>{{ task.assignee.name or task.assignee.email if task.assignee else "-" }}</td>
                             <td class="text-end">
-                                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('tasks.task_edit', task_id=task.id) }}">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                {% if task.status != "annullata" %}
-                                <form action="{{ url_for('tasks.task_delete', task_id=task.id) }}" method="post" class="d-inline">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-                                </form>
-                                {% endif %}
+                                <div class="erp-actions">
+                                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('tasks.task_edit', task_id=task.id) }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% if task.status != "annullata" %}
+                                    <form action="{{ url_for('tasks.task_delete', task_id=task.id) }}" method="post" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}

@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import g, jsonify, redirect, request, session, url_for
+from flask import flash, g, jsonify, redirect, request, session, url_for
 
 from .extensions import db
 from .models import User
@@ -64,7 +64,13 @@ def role_required(*roles):
                     )
                 return redirect(url_for("login", next=request.full_path))
             if user.role not in roles:
-                return jsonify({"success": False, "data": None, "error": "Forbidden"}), 403
+                if is_api_request():
+                    return (
+                        jsonify({"success": False, "data": None, "error": "Forbidden"}),
+                        403,
+                    )
+                flash("Accesso riservato agli amministratori.", "warning")
+                return redirect(url_for("main.app_shell"))
             return view(*args, **kwargs)
 
         return wrapped_view

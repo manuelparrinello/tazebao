@@ -4,9 +4,8 @@ const TabellaClienti = {
     <table class="table my-0 sortable table-hover rounded-3 p-2 no-last-border erp-table">
       <thead>
         <tr>
-          <th class="fw-bold pointer col-cliente" scope="col">Nominativo</th>
-          <th title="Quantita di lavori del cliente" class="fw-bold text-center pointer col-id" scope="col">Qty</th>
-          <th class="fw-bold pointer" scope="col">Email</th>
+          <th class="fw-bold pointer col-nominativo" scope="col">Nominativo</th>
+          <th class="fw-bold pointer col-email" scope="col">Email</th>
           <th class="fw-bold pointer col-date" scope="col">Telefono</th>
           <th class="fw-bold pointer text-center col-note" scope="col">Note</th>
         </tr>
@@ -19,14 +18,13 @@ const TabellaClienti = {
                 <i :style="{ color: cliente.colore }" class="bi bi-person-circle me-2"></i>[[ cliente.nome ]]
               </a>
             </td>
-            <td class="text-center">[[ cliente.count_lavori ]]</td>
-            <td>[[ cliente.email ]]</td>
+            <td class="text-nowrap">[[ cliente.email ]]</td>
             <td>[[ cliente.telefono ]]</td>
             <td class="text-center" v-html="renderNoteIcon(cliente.note)"></td>
           </tr>
         </template>
         <tr v-else>
-          <td colspan="5" class="text-center">Nessun cliente trovato.</td>
+          <td colspan="4" class="text-center">Nessun cliente trovato.</td>
         </tr>
       </tbody>
     </table>

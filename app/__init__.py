@@ -57,7 +57,7 @@ def create_app():
     register_cli(app)
 
     from . import models  # noqa: F401
-    from .routes import api, auth, calendar, clienti, emails, finance, lavori, mail, main, preventivi, tasks
+    from .routes import api, auth, calendar, clienti, emails, finance, lavori, mail, main, preventivi, tasks, users
 
     register_auth_endpoint_aliases(app)
     register_legacy_endpoint_aliases(app)
@@ -71,6 +71,7 @@ def create_app():
     app.register_blueprint(finance.bp)
     app.register_blueprint(emails.bp)
     app.register_blueprint(mail.bp)
+    app.register_blueprint(users.bp)
     app.register_blueprint(api.bp)
     csrf.exempt(api.bp)
     register_auth_guards(app)

@@ -7,6 +7,7 @@ from email.header import decode_header, make_header
 from email.message import EmailMessage as StdEmailMessage
 from email.utils import getaddresses, parsedate_to_datetime
 
+from flask import current_app, has_app_context
 from cryptography.fernet import Fernet, InvalidToken
 
 from .extensions import db
@@ -25,11 +26,19 @@ class MailSyncError(RuntimeError):
 
 
 def credentials_key_configured():
-    return bool(os.environ.get("EMAIL_CREDENTIALS_KEY"))
+    return bool(get_credentials_key())
+
+
+def get_credentials_key():
+    if has_app_context():
+        return current_app.config.get("EMAIL_CREDENTIALS_KEY") or os.environ.get(
+            "EMAIL_CREDENTIALS_KEY"
+        )
+    return os.environ.get("EMAIL_CREDENTIALS_KEY")
 
 
 def get_fernet():
-    key = os.environ.get("EMAIL_CREDENTIALS_KEY")
+    key = get_credentials_key()
     if not key:
         raise MailConfigurationError(
             "EMAIL_CREDENTIALS_KEY non configurata. Imposta una chiave Fernet valida "

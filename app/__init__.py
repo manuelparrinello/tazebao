@@ -2,13 +2,35 @@ import locale
 import os
 
 from flask import Flask
+from dotenv import load_dotenv
 
 from .auth import register_auth_guards
 from .cli import register_cli
 from .extensions import cors, db, migrate
 
 
+def configure_environment(app):
+    flask_env = os.environ.get("FLASK_ENV", "development").lower()
+    flask_debug = os.environ.get("FLASK_DEBUG", "").lower() in {"1", "true", "yes"}
+    is_dev = flask_env in {"development", "dev", "local"} or flask_debug
+    secret_key = os.environ.get("SECRET_KEY")
+
+    # In produzione SECRET_KEY e obbligatoria: non usare fallback prevedibili.
+    if not secret_key:
+        if is_dev:
+            secret_key = "dev-secret-key"
+        else:
+            raise RuntimeError(
+                "SECRET_KEY non configurata. Imposta SECRET_KEY nelle variabili ambiente."
+            )
+
+    app.config["SECRET_KEY"] = secret_key
+    app.config["EMAIL_CREDENTIALS_KEY"] = os.environ.get("EMAIL_CREDENTIALS_KEY")
+    app.config["ERP_ENV"] = flask_env
+
+
 def create_app():
+    load_dotenv()
     locale.setlocale(locale.LC_TIME, "it_IT.UTF-8")
 
     app = Flask(
@@ -22,10 +44,9 @@ def create_app():
     app.config["DB_PATH"] = db_path
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    # In produzione impostare SECRET_KEY da variabile d'ambiente.
-    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+    configure_environment(app)
 
     db.init_app(app)
     cors.init_app(app)

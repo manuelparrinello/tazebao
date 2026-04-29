@@ -47,7 +47,7 @@
             <tr>
                 <td>{{ movement.movement_date.strftime("%d/%m/%Y") }}</td>
                 <td>
-                    <a class="fw-bold a-no-color" href="{{ url_for('finance.finance_edit', movement_id=movement.id) }}">{{ movement.title }}</a>
+                    <a class="fw-bold a-no-color" href="{{ url_for('finance.finance_edit', movement_id=movement.id) if current_user and current_user.role != 'readonly' else '#' }}">{{ movement.title }}</a>
                     {% if movement.description %}
                     <div class="small text-secondary">{{ movement.description }}</div>
                     {% endif %}
@@ -62,6 +62,7 @@
                 </td>
                 <td class="text-end fw-bold">{{ euro(movement.amount|float) }}</td>
                 <td class="text-end">
+                    {% if current_user and current_user.role != "readonly" %}
                     <div class="erp-actions">
                     <a class="btn btn-sm btn-outline-primary" href="{{ url_for('finance.finance_edit', movement_id=movement.id) }}">
                         <i class="bi bi-pencil"></i>
@@ -73,6 +74,7 @@
                         </button>
                     </form>
                     </div>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -85,11 +87,13 @@
 {%- endmacro %}
 
 {% block content %}
+{% set can_mutate = current_user and current_user.role != "readonly" %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
     <div class="col-12 col-lg-5 px-0">
         <h3 class="fw-bolder">Finanze</h3>
         <p>Riepilogo budget, entrate, uscite e saldo interno.</p>
     </div>
+    {% if can_mutate %}
     <div class="col-12 col-lg-7 d-inline-flex justify-content-lg-end px-0">
         <a href="{{ url_for('finance.finance_new') }}">
             <button class="button-61">
@@ -97,6 +101,7 @@
             </button>
         </a>
     </div>
+    {% endif %}
 </div>
 <hr>
 

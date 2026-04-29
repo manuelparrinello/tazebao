@@ -399,6 +399,119 @@ body {
   font-size: 0.82rem;
 }
 
+.cliente-action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.erp-action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.cliente-action-primary,
+.cliente-action-secondary,
+.erp-action-primary,
+.erp-action-secondary {
+  min-height: 40px;
+}
+
+.cliente-action-primary {
+  min-width: 170px;
+}
+
+.cliente-action-secondary,
+.erp-action-secondary {
+  min-width: 132px;
+}
+
+.erp-action-primary {
+  min-width: 170px;
+}
+
+@media (max-width: 575.98px) {
+  .cliente-action-bar > .btn,
+  .cliente-action-bar > .dropdown,
+  .erp-action-bar > .btn,
+  .erp-action-bar > .dropdown {
+    flex: 1 1 calc(50% - 0.25rem);
+  }
+
+  .cliente-action-bar > .cliente-action-primary,
+  .erp-action-bar > .erp-action-primary {
+    flex-basis: 100%;
+  }
+
+  .cliente-action-bar .dropdown > .btn,
+  .erp-action-bar .dropdown > .btn {
+    width: 100%;
+  }
+}
+
+.preventivo-action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.preventivo-action-primary,
+.preventivo-action-secondary {
+  min-height: 40px;
+}
+
+.preventivo-action-primary {
+  min-width: 170px;
+}
+
+.preventivo-action-secondary {
+  min-width: 132px;
+}
+
+.preventivo-row-card {
+  border: 1px solid var(--sidebar-border);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.preventivo-lines-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.preventivo-summary-card {
+  position: sticky;
+  top: 1rem;
+}
+
+@media (max-width: 575.98px) {
+  .preventivo-action-bar > .btn,
+  .preventivo-action-bar > .dropdown {
+    flex: 1 1 calc(50% - 0.25rem);
+  }
+
+  .preventivo-action-bar > .preventivo-action-primary {
+    flex-basis: 100%;
+  }
+
+  .preventivo-action-bar .dropdown > .btn {
+    width: 100%;
+  }
+
+  .preventivo-summary-card {
+    position: static;
+  }
+
+  .preventivo-summary-card .display-6 {
+    font-size: 1.35rem;
+  }
+}
+
 .users-table {
   width: 100%;
   min-width: 0;

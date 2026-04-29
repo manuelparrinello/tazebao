@@ -15,17 +15,20 @@
 {%- endmacro %}
 
 {% block content %}
+{% set can_mutate = current_user and current_user.role != "readonly" %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
     <div class="col-12 col-lg-6 px-0">
         <h6 class="text-primary fw-bold" style="letter-spacing: 1.2px">ERP</h6>
         <h3 class="fw-bolder">Comunicazioni</h3>
         <p>Registro manuale delle email e delle comunicazioni collegate ai clienti.</p>
     </div>
+    {% if can_mutate %}
     <div class="col-12 col-lg-6 d-flex flex-wrap justify-content-lg-end gap-2 px-0">
         <a href="{{ url_for('emails.emails_new') }}" class="btn btn-primary">
             <i class="bi bi-plus"></i>&nbsp;Nuova comunicazione
         </a>
     </div>
+    {% endif %}
 </div>
 <hr>
 
@@ -61,7 +64,7 @@
                 <tr>
                     <td class="text-nowrap">{{ email_log.sent_at.strftime("%d/%m/%Y %H:%M") if email_log.sent_at else "-" }}</td>
                     <td>
-                        <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) }}" class="fw-bold text-decoration-none">{{ email_log.subject }}</a>
+                        <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) if can_mutate else '#' }}" class="fw-bold text-decoration-none">{{ email_log.subject }}</a>
                         <div class="small text-secondary">{{ email_log.email_address }}</div>
                     </td>
                     <td>{{ direction_badge(email_log.direction) }}</td>
@@ -82,6 +85,7 @@
                         {% endif %}
                     </td>
                     <td class="text-end">
+                        {% if can_mutate %}
                         <div class="erp-actions">
                             <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) }}" class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-pencil"></i>
@@ -93,6 +97,7 @@
                                 </button>
                             </form>
                         </div>
+                        {% endif %}
                     </td>
                 </tr>
                 {% else %}
@@ -106,7 +111,7 @@
     <div class="d-md-none mobile-list p-3">
         {% if email_logs %}
             {% for email_log in email_logs %}
-            <a class="mobile-list-item mobile-row-link" href="{{ url_for('emails.emails_edit', email_id=email_log.id) }}">
+            <a class="mobile-list-item mobile-row-link" href="{{ url_for('emails.emails_edit', email_id=email_log.id) if can_mutate else '#' }}">
                 <div class="d-flex align-items-start justify-content-between gap-3">
                     <div class="min-w-0">
                         <div class="d-flex align-items-center gap-2 mb-1">

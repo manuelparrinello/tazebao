@@ -69,7 +69,7 @@ def role_required(*roles):
                         jsonify({"success": False, "data": None, "error": "Forbidden"}),
                         403,
                     )
-                flash("Accesso riservato agli amministratori.", "warning")
+                flash("Accesso non autorizzato.", "warning")
                 return redirect(url_for("main.app_shell"))
             return view(*args, **kwargs)
 

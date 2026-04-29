@@ -11,6 +11,7 @@
 {%- endmacro %}
 
 {% block content %}
+{% set can_mutate = current_user and current_user.role != "readonly" %}
 <div class="row mx-auto w-100 align-items-start g-3">
     <div class="col-12 col-lg-7 px-0">
         <h6 class="text-primary fw-bold" style="letter-spacing: 1.2px">EMAIL</h6>
@@ -22,7 +23,9 @@
     </div>
     <div class="col-12 col-lg-5 d-inline-flex flex-wrap justify-content-lg-end gap-2 px-0">
         <a href="{{ url_for('mail.mail_index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i>&nbsp;Inbox</a>
+        {% if can_mutate %}
         <a href="{{ url_for('mail.mail_reply', message_id=message.id) }}" class="btn btn-primary"><i class="bi bi-reply"></i>&nbsp;Rispondi</a>
+        {% endif %}
     </div>
 </div>
 <hr>
@@ -76,6 +79,7 @@
         <section class="card border-0 shadow-sm">
             <div class="card-body p-4">
                 <h5 class="fw-bolder mb-3">Collegamenti ERP</h5>
+                {% if can_mutate %}
                 <form action="{{ url_for('mail.mail_link', message_id=message.id) }}" method="post">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
@@ -98,6 +102,9 @@
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Salva collegamenti</button>
                 </form>
+                {% else %}
+                <div class="text-secondary">Collegamenti disponibili in sola lettura.</div>
+                {% endif %}
             </div>
         </section>
     </div>

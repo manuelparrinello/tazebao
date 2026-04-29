@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 
-from ..auth import login_required
+from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import Cliente, Lavoro, Preventivo, RigaPreventivo
 
@@ -48,7 +48,7 @@ def recalculate_preventivo(preventivo, righe_data):
 
 
 @bp.route("/preventivi/nuovo", methods=["POST", "GET"])
-@login_required
+@role_required("admin", "operatore")
 def nuovo_preventivo():
     if request.method == "POST":
         data = request.get_json()
@@ -130,6 +130,7 @@ def preventivi():
 
 @bp.get("/presentivi/addrow")
 @bp.get("/preventivi/addrow")
+@login_required
 def render_row():
     id_riga = request.form.get("idRiga")
     qty = request.form.get("qty")
@@ -148,7 +149,7 @@ def visualizza_preventivo(id):
 
 
 @bp.route("/preventivi/<int:id>/edit", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "operatore")
 def preventivo_edit(id):
     preventivo = Preventivo.query.filter_by(id=id).first_or_404()
     clienti = Cliente.query.order_by(Cliente.name.asc()).all()

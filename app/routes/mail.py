@@ -1,6 +1,8 @@
+from math import ceil
+
 from flask import Blueprint, flash, g, redirect, render_template, request, url_for
 
-from ..auth import login_required
+from ..auth import login_required, role_required
 from ..extensions import db
 from ..mail_service import (
     MailConfigurationError,
@@ -36,6 +38,33 @@ def mail_choices():
         "clienti": Cliente.query.order_by(Cliente.name.asc()).all(),
         "lavori": Lavoro.query.order_by(Lavoro.descrizione.asc()).all(),
     }
+
+
+def normalize_page_number(value, default=1):
+    try:
+        page = int(value)
+    except (TypeError, ValueError):
+        return default
+    return max(page, 1)
+
+
+def normalize_per_page(value, default=25, maximum=25):
+    try:
+        per_page = int(value)
+    except (TypeError, ValueError):
+        return default
+    if per_page < 1:
+        return default
+    return min(per_page, maximum)
+
+
+def build_mail_query_args(**kwargs):
+    args = {}
+    for key, value in kwargs.items():
+        if value in (None, "", 0):
+            continue
+        args[key] = value
+    return args
 
 
 def apply_account_form(account):
@@ -77,12 +106,17 @@ def mail_index():
     query = EmailMessage.query
     account_id = request.args.get("account_id", type=int)
     cliente_id = request.args.get("cliente_id", type=int)
+    lavoro_id = request.args.get("lavoro_id", type=int)
     q = (request.args.get("q") or "").strip()
+    page = normalize_page_number(request.args.get("page"), default=1)
+    per_page = normalize_per_page(request.args.get("per_page"), default=25, maximum=25)
 
     if account_id:
         query = query.filter_by(account_id=account_id)
     if cliente_id:
         query = query.filter_by(cliente_id=cliente_id)
+    if lavoro_id:
+        query = query.filter_by(lavoro_id=lavoro_id)
     if q:
         pattern = f"%{q}%"
         query = query.filter(
@@ -93,16 +127,49 @@ def mail_index():
             )
         )
 
+    total_messages = query.order_by(None).count()
+    total_pages = ceil(total_messages / per_page) if total_messages else 0
+    if total_pages:
+        page = min(page, total_pages)
+    else:
+        page = 1
+
     messages = query.order_by(
         EmailMessage.received_at.desc().nullslast(),
         EmailMessage.sent_at.desc().nullslast(),
         EmailMessage.id.desc(),
-    ).limit(200).all()
+    ).offset((page - 1) * per_page).limit(per_page).all()
+
+    query_args = build_mail_query_args(
+        account_id=account_id,
+        cliente_id=cliente_id,
+        lavoro_id=lavoro_id,
+        q=q,
+        per_page=per_page,
+    )
+
+    prev_url = (
+        url_for("mail.mail_index", page=page - 1, **query_args)
+        if total_messages and page > 1
+        else None
+    )
+    next_url = (
+        url_for("mail.mail_index", page=page + 1, **query_args)
+        if total_pages and page < total_pages
+        else None
+    )
     return render_template(
         "mail.html",
         messages=messages,
+        total_messages=total_messages,
+        current_page=page,
+        total_pages=total_pages,
+        per_page=per_page,
+        prev_url=prev_url,
+        next_url=next_url,
         selected_account_id=account_id,
         selected_cliente_id=cliente_id,
+        selected_lavoro_id=lavoro_id,
         q=q,
         **mail_choices(),
     )
@@ -116,7 +183,7 @@ def mail_detail(message_id):
 
 
 @bp.route("/mail/new", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "operatore")
 def mail_new():
     error = None
     form_data = {}
@@ -152,7 +219,7 @@ def mail_new():
 
 
 @bp.route("/mail/<int:message_id>/reply", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "operatore")
 def mail_reply(message_id):
     original = EmailMessage.query.get_or_404(message_id)
     error = None
@@ -197,7 +264,7 @@ def mail_reply(message_id):
 
 
 @bp.post("/mail/<int:message_id>/link")
-@login_required
+@role_required("admin", "operatore")
 def mail_link(message_id):
     message = EmailMessage.query.get_or_404(message_id)
     apply_message_links(message)
@@ -206,14 +273,14 @@ def mail_link(message_id):
 
 
 @bp.get("/mail/accounts")
-@login_required
+@role_required("admin")
 def mail_accounts():
     accounts = EmailAccount.query.order_by(EmailAccount.label.asc()).all()
     return render_template("mail_accounts.html", accounts=accounts)
 
 
 @bp.route("/mail/accounts/new", methods=["GET", "POST"])
-@login_required
+@role_required("admin")
 def mail_account_new():
     account = EmailAccount(imap_port=993, imap_use_ssl=True, smtp_port=587, smtp_use_tls=True, is_active=True)
     error = None
@@ -245,7 +312,7 @@ def mail_account_new():
 
 
 @bp.route("/mail/accounts/<int:account_id>/edit", methods=["GET", "POST"])
-@login_required
+@role_required("admin")
 def mail_account_edit(account_id):
     account = EmailAccount.query.get_or_404(account_id)
     error = None
@@ -270,7 +337,7 @@ def mail_account_edit(account_id):
 
 
 @bp.post("/mail/accounts/<int:account_id>/sync")
-@login_required
+@role_required("admin")
 def mail_account_sync(account_id):
     account = EmailAccount.query.get_or_404(account_id)
     try:

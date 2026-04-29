@@ -2,7 +2,7 @@ from datetime import date
 
 from flask import Blueprint, g, redirect, render_template, request, url_for
 
-from ..auth import login_required
+from ..auth import login_required, role_required
 from ..extensions import db
 from ..finance_service import (
     MONTH_NAMES,
@@ -67,7 +67,7 @@ def finance_index():
 
 
 @bp.route("/finance/new", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "operatore")
 def finance_new():
     lavoro_id = request.args.get("lavoro_id", type=int)
     cliente_id = request.args.get("cliente_id", type=int)
@@ -108,7 +108,7 @@ def finance_new():
 
 
 @bp.route("/finance/<int:movement_id>/edit", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "operatore")
 def finance_edit(movement_id):
     movement = FinancialMovement.query.get_or_404(movement_id)
     error = None
@@ -136,7 +136,7 @@ def finance_edit(movement_id):
 
 
 @bp.post("/finance/<int:movement_id>/delete")
-@login_required
+@role_required("admin", "operatore")
 def finance_delete(movement_id):
     movement = FinancialMovement.query.get_or_404(movement_id)
     year = movement.year

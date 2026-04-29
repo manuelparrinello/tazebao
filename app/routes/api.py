@@ -2,7 +2,7 @@ from datetime import date, datetime, time, timedelta
 
 from flask import Blueprint, g, jsonify, request, url_for
 
-from ..auth import login_required
+from ..auth import login_required, role_required
 from ..extensions import db
 from ..finance_service import (
     apply_financial_payload,
@@ -246,6 +246,7 @@ def apply_task_payload(task, data, partial=False):
 
 
 @bp.get("/api/clienti/getall")
+@login_required
 def get_clienti():
     clienti = Cliente.query.all()
     return jsonify(
@@ -360,7 +361,7 @@ def get_finance_movement(movement_id):
 
 
 @bp.post("/api/finance")
-@login_required
+@role_required("admin", "operatore")
 def create_finance_movement():
     data = request.get_json(silent=True) or {}
     movement = FinancialMovement()
@@ -377,7 +378,7 @@ def create_finance_movement():
 
 
 @bp.patch("/api/finance/<int:movement_id>")
-@login_required
+@role_required("admin", "operatore")
 def update_finance_movement(movement_id):
     movement = db.session.get(FinancialMovement, movement_id)
     if movement is None:
@@ -395,7 +396,7 @@ def update_finance_movement(movement_id):
 
 
 @bp.delete("/api/finance/<int:movement_id>")
-@login_required
+@role_required("admin", "operatore")
 def delete_finance_movement(movement_id):
     movement = db.session.get(FinancialMovement, movement_id)
     if movement is None:
@@ -427,7 +428,7 @@ def get_email_log(email_id):
 
 
 @bp.post("/api/emails")
-@login_required
+@role_required("admin", "operatore")
 def create_email_log():
     data = request.get_json(silent=True) or {}
     email_log = EmailLog()
@@ -445,7 +446,7 @@ def create_email_log():
 
 
 @bp.patch("/api/emails/<int:email_id>")
-@login_required
+@role_required("admin", "operatore")
 def update_email_log(email_id):
     email_log = db.session.get(EmailLog, email_id)
     if email_log is None:
@@ -463,7 +464,7 @@ def update_email_log(email_id):
 
 
 @bp.delete("/api/emails/<int:email_id>")
-@login_required
+@role_required("admin", "operatore")
 def delete_email_log(email_id):
     email_log = db.session.get(EmailLog, email_id)
     if email_log is None:
@@ -502,7 +503,7 @@ def get_task(task_id):
 
 
 @bp.post("/api/tasks")
-@login_required
+@role_required("admin", "operatore")
 def create_task():
     data = request.get_json(silent=True) or {}
     task = Task()
@@ -519,7 +520,7 @@ def create_task():
 
 
 @bp.patch("/api/tasks/<int:task_id>")
-@login_required
+@role_required("admin", "operatore")
 def update_task(task_id):
     task = db.session.get(Task, task_id)
     if task is None:
@@ -537,7 +538,7 @@ def update_task(task_id):
 
 
 @bp.delete("/api/tasks/<int:task_id>")
-@login_required
+@role_required("admin", "operatore")
 def delete_task(task_id):
     task = db.session.get(Task, task_id)
     if task is None:
@@ -570,7 +571,7 @@ def get_calendar_event(event_id):
 
 
 @bp.post("/api/calendar/events")
-@login_required
+@role_required("admin", "operatore")
 def create_calendar_event():
     data = request.get_json(silent=True) or {}
     event = CalendarEvent()
@@ -587,7 +588,7 @@ def create_calendar_event():
 
 
 @bp.patch("/api/calendar/events/<int:event_id>")
-@login_required
+@role_required("admin", "operatore")
 def update_calendar_event(event_id):
     event = db.session.get(CalendarEvent, event_id)
     if event is None:
@@ -605,7 +606,7 @@ def update_calendar_event(event_id):
 
 
 @bp.delete("/api/calendar/events/<int:event_id>")
-@login_required
+@role_required("admin", "operatore")
 def delete_calendar_event(event_id):
     event = db.session.get(CalendarEvent, event_id)
     if event is None:
@@ -617,6 +618,7 @@ def delete_calendar_event(event_id):
 
 
 @bp.get("/api/lavori/getall")
+@login_required
 def get_lavori():
     lavori = Lavoro.query.all()
     return jsonify(
@@ -643,6 +645,7 @@ def get_lavori():
 
 
 @bp.get("/api/lavori/get/<int:id>")
+@login_required
 def get_lavoro_byID(id):
     lavoro = Lavoro.query.get_or_404(id)
     return jsonify(
@@ -666,6 +669,7 @@ def get_lavoro_byID(id):
 
 
 @bp.get("/api/clienti/get/<int:cliente_id>")
+@login_required
 def get_cliente_byID(cliente_id):
     c = Cliente.query.get_or_404(cliente_id)
     lavori = Lavoro.query.filter_by(cliente_id=cliente_id)
@@ -707,6 +711,7 @@ def get_cliente_byID(cliente_id):
 
 
 @bp.get("/api/clienti/getid/<string:nome>")
+@login_required
 def get_ID_by_name(nome):
     cliente = Cliente.query.filter_by(name=nome).first()
     id = cliente.id
@@ -715,6 +720,7 @@ def get_ID_by_name(nome):
 
 
 @bp.get("/api/preventivi/getall")
+@login_required
 def get_preventivi():
     preventivi = Preventivo.query.all()
     return jsonify(
@@ -746,6 +752,7 @@ def get_preventivi():
 
 
 @bp.get("/api/preventivi/get/<int:id>")
+@login_required
 def get_preventivo_byID(id):
     preventivo = Preventivo.query.filter_by(id=id).first_or_404()
     return jsonify(

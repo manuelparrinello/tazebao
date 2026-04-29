@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask import Blueprint, redirect, render_template, request, url_for
 
-from ..auth import login_required
+from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import (
     TASK_CATEGORIES,
@@ -76,7 +76,7 @@ def tasks():
 
 
 @bp.route("/tasks/new", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "operatore")
 def task_new():
     lavoro_id = request.args.get("lavoro_id", type=int)
     cliente_id = request.args.get("cliente_id", type=int)
@@ -110,7 +110,7 @@ def task_new():
 
 
 @bp.route("/tasks/<int:task_id>/edit", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "operatore")
 def task_edit(task_id):
     task = Task.query.get_or_404(task_id)
     error = None
@@ -136,7 +136,7 @@ def task_edit(task_id):
 
 
 @bp.post("/tasks/<int:task_id>/delete")
-@login_required
+@role_required("admin", "operatore")
 def task_delete(task_id):
     task = Task.query.get_or_404(task_id)
     task.status = "annullata"

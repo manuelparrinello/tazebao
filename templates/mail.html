@@ -3,6 +3,8 @@
 {% block title %}Client email{% endblock %}
 
 {% block content %}
+{% set can_mutate = current_user and current_user.role != "readonly" %}
+{% set can_admin = current_user and current_user.role == "admin" %}
 <div class="row mx-auto w-100 align-items-center g-3">
     <div class="col-12 col-lg-6 px-0">
         <h6 class="text-primary fw-bold" style="letter-spacing: 1.2px">EMAIL ERP</h6>
@@ -10,8 +12,12 @@
         <p>Inbox e invio email tramite account IMAP/SMTP configurati.</p>
     </div>
     <div class="col-12 col-lg-6 d-inline-flex flex-wrap justify-content-lg-end gap-2 px-0">
+        {% if can_mutate %}
         <a href="{{ url_for('mail.mail_new') }}" class="btn btn-primary"><i class="bi bi-pencil-square"></i>&nbsp;Nuova email</a>
+        {% endif %}
+        {% if can_admin %}
         <a href="{{ url_for('mail.mail_accounts') }}" class="btn btn-outline-secondary"><i class="bi bi-gear"></i>&nbsp;Account</a>
+        {% endif %}
         <a href="{{ url_for('emails.emails_index') }}" class="btn btn-outline-secondary"><i class="bi bi-journal-text"></i>&nbsp;Registro email</a>
     </div>
 </div>

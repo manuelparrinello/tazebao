@@ -5,11 +5,13 @@
 {% macro empty_state(text, action_url=None, action_label=None) -%}
 <div class="border rounded-3 bg-light px-3 py-4 text-secondary">
     <div>{{ text }}</div>
-    {% if action_url and action_label %}
+    {% if current_user and current_user.role != "readonly" and action_url and action_label %}
     <a class="btn btn-sm btn-outline-primary mt-3" href="{{ action_url }}">{{ action_label }}</a>
     {% endif %}
 </div>
 {%- endmacro %}
+
+{% set can_mutate = current_user and current_user.role != "readonly" %}
 
 {% macro labelize(value) -%}
 {{ value.replace("_", " ").title() if value else "-" }}
@@ -41,24 +43,57 @@
 {% block content %}
 <div class="row mx-auto w-100 align-items-start g-3">
     <div class="col-12 col-xl-5 px-0">
-        <h6 class="text-primary fw-bold mb-2" style="letter-spacing: 1.2px">SCHEDA CLIENTE ERP</h6>
-        <h2 class="mb-1">{{ cliente.name }}</h2>
-        <p class="text-secondary mb-0">{{ cliente.ragsoc or "Ragione sociale non indicata" }}</p>
+        <h6 class="text-primary fw-bold mb-2 text-uppercase" style="letter-spacing: 1.2px">Scheda cliente ERP</h6>
+        <h2 class="mb-1 text-break">{{ cliente.name }}</h2>
+        <p class="text-secondary mb-0 text-break">{{ cliente.ragsoc or "Ragione sociale non indicata" }}</p>
     </div>
-    <div class="col-12 col-xl-7 d-inline-flex flex-wrap justify-content-xl-end gap-2 px-0">
-        <a href="{{ quick_actions.nuovo_lavoro }}" class="btn btn-outline-primary"><i class="bi bi-briefcase"></i>&nbsp;Nuovo lavoro</a>
-        <a href="{{ quick_actions.nuovo_task }}" class="btn btn-outline-primary"><i class="bi bi-list-check"></i>&nbsp;Nuova task</a>
-        <a href="{{ quick_actions.nuovo_preventivo }}" class="btn btn-outline-primary"><i class="bi bi-receipt"></i>&nbsp;Nuovo preventivo</a>
-        <a href="{{ quick_actions.nuovo_evento }}" class="btn btn-outline-primary"><i class="bi bi-calendar-plus"></i>&nbsp;Nuovo evento</a>
-        <a href="{{ quick_actions.nuovo_movimento }}" class="btn btn-outline-primary"><i class="bi bi-cash-coin"></i>&nbsp;Nuovo movimento</a>
-        <a href="{{ url_for('cliente_edit', cliente_id=cliente.id) }}" class="btn btn-warning"><i class="bi bi-pencil"></i>&nbsp;Modifica</a>
+    <div class="col-12 col-xl-7 px-0">
+        {% if can_mutate %}
+        <div class="cliente-action-bar d-flex flex-wrap justify-content-xl-end align-items-stretch gap-2">
+            <a href="{{ quick_actions.nuovo_lavoro if can_mutate else '#' }}" class="btn btn-primary cliente-action-primary">
+                <i class="bi bi-briefcase"></i>&nbsp;Nuovo lavoro
+            </a>
+
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle cliente-action-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-plus-lg"></i>&nbsp;Aggiungi
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li><a class="dropdown-item" href="{{ quick_actions.nuovo_task if can_mutate else '#' }}"><i class="bi bi-list-check me-2"></i>Nuova task</a></li>
+                    <li><a class="dropdown-item" href="{{ quick_actions.nuovo_preventivo if can_mutate else '#' }}"><i class="bi bi-receipt me-2"></i>Nuovo preventivo</a></li>
+                    <li><a class="dropdown-item" href="{{ quick_actions.nuovo_evento if can_mutate else '#' }}"><i class="bi bi-calendar-plus me-2"></i>Nuovo evento</a></li>
+                    <li><a class="dropdown-item" href="{{ quick_actions.nuovo_movimento if can_mutate else '#' }}"><i class="bi bi-cash-coin me-2"></i>Nuovo movimento</a></li>
+                    {% if quick_actions.nuova_comunicazione %}
+                    <li><a class="dropdown-item" href="{{ quick_actions.nuova_comunicazione if can_mutate else '#' }}"><i class="bi bi-chat-left-text me-2"></i>Nuova comunicazione</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            
+            <a href="{{ url_for('cliente_edit', cliente_id=cliente.id) if can_mutate else '#' }}" class="btn btn-outline-secondary cliente-action-secondary">
+                <i class="bi bi-pencil"></i>&nbsp;Modifica
+            </a>
+
+            <div class="dropdown">
+                <button class="btn btn-outline-danger dropdown-toggle cliente-action-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li>
+                        <button class="dropdown-item text-danger" type="button" onclick="clickForDeleteCliente(event, {{ cliente.id }})">
+                            <i class="bi bi-trash3 me-2"></i>Elimina cliente
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 <hr>
 
 <section class="mt-4">
     <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-md-4">
             <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
                 <div>
                     <h5 class="fw-bolder mb-1">Dati anagrafici</h5>
@@ -98,7 +133,7 @@
                 </div>
                 <div class="col-12 col-md-6">
                     <div class="text-secondary small">Indirizzo</div>
-                    <div>
+                    <div class="text-break">
                         {{ cliente.indirizzo or "-" }}
                         {% if cliente.cap or cliente.citta or cliente.provincia %}
                         <br>{{ cliente.cap or "" }} {{ cliente.citta or "" }} {{ cliente.provincia or "" }}
@@ -115,7 +150,7 @@
                 </div>
                 <div class="col-12">
                     <div class="text-secondary small">Note</div>
-                    <div class="descrizione-preventivo">{{ cliente.note or "-" }}</div>
+                    <div class="descrizione-preventivo text-break">{{ cliente.note or "-" }}</div>
                 </div>
             </div>
         </div>
@@ -125,16 +160,16 @@
 <div class="row g-4 mt-1">
     <div class="col-12 col-xl-6">
         <section class="card h-100 border-0 shadow-sm">
-            <div class="card-body p-4">
+            <div class="card-body p-3 p-md-4">
                 {{ section_title("Lavori recenti", 10) }}
                 {% if lavori %}
                 <div class="list-group list-group-flush">
                     {% for lavoro in lavori %}
-                    <a href="{{ url_for('lavoro_page', lavoro_id=lavoro.id) }}" class="list-group-item list-group-item-action px-0">
+                    <a href="{{ url_for('lavoro_page', lavoro_id=lavoro.id) }}" class="list-group-item list-group-item-action px-0 py-3">
                         <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div>
+                            <div class="min-w-0">
                                 <div class="fw-bold">{{ lavoro.descrizione }}</div>
-                                <div class="small text-secondary">
+                                <div class="small text-secondary text-break">
                                     Stato {{ lavoro.stato or "-" }} &middot; Priorita {{ lavoro.priorita or "-" }}
                                 </div>
                             </div>
@@ -152,16 +187,16 @@
 
     <div class="col-12 col-xl-6">
         <section class="card h-100 border-0 shadow-sm">
-            <div class="card-body p-4">
+            <div class="card-body p-3 p-md-4">
                 {{ section_title("Task ERP recenti", 10) }}
                 {% if tasks %}
                 <div class="list-group list-group-flush">
                     {% for task in tasks %}
-                    <a href="{{ url_for('tasks.task_edit', task_id=task.id) }}" class="list-group-item list-group-item-action px-0">
+                    <a href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}" class="list-group-item list-group-item-action px-0 py-3">
                         <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div>
+                            <div class="min-w-0">
                                 <div class="fw-bold">{{ task.name }}</div>
-                                <div class="small text-secondary">
+                                <div class="small text-secondary text-break">
                                     {{ labelize(task.status) }} &middot; {{ labelize(task.priority) }}{% if task.due_date %} &middot; Scadenza {{ task.due_date.strftime("%d/%m/%Y") }}{% endif %}
                                 </div>
                             </div>
@@ -179,16 +214,16 @@
 
     <div class="col-12 col-xl-6">
         <section class="card h-100 border-0 shadow-sm">
-            <div class="card-body p-4">
+            <div class="card-body p-3 p-md-4">
                 {{ section_title("Preventivi recenti", 10) }}
                 {% if preventivi %}
                 <div class="list-group list-group-flush">
                     {% for preventivo in preventivi %}
-                    <a href="{{ url_for('visualizza_preventivo', id=preventivo.id) }}" class="list-group-item list-group-item-action px-0">
+                    <a href="{{ url_for('visualizza_preventivo', id=preventivo.id) }}" class="list-group-item list-group-item-action px-0 py-3">
                         <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div>
+                            <div class="min-w-0">
                                 <div class="fw-bold">{{ preventivo.descrizione }}</div>
-                                <div class="small text-secondary">
+                                <div class="small text-secondary text-break">
                                     {{ labelize(preventivo.stato) }} &middot; {{ preventivo.data_creazione.strftime("%d/%m/%Y") }}
                                 </div>
                             </div>
@@ -206,16 +241,16 @@
 
     <div class="col-12 col-xl-6">
         <section class="card h-100 border-0 shadow-sm">
-            <div class="card-body p-4">
+            <div class="card-body p-3 p-md-4">
                 {{ section_title("Eventi calendario recenti", 10) }}
                 {% if eventi %}
                 <div class="list-group list-group-flush">
                     {% for evento in eventi %}
-                    <a href="{{ url_for('calendar.calendar_edit', event_id=evento.id) }}" class="list-group-item list-group-item-action px-0">
+                    <a href="{{ url_for('calendar.calendar_edit', event_id=evento.id) if can_mutate else '#' }}" class="list-group-item list-group-item-action px-0 py-3">
                         <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div>
+                            <div class="min-w-0">
                                 <div class="fw-bold">{{ evento.title }}</div>
-                                <div class="small text-secondary">
+                                <div class="small text-secondary text-break">
                                     {{ labelize(evento.event_type) }} &middot; {{ evento.start_datetime.strftime("%d/%m/%Y %H:%M") }}
                                 </div>
                             </div>
@@ -233,16 +268,16 @@
 
     <div class="col-12">
         <section class="card border-0 shadow-sm">
-            <div class="card-body p-4">
+            <div class="card-body p-3 p-md-4">
                 {{ section_title("Movimenti economici recenti", 10) }}
                 {% if movimenti %}
                 <div class="list-group list-group-flush">
                     {% for movimento in movimenti %}
-                    <a href="{{ url_for('finance.finance_edit', movement_id=movimento.id) }}" class="list-group-item list-group-item-action px-0">
+                    <a href="{{ url_for('finance.finance_edit', movement_id=movimento.id) if can_mutate else '#' }}" class="list-group-item list-group-item-action px-0 py-3">
                         <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div>
+                            <div class="min-w-0">
                                 <div class="fw-bold">{{ movimento.title }}</div>
-                                <div class="small text-secondary">
+                                <div class="small text-secondary text-break">
                                     {{ labelize(movimento.category) }} &middot; {{ movimento.movement_date.strftime("%d/%m/%Y") }}
                                 </div>
                             </div>
@@ -263,7 +298,7 @@
 
     <div class="col-12">
         <section class="card border-0 shadow-sm">
-            <div class="card-body p-4">
+            <div class="card-body p-3 p-md-4">
                 <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
                     <div>
                         <h5 class="fw-bolder mb-1">Email reali recenti</h5>
@@ -274,11 +309,11 @@
                 {% if mail_messages %}
                 <div class="list-group list-group-flush">
                     {% for mail_message in mail_messages %}
-                    <a href="{{ url_for('mail.mail_detail', message_id=mail_message.id) }}" class="list-group-item list-group-item-action px-0">
+                    <a href="{{ url_for('mail.mail_detail', message_id=mail_message.id) }}" class="list-group-item list-group-item-action px-0 py-3">
                         <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div>
+                            <div class="min-w-0">
                                 <div class="fw-bold">{{ mail_message.subject or "(senza oggetto)" }}</div>
-                                <div class="small text-secondary">
+                                <div class="small text-secondary text-break">
                                     {{ "Ricevuta" if mail_message.direction == "inbound" else "Inviata" }}
                                     &middot; {{ mail_message.from_address if mail_message.direction == "inbound" else mail_message.to_addresses }}
                                     &middot; {{ (mail_message.received_at or mail_message.sent_at or mail_message.created_at).strftime("%d/%m/%Y %H:%M") }}
@@ -300,7 +335,7 @@
 
     <div class="col-12">
         <section class="card border-0 shadow-sm">
-            <div class="card-body p-4">
+            <div class="card-body p-3 p-md-4">
                 <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
                     <div>
                         <h5 class="fw-bolder mb-1">Registro email manuale recente</h5>
@@ -310,11 +345,11 @@
                 {% if email_logs %}
                 <div class="list-group list-group-flush">
                     {% for email_log in email_logs %}
-                    <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) }}" class="list-group-item list-group-item-action px-0">
+                    <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) if can_mutate else '#' }}" class="list-group-item list-group-item-action px-0 py-3">
                         <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div>
+                            <div class="min-w-0">
                                 <div class="fw-bold">{{ email_log.subject }}</div>
-                                <div class="small text-secondary">
+                                <div class="small text-secondary text-break">
                                     {{ "Ricevuta" if email_log.direction == "inbound" else "Inviata" }}
                                     &middot; {{ email_log.email_address }}
                                     &middot; {{ email_log.sent_at.strftime("%d/%m/%Y %H:%M") if email_log.sent_at else "-" }}

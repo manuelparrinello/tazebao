@@ -15,11 +15,13 @@
 {%- endmacro %}
 
 {% block content %}
+{% set can_mutate = current_user and current_user.role != "readonly" %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
     <div class="col-12 col-lg-5 px-0">
         <h3 class="fw-bolder">Calendario</h3>
         <p>Agenda mensile ERP con eventi e scadenze task.</p>
     </div>
+    {% if can_mutate %}
     <div class="col-12 col-lg-7 d-inline-flex justify-content-lg-end px-0">
         <a href="{{ url_for('calendar.calendar_new') }}">
             <button class="button-61">
@@ -27,6 +29,7 @@
             </button>
         </a>
     </div>
+    {% endif %}
 </div>
 <hr>
 
@@ -70,7 +73,7 @@
 
                         <div class="d-flex flex-column gap-1">
                             {% for event in day.events %}
-                            <a class="d-block rounded-2 border p-2 bg-white text-dark small" href="{{ event.edit_url }}">
+                            <a class="d-block rounded-2 border p-2 bg-white text-dark small" href="{{ event.edit_url if can_mutate else '#' }}">
                                 <div class="d-flex align-items-center justify-content-between gap-2">
                                     <span class="fw-bold text-truncate">{{ event.title }}</span>
                                     {{ event_badge(event) }}
@@ -121,7 +124,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a class="fw-bold a-no-color" href="{{ event.edit_url }}">{{ event.title }}</a>
+                                <a class="fw-bold a-no-color" href="{{ event.edit_url if can_mutate else '#' }}">{{ event.title }}</a>
                                 {% if event.description %}
                                 <div class="small text-secondary">{{ event.description }}</div>
                                 {% endif %}
@@ -154,7 +157,7 @@
             {% if events %}
             <div class="list-group list-group-flush">
                 {% for event in events %}
-                <a class="list-group-item list-group-item-action px-0" href="{{ event.edit_url }}">
+                <a class="list-group-item list-group-item-action px-0" href="{{ event.edit_url if can_mutate else '#' }}">
                     <div class="d-flex align-items-start justify-content-between gap-3">
                         <div class="min-w-0">
                             <div class="d-flex align-items-center gap-2 mb-1">

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask import Blueprint, g, redirect, render_template, request, url_for
 
-from ..auth import login_required
+from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import EMAIL_DIRECTIONS, Cliente, EmailLog, Lavoro, Task
 
@@ -73,7 +73,7 @@ def emails_index():
 
 
 @bp.route("/emails/new", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "operatore")
 def emails_new():
     email_log = EmailLog(
         direction="outbound",
@@ -105,7 +105,7 @@ def emails_new():
 
 
 @bp.route("/emails/<int:email_id>/edit", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "operatore")
 def emails_edit(email_id):
     email_log = EmailLog.query.get_or_404(email_id)
     error = None
@@ -131,7 +131,7 @@ def emails_edit(email_id):
 
 
 @bp.post("/emails/<int:email_id>/delete")
-@login_required
+@role_required("admin", "operatore")
 def emails_delete(email_id):
     email_log = EmailLog.query.get_or_404(email_id)
     db.session.delete(email_log)

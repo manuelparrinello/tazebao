@@ -1,15 +1,18 @@
 {% extends "base.html" %} {% block title %}Tutti i clienti{% endblock %} {% block content %}
+{% set can_mutate = current_user and current_user.role != "readonly" %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
     <div class="col-12 col-lg-4 px-0">
         <h3 class="fw-bolder">Tutti i clienti</h3>
         <p>Elenco di tutti i clienti presenti nel sistema.</p>
     </div>
+    {% if can_mutate %}
     <div class="col-12 col-lg-8 d-inline-flex justify-content-lg-end px-0">
         <a href="{{ url_for('nuovo_cliente') }}"><button class="button-61">
                 <span><i class="bi bi-person-plus-fill"></i></span>&nbsp;Nuovo
                 cliente
             </button></a>
     </div>
+    {% endif %}
 </div>
 <hr>
 

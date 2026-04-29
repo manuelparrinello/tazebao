@@ -35,10 +35,15 @@ const TabellaLavori = {
             <td class="text-center mobile-hide">[[ lavoro.data_pagamento || '-' ]]</td>
             <td class="text-center mobile-hide" id="note_td" v-html="renderNoteIcon(lavoro.note)"></td>
             <td class="text-center">
-              <select :class="statusColor(lavoro.stato)" @change="update_status($event, lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
-                <option :value="lavoro.stato" selected>[[ lavoro.stato ]]</option>
-                <option v-for="stato in filtro_stati(lavoro.stato)" :value="stato">[[ stato ]]</option>
-              </select>
+              <template v-if="canMutate()">
+                <select :class="statusColor(lavoro.stato)" @change="update_status($event, lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
+                  <option :value="lavoro.stato" selected>[[ lavoro.stato ]]</option>
+                  <option v-for="stato in filtro_stati(lavoro.stato)" :value="stato">[[ stato ]]</option>
+                </select>
+              </template>
+              <template v-else>
+                <span class="badge rounded-pill bg-primary">[[ lavoro.stato ]]</span>
+              </template>
             </td>
           </tr>
         </template>
@@ -67,6 +72,9 @@ const TabellaLavori = {
     </div>
   `,
   methods: {
+    canMutate() {
+      return window.erpCanMutate !== false;
+    },
     prioPill(prio) {
       if (prio === "Bassa") return `<i class="bi bi-emoji-smile"></i>`;
       if (prio === "Media") return `<i class="bi bi-emoji-neutral"></i>`;

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, render_template, request, url_for
 
-from ..auth import login_required
+from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Preventivo, Task
 
@@ -9,6 +9,7 @@ bp = Blueprint("clienti", __name__)
 
 
 @bp.route("/clienti/new", methods=["GET", "POST"])
+@role_required("admin", "operatore")
 def nuovo_cliente():
     if request.method == "POST":
         nome = request.form.get("nome").title()
@@ -64,6 +65,7 @@ def nuovo_cliente():
 
 
 @bp.route("/clienti")
+@login_required
 def clienti():
     clienti_list = Cliente.query.all()
     return render_template("clienti.html", clienti=clienti_list)
@@ -144,6 +146,7 @@ def cliente_page(cliente_id):
 
 
 @bp.delete("/clienti/<int:cliente_id>")
+@role_required("admin", "operatore")
 def cliente_delete(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     db.session.delete(cliente)
@@ -152,6 +155,7 @@ def cliente_delete(cliente_id):
 
 
 @bp.route("/clienti/edit/<int:cliente_id>", methods=["GET", "PUT"])
+@role_required("admin", "operatore")
 def cliente_edit(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
     if request.method == "GET":

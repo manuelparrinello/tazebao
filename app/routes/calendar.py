@@ -3,7 +3,7 @@ from datetime import date, datetime, time, timedelta
 
 from flask import Blueprint, redirect, render_template, request, url_for
 
-from ..auth import login_required
+from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import (
     CALENDAR_EVENT_TYPES,
@@ -209,7 +209,7 @@ def calendar_index():
 
 
 @bp.route("/calendar/new", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "operatore")
 def calendar_new():
     lavoro_id = request.args.get("lavoro_id", type=int)
     cliente_id = request.args.get("cliente_id", type=int)
@@ -243,7 +243,7 @@ def calendar_new():
 
 
 @bp.route("/calendar/<int:event_id>/edit", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "operatore")
 def calendar_edit(event_id):
     event = CalendarEvent.query.get_or_404(event_id)
     error = None
@@ -269,7 +269,7 @@ def calendar_edit(event_id):
 
 
 @bp.post("/calendar/<int:event_id>/delete")
-@login_required
+@role_required("admin", "operatore")
 def calendar_delete(event_id):
     event = CalendarEvent.query.get_or_404(event_id)
     db.session.delete(event)

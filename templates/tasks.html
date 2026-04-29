@@ -7,11 +7,13 @@
 {%- endmacro %}
 
 {% block content %}
+{% set can_mutate = current_user and current_user.role != "readonly" %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
     <div class="col-12 col-lg-5 px-0">
         <h3 class="fw-bolder">Task</h3>
         <p>Elenco delle task ERP operative.</p>
     </div>
+    {% if can_mutate %}
     <div class="col-12 col-lg-7 d-inline-flex justify-content-lg-end px-0">
         <a href="{{ url_for('tasks.task_new') }}">
             <button class="button-61">
@@ -19,6 +21,7 @@
             </button>
         </a>
     </div>
+    {% endif %}
 </div>
 <hr>
 
@@ -45,7 +48,7 @@
                         {% for task in tasks %}
                         <tr>
                             <td>
-                                <a class="fw-bold a-no-color" href="{{ url_for('tasks.task_edit', task_id=task.id) }}">{{ task.name }}</a>
+                                <a class="fw-bold a-no-color" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}">{{ task.name }}</a>
                             </td>
                             <td class="mobile-priority-low"><span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span></td>
                             <td><span class="badge rounded-pill bg-primary">{{ labelize(task.status) }}</span></td>
@@ -55,6 +58,7 @@
                             <td class="mobile-hide">{{ task.lavoro.descrizione if task.lavoro else "-" }}</td>
                             <td class="mobile-hide">{{ task.assignee.name or task.assignee.email if task.assignee else "-" }}</td>
                             <td class="text-end">
+                                {% if can_mutate %}
                                 <div class="erp-actions">
                                     <a class="btn btn-sm btn-outline-primary" href="{{ url_for('tasks.task_edit', task_id=task.id) }}">
                                         <i class="bi bi-pencil"></i>
@@ -68,6 +72,7 @@
                                     </form>
                                     {% endif %}
                                 </div>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -76,7 +81,7 @@
             </div>
             <div class="d-md-none mobile-list">
                 {% for task in tasks %}
-                <a class="mobile-list-item mobile-row-link" href="{{ url_for('tasks.task_edit', task_id=task.id) }}">
+                <a class="mobile-list-item mobile-row-link" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}">
                     <div class="d-flex align-items-start justify-content-between gap-3">
                         <div class="min-w-0">
                             <div class="d-flex align-items-center gap-2 mb-1">

@@ -42,6 +42,16 @@ def would_remove_last_admin(user, new_role, new_is_active):
     return active_admin_count() <= 1
 
 
+def can_soft_delete_user(user):
+    if user.id == g.current_user.id:
+        flash("Non puoi eliminare il tuo account.", "danger")
+        return False
+    if would_remove_last_admin(user, user.role, False):
+        flash("Non puoi eliminare l'ultimo admin attivo.", "danger")
+        return False
+    return True
+
+
 def user_form_values(user=None, source=None):
     source = source or {}
     return {
@@ -171,6 +181,23 @@ def users_deactivate(user_id):
     user.is_active = False
     db.session.commit()
     flash("Utente disattivato.", "success")
+    return redirect(url_for("users.users_index"))
+
+
+@bp.post("/users/<int:user_id>/delete")
+@role_required("admin")
+def users_delete(user_id):
+    user = db.session.get(User, user_id)
+    if user is None:
+        flash("Utente non trovato.", "danger")
+        return redirect(url_for("users.users_index"))
+
+    if not can_soft_delete_user(user):
+        return redirect(url_for("users.users_index"))
+
+    user.is_active = False
+    db.session.commit()
+    flash("Utente eliminato dalla lista attiva. L'account è stato disattivato.", "success")
     return redirect(url_for("users.users_index"))
 
 

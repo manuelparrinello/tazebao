@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import Blueprint, jsonify, render_template, request, url_for
 
+from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import CalendarEvent, Cliente, FinancialMovement, Lavoro, Preventivo, Task
 
@@ -18,6 +19,7 @@ def parse_optional_float(value):
 
 
 @bp.route("/lavori/new", methods=["GET", "POST"])
+@role_required("admin", "operatore")
 def nuovo_lavoro():
     if request.method == "POST":
         descrizione = request.form.get("descrizione")
@@ -98,12 +100,14 @@ def nuovo_lavoro():
 
 
 @bp.route("/lavori")
+@login_required
 def lavori():
     lavori_list = Lavoro.query.all()
     return render_template("lavori.html", lavori=lavori_list)
 
 
 @bp.get("/lavori/<int:lavoro_id>")
+@login_required
 def lavoro_page(lavoro_id):
     lavoro = Lavoro.query.get_or_404(lavoro_id)
     tasks = (
@@ -164,6 +168,7 @@ def lavoro_page(lavoro_id):
 
 
 @bp.delete("/lavori/<int:lavoro_id>")
+@role_required("admin", "operatore")
 def lavoro_delete(lavoro_id):
     lavoro = Lavoro.query.get_or_404(lavoro_id)
     db.session.delete(lavoro)
@@ -172,6 +177,7 @@ def lavoro_delete(lavoro_id):
 
 
 @bp.patch("/lavori/<int:lavoro_id>")
+@role_required("admin", "operatore")
 def status_lavoro_update(lavoro_id):
     lavoro = Lavoro.query.filter_by(id=lavoro_id).first()
     data = request.get_json()

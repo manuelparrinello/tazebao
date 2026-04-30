@@ -45,36 +45,36 @@
         </div>
 
         <div class="row">
-            <div class="col-md mt-4">
+            <div class="col-12 mt-4">
                 <h5 class="fw-bold">Aggiungi righe</h5>
-                <div class="card rounded-3 g-0 border border-light-subtle">
+                <div class="card rounded-3 g-0 border border-light-subtle w-100">
                     <div class="card-body p-4">
-                        <div :id="idRiga" class="row align-items-md-start g-2">
-                            <div class="col-auto">
+                        <div :id="idRiga" class="row align-items-md-start g-3 w-100">
+                            <div class="col-12 col-sm-auto">
                                 <div class="form-group">
-                                    <input min="1" placeholder="Qta" style="max-width: 80px"
-                                        class="align-baseline form-control" type="number" name="qty" :value="qty"
+                                    <input min="1" placeholder="Qta"
+                                        class="align-baseline form-control quote-qty-input text-center" type="number" name="qty" :value="qty"
                                         v-model="qty">
                                 </div>
                             </div>
 
-                            <div class="col">
+                            <div class="col-12 col-lg">
                                 <div class="form-group">
-                                    <textarea placeholder="Inserisci descrizione lavoro" rows="1" class="form-control"
+                                    <textarea placeholder="Inserisci descrizione lavoro" rows="1" class="form-control quote-description-input"
                                         type="text" name="descrizione" v-model="descrizione"
                                         @input="autoResize($event)"></textarea>
                                 </div>
                             </div>
 
-                            <div class="col-2">
+                            <div class="col-12 col-sm-4 col-lg-3">
                                 <div class="input-group">
-                                    <input placeholder="Prezzo imponibile" class="align-baseline form-control" type="number"
+                                    <input placeholder="Prezzo imponibile" class="align-baseline form-control quote-price-input" type="number"
                                         name="prezzo" v-model="prezzo">
                                     <span class="input-group-text">&euro;</span>
                                 </div>
                             </div>
 
-                            <div class="col-auto align-self-xxl-center">
+                            <div class="col-12 col-sm-auto align-self-xxl-center">
                                 <button class="button-61-p0" @click="addRigaPreventivo">
                                     <i class="bi bi-plus-lg"></i>
                                 </button>
@@ -89,11 +89,11 @@
                         <div class="card-body p-4">
                             <div class="col-auto col-sm align-content-center" v-if="righe.length > 0" v-cloak>
                                 <div>
-                                    <table class="table">
+                                    <table class="table preventivo-lines-table">
                                         <thead>
                                             <tr>
                                                 <th style="width: auto; width: 50px;"></th>
-                                                <th style="width: auto; width: 50px;">Qta</th>
+                                                <th class="col-qta">Qta</th>
                                                 <th style="width: auto">Descrizione</th>
                                                 <th class="text-end" style="width: 160px">Prezzo imponibile</th>
                                                 <th class="text-end" style="width: 160px">Totale imponibile</th>
@@ -101,14 +101,14 @@
                                         </thead>
                                         <tbody>
                                             <tr v-if="righe.length > 0" v-for="riga in righe" :id="riga.idRiga">
-                                                <td class="text-center">
+                                                <td class="text-center col-qta-cell">
                                                     <strong @click="deleteRigaPreventivo(riga.idRiga)"
                                                         class="text-secondary icon-trash-righe pointer"
                                                         title="Elimina riga">
                                                         <i class="bi bi-trash"></i>
                                                     </strong>
                                                 </td>
-                                                <td class="text-start"><strong class="text-primary">[[ riga.qty ]]x</strong></td>
+                                                <td class="text-start col-qta-cell"><strong class="text-primary">[[ riga.qty ]]x</strong></td>
                                                 <td class="descrizione-preventivo">[[ riga.descrizione ]]</td>
                                                 <td class="text-end">[[ euroFormat(riga.prezzo) ]]&euro;</td>
                                                 <td class="text-end">[[ euroFormat(riga.totaleRiga) ]]&euro;</td>

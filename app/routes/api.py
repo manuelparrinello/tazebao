@@ -9,7 +9,7 @@ from ..finance_service import (
     delete_financial_movement,
     finance_summary,
 )
-from ..models import CalendarEvent, Cliente, EmailLog, FinancialMovement, Lavoro, Preventivo
+from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Preventivo
 from ..models import (
     CALENDAR_EVENT_TYPES,
     EMAIL_DIRECTIONS,
@@ -198,7 +198,7 @@ def serialize_dashboard_event(event):
 def serialize_dashboard_quote(preventivo):
     return {
         "id": preventivo.id,
-        "url": url_for("visualizza_preventivo", id=preventivo.id),
+        "url": url_for("preventivi.visualizza_preventivo", id=preventivo.id),
         "descrizione": preventivo.descrizione,
         "stato": preventivo.stato,
         "data_creazione": (
@@ -301,6 +301,10 @@ def get_dashboard_summary():
     recent_quotes = (
         Preventivo.query.order_by(Preventivo.data_creazione.desc()).limit(5).all()
     )
+    unread_mail_count = EmailMessage.query.filter(
+        EmailMessage.direction == "inbound",
+        EmailMessage.is_read.is_(False),
+    ).count()
 
     data = {
         "task_open_count": task_open_count,
@@ -331,6 +335,7 @@ def get_dashboard_summary():
         "recent_quotes": [
             serialize_dashboard_quote(preventivo) for preventivo in recent_quotes
         ],
+        "unread_mail_count": unread_mail_count,
         "current_balance": finance_data["current_balance"],
         "month_income_effective": finance_data["month_income_effective"],
         "month_income_expected": finance_data["month_income_expected"],

@@ -5,6 +5,17 @@
 {% block content %}
 {% set can_mutate = current_user and current_user.role != "readonly" %}
 {% set can_admin = current_user and current_user.role == "admin" %}
+
+{% macro read_badge(message) -%}
+{% if message.direction == "inbound" and not message.is_read %}
+<span class="badge rounded-pill text-bg-warning">Non letta</span>
+{% elif message.direction == "inbound" %}
+<span class="badge rounded-pill text-bg-success">Letta</span>
+{% else %}
+<span class="badge rounded-pill text-bg-primary">Inviata</span>
+{% endif %}
+{%- endmacro %}
+
 <div class="row mx-auto w-100 align-items-center g-3">
     <div class="col-12 col-lg-6 px-0">
         <h6 class="text-primary fw-bold" style="letter-spacing: 1.2px">EMAIL ERP</h6>
@@ -78,23 +89,19 @@
             </thead>
             <tbody>
                 {% for message in messages %}
-                <tr>
+                <tr class="{% if message.direction == 'inbound' and not message.is_read %}table-warning-subtle{% endif %}">
                     <td class="text-nowrap">
                         {{ (message.received_at or message.sent_at or message.created_at).strftime("%d/%m/%Y %H:%M") }}
                     </td>
                     <td class="text-nowrap">
-                        {% if message.direction == "inbound" %}
-                        <span class="badge rounded-pill {% if message.is_read %}text-bg-success{% else %}text-bg-secondary{% endif %}">
-                            {{ "Letta" if message.is_read else "Non letta" }}
-                        </span>
-                        {% else %}
-                        <span class="badge rounded-pill text-bg-primary">Inviata</span>
-                        {% endif %}
+                        {{ read_badge(message) }}
                     </td>
                     <td class="text-nowrap mobile-hide">{{ message.account.label if message.account else "-" }}</td>
                     <td>
-                        <a href="{{ url_for('mail.mail_detail', message_id=message.id) }}" class="fw-bold text-decoration-none">{{ message.subject or "(senza oggetto)" }}</a>
-                        <div class="small text-secondary text-truncate" title="{{ message.from_address if message.direction == 'inbound' else message.to_addresses }}">
+                        <a href="{{ url_for('mail.mail_detail', message_id=message.id) }}" class="{% if message.direction == 'inbound' and not message.is_read %}fw-bold{% else %}text-decoration-none{% endif %}">
+                            {{ message.subject or "(senza oggetto)" }}
+                        </a>
+                        <div class="small {% if message.direction == 'inbound' and not message.is_read %}fw-semibold text-dark{% else %}text-secondary{% endif %} text-truncate" title="{{ message.from_address if message.direction == 'inbound' else message.to_addresses }}">
                             {{ message.from_address if message.direction == "inbound" else message.to_addresses }}
                         </div>
                     </td>
@@ -122,24 +129,18 @@
     <div class="d-md-none mobile-list">
         {% if messages %}
             {% for message in messages %}
-            <a class="mobile-list-item mobile-row-link" href="{{ url_for('mail.mail_detail', message_id=message.id) }}">
+            <a class="mobile-list-item mobile-row-link {% if message.direction == 'inbound' and not message.is_read %}border-warning{% endif %}" href="{{ url_for('mail.mail_detail', message_id=message.id) }}">
                 <div class="d-flex align-items-start justify-content-between gap-3">
                     <div class="min-w-0">
                         <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="fw-bold mobile-row-title" title="{{ message.subject or '(senza oggetto)' }}">{{ message.subject or '(senza oggetto)' }}</span>
-                            {% if message.direction == "inbound" %}
-                            <span class="badge rounded-pill {% if message.is_read %}text-bg-success{% else %}text-bg-secondary{% endif %}">
-                                {{ "Letta" if message.is_read else "Non letta" }}
-                            </span>
-                            {% else %}
-                            <span class="badge rounded-pill text-bg-primary">Inviata</span>
-                            {% endif %}
+                            <span class="fw-bold mobile-row-title {% if message.direction == 'inbound' and not message.is_read %}text-dark{% endif %}" title="{{ message.subject or '(senza oggetto)' }}">{{ message.subject or '(senza oggetto)' }}</span>
+                            {{ read_badge(message) }}
                         </div>
-                        <div class="mobile-row-muted text-truncate" title="{{ message.from_address if message.direction == 'inbound' else message.to_addresses }}">
+                        <div class="mobile-row-muted text-truncate {% if message.direction == 'inbound' and not message.is_read %}fw-semibold text-dark{% endif %}" title="{{ message.from_address if message.direction == 'inbound' else message.to_addresses }}">
                             {{ message.from_address if message.direction == "inbound" else message.to_addresses }}
                         </div>
                         <div class="mobile-row-meta mobile-row-muted mt-1">
-                            <span>{{ message.account.label if message.account else "-" }}</span>
+                            <span class="fw-semibold">{{ message.account.label if message.account else "-" }}</span>
                             {% if message.cliente %}<span>{{ message.cliente.name }}</span>{% endif %}
                             {% if message.lavoro %}<span>{{ message.lavoro.descrizione }}</span>{% endif %}
                         </div>

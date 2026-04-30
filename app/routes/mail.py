@@ -96,8 +96,15 @@ def apply_account_form(account):
 
 
 def apply_message_links(message):
-    message.cliente_id = parse_optional_id(request.form.get("cliente_id"))
-    message.lavoro_id = parse_optional_id(request.form.get("lavoro_id"))
+    cliente_id = parse_optional_id(request.form.get("cliente_id"))
+    lavoro_id = parse_optional_id(request.form.get("lavoro_id"))
+
+    if lavoro_id and cliente_id is None:
+        lavoro = db.session.get(Lavoro, lavoro_id)
+        cliente_id = lavoro.cliente_id if lavoro else None
+
+    message.cliente_id = cliente_id
+    message.lavoro_id = lavoro_id
 
 
 @bp.get("/mail")
@@ -179,6 +186,9 @@ def mail_index():
 @login_required
 def mail_detail(message_id):
     message = EmailMessage.query.get_or_404(message_id)
+    if message.direction == "inbound" and not message.is_read:
+        message.is_read = True
+        db.session.commit()
     return render_template("mail_detail.html", message=message, **mail_choices())
 
 

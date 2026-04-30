@@ -97,6 +97,7 @@ if (document.getElementById("app")) {
           { title: "Task aperte", value: this.summary.task_open_count, icon: "bi-list-check" },
           { title: "Scadenze prossime", value: this.summary.task_due_soon_count, icon: "bi-alarm" },
           { title: "Task scadute", value: this.summary.overdue_task_count, icon: "bi-exclamation-triangle" },
+          { title: "Email non lette", value: this.summary.unread_mail_count, icon: "bi-envelope-exclamation" },
           { title: "Eventi prossimi", value: this.summary.upcoming_events_count, icon: "bi-calendar-event" },
           { title: "Clienti", value: this.summary.active_clients_count, icon: "bi-people" },
           { title: "Lavori attivi", value: this.summary.active_jobs_count, icon: "bi-briefcase" },

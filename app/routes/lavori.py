@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Blueprint, jsonify, render_template, request, url_for
+from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
@@ -16,6 +16,37 @@ def parse_optional_float(value):
     if value in (None, ""):
         return 0
     return float(str(value).replace(",", "."))
+
+
+def parse_optional_date(value):
+    if not value:
+        return None
+    return datetime.strptime(value, "%Y-%m-%d").date()
+
+
+def parse_optional_id(value):
+    if value in (None, ""):
+        return None
+    return int(value)
+
+
+def apply_lavoro_form(lavoro):
+    lavoro.descrizione = (request.form.get("descrizione") or "").strip()
+    lavoro.cliente_id = parse_optional_id(request.form.get("cliente_id"))
+    lavoro.priorita = request.form.get("priorita") or None
+    lavoro.stato = request.form.get("stato") or None
+    lavoro.data_inizio = parse_optional_date(request.form.get("data_inizio"))
+    lavoro.data_fine = parse_optional_date(request.form.get("data_fine"))
+    lavoro.data_pagamento = parse_optional_date(request.form.get("data_pagamento"))
+    lavoro.preventivato = parse_optional_float(request.form.get("preventivato"))
+    lavoro.note = (request.form.get("note") or "").strip() or None
+
+    if not lavoro.descrizione:
+        raise ValueError("La descrizione lavoro e obbligatoria.")
+    if not lavoro.cliente_id:
+        raise ValueError("Il cliente e obbligatorio.")
+    if lavoro.stato not in status_lavori:
+        raise ValueError("Stato lavoro non valido.")
 
 
 @bp.route("/lavori/new", methods=["GET", "POST"])
@@ -148,6 +179,7 @@ def lavoro_page(lavoro_id):
         "nuovo_preventivo": url_for("nuovo_preventivo", **quick_params),
         "nuovo_evento": url_for("calendar.calendar_new", **quick_params),
         "nuovo_movimento": url_for("finance.finance_new", **quick_params),
+        "modifica": url_for("lavori.lavoro_edit", lavoro_id=lavoro.id),
         "cliente": (
             url_for("cliente_page", cliente_id=lavoro.cliente_id)
             if lavoro.cliente_id
@@ -164,6 +196,34 @@ def lavoro_page(lavoro_id):
         eventi=eventi,
         movimenti=movimenti,
         quick_actions=quick_actions,
+    )
+
+
+@bp.route("/lavori/<int:lavoro_id>/edit", methods=["GET", "POST"])
+@role_required("admin", "operatore")
+def lavoro_edit(lavoro_id):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    clienti_list = Cliente.query.order_by(Cliente.name.asc()).all()
+    error = None
+
+    if request.method == "POST":
+        try:
+            apply_lavoro_form(lavoro)
+            db.session.commit()
+            return redirect(url_for("lavori.lavoro_page", lavoro_id=lavoro.id))
+        except ValueError as exc:
+            db.session.rollback()
+            error = str(exc)
+
+    return render_template(
+        "lavoro_edit.html",
+        lavoro=lavoro,
+        clienti=clienti_list,
+        status_lavori=status_lavori,
+        error=error,
+        form_action=url_for("lavori.lavoro_edit", lavoro_id=lavoro.id),
+        page_title="Modifica lavoro",
+        submit_label="Salva modifiche",
     )
 
 

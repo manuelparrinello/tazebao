@@ -94,6 +94,9 @@
     <div class="col-12 col-xl-7 px-0">
         {% if can_mutate %}
         <div class="erp-action-bar d-flex flex-wrap justify-content-xl-end align-items-stretch gap-2">
+            <a href="{{ quick_actions.modifica }}" class="btn btn-outline-secondary erp-action-secondary">
+                <i class="bi bi-pencil-square"></i>&nbsp;Modifica
+            </a>
             <a href="{{ quick_actions.nuovo_task if can_mutate else '#' }}" class="btn btn-primary erp-action-primary">
                 <i class="bi bi-list-check"></i>&nbsp;Nuova task
             </a>

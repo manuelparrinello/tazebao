@@ -75,30 +75,34 @@
 {%- endmacro %}
 
 {% block content %}
-<div class="row mx-auto w-100 align-items-start g-3">
-    <div class="col-12 col-xl-5 px-0">
-        <div class="breadcrumbs mb-3">
-            <h6 class="text-primary mb-0" style="letter-spacing: 1.2px">
-                <span class="text-muted me-2"><a class="a-no-color" href="{{ url_for('lavori') }}">LAVORI</a></span>
-                /
-                <span class="text-uppercase fw-bold">{{ lavoro.descrizione }}</span>
-            </h6>
-        </div>
-        <h2 class="fw-bold mb-2 text-break">{{ lavoro.descrizione }}</h2>
-        <div class="d-flex flex-wrap gap-2">
-            {{ status_badge(lavoro.stato) }}
-            {{ priority_badge(lavoro.priorita) }}
+<div class="row align-items-start g-3 mb-4">
+    <div class="col-12 col-xl-7">
+        <div class="d-flex flex-column gap-2">
+            <div class="text-uppercase text-secondary small fw-bold">
+                <a class="a-no-color" href="{{ url_for('lavori') }}">Lavori</a>
+            </div>
+            <h2 class="fw-bold mb-0 text-break">{{ lavoro.descrizione }}</h2>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                {% if lavoro.cliente %}
+                <a href="{{ url_for('cliente_page', cliente_id=lavoro.cliente.id) }}" class="fw-semibold text-decoration-none">
+                    {{ lavoro.cliente.name }}
+                </a>
+                {% else %}
+                <span class="text-secondary">Nessun cliente collegato</span>
+                {% endif %}
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                {{ status_badge(lavoro.stato) }}
+                {{ priority_badge(lavoro.priorita) }}
+            </div>
         </div>
     </div>
 
-    <div class="col-12 col-xl-7 px-0">
+    <div class="col-12 col-xl-5">
         {% if can_mutate %}
         <div class="erp-action-bar d-flex flex-wrap justify-content-xl-end align-items-stretch gap-2">
-            <a href="{{ quick_actions.modifica }}" class="btn btn-outline-secondary erp-action-secondary">
-                <i class="bi bi-pencil-square"></i>&nbsp;Modifica
-            </a>
-            <a href="{{ quick_actions.nuovo_task if can_mutate else '#' }}" class="btn btn-primary erp-action-primary">
-                <i class="bi bi-list-check"></i>&nbsp;Nuova task
+            <a href="{{ quick_actions.modifica }}" class="btn btn-primary erp-action-primary">
+                <i class="bi bi-pencil-square"></i>&nbsp;Modifica lavoro
             </a>
 
             <div class="dropdown">
@@ -106,22 +110,29 @@
                     <i class="bi bi-plus-lg"></i>&nbsp;Aggiungi
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                    <li><a class="dropdown-item" href="{{ quick_actions.nuovo_preventivo if can_mutate else '#' }}"><i class="bi bi-receipt me-2"></i>Nuovo preventivo</a></li>
-                    <li><a class="dropdown-item" href="{{ quick_actions.nuovo_evento if can_mutate else '#' }}"><i class="bi bi-calendar-plus me-2"></i>Nuovo evento</a></li>
-                    <li><a class="dropdown-item" href="{{ quick_actions.nuovo_movimento if can_mutate else '#' }}"><i class="bi bi-cash-coin me-2"></i>Nuovo movimento</a></li>
+                    <li><a class="dropdown-item" href="{{ quick_actions.nuovo_task }}"><i class="bi bi-list-check me-2"></i>Nuovo task</a></li>
+                    <li><a class="dropdown-item" href="{{ quick_actions.nuovo_preventivo }}"><i class="bi bi-receipt me-2"></i>Nuovo preventivo</a></li>
+                    <li><a class="dropdown-item" href="{{ quick_actions.nuovo_evento }}"><i class="bi bi-calendar-plus me-2"></i>Nuovo evento</a></li>
+                    <li><a class="dropdown-item" href="{{ quick_actions.nuovo_movimento }}"><i class="bi bi-cash-coin me-2"></i>Nuovo movimento</a></li>
                 </ul>
             </div>
 
             {% if quick_actions.cliente %}
-            <a href="{{ quick_actions.cliente if can_mutate else '#' }}" class="btn btn-outline-secondary erp-action-secondary">
+            <a href="{{ quick_actions.cliente }}" class="btn btn-outline-secondary erp-action-secondary">
                 <i class="bi bi-person"></i>&nbsp;Torna al cliente
             </a>
             {% endif %}
         </div>
+        {% elif quick_actions.cliente %}
+        <div class="d-flex justify-content-xl-end">
+            <a href="{{ quick_actions.cliente }}" class="btn btn-outline-secondary">
+                <i class="bi bi-person"></i>&nbsp;Vai al cliente
+            </a>
+        </div>
         {% endif %}
     </div>
 </div>
-<hr>
+<hr class="mb-4">
 
 <div class="row g-4 mt-1">
     <div class="col-12 col-xl-7">

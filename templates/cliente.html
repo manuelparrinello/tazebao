@@ -197,7 +197,7 @@
                             <div class="min-w-0">
                                 <div class="fw-bold">{{ task.name }}</div>
                                 <div class="small text-secondary text-break">
-                                    {{ labelize(task.status) }} &middot; {{ labelize(task.priority) }}{% if task.due_date %} &middot; Scadenza {{ task.due_date.strftime("%d/%m/%Y") }}{% endif %}
+                                    {{ labelize(task.status) }} &middot; {{ labelize(task.priority) }}{% if task.due_date %} &middot; Scadenza {{ task.due_date|date_it }}{% endif %}
                                 </div>
                             </div>
                             <span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span>
@@ -224,7 +224,7 @@
                             <div class="min-w-0">
                                 <div class="fw-bold">{{ preventivo.descrizione }}</div>
                                 <div class="small text-secondary text-break">
-                                    {{ labelize(preventivo.stato) }} &middot; {{ preventivo.data_creazione.strftime("%d/%m/%Y") }}
+                                    {{ labelize(preventivo.stato) }} &middot; {{ preventivo.data_creazione|date_it }}
                                 </div>
                             </div>
                             <div class="fw-bold text-end">{{ euro(preventivo.totale_preventivo) }}</div>
@@ -251,7 +251,7 @@
                             <div class="min-w-0">
                                 <div class="fw-bold">{{ evento.title }}</div>
                                 <div class="small text-secondary text-break">
-                                    {{ labelize(evento.event_type) }} &middot; {{ evento.start_datetime.strftime("%d/%m/%Y %H:%M") }}
+                                    {{ labelize(evento.event_type) }} &middot; {{ evento.start_datetime|datetime_it }}
                                 </div>
                             </div>
                             <i class="bi bi-calendar-event text-secondary"></i>
@@ -278,7 +278,7 @@
                             <div class="min-w-0">
                                 <div class="fw-bold">{{ movimento.title }}</div>
                                 <div class="small text-secondary text-break">
-                                    {{ labelize(movimento.category) }} &middot; {{ movimento.movement_date.strftime("%d/%m/%Y") }}
+                                    {{ labelize(movimento.category) }} &middot; {{ movimento.movement_date|date_it }}
                                 </div>
                             </div>
                             <div class="text-end">
@@ -316,7 +316,7 @@
                                 <div class="small text-secondary text-break">
                                     {{ "Ricevuta" if mail_message.direction == "inbound" else "Inviata" }}
                                     &middot; {{ mail_message.from_address if mail_message.direction == "inbound" else mail_message.to_addresses }}
-                                    &middot; {{ (mail_message.received_at or mail_message.sent_at or mail_message.created_at).strftime("%d/%m/%Y %H:%M") }}
+                                    &middot; {{ (mail_message.received_at or mail_message.sent_at or mail_message.created_at)|datetime_it }}
                                 </div>
                             </div>
                             <span class="badge {{ 'text-bg-info' if mail_message.direction == 'inbound' else 'text-bg-success' }}">
@@ -352,7 +352,7 @@
                                 <div class="small text-secondary text-break">
                                     {{ "Ricevuta" if email_log.direction == "inbound" else "Inviata" }}
                                     &middot; {{ email_log.email_address }}
-                                    &middot; {{ email_log.sent_at.strftime("%d/%m/%Y %H:%M") if email_log.sent_at else "-" }}
+                                    &middot; {{ email_log.sent_at|datetime_it if email_log.sent_at else "-" }}
                                 </div>
                             </div>
                             <span class="badge {{ 'text-bg-info' if email_log.direction == 'inbound' else 'text-bg-success' }}">

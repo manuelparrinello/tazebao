@@ -6,102 +6,115 @@
 {% if current == value %}selected{% endif %}
 {%- endmacro %}
 
-{% macro labelize(value) -%}
-{{ value.replace("_", " ").title() if value else "-" }}
-{%- endmacro %}
-
 {% macro date_value(value) -%}
 {{ value.isoformat() if value else "" }}
 {%- endmacro %}
 
 {% block content %}
-<div class="row align-items-start g-3">
-    <div class="col-12 col-xl-7">
-        <div class="mb-3">
-            <div class="text-uppercase text-secondary small fw-bold">Lavori</div>
-            <h2 class="fw-bold mb-1 text-break">{{ lavoro.descrizione }}</h2>
-            <div class="text-secondary text-break">
-                Modifica completa del lavoro collegato a {{ lavoro.cliente.name if lavoro.cliente else "nessun cliente" }}.
+<div class="erp-form-page">
+    <div class="erp-form-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2">
+            <div>
+                <h3 class="fw-bolder erp-form-title">Modifica lavoro</h3>
+                <p class="erp-form-subtitle">Aggiorna i dati del lavoro e mantieni allineati cliente, date e note.</p>
+            </div>
+            <div class="erp-form-actions">
+                <a href="{{ url_for('lavori.lavoro_page', lavoro_id=lavoro.id) }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>&nbsp;Torna alla scheda
+                </a>
+                <button type="submit" form="lavoroEditForm" class="btn btn-primary">
+                    <i class="bi bi-floppy"></i>&nbsp;Salva modifiche
+                </button>
             </div>
         </div>
-    </div>
-    <div class="col-12 col-xl-5">
-        <div class="erp-action-bar d-flex flex-wrap justify-content-xl-end gap-2">
-            <a href="{{ url_for('lavori.lavoro_page', lavoro_id=lavoro.id) }}" class="btn btn-outline-secondary erp-action-secondary">
-                <i class="bi bi-arrow-left"></i>&nbsp;Torna alla scheda
-            </a>
-            <button type="submit" form="lavoroEditForm" class="btn btn-primary erp-action-primary">
-                <i class="bi bi-floppy"></i>&nbsp;Salva modifiche
-            </button>
+        <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+            <span class="badge rounded-pill text-bg-primary">{{ lavoro.stato or "-" }}</span>
+            <span class="badge rounded-pill text-bg-light border">{{ lavoro.priorita or "-" }}</span>
+            <span class="text-secondary">
+                Cliente:
+                {% if lavoro.cliente %}
+                <a href="{{ url_for('cliente_page', cliente_id=lavoro.cliente.id) }}" class="fw-semibold text-decoration-none">{{ lavoro.cliente.name }}</a>
+                {% else %}
+                <span class="fw-semibold">nessun cliente collegato</span>
+                {% endif %}
+            </span>
         </div>
     </div>
-</div>
 
-{% if error %}
-<div class="alert alert-danger mt-4">{{ error }}</div>
-{% endif %}
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
 
-<form id="lavoroEditForm" action="{{ form_action }}" method="post" class="mt-4">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <form id="lavoroEditForm" action="{{ form_action }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="card erp-form-card">
+            <div class="card-body p-3 p-md-4">
+                <div class="row g-3">
+                    <div class="col-12 col-lg-7">
+                        <label for="descrizione" class="form-label fw-bold">Descrizione</label>
+                        <input type="text" class="form-control" id="descrizione" name="descrizione" value="{{ lavoro.descrizione or '' }}" required>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-5">
+                        <label for="cliente_id" class="form-label fw-bold">Cliente</label>
+                        <select class="form-select" id="cliente_id" name="cliente_id" required>
+                            {% for cliente in clienti %}
+                            <option value="{{ cliente.id }}" {{ selected(lavoro.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-3 p-md-4">
-            <div class="row g-3">
-                <div class="col-12 col-lg-7">
-                    <label for="descrizione" class="form-label fw-bold">Descrizione</label>
-                    <input type="text" class="form-control" id="descrizione" name="descrizione" value="{{ lavoro.descrizione or '' }}" required>
-                </div>
-                <div class="col-12 col-md-6 col-lg-5">
-                    <label for="cliente_id" class="form-label fw-bold">Cliente</label>
-                    <select class="form-select" id="cliente_id" name="cliente_id" required>
-                        {% for cliente in clienti %}
-                        <option value="{{ cliente.id }}" {{ selected(lavoro.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="col-12 col-md-6 col-lg-3">
-                    <label for="stato" class="form-label fw-bold">Stato</label>
-                    <select class="form-select" id="stato" name="stato" required>
-                        {% for stato in status_lavori %}
-                        <option value="{{ stato }}" {{ selected(lavoro.stato, stato) }}>{{ stato }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-12 col-md-6 col-lg-3">
-                    <label for="priorita" class="form-label fw-bold">Priorità</label>
-                    <select class="form-select" id="priorita" name="priorita">
-                        <option value="" {% if not lavoro.priorita %}selected{% endif %}>Nessuna priorità</option>
-                        <option value="Bassa" {{ selected(lavoro.priorita, "Bassa") }}>Bassa</option>
-                        <option value="Media" {{ selected(lavoro.priorita, "Media") }}>Media</option>
-                        <option value="Alta" {{ selected(lavoro.priorita, "Alta") }}>Alta</option>
-                    </select>
-                </div>
-                <div class="col-12 col-md-4 col-lg-2">
-                    <label for="data_inizio" class="form-label fw-bold">Data inizio</label>
-                    <input type="date" class="form-control" id="data_inizio" name="data_inizio" value="{{ date_value(lavoro.data_inizio) }}">
-                </div>
-                <div class="col-12 col-md-4 col-lg-2">
-                    <label for="data_fine" class="form-label fw-bold">Data fine</label>
-                    <input type="date" class="form-control" id="data_fine" name="data_fine" value="{{ date_value(lavoro.data_fine) }}">
-                </div>
-                <div class="col-12 col-md-4 col-lg-2">
-                    <label for="data_pagamento" class="form-label fw-bold">Data pagamento</label>
-                    <input type="date" class="form-control" id="data_pagamento" name="data_pagamento" value="{{ date_value(lavoro.data_pagamento) }}">
-                </div>
-                <div class="col-12 col-md-6 col-lg-3">
-                    <label for="preventivato" class="form-label fw-bold">Preventivato</label>
-                    <div class="input-group">
-                        <input type="number" min="0" step="0.01" class="form-control" id="preventivato" name="preventivato" value="{{ lavoro.preventivato if lavoro.preventivato is not none else '' }}">
-                        <span class="input-group-text">&euro;</span>
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <label for="stato" class="form-label fw-bold">Stato</label>
+                        <select class="form-select" id="stato" name="stato" required>
+                            {% for stato in status_lavori %}
+                            <option value="{{ stato }}" {{ selected(lavoro.stato, stato) }}>{{ stato }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <label for="priorita" class="form-label fw-bold">Priorità</label>
+                        <select class="form-select" id="priorita" name="priorita">
+                            <option value="" {% if not lavoro.priorita %}selected{% endif %}>Nessuna priorità</option>
+                            <option value="Bassa" {{ selected(lavoro.priorita, "Bassa") }}>Bassa</option>
+                            <option value="Media" {{ selected(lavoro.priorita, "Media") }}>Media</option>
+                            <option value="Alta" {{ selected(lavoro.priorita, "Alta") }}>Alta</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-2">
+                        <label for="data_inizio" class="form-label fw-bold">Data inizio</label>
+                        <input type="date" class="form-control" id="data_inizio" name="data_inizio" value="{{ date_value(lavoro.data_inizio) }}">
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-2">
+                        <label for="data_fine" class="form-label fw-bold">Data fine</label>
+                        <input type="date" class="form-control" id="data_fine" name="data_fine" value="{{ date_value(lavoro.data_fine) }}">
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-2">
+                        <label for="data_pagamento" class="form-label fw-bold">Data pagamento</label>
+                        <input type="date" class="form-control" id="data_pagamento" name="data_pagamento" value="{{ date_value(lavoro.data_pagamento) }}">
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <label for="preventivato" class="form-label fw-bold">Preventivato</label>
+                        <div class="input-group">
+                            <input type="number" min="0" step="0.01" class="form-control" id="preventivato" name="preventivato" value="{{ lavoro.preventivato if lavoro.preventivato is not none else '' }}">
+                            <span class="input-group-text">&euro;</span>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label for="note" class="form-label fw-bold">Note</label>
+                        <textarea class="form-control" id="note" name="note" rows="5">{{ lavoro.note or '' }}</textarea>
                     </div>
                 </div>
-                <div class="col-12">
-                    <label for="note" class="form-label fw-bold">Note</label>
-                    <textarea class="form-control" id="note" name="note" rows="5">{{ lavoro.note or '' }}</textarea>
+
+                <div class="erp-form-actions mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-floppy"></i>&nbsp;Salva modifiche
+                    </button>
+                    <a href="{{ url_for('lavori.lavoro_page', lavoro_id=lavoro.id) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg"></i>&nbsp;Annulla
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 {% endblock %}

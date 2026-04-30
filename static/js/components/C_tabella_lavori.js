@@ -32,7 +32,7 @@ const TabellaLavori = {
               <i :style="{ color: lavoro.cliente.colore }" class="bi bi-person-circle me-2"></i>
               <a :href="'/clienti/' + lavoro.cliente.id" class="text-decoration-none a-no-color">[[ lavoro.cliente.name ]]</a>
             </td>
-            <td class="text-center mobile-hide">[[ lavoro.data_pagamento || '-' ]]</td>
+            <td class="text-center mobile-hide">[[ formatDate(lavoro.data_pagamento) ]]</td>
             <td class="text-center mobile-hide" id="note_td" v-html="renderNoteIcon(lavoro.note)"></td>
             <td class="text-center">
               <template v-if="canMutate()">
@@ -74,6 +74,21 @@ const TabellaLavori = {
   methods: {
     canMutate() {
       return window.erpCanMutate !== false;
+    },
+    formatDate(value) {
+      const formatter = window.erpDateFormatter?.formatDate;
+      if (formatter) return formatter(value);
+      if (!value) return "-";
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) return "-";
+      const parts = new Intl.DateTimeFormat("it-IT", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).formatToParts(parsed);
+      return parts
+        .map((part) => (part.type === "month" ? part.value.charAt(0).toUpperCase() + part.value.slice(1) : part.value))
+        .join("");
     },
     prioPill(prio) {
       if (prio === "Bassa") return `<i class="bi bi-emoji-smile"></i>`;

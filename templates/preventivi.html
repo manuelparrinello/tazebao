@@ -40,7 +40,7 @@
                                     </a>
                                 </td>
                                 <td class="mobile-hide">[[ preventivo.cliente ]]</td>
-                                <td>[[ preventivo.data_creazione ]]</td>
+                                <td>[[ formatDate(preventivo.data_creazione) ]]</td>
                                 <td class="text-end">[[ preventivo.totale_preventivo ]] &euro;</td>
                             </tr>
                         </tbody>
@@ -53,7 +53,7 @@
                                 <div class="fw-bold mobile-row-title" :title="preventivo.descrizione">[[ preventivo.descrizione ]]</div>
                                 <div class="mobile-row-meta mobile-row-muted">
                                     <span>[[ preventivo.cliente ]]</span>
-                                    <span>[[ preventivo.data_creazione ]]</span>
+                                    <span>[[ formatDate(preventivo.data_creazione) ]]</span>
                                 </div>
                             </div>
                             <div class="text-end flex-shrink-0">

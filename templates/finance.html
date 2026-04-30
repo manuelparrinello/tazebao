@@ -45,7 +45,7 @@
         <tbody>
             {% for movement in movements %}
             <tr>
-                <td>{{ movement.movement_date.strftime("%d/%m/%Y") }}</td>
+                <td>{{ movement.movement_date|date_it }}</td>
                 <td>
                     <a class="fw-bold a-no-color" href="{{ url_for('finance.finance_edit', movement_id=movement.id) if current_user and current_user.role != 'readonly' else '#' }}">{{ movement.title }}</a>
                     {% if movement.description %}

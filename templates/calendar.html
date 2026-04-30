@@ -118,7 +118,7 @@
                         {% for event in events %}
                         <tr>
                             <td>
-                                <div class="fw-bold">{{ event.date.strftime("%d/%m/%Y") }}</div>
+                                <div class="fw-bold">{{ event.date|date_it }}</div>
                                 {% if event.time %}
                                 <div class="small text-secondary">{{ event.time }}</div>
                                 {% endif %}
@@ -164,7 +164,7 @@
                                 <span class="fw-bold text-truncate">{{ event.title }}</span>
                                 {{ event_badge(event) }}
                             </div>
-                            <div class="small text-secondary">{{ event.date.strftime("%d/%m/%Y") }}{% if event.time %} &middot; {{ event.time }}{% endif %}</div>
+                            <div class="small text-secondary">{{ event.date|date_it }}{% if event.time %} &middot; {{ event.time }}{% endif %}</div>
                             <div class="small text-secondary text-truncate">
                                 {{ event.cliente.name if event.cliente else "-" }}
                                 {% if event.lavoro %}&middot; {{ event.lavoro.descrizione }}{% endif %}

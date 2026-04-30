@@ -1,5 +1,6 @@
 import locale
 import os
+from datetime import date as date_cls, datetime as datetime_cls
 
 from flask import Flask
 from dotenv import load_dotenv
@@ -80,10 +81,65 @@ def create_app():
 
 
 def register_template_filters(app):
+    italian_months = {
+        1: "Gennaio",
+        2: "Febbraio",
+        3: "Marzo",
+        4: "Aprile",
+        5: "Maggio",
+        6: "Giugno",
+        7: "Luglio",
+        8: "Agosto",
+        9: "Settembre",
+        10: "Ottobre",
+        11: "Novembre",
+        12: "Dicembre",
+    }
+
+    def _parse_display_datetime(value):
+        if value in (None, ""):
+            return None
+        if isinstance(value, datetime_cls):
+            return value
+        if isinstance(value, date_cls):
+            return datetime_cls.combine(value, datetime_cls.min.time())
+        if isinstance(value, str):
+            normalized = value.strip()
+            if not normalized:
+                return None
+            if normalized.endswith("Z"):
+                normalized = normalized[:-1] + "+00:00"
+            try:
+                parsed = datetime_cls.fromisoformat(normalized)
+            except ValueError:
+                return None
+            return parsed
+        return None
+
+    def _format_display_date(value, include_time=False):
+        parsed = _parse_display_datetime(value)
+        if parsed is None:
+            return "-"
+
+        day = parsed.day
+        month = italian_months.get(parsed.month, "")
+        year = parsed.year
+        if include_time:
+            return f"{day} {month} {year} {parsed:%H:%M}"
+        return f"{day} {month} {year}"
+
     @app.template_filter()
     def euroFormat(value):
         value = float(value)
         return "{:.2f}".format(value).replace(".", ",")
+
+    @app.template_filter("date_it")
+    def date_it_filter(value):
+        return _format_display_date(value, include_time=False)
+
+    @app.template_filter("datetime_it")
+    def datetime_it_filter(value):
+        return _format_display_date(value, include_time=True)
 
     @app.template_filter("nl2br")
     def nl2br_filter(text):

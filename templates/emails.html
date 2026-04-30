@@ -62,7 +62,7 @@
             <tbody>
                 {% for email_log in email_logs %}
                 <tr>
-                    <td class="text-nowrap">{{ email_log.sent_at.strftime("%d/%m/%Y %H:%M") if email_log.sent_at else "-" }}</td>
+                    <td class="text-nowrap">{{ email_log.sent_at|datetime_it if email_log.sent_at else "-" }}</td>
                     <td>
                         <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) if can_mutate else '#' }}" class="fw-bold text-decoration-none">{{ email_log.subject }}</a>
                         <div class="small text-secondary">{{ email_log.email_address }}</div>
@@ -119,6 +119,7 @@
                             {{ direction_badge(email_log.direction) }}
                         </div>
                         <div class="mobile-row-muted text-truncate" title="{{ email_log.email_address }}">{{ email_log.email_address }}</div>
+                        <div class="mobile-row-muted small mt-1">{{ email_log.sent_at|datetime_it if email_log.sent_at else "-" }}</div>
                         <div class="mobile-row-meta mobile-row-muted mt-1">
                             {% if email_log.cliente %}<span>{{ email_log.cliente.name }}</span>{% endif %}
                             {% if email_log.lavoro %}<span>{{ email_log.lavoro.descrizione }}</span>{% endif %}

@@ -53,7 +53,7 @@
                             <td class="mobile-priority-low"><span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span></td>
                             <td><span class="badge rounded-pill bg-primary">{{ labelize(task.status) }}</span></td>
                             <td class="mobile-priority-low"><span class="badge rounded-pill text-bg-warning">{{ labelize(task.priority) }}</span></td>
-                            <td>{{ task.due_date.strftime("%d/%m/%Y") if task.due_date else "-" }}</td>
+                            <td>{{ task.due_date|date_it if task.due_date else "-" }}</td>
                             <td class="mobile-hide">{{ task.cliente.name if task.cliente else "-" }}</td>
                             <td class="mobile-hide">{{ task.lavoro.descrizione if task.lavoro else "-" }}</td>
                             <td class="mobile-hide">{{ task.assignee.name or task.assignee.email if task.assignee else "-" }}</td>
@@ -90,7 +90,7 @@
                                 <span class="badge rounded-pill text-bg-warning flex-shrink-0">{{ labelize(task.priority) }}</span>
                             </div>
                             <div class="mobile-row-muted">
-                                {% if task.due_date %}Scadenza {{ task.due_date.strftime("%d/%m/%Y") }}{% else %}Nessuna scadenza{% endif %}
+                                {% if task.due_date %}Scadenza {{ task.due_date|date_it }}{% else %}Nessuna scadenza{% endif %}
                             </div>
                         </div>
                         <i class="bi bi-chevron-right text-secondary flex-shrink-0"></i>

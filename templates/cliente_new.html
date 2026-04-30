@@ -1,90 +1,91 @@
-{% extends "base.html" %} {% block title %}Nuovo Cliente{% endblock %} {% block content %}
+{% extends "base.html" %}
 
-<div id="formCliente" v-cloak>
+{% block title %}Nuovo Cliente{% endblock %}
 
-    <form id="nuovoCliente">
+{% block content %}
+<div id="formCliente" class="erp-form-page" v-cloak>
+    <div class="erp-form-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2">
+            <div>
+                <h3 class="fw-bolder erp-form-title">Nuovo cliente</h3>
+                <p class="erp-form-subtitle">Compila il modulo sottostante per aggiungere un nuovo cliente.</p>
+            </div>
+            <a href="{{ url_for('clienti') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i>&nbsp;Torna ai clienti
+            </a>
+        </div>
+    </div>
+
+    <form id="nuovoCliente" @submit.prevent="submitFormNewCliente($event)">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <!-- FORM INPUTS ------------------------------>
-        <div class="row">
-            <div class="col">
-                <div class="row">
-                    <h3 class="fw-bolder">Nuovo cliente</h3>
-                    <p class="mb-4">Compila il modulo sottostante per aggiungere un nuovo cliente.</p>
-
-                    <div class="col-md-2">
-                        <label class="form-label" for="nomeCliente">Nome</label>
+        <div class="card erp-form-card">
+            <div class="card-body p-3 p-md-4">
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label fw-bold" for="nomeCliente">Nome</label>
                         <input style="text-transform:capitalize" name="nome" type="text" v-model="nome" class="form-control">
                     </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="nomeCliente">Ragione Sociale/Intestazione</label>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label fw-bold" for="nomeCliente">Ragione Sociale/Intestazione</label>
                         <input style="text-transform:capitalize" name="ragsoc" type="text" v-model="ragsoc" class="form-control">
                     </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="nomeCliente">Indirizzo</label>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label fw-bold" for="nomeCliente">Indirizzo</label>
                         <input style="text-transform:capitalize" name="indirizzo" type="text" v-model="indirizzo" class="form-control">
                     </div>
-
-                    <div class="col-md-1">
-                        <label class="form-label" for="nomeCliente">CAP</label>
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <label class="form-label fw-bold" for="nomeCliente">CAP</label>
                         <input maxlength="5" style="text-transform:capitalize" name="cap" type="text" v-model="cap" class="form-control">
                     </div>
-
-                    <div class="col-md-2">
-                        <label class="form-label" for="nomeCliente">Città</label>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <label class="form-label fw-bold" for="nomeCliente">Città</label>
                         <input style="text-transform:capitalize" name="citta" type="text" v-model="citta" class="form-control">
                     </div>
-
-                    <div class="col-1">
-                        <label class="form-label" for="nomeCliente">Provincia</label>
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <label class="form-label fw-bold" for="nomeCliente">Provincia</label>
                         <input style="text-transform:uppercase" name="provincia" type="text" v-model="provincia" maxlength="2" class="form-control">
                     </div>
-
-
-                </div>
-
-                <div class="row mt-3">
-                    <div class="col-md-3">
-                        <label class="form-label" for="email">Email</label>
+                    <div class="col-12 col-sm-6 col-md-5">
+                        <label class="form-label fw-bold" for="email">Email</label>
                         <input name="email" type="email" v-model="email" class="form-control">
                     </div>
-                    <div class="col-md-2 col-sm-12">
-                        <label class="form-label" for="telefono">Telefono</label>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <label class="form-label fw-bold" for="telefono">Telefono</label>
                         <input name="telefono" type="tel" v-model="telefono" class="form-control">
                     </div>
-                    <div class="col-md-2 col-sm-12">
-                        <label class="form-label" for="telefono">P.IVA/C.F</label>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <label class="form-label fw-bold" for="telefono">P.IVA/C.F</label>
                         <input name="p_iva" style="text-transform:uppercase" type="text" v-model="p_iva" class="form-control">
                     </div>
-                    <div class="col-md-1 col-sm-12">
-                        <label class="form-label" for="telefono">SDI</label>
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <label class="form-label fw-bold" for="telefono">SDI</label>
                         <input maxlength="7" name="sdi" style="text-transform:uppercase" type="text" v-model="sdi" class="form-control">
                     </div>
-                    <div class="col-md-3 col-sm-12">
-                        <label class="form-label" for="telefono">PEC</label>
+                    <div class="col-12 col-sm-6 col-md-4">
+                        <label class="form-label fw-bold" for="telefono">PEC</label>
                         <input name="pec" type="email" v-model="pec" class="form-control">
                     </div>
-                    <div class="col-md-1">
-                        <label class="form-label" for="colore">Colore</label>
-                        <input name="colore" style="width:100%;" type="color" v-model="colore" class="form-control form-control-color" title="Scegli il colore">
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <label class="form-label fw-bold" for="colore">Colore</label>
+                        <input name="colore" type="color" v-model="colore" class="form-control form-control-color w-100" title="Scegli il colore">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold" for="telefono">Note</label>
+                        <textarea name="note" v-model="note" class="form-control" rows="4"></textarea>
                     </div>
                 </div>
 
-                <div class="row mt-3">
-                    <div class="col">
-                        <label class="form-label" for="telefono">Note</label>
-                        <textarea name="note" v-model="note" class="form-control"></textarea>
-                        <button class="mt-4 button-61" @click="submitFormNewCliente">Salva cliente</button>
-                    </div>
+                <div class="erp-form-actions mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-floppy"></i>&nbsp;Salva cliente
+                    </button>
                 </div>
-
             </div>
-
+        </div>
     </form>
+</div>
+{% endblock %}
 
-    </div>
-    {% endblock %} {% block scripts %}
-    <script src="{{ url_for('static', filename='js/cliente_new.js') }}"></script>
-
-    {% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/cliente_new.js') }}"></script>
+{% endblock %}

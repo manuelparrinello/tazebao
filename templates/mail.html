@@ -91,7 +91,7 @@
                 {% for message in messages %}
                 <tr class="{% if message.direction == 'inbound' and not message.is_read %}table-warning-subtle{% endif %}">
                     <td class="text-nowrap">
-                        {{ (message.received_at or message.sent_at or message.created_at).strftime("%d/%m/%Y %H:%M") }}
+                        {{ (message.received_at or message.sent_at or message.created_at)|datetime_it }}
                     </td>
                     <td class="text-nowrap">
                         {{ read_badge(message) }}
@@ -141,6 +141,7 @@
                         </div>
                         <div class="mobile-row-meta mobile-row-muted mt-1">
                             <span class="fw-semibold">{{ message.account.label if message.account else "-" }}</span>
+                            <span>{{ (message.received_at or message.sent_at or message.created_at)|datetime_it }}</span>
                             {% if message.cliente %}<span>{{ message.cliente.name }}</span>{% endif %}
                             {% if message.lavoro %}<span>{{ message.lavoro.descrizione }}</span>{% endif %}
                         </div>

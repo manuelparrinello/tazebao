@@ -11,11 +11,11 @@
 {%- endmacro %}
 
 {% macro date_value(value) -%}
-{{ value.strftime("%d/%m/%Y") if value else "-" }}
+{{ value|date_it if value else "-" }}
 {%- endmacro %}
 
 {% macro datetime_value(value) -%}
-{{ value.strftime("%d/%m/%Y %H:%M") if value else "-" }}
+{{ value|datetime_it if value else "-" }}
 {%- endmacro %}
 
 {% macro empty_state(text, action_url=None, action_label=None) -%}
@@ -208,7 +208,7 @@
                             <div class="min-w-0">
                                 <div class="fw-bold">{{ task.name }}</div>
                                 <div class="small text-secondary text-break">
-                                    {{ labelize(task.status) }} &middot; {{ labelize(task.priority) }}{% if task.due_date %} &middot; Scadenza {{ task.due_date.strftime("%d/%m/%Y") }}{% endif %}
+                                    {{ labelize(task.status) }} &middot; {{ labelize(task.priority) }}{% if task.due_date %} &middot; Scadenza {{ task.due_date|date_it }}{% endif %}
                                 </div>
                             </div>
                             <span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span>
@@ -276,7 +276,7 @@
                             <div class="min-w-0">
                                 <div class="fw-bold">{{ preventivo.descrizione }}</div>
                                 <div class="small text-secondary text-break">
-                                    {{ labelize(preventivo.stato) }} &middot; {{ preventivo.data_creazione.strftime("%d/%m/%Y") }}
+                                    {{ labelize(preventivo.stato) }} &middot; {{ preventivo.data_creazione|date_it }}
                                 </div>
                             </div>
                             <div class="fw-bold text-end">{{ euro(preventivo.totale_preventivo) }}</div>
@@ -330,7 +330,7 @@
                             <div class="min-w-0">
                                 <div class="fw-bold">{{ movimento.title }}</div>
                                 <div class="small text-secondary text-break">
-                                    {{ labelize(movimento.category) }} &middot; {{ movimento.movement_date.strftime("%d/%m/%Y") }}
+                                    {{ labelize(movimento.category) }} &middot; {{ movimento.movement_date|date_it }}
                                 </div>
                             </div>
                             <div class="text-end">

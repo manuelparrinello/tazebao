@@ -1,3 +1,19 @@
+function formatPreventivoDate(value) {
+  const formatter = window.erpDateFormatter?.formatDate;
+  if (formatter) return formatter(value);
+  if (!value) return "-";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "-";
+  const parts = new Intl.DateTimeFormat("it-IT", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).formatToParts(parsed);
+  return parts
+    .map((part) => (part.type === "month" ? part.value.charAt(0).toUpperCase() + part.value.slice(1) : part.value))
+    .join("");
+}
+
 const preventivi = Vue.createApp({
   data() {
     return {
@@ -18,14 +34,6 @@ const preventivi = Vue.createApp({
           throw new Error("Errore HTTP:" + response.status);
         }
         const data = await response.json();
-        for (const preventivo of data) {
-          preventivo.data_creazione = new Date(preventivo.data_creazione,
-          ).toLocaleDateString("it-IT", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          });
-        }
         // console.log(data);
         this.preventivi = data;
         console.log(this.preventivi);
@@ -36,6 +44,9 @@ const preventivi = Vue.createApp({
     openPreventivo(id) {
       if (!id) return;
       window.location.href = `/preventivi/visualizza/${id}`;
+    },
+    formatDate(value) {
+      return formatPreventivoDate(value);
     },
   },
   delimiters: ["[[", "]]"],

@@ -47,7 +47,7 @@
                     </div>
                     {% endif %}
                     <div class="col-12">
-                        <span class="text-secondary">Data:</span> {{ (message.received_at or message.sent_at or message.created_at).strftime("%d/%m/%Y %H:%M") }}
+                        <span class="text-secondary">Data:</span> {{ (message.received_at or message.sent_at or message.created_at)|datetime_it }}
                     </div>
                 </div>
 

@@ -1,78 +1,78 @@
-{% extends "base.html" %} {% block title %}Modifica cliente: {{ cliente.name }}{% endblock %} {% block content %}
-<div id="clienteEditPage" data-cliente-id='{{ cliente.id }}'>
+{% extends "base.html" %}
 
-    <div v-if="loading" style="height: 800px!important;" class="d-flex container w-100 align-items-center justify-content-center">
-        <span class="loader mx-auto d-flex align-items-center justify-content-center"></span>
+{% block title %}Modifica cliente: {{ cliente.name }}{% endblock %}
+
+{% block content %}
+<div id="clienteEditPage" data-cliente-id="{{ cliente.id }}" class="erp-form-page">
+    <div class="erp-form-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2">
+            <div>
+                <h3 class="fw-bolder erp-form-title">Modifica cliente</h3>
+                <p class="erp-form-subtitle">Aggiorna anagrafica e note del cliente selezionato.</p>
+            </div>
+            <a href="{{ url_for('clienti') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i>&nbsp;Torna ai clienti
+            </a>
+        </div>
     </div>
 
-    <div v-else>
-        <form id="editClienteForm" v-cloak>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-                <div class="col-12 col-lg-4 px-0">
-                    <h6 class="fw-bold text-warning" style="letter-spacing: 1.2px;">MODIFICA CLIENTE</h6>
-                    <h2>[[ cliente.nome ]]</h2>
-                    <p>Totale lavori:
-                        <span v-if="cliente.count_lavori > 0" class="fw-bold" id="testdiv">[[ cliente.count_lavori
-                            ]]</span>
-                        <span v-else class="fw-bold">nessun lavoro per questo cliente</span>
-                    </p>
-                </div>
-                <div class="col-12 col-lg-8 d-flex flex-wrap justify-content-lg-end gap-2 px-0">
+    <div v-if="loading" class="card erp-form-card">
+        <div class="card-body p-5 d-flex align-items-center justify-content-center" style="min-height: 320px;">
+            <span class="loader mx-auto d-flex align-items-center justify-content-center"></span>
+        </div>
+    </div>
 
-                    <button @click="clickForDeleteCliente($event, cliente.id)" class="button-61 button-61-danger me-2"><span><i class="bi bi-trash3"></i></span>&nbsp;Elimina
-                        cliente
-                    </button>
-
-                    <button v-on:click="editCliente($event, {{ cliente.id }})" class="button-61 button-61-success"><span><i class="bi bi-floppy"></i></span>&nbsp;Salva
-                        modifiche
-                    </button>
-
-                </div>
-            </div>
-
-
-            <div class="container p-0 mt-2">
-                <div class="row">
-                    <div class="col">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold" for="nomeCliente">Nominativo</label>
-                                <input name="nomeCliente" type="text" v-model="cliente.nome" class="form-control">
-                            </div>
+    <form v-else id="editClienteForm" class="mt-4" @submit.prevent="editCliente($event, {{ cliente.id }})" v-cloak>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="card erp-form-card">
+            <div class="card-body p-3 p-md-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1 text-break">[[ cliente.nome ]]</h4>
+                        <div class="text-secondary">
+                            Totale lavori:
+                            <span v-if="cliente.count_lavori > 0" class="fw-bold">[[ cliente.count_lavori ]]</span>
+                            <span v-else class="fw-bold">nessun lavoro per questo cliente</span>
                         </div>
-
-                        <div class="row mt-3">
-                            <div class="col-md-5">
-                                <label class="form-label fw-bold" for="email">Email</label>
-                                <input name="email" type="email" v-model="cliente.email" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" for="telefono">Telefono</label>
-                                <input name="telefono" type="tel" v-model="cliente.telefono" class="form-control">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" for="colore">Colore</label>
-                                <input style="width:100%;" name="colore" type="color" v-model="cliente.colore" class="form-control form-control-color" title="Scegli il colore">
-                            </div>
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col">
-                                <label class="form-label fw-bold" for="cliente.telefono">Note</label>
-                                <textarea name="note" v-model="cliente.note" class="form-control"></textarea>
-                            </div>
-                        </div>
-
                     </div>
+                    <div class="erp-form-actions">
+                        <button type="button" @click="clickForDeleteCliente($event, cliente.id)" class="btn btn-outline-danger">
+                            <i class="bi bi-trash3"></i>&nbsp;Elimina cliente
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-floppy"></i>&nbsp;Salva modifiche
+                        </button>
+                    </div>
+                </div>
 
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold" for="nomeCliente">Nominativo</label>
+                        <input name="nomeCliente" type="text" v-model="cliente.nome" class="form-control">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold" for="email">Email</label>
+                        <input name="email" type="email" v-model="cliente.email" class="form-control">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold" for="telefono">Telefono</label>
+                        <input name="telefono" type="tel" v-model="cliente.telefono" class="form-control">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold" for="colore">Colore</label>
+                        <input name="colore" type="color" v-model="cliente.colore" class="form-control form-control-color w-100" title="Scegli il colore">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold" for="cliente.telefono">Note</label>
+                        <textarea name="note" v-model="cliente.note" class="form-control" rows="5"></textarea>
+                    </div>
                 </div>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
+{% endblock %}
 
-{% endblock %} {% block scripts %}
+{% block scripts %}
 <script src="{{ url_for('static', filename='js/cliente_edit.js') }}"></script>
-
 {% endblock %}

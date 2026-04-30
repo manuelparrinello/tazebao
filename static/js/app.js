@@ -1,4 +1,4 @@
-/*--------------------*/
+﻿/*--------------------*/
 /*  CANCELLA CLIENTE  */
 /*--------------------*/
 function getCSRFToken() {
@@ -9,6 +9,70 @@ function csrfHeaders(headers = {}) {
   const token = getCSRFToken();
   return token ? { ...headers, "X-CSRFToken": token } : headers;
 }
+
+function parseDateLike(value) {
+  if (!value) return null;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  if (typeof value === "number") {
+    const parsedNumber = new Date(value);
+    return Number.isNaN(parsedNumber.getTime()) ? null : parsedNumber;
+  }
+
+  const text = String(value).trim();
+  if (!text) return null;
+
+  const dateOnlyMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (dateOnlyMatch) {
+    const [, year, month, day] = dateOnlyMatch;
+    const parsedDateOnly = new Date(Number(year), Number(month) - 1, Number(day));
+    return Number.isNaN(parsedDateOnly.getTime()) ? null : parsedDateOnly;
+  }
+
+  const normalized = text.includes("T") ? text : text.replace(" ", "T");
+  const parsed = new Date(normalized);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function capitalizeFirstLetter(value) {
+  if (!value) return value;
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function formatItalianDate(value) {
+  const parsed = parseDateLike(value);
+  if (!parsed) return "-";
+
+  const parts = new Intl.DateTimeFormat("it-IT", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).formatToParts(parsed);
+
+  return parts
+    .map((part) => {
+      if (part.type !== "month") return part.value;
+      return capitalizeFirstLetter(part.value);
+    })
+    .join("");
+}
+
+function formatItalianDateTime(value) {
+  const parsed = parseDateLike(value);
+  if (!parsed) return "-";
+
+  const datePart = formatItalianDate(parsed);
+  const timePart = new Intl.DateTimeFormat("it-IT", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(parsed);
+
+  return `${datePart} ${timePart}`;
+}
+
+window.erpDateFormatter = {
+  formatDate: formatItalianDate,
+  formatDateTime: formatItalianDateTime,
+};
 
 function deleteCliente(id) {
   return fetch(`/clienti/${id}`, {
@@ -144,22 +208,10 @@ if (document.getElementById("app")) {
         }
       },
       formatDate(value) {
-        if (!value) return "-";
-        return new Intl.DateTimeFormat("it-IT", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        }).format(new Date(value));
+        return formatItalianDate(value);
       },
       formatDateTime(value) {
-        if (!value) return "-";
-        return new Intl.DateTimeFormat("it-IT", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        }).format(new Date(value));
+        return formatItalianDateTime(value);
       },
       formatCurrency(value) {
         if (value === null || value === undefined) return "-";
@@ -288,3 +340,4 @@ if (document.getElementById("app")) {
 
   erpDashboardApp.mount("#app");
 }
+

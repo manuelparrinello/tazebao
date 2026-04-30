@@ -37,9 +37,9 @@ const TabellaLavori = {
                             <option v-for="stato in filtro_stati(lavoro.stato)" :value="[[ stato ]]">[[stato]]</option>
                         </select>
                         </td>
-                        <td class="text-center">[[ lavoro.data_inizio ? new Date(lavoro.data_inizio).toLocaleDateString('it-IT') : '-' ]]</td>
-                        <td class="text-center">[[ lavoro.data_fine || '-' ]]</td>  
-                        <td class="text-center">[[ lavoro.data_pagamento || '-' ]]</td>
+                        <td class="text-center">[[ formatDate(lavoro.data_inizio) ]]</td>
+                        <td class="text-center">[[ formatDate(lavoro.data_fine) ]]</td>  
+                        <td class="text-center">[[ formatDate(lavoro.data_pagamento) ]]</td>
                         <td class="text-center" id="note_td" v-html="renderNoteIcon(lavoro.note)"></td>
                     </tr>
                 </template>
@@ -50,6 +50,21 @@ const TabellaLavori = {
         </table>
     `,
     methods: {
+        formatDate(value) {
+            const formatter = window.erpDateFormatter?.formatDate;
+            if (formatter) return formatter(value);
+            if (!value) return "-";
+            const parsed = new Date(value);
+            if (Number.isNaN(parsed.getTime())) return "-";
+            const parts = new Intl.DateTimeFormat("it-IT", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+            }).formatToParts(parsed);
+            return parts
+                .map((part) => (part.type === "month" ? part.value.charAt(0).toUpperCase() + part.value.slice(1) : part.value))
+                .join("");
+        },
 
         statusColor(stato) {
             if (stato === "Da iniziare") {

@@ -16,66 +16,102 @@
         </div>
     </div>
 
-    <form id="nuovoCliente" @submit.prevent="submitFormNewCliente($event)">
+    <form id="nuovoCliente" class="erp-boxed-form" @submit.prevent="submitFormNewCliente($event)">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="card erp-form-card">
             <div class="card-body p-3 p-md-4">
-                <div class="row g-3">
-                    <div class="col-12 col-md-4">
-                        <label class="form-label fw-bold" for="nomeCliente">Nome</label>
-                        <input style="text-transform:capitalize" name="nome" type="text" v-model="nome" class="form-control">
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Dati cliente</h5>
+                        <p>Nominativo, ragione sociale e indirizzo principale.</p>
                     </div>
-                    <div class="col-12 col-md-4">
-                        <label class="form-label fw-bold" for="nomeCliente">Ragione Sociale/Intestazione</label>
-                        <input style="text-transform:capitalize" name="ragsoc" type="text" v-model="ragsoc" class="form-control">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-bold" for="nomeCliente">Nome</label>
+                            <input name="nome" type="text" v-model="nome" class="form-control erp-text-capitalize">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-bold" for="nomeCliente">Ragione Sociale/Intestazione</label>
+                            <input name="ragsoc" type="text" v-model="ragsoc" class="form-control erp-text-capitalize">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-bold" for="nomeCliente">Indirizzo</label>
+                            <input name="indirizzo" type="text" v-model="indirizzo" class="form-control erp-text-capitalize">
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-2">
+                            <label class="form-label fw-bold" for="nomeCliente">CAP</label>
+                            <input maxlength="5" name="cap" type="text" v-model="cap" class="form-control erp-text-capitalize">
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <label class="form-label fw-bold" for="nomeCliente">Citta</label>
+                            <input name="citta" type="text" v-model="citta" class="form-control erp-text-capitalize">
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-2">
+                            <label class="form-label fw-bold" for="nomeCliente">Provincia</label>
+                            <input name="provincia" type="text" v-model="provincia" maxlength="2" class="form-control erp-text-uppercase">
+                        </div>
                     </div>
-                    <div class="col-12 col-md-4">
-                        <label class="form-label fw-bold" for="nomeCliente">Indirizzo</label>
-                        <input style="text-transform:capitalize" name="indirizzo" type="text" v-model="indirizzo" class="form-control">
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-2">
-                        <label class="form-label fw-bold" for="nomeCliente">CAP</label>
-                        <input maxlength="5" style="text-transform:capitalize" name="cap" type="text" v-model="cap" class="form-control">
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-3">
-                        <label class="form-label fw-bold" for="nomeCliente">Città</label>
-                        <input style="text-transform:capitalize" name="citta" type="text" v-model="citta" class="form-control">
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-2">
-                        <label class="form-label fw-bold" for="nomeCliente">Provincia</label>
-                        <input style="text-transform:uppercase" name="provincia" type="text" v-model="provincia" maxlength="2" class="form-control">
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-5">
-                        <label class="form-label fw-bold" for="email">Email</label>
-                        <input name="email" type="email" v-model="email" class="form-control">
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-3">
-                        <label class="form-label fw-bold" for="telefono">Telefono</label>
-                        <input name="telefono" type="tel" v-model="telefono" class="form-control">
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-3">
-                        <label class="form-label fw-bold" for="telefono">P.IVA/C.F</label>
-                        <input name="p_iva" style="text-transform:uppercase" type="text" v-model="p_iva" class="form-control">
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-2">
-                        <label class="form-label fw-bold" for="telefono">SDI</label>
-                        <input maxlength="7" name="sdi" style="text-transform:uppercase" type="text" v-model="sdi" class="form-control">
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-4">
-                        <label class="form-label fw-bold" for="telefono">PEC</label>
-                        <input name="pec" type="email" v-model="pec" class="form-control">
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-2">
-                        <label class="form-label fw-bold" for="colore">Colore</label>
-                        <input name="colore" type="color" v-model="colore" class="form-control form-control-color w-100" title="Scegli il colore">
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label fw-bold" for="telefono">Note</label>
-                        <textarea name="note" v-model="note" class="form-control" rows="4"></textarea>
-                    </div>
-                </div>
+                </section>
 
-                <div class="erp-form-actions mt-4">
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Contatti</h5>
+                        <p>Email, telefono e canali amministrativi.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6 col-md-5">
+                            <label class="form-label fw-bold" for="email">Email</label>
+                            <input name="email" type="email" v-model="email" class="form-control">
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <label class="form-label fw-bold" for="telefono">Telefono</label>
+                            <input name="telefono" type="tel" v-model="telefono" class="form-control">
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <label class="form-label fw-bold" for="telefono">PEC</label>
+                            <input name="pec" type="email" v-model="pec" class="form-control">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Dati fiscali</h5>
+                        <p>Informazioni utili a fatturazione e documenti.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <label class="form-label fw-bold" for="telefono">P.IVA/C.F</label>
+                            <input name="p_iva" type="text" v-model="p_iva" class="form-control erp-text-uppercase">
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-2">
+                            <label class="form-label fw-bold" for="telefono">SDI</label>
+                            <input maxlength="7" name="sdi" type="text" v-model="sdi" class="form-control erp-text-uppercase">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Note e preferenze</h5>
+                        <p>Colore cliente e note interne.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6 col-md-2">
+                            <label class="form-label fw-bold" for="colore">Colore</label>
+                            <input name="colore" type="color" v-model="colore" class="form-control form-control-color w-100" title="Scegli il colore">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold" for="telefono">Note</label>
+                            <textarea name="note" v-model="note" class="form-control" rows="4"></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="erp-form-footer-actions">
+                    <a href="{{ url_for('clienti') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg"></i>&nbsp;Annulla
+                    </a>
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-floppy"></i>&nbsp;Salva cliente
                     </button>

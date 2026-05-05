@@ -11,99 +11,125 @@
 {%- endmacro %}
 
 {% block content %}
-<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-    <div class="col-12 col-lg-6 px-0">
-        <h3 class="fw-bolder">{{ page_title }}</h3>
-        <p>Gestisci i dettagli operativi della task.</p>
-    </div>
-    <div class="col-12 col-lg-6 d-inline-flex justify-content-lg-end px-0">
-        <a href="{{ url_for('tasks.tasks') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i>&nbsp;Torna alle task
-        </a>
-    </div>
-</div>
-<hr>
-
-{% if error %}
-<div class="alert alert-danger mt-4">{{ error }}</div>
-{% endif %}
-
-<form action="{{ form_action }}" method="post" class="mt-5">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div class="card rounded-3 border border-light-subtle">
-        <div class="card-body p-4">
-            <div class="row g-3">
-                <div class="col-12 col-lg-6">
-                    <label for="name" class="form-label fw-bold">Titolo</label>
-                    <input type="text" class="form-control" id="name" name="name" value="{{ task.name or '' }}" required>
-                </div>
-                <div class="col-12 col-md-6 col-lg-2">
-                    <label for="category" class="form-label fw-bold">Categoria</label>
-                    <select class="form-control form-select" id="category" name="category">
-                        {% for category in categories %}
-                        <option value="{{ category }}" {{ selected(task.category or 'generale', category) }}>{{ labelize(category) }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-12 col-md-6 col-lg-2">
-                    <label for="status" class="form-label fw-bold">Stato</label>
-                    <select class="form-control form-select" id="status" name="status">
-                        {% for status in statuses %}
-                        <option value="{{ status }}" {{ selected(task.status or 'da_fare', status) }}>{{ labelize(status) }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-12 col-md-6 col-lg-2">
-                    <label for="priority" class="form-label fw-bold">Priorita</label>
-                    <select class="form-control form-select" id="priority" name="priority">
-                        {% for priority in priorities %}
-                        <option value="{{ priority }}" {{ selected(task.priority or 'media', priority) }}>{{ labelize(priority) }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="col-12">
-                    <label for="note" class="form-label fw-bold">Descrizione / note</label>
-                    <textarea class="form-control" id="note" name="note" rows="4">{{ task.note or '' }}</textarea>
-                </div>
-
-                <div class="col-12 col-md-6 col-lg-3">
-                    <label for="due_date" class="form-label fw-bold">Scadenza</label>
-                    <input type="date" class="form-control" id="due_date" name="due_date" value="{{ task.due_date.isoformat() if task.due_date else '' }}">
-                </div>
-                <div class="col-12 col-md-6 col-lg-3">
-                    <label for="cliente_id" class="form-label fw-bold">Cliente</label>
-                    <select class="form-control form-select" id="cliente_id" name="cliente_id">
-                        <option value="">Nessun cliente</option>
-                        {% for cliente in clienti %}
-                        <option value="{{ cliente.id }}" {{ selected(task.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-12 col-md-6 col-lg-3">
-                    <label for="lavoro_id" class="form-label fw-bold">Lavoro</label>
-                    <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
-                        <option value="">Nessun lavoro</option>
-                        {% for lavoro in lavori %}
-                        <option value="{{ lavoro.id }}" {{ selected(task.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-12 col-md-6 col-lg-3">
-                    <label for="assignee_id" class="form-label fw-bold">Assegnatario</label>
-                    <select class="form-control form-select" id="assignee_id" name="assignee_id">
-                        <option value="">Nessun assegnatario</option>
-                        {% for user in users %}
-                        <option value="{{ user.id }}" {{ selected(task.assignee_id, user.id) }}>{{ user.name or user.email }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+<div class="erp-form-page">
+    <div class="erp-form-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2">
+            <div>
+                <h3 class="fw-bolder erp-form-title">{{ page_title }}</h3>
+                <p class="erp-form-subtitle">Gestisci i dettagli operativi della task.</p>
             </div>
-
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
-            </div>
+            <a href="{{ url_for('tasks.tasks') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i>&nbsp;Torna alle task
+            </a>
         </div>
     </div>
-</form>
+
+    {% if error %}
+    <div class="alert alert-danger mt-4">{{ error }}</div>
+    {% endif %}
+
+    <form action="{{ form_action }}" method="post" class="erp-boxed-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="card erp-form-card">
+            <div class="card-body p-3 p-md-4">
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Dati task</h5>
+                        <p>Titolo, categoria e descrizione operativa.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-lg-7">
+                            <label for="name" class="form-label fw-bold">Titolo</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ task.name or '' }}" required>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-5">
+                            <label for="category" class="form-label fw-bold">Categoria</label>
+                            <select class="form-control form-select" id="category" name="category">
+                                {% for category in categories %}
+                                <option value="{{ category }}" {{ selected(task.category or 'generale', category) }}>{{ labelize(category) }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="note" class="form-label fw-bold">Descrizione / note</label>
+                            <textarea class="form-control" id="note" name="note" rows="4">{{ task.note or '' }}</textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Workflow</h5>
+                        <p>Stato, priorita e scadenza della task.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label for="status" class="form-label fw-bold">Stato</label>
+                            <select class="form-control form-select" id="status" name="status">
+                                {% for status in statuses %}
+                                <option value="{{ status }}" {{ selected(task.status or 'da_fare', status) }}>{{ labelize(status) }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="priority" class="form-label fw-bold">Priorita</label>
+                            <select class="form-control form-select" id="priority" name="priority">
+                                {% for priority in priorities %}
+                                <option value="{{ priority }}" {{ selected(task.priority or 'media', priority) }}>{{ labelize(priority) }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="due_date" class="form-label fw-bold">Scadenza</label>
+                            <input type="date" class="form-control" id="due_date" name="due_date" value="{{ task.due_date.isoformat() if task.due_date else '' }}">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Collegamenti</h5>
+                        <p>Cliente, lavoro e assegnatario collegati alla task.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <label for="cliente_id" class="form-label fw-bold">Cliente</label>
+                            <select class="form-control form-select" id="cliente_id" name="cliente_id">
+                                <option value="">Nessun cliente</option>
+                                {% for cliente in clienti %}
+                                <option value="{{ cliente.id }}" {{ selected(task.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <label for="lavoro_id" class="form-label fw-bold">Lavoro</label>
+                            <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
+                                <option value="">Nessun lavoro</option>
+                                {% for lavoro in lavori %}
+                                <option value="{{ lavoro.id }}" {{ selected(task.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <label for="assignee_id" class="form-label fw-bold">Assegnatario</label>
+                            <select class="form-control form-select" id="assignee_id" name="assignee_id">
+                                <option value="">Nessun assegnatario</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}" {{ selected(task.assignee_id, user.id) }}>{{ user.name or user.email }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="erp-form-footer-actions">
+                    <a href="{{ url_for('tasks.tasks') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg"></i>&nbsp;Annulla
+                    </a>
+                    <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 {% endblock %}

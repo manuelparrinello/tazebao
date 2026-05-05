@@ -17,55 +17,86 @@
     </div>
 
     <div v-if="loading" class="card erp-form-card">
-        <div class="card-body p-5 d-flex align-items-center justify-content-center" style="min-height: 320px;">
+        <div class="card-body p-5 d-flex align-items-center justify-content-center erp-form-loading">
             <span class="loader mx-auto d-flex align-items-center justify-content-center"></span>
         </div>
     </div>
 
-    <form v-else id="editClienteForm" class="mt-4" @submit.prevent="editCliente($event, {{ cliente.id }})" v-cloak>
+    <form v-else id="editClienteForm" class="erp-boxed-form" @submit.prevent="editCliente($event, {{ cliente.id }})" v-cloak>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="card erp-form-card">
             <div class="card-body p-3 p-md-4">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
-                    <div>
-                        <h4 class="fw-bold mb-1 text-break">[[ cliente.nome ]]</h4>
-                        <div class="text-secondary">
-                            Totale lavori:
-                            <span v-if="cliente.count_lavori > 0" class="fw-bold">[[ cliente.count_lavori ]]</span>
-                            <span v-else class="fw-bold">nessun lavoro per questo cliente</span>
+                <section class="erp-form-section">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
+                        <div class="min-w-0">
+                            <h5 class="fw-bold mb-1 text-break">[[ cliente.nome ]]</h5>
+                            <div class="text-secondary">
+                                Totale lavori:
+                                <span v-if="cliente.count_lavori > 0" class="fw-bold">[[ cliente.count_lavori ]]</span>
+                                <span v-else class="fw-bold">nessun lavoro per questo cliente</span>
+                            </div>
+                        </div>
+                        <div class="erp-form-actions">
+                            <button type="button" @click="clickForDeleteCliente($event, cliente.id)" class="btn btn-outline-danger">
+                                <i class="bi bi-trash3"></i>&nbsp;Elimina cliente
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-floppy"></i>&nbsp;Salva modifiche
+                            </button>
                         </div>
                     </div>
-                    <div class="erp-form-actions">
-                        <button type="button" @click="clickForDeleteCliente($event, cliente.id)" class="btn btn-outline-danger">
-                            <i class="bi bi-trash3"></i>&nbsp;Elimina cliente
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-floppy"></i>&nbsp;Salva modifiche
-                        </button>
-                    </div>
-                </div>
+                </section>
 
-                <div class="row g-3">
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold" for="nomeCliente">Nominativo</label>
-                        <input name="nomeCliente" type="text" v-model="cliente.nome" class="form-control">
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Dati cliente</h5>
+                        <p>Nominativo e preferenze principali.</p>
                     </div>
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold" for="email">Email</label>
-                        <input name="email" type="email" v-model="cliente.email" class="form-control">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-bold" for="nomeCliente">Nominativo</label>
+                            <input name="nomeCliente" type="text" v-model="cliente.nome" class="form-control">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-bold" for="colore">Colore</label>
+                            <input name="colore" type="color" v-model="cliente.colore" class="form-control form-control-color w-100" title="Scegli il colore">
+                        </div>
                     </div>
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold" for="telefono">Telefono</label>
-                        <input name="telefono" type="tel" v-model="cliente.telefono" class="form-control">
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Contatti</h5>
+                        <p>Email e telefono di riferimento.</p>
                     </div>
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold" for="colore">Colore</label>
-                        <input name="colore" type="color" v-model="cliente.colore" class="form-control form-control-color w-100" title="Scegli il colore">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-bold" for="email">Email</label>
+                            <input name="email" type="email" v-model="cliente.email" class="form-control">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-bold" for="telefono">Telefono</label>
+                            <input name="telefono" type="tel" v-model="cliente.telefono" class="form-control">
+                        </div>
                     </div>
-                    <div class="col-12">
-                        <label class="form-label fw-bold" for="cliente.telefono">Note</label>
-                        <textarea name="note" v-model="cliente.note" class="form-control" rows="5"></textarea>
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Note</h5>
+                        <p>Informazioni operative interne sul cliente.</p>
                     </div>
+                    <label class="form-label fw-bold" for="cliente.telefono">Note</label>
+                    <textarea name="note" v-model="cliente.note" class="form-control" rows="5"></textarea>
+                </section>
+
+                <div class="erp-form-footer-actions">
+                    <a href="{{ url_for('clienti') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg"></i>&nbsp;Annulla
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-floppy"></i>&nbsp;Salva modifiche
+                    </button>
                 </div>
             </div>
         </div>

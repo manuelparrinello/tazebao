@@ -74,6 +74,151 @@ window.erpDateFormatter = {
   formatDateTime: formatItalianDateTime,
 };
 
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function normalizeBadgeValue(value) {
+  if (value === null || value === undefined) return "";
+  return String(value).trim().toLowerCase().replaceAll(" ", "_");
+}
+
+const ERP_BADGE_MAP = {
+  work_status: {
+    completato: ["success", "Completato"],
+    completata: ["success", "Completato"],
+    in_corso: ["primary", "In corso"],
+    in_attesa: ["warning", "In attesa"],
+    da_iniziare: ["secondary", "Da iniziare"],
+    annullata: ["secondary", "Annullata"],
+  },
+  work_priority: {
+    urgente: ["danger", "Urgente"],
+    alta: ["danger", "Alta"],
+    media: ["warning", "Media"],
+    bassa: ["success", "Bassa"],
+  },
+  task_status: {
+    da_fare: ["primary", "Da fare"],
+    in_corso: ["primary", "In corso"],
+    in_revisione: ["warning", "In revisione"],
+    completata: ["success", "Completata"],
+    annullata: ["secondary", "Annullata"],
+  },
+  task_priority: {
+    urgente: ["danger", "Urgente"],
+    alta: ["danger", "Alta"],
+    media: ["warning", "Media"],
+    bassa: ["success", "Bassa"],
+  },
+  task_category: {
+    social_media: ["text-bg-light border", "Social media"],
+    grafica: ["text-bg-light border", "Grafica"],
+    amministrazione: ["text-bg-light border", "Amministrazione"],
+    fotografia: ["text-bg-light border", "Fotografia"],
+    web: ["text-bg-light border", "Web"],
+    commerciale: ["text-bg-light border", "Commerciale"],
+    generale: ["text-bg-light border", "Generale"],
+  },
+  quote_status: {
+    bozza: ["warning", "Bozza"],
+    draft: ["warning", "Bozza"],
+    inviato: ["primary", "Inviato"],
+    inviata: ["primary", "Inviato"],
+    accettato: ["success", "Accettato"],
+    accettata: ["success", "Accettato"],
+    approvato: ["success", "Accettato"],
+    approvata: ["success", "Accettato"],
+    rifiutato: ["danger", "Rifiutato"],
+    rifiutata: ["danger", "Rifiutato"],
+    annullato: ["secondary", "Annullato"],
+    annullata: ["secondary", "Annullato"],
+  },
+  event_type: {
+    appuntamento: ["primary", "Appuntamento"],
+    scadenza: ["warning", "Scadenza"],
+    impegno_cliente: ["info", "Impegno cliente"],
+    promemoria: ["secondary", "Promemoria"],
+    generale: ["text-bg-light border", "Generale"],
+    task_due_date: ["warning", "Task"],
+  },
+  finance_income_status: {
+    effettiva: ["success", "Entrata effettiva"],
+    prevista: ["warning", "Entrata prevista"],
+  },
+  finance_expense_type: {
+    fissa: ["secondary", "Fissa"],
+    variabile: ["warning", "Variabile"],
+  },
+  finance_category: {
+    pagamento_cliente: ["text-bg-light border", "Pagamento cliente"],
+    fornitore: ["text-bg-light border", "Fornitore"],
+    software: ["text-bg-light border", "Software"],
+    advertising: ["text-bg-light border", "Advertising"],
+    consulenza: ["text-bg-light border", "Consulenza"],
+    attrezzatura: ["text-bg-light border", "Attrezzatura"],
+    tasse: ["text-bg-light border", "Tasse"],
+    stipendio: ["text-bg-light border", "Stipendio"],
+    commercialista: ["text-bg-light border", "Commercialista"],
+    banca: ["text-bg-light border", "Banca"],
+    costituzione_societa: ["text-bg-light border", "Costituzione società"],
+    generale: ["text-bg-light border", "Generale"],
+  },
+  finance_movement_type: {
+    entrata: ["success", "Entrata"],
+    uscita: ["danger", "Uscita"],
+  },
+  mail_read_status: {
+    read: ["success", "Letta"],
+    unread: ["warning", "Non letta"],
+    inviata: ["primary", "Inviata"],
+  },
+  mail_direction: {
+    inbound: ["info", "Ricevuta"],
+    outbound: ["success", "Inviata"],
+  },
+  user_role: {
+    admin: ["primary", "Admin"],
+    operatore: ["primary", "Operatore"],
+    readonly: ["secondary", "Readonly"],
+  },
+  user_state: {
+    active: ["success", "Attivo"],
+    inactive: ["secondary", "Non attivo"],
+  },
+};
+
+function erpBadgePayload(kind, value) {
+  const key = normalizeBadgeValue(value);
+  return ERP_BADGE_MAP[kind]?.[key] || null;
+}
+
+function erpBadgeLabel(kind, value, text = null) {
+  const payload = erpBadgePayload(kind, value);
+  if (payload) return text || payload[1];
+  if (text) return text;
+  if (value === null || value === undefined || value === "") return "-";
+  return String(value).replaceAll("_", " ").replaceAll("-", " ").replace(/\s+/g, " ").trim().replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function erpBadgeHtml(kind, value, text = null) {
+  const payload = erpBadgePayload(kind, value);
+  const variant = payload ? payload[0] : "text-bg-light border";
+  const label = escapeHtml(erpBadgeLabel(kind, value, text));
+  return `<span class="badge rounded-pill erp-badge ${variant}">${label}</span>`;
+}
+
+window.erpBadge = {
+  payload: erpBadgePayload,
+  label: erpBadgeLabel,
+  html: erpBadgeHtml,
+};
+
 function deleteCliente(id) {
   return fetch(`/clienti/${id}`, {
     method: "delete",

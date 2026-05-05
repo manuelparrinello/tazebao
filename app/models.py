@@ -313,6 +313,7 @@ class EditorialPublication(db.Model):
     cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False, index=True)
     publication_date = db.Column(db.Date, nullable=False, index=True)
     platform = db.Column(db.String(40), nullable=False, default="instagram", index=True)
+    platforms = db.Column(db.String(200), nullable=True)
     content_type = db.Column(db.String(40), nullable=False, default="post_grafico")
     title = db.Column(db.String(180), nullable=False)
     caption = db.Column(db.Text, nullable=True)
@@ -337,6 +338,27 @@ class EditorialPublication(db.Model):
     cliente = db.relationship("Cliente", backref="editorial_publications")
     assigned_user = db.relationship("User", backref="assigned_editorial_publications")
 
+    def get_platforms(self):
+        source = self.platforms or self.platform or ""
+        values = []
+        for value in source.split(","):
+            normalized = value.strip().lower()
+            if normalized and normalized in EDITORIAL_PLATFORMS and normalized not in values:
+                values.append(normalized)
+        return values
+
+    def set_platforms(self, platforms):
+        values = []
+        for value in platforms or []:
+            normalized = str(value).strip().lower()
+            if normalized and normalized in EDITORIAL_PLATFORMS and normalized not in values:
+                values.append(normalized)
+        self.platforms = ",".join(values) if values else None
+        self.platform = values[0] if values else "instagram"
+
+    def has_platform(self, platform):
+        return platform in self.get_platforms()
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -350,6 +372,7 @@ class EditorialPublication(db.Model):
                 self.publication_date.isoformat() if self.publication_date else None
             ),
             "platform": self.platform,
+            "platforms": self.get_platforms(),
             "content_type": self.content_type,
             "title": self.title,
             "caption": self.caption,

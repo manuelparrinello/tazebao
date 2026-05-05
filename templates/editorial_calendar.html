@@ -20,24 +20,51 @@
 {% endif %}
 {%- endmacro %}
 
+{% macro platform_pill(platform) -%}
+{% set key = platform or '' %}
+{% if key == "instagram" %}
+<span class="editorial-platform-pill editorial-platform-instagram">
+    <i class="bi bi-instagram"></i>
+    <span>Instagram</span>
+</span>
+{% elif key == "facebook" %}
+<span class="editorial-platform-pill editorial-platform-facebook">
+    <i class="bi bi-facebook"></i>
+    <span>Facebook</span>
+</span>
+{% else %}
+<span class="editorial-platform-pill editorial-platform-generic">
+    <i class="bi bi-share"></i>
+    <span>{{ labelize(key) }}</span>
+</span>
+{% endif %}
+{%- endmacro %}
+
+{% macro platform_pills(publication) -%}
+<div class="editorial-platform-list">
+    {% for platform in publication.get_platforms() %}
+    {{ platform_pill(platform) }}
+    {% endfor %}
+</div>
+{%- endmacro %}
+
 {% macro publication_card(publication) -%}
 {% set can_mutate = current_user and current_user.role != "readonly" %}
 <a class="editorial-calendar-item" href="{{ url_for('editorial_calendar.editorial_edit', publication_id=publication.id) if can_mutate else '#' }}">
     {{ publication_thumb(publication) }}
     <div class="min-w-0 flex-grow-1">
         <div class="fw-bold text-truncate">{{ publication.title }}</div>
-        <div class="editorial-calendar-meta">
-            <span>{{ labelize(publication.platform) }}</span>
-            <span>{{ labelize(publication.content_type) }}</span>
+        <div class="editorial-calendar-meta mt-1">
+            {{ platform_pills(publication) }}
+            {{ erp_badge("editorial_content_type", publication.content_type) }}
         </div>
-        <div class="mt-1">{{ erp_badge("editorial_status", publication.status) }}</div>
+        <div class="editorial-calendar-meta mt-1">{{ erp_badge("editorial_status", publication.status) }}</div>
     </div>
 </a>
 {%- endmacro %}
 
 {% block content %}
 {% set can_mutate = current_user and current_user.role != "readonly" %}
-{% set active_cliente_id = cliente.id if cliente is defined and cliente else request.args.get('cliente_id', type=int) %}
 
 <div class="row mx-auto w-100 align-items-start g-3">
     <div class="col-12 col-xl-5 px-0">
@@ -51,12 +78,12 @@
     <div class="col-12 col-xl-7 px-0">
         <div class="erp-action-bar justify-content-xl-end">
             {% if view_mode == "calendar" and cliente %}
-            <a class="btn btn-outline-secondary erp-action-secondary" href="{{ url_for('editorial_calendar.editorial_index', cliente_id=cliente.id, year=current_year, month=current_month) }}">
+            <a class="btn btn-outline-secondary erp-action-secondary" href="{{ url_for('editorial_calendar.editorial_index', **list_filter_params) }}">
                 <i class="bi bi-list-ul"></i>&nbsp;Vista lista
             </a>
             {% else %}
             {% if active_cliente_id %}
-            <a class="btn btn-outline-secondary erp-action-secondary" href="{{ url_for('editorial_calendar.client_calendar', cliente_id=active_cliente_id, year=current_year, month=current_month) }}">
+            <a class="btn btn-outline-secondary erp-action-secondary" href="{{ url_for('editorial_calendar.client_calendar', cliente_id=active_cliente_id, **calendar_filter_params) }}">
                 <i class="bi bi-calendar3"></i>&nbsp;Vista mese
             </a>
             {% endif %}
@@ -75,7 +102,7 @@
 <section class="mt-4">
     <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-3">
         <div>
-            <h4 class="fw-bolder mb-1">{{ month_name }} {{ current_year }}</h4>
+            <h4 class="fw-bolder mb-1">{{ month_name }} {{ current_year }} &middot; {{ cliente.name }}</h4>
             <div class="small text-secondary">{{ publications|length }} pubblicazioni nel mese.</div>
         </div>
         <div class="d-inline-flex gap-2">
@@ -180,7 +207,7 @@
                     <select class="form-control form-select" id="platform" name="platform">
                         <option value="">Tutte</option>
                         {% for platform in platforms %}
-                        <option value="{{ platform }}" {{ selected(request.args.get('platform'), platform) }}>{{ labelize(platform) }}</option>
+                        <option value="{{ platform }}" {{ selected(active_platform, platform) }}>{{ labelize(platform) }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -189,7 +216,7 @@
                     <select class="form-control form-select" id="status" name="status">
                         <option value="">Tutti</option>
                         {% for status in statuses %}
-                        <option value="{{ status }}" {{ selected(request.args.get('status'), status) }}>{{ labelize(status) }}</option>
+                        <option value="{{ status }}" {{ selected(active_status, status) }}>{{ labelize(status) }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -198,7 +225,7 @@
                     <select class="form-control form-select" id="assigned_user_id" name="assigned_user_id">
                         <option value="">Tutti</option>
                         {% for user in users %}
-                        <option value="{{ user.id }}" {{ selected(request.args.get('assigned_user_id', type=int), user.id) }}>{{ user.name or user.email }}</option>
+                        <option value="{{ user.id }}" {{ selected(active_assigned_user_id, user.id) }}>{{ user.name or user.email }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -215,7 +242,7 @@
                     <thead>
                         <tr>
                             <th class="fw-bold col-date">Data</th>
-                            <th class="fw-bold">Pubblicazione</th>
+                            <th class="fw-bold editorial-col-publication">Pubblicazione</th>
                             <th class="fw-bold col-status">Piattaforma</th>
                             <th class="fw-bold col-status">Tipo</th>
                             <th class="fw-bold col-status">Stato</th>
@@ -228,7 +255,7 @@
                         {% for publication in publications %}
                         <tr>
                             <td>{{ publication.publication_date|date_it }}</td>
-                            <td>
+                            <td class="editorial-publication-cell">
                                 <div class="d-flex align-items-center gap-2 min-w-0">
                                     {{ publication_thumb(publication) }}
                                     <div class="min-w-0">
@@ -239,7 +266,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ erp_badge("editorial_platform", publication.platform) }}</td>
+                            <td>{{ platform_pills(publication) }}</td>
                             <td>{{ erp_badge("editorial_content_type", publication.content_type) }}</td>
                             <td>{{ erp_badge("editorial_status", publication.status) }}</td>
                             <td>{{ erp_badge("editorial_client_approval", publication.client_approval_status) }}</td>

@@ -55,6 +55,7 @@
             {% if current_user and current_user.is_admin %}
             {{ section("Amministrazione") }}
             {{ nav_item("Utenti", "bi-people", url_for('users.users_index'), is_active(endpoint_prefix='users.')) }}
+            {{ nav_item("Backup / Export", "bi-download", url_for('admin_export.export_index'), is_active(endpoint_prefix='admin_export.')) }}
             {% endif %}
         </ul>
     </nav>
@@ -114,6 +115,7 @@
             {% if current_user and current_user.is_admin %}
             {{ section("Amministrazione") }}
             {{ nav_item("Utenti", "bi-people", url_for('users.users_index'), is_active(endpoint_prefix='users.')) }}
+            {{ nav_item("Backup / Export", "bi-download", url_for('admin_export.export_index'), is_active(endpoint_prefix='admin_export.')) }}
             {% endif %}
         </ul>
 

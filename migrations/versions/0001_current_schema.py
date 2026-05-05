@@ -214,6 +214,7 @@ def upgrade():
         sa.Column("cliente_id", sa.Integer(), nullable=False),
         sa.Column("publication_date", sa.Date(), nullable=False),
         sa.Column("platform", sa.String(length=40), nullable=False),
+        sa.Column("platforms", sa.String(length=200), nullable=True),
         sa.Column("content_type", sa.String(length=40), nullable=False),
         sa.Column("title", sa.String(length=180), nullable=False),
         sa.Column("caption", sa.Text(), nullable=True),

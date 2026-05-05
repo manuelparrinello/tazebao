@@ -2,7 +2,16 @@ from flask import Blueprint, flash, g, redirect, render_template, request, url_f
 
 from ..auth import role_required
 from ..extensions import db
-from ..models import User, VALID_USER_ROLES
+from ..models import (
+    CalendarEvent,
+    EditorialPublication,
+    EmailAccount,
+    EmailLog,
+    FinancialMovement,
+    Task,
+    User,
+    VALID_USER_ROLES,
+)
 
 
 bp = Blueprint("users", __name__)
@@ -48,6 +57,31 @@ def can_soft_delete_user(user):
         return False
     if would_remove_last_admin(user, user.role, False):
         flash("Non puoi eliminare l'ultimo admin attivo.", "danger")
+        return False
+    return True
+
+
+def user_has_erp_links(user):
+    checks = (
+        Task.query.filter_by(assignee_id=user.id).first(),
+        CalendarEvent.query.filter_by(assigned_user_id=user.id).first(),
+        FinancialMovement.query.filter_by(created_by=user.id).first(),
+        EmailAccount.query.filter_by(created_by=user.id).first(),
+        EmailLog.query.filter_by(created_by=user.id).first(),
+        EditorialPublication.query.filter_by(assigned_user_id=user.id).first(),
+    )
+    return any(checks)
+
+
+def can_destroy_user(user):
+    if user.id == g.current_user.id:
+        flash("Non puoi eliminare definitivamente il tuo account.", "danger")
+        return False
+    if would_remove_last_admin(user, user.role, False):
+        flash("Non puoi eliminare definitivamente l'ultimo admin attivo.", "danger")
+        return False
+    if user_has_erp_links(user):
+        flash("Utente collegato a dati ERP, disattivalo invece.", "warning")
         return False
     return True
 
@@ -198,6 +232,23 @@ def users_delete(user_id):
     user.is_active = False
     db.session.commit()
     flash("Utente eliminato dalla lista attiva. L'account è stato disattivato.", "success")
+    return redirect(url_for("users.users_index"))
+
+
+@bp.post("/users/<int:user_id>/destroy")
+@role_required("admin")
+def users_destroy(user_id):
+    user = db.session.get(User, user_id)
+    if user is None:
+        flash("Utente non trovato.", "danger")
+        return redirect(url_for("users.users_index"))
+
+    if not can_destroy_user(user):
+        return redirect(url_for("users.users_index"))
+
+    db.session.delete(user)
+    db.session.commit()
+    flash("Utente eliminato definitivamente.", "success")
     return redirect(url_for("users.users_index"))
 
 

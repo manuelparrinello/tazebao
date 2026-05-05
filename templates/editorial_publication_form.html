@@ -14,6 +14,10 @@
 {{ value.replace("_", " ").title() if value else "-" }}
 {%- endmacro %}
 
+{% macro checked_platform(publication, value) -%}
+{% if value in publication.get_platforms() %}checked{% endif %}
+{%- endmacro %}
+
 {% block content %}
 {% set can_delete = publication.id and current_user and current_user.role != "readonly" %}
 
@@ -61,12 +65,15 @@
                     <input type="date" class="form-control" id="publication_date" name="publication_date" value="{{ date_value(publication.publication_date) }}" required>
                 </div>
                 <div class="col-12 col-md-6 col-lg-3">
-                    <label for="platform" class="form-label fw-bold">Piattaforma</label>
-                    <select class="form-control form-select" id="platform" name="platform">
+                    <div class="form-label fw-bold">Piattaforme</div>
+                    <div class="editorial-platform-checks">
                         {% for platform in platforms %}
-                        <option value="{{ platform }}" {{ selected(publication.platform or 'instagram', platform) }}>{{ labelize(platform) }}</option>
+                        <label class="editorial-platform-check" for="platform_{{ platform }}">
+                            <input class="form-check-input" type="checkbox" id="platform_{{ platform }}" name="platforms" value="{{ platform }}" {{ checked_platform(publication, platform) }}>
+                            <span>{{ labelize(platform) }}</span>
+                        </label>
                         {% endfor %}
-                    </select>
+                    </div>
                 </div>
                 <div class="col-12 col-md-6 col-lg-3">
                     <label for="content_type" class="form-label fw-bold">Tipo contenuto</label>

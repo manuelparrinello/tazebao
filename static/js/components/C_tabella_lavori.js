@@ -22,7 +22,7 @@ const TabellaLavori = {
         <template v-if="lavori_data.length > 0">
           <tr v-for="lavoro in lavori_data">
             <td :sorttable_customkey="prioIndex(lavoro.priorita)" class="text-center col-prio">
-              <span v-html="prioPill(lavoro.priorita)" :class="prioClass(lavoro.priorita)"></span>
+              <span v-html="badgeHtml('work_priority', lavoro.priorita)"></span>
             </td>
             <td>
               <a class="fw-bold text-decoration-underline" :href="'/lavori/' + lavoro.id">[[ lavoro.descrizione ]]</a>
@@ -42,7 +42,7 @@ const TabellaLavori = {
                 </select>
               </template>
               <template v-else>
-                <span class="badge rounded-pill bg-primary">[[ lavoro.stato ]]</span>
+                <span v-html="badgeHtml('work_status', lavoro.stato)"></span>
               </template>
             </td>
           </tr>
@@ -59,7 +59,7 @@ const TabellaLavori = {
             <div class="min-w-0">
               <div class="d-flex align-items-center gap-2 mb-1">
                 <span class="fw-bold mobile-row-title" :title="lavoro.descrizione">[[ lavoro.descrizione ]]</span>
-                <span class="badge rounded-pill text-bg-primary flex-shrink-0">[[ lavoro.stato ]]</span>
+                <span v-html="badgeHtml('work_status', lavoro.stato)" class="flex-shrink-0"></span>
               </div>
             </div>
             <i class="bi bi-chevron-right text-secondary flex-shrink-0"></i>
@@ -74,6 +74,9 @@ const TabellaLavori = {
   methods: {
     canMutate() {
       return window.erpCanMutate !== false;
+    },
+    badgeHtml(kind, value, text = null) {
+      return window.erpBadge?.html ? window.erpBadge.html(kind, value, text) : `<span class="badge rounded-pill">${value || "-"}</span>`;
     },
     formatDate(value) {
       const formatter = window.erpDateFormatter?.formatDate;
@@ -90,13 +93,6 @@ const TabellaLavori = {
         .map((part) => (part.type === "month" ? part.value.charAt(0).toUpperCase() + part.value.slice(1) : part.value))
         .join("");
     },
-    prioPill(prio) {
-      if (prio === "Bassa") return `<i class="bi bi-emoji-smile"></i>`;
-      if (prio === "Media") return `<i class="bi bi-emoji-neutral"></i>`;
-      if (prio === "Alta") return `<i class="bi bi-emoji-angry"></i>`;
-      return "";
-    },
-
     statusColor(stato) {
       if (stato === "Da iniziare") return "selectDaIniziare";
       if (stato === "In corso") return "selectInCorso";
@@ -108,13 +104,6 @@ const TabellaLavori = {
       if (prio === "Bassa") return 1;
       if (prio === "Media") return 2;
       if (prio === "Alta") return 3;
-      return "";
-    },
-
-    prioClass(prio) {
-      if (prio === "Bassa") return "prio-low";
-      if (prio === "Media") return "prio-med";
-      if (prio === "Alta") return "prio-high";
       return "";
     },
 

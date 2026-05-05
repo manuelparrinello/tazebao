@@ -30,16 +30,6 @@
 </div>
 {%- endmacro %}
 
-{% macro finance_badge(movement) -%}
-{% if movement.movement_type == "entrata" and movement.movement_status == "effettiva" %}
-<span class="badge rounded-pill text-bg-success">Entrata effettiva</span>
-{% elif movement.movement_type == "entrata" %}
-<span class="badge rounded-pill text-bg-warning">Entrata prevista</span>
-{% else %}
-<span class="badge rounded-pill text-bg-danger">Uscita</span>
-{% endif %}
-{%- endmacro %}
-
 {% block content %}
 <div class="row mx-auto w-100 align-items-start g-3">
     <div class="col-12 col-xl-5 px-0">
@@ -62,6 +52,7 @@
                     <li><a class="dropdown-item" href="{{ quick_actions.nuovo_task if can_mutate else '#' }}"><i class="bi bi-list-check me-2"></i>Nuova task</a></li>
                     <li><a class="dropdown-item" href="{{ quick_actions.nuovo_preventivo if can_mutate else '#' }}"><i class="bi bi-receipt me-2"></i>Nuovo preventivo</a></li>
                     <li><a class="dropdown-item" href="{{ quick_actions.nuovo_evento if can_mutate else '#' }}"><i class="bi bi-calendar-plus me-2"></i>Nuovo evento</a></li>
+                    <li><a class="dropdown-item" href="{{ quick_actions.nuova_pubblicazione if can_mutate else '#' }}"><i class="bi bi-calendar2-week me-2"></i>Nuova pubblicazione</a></li>
                     <li><a class="dropdown-item" href="{{ quick_actions.nuovo_movimento if can_mutate else '#' }}"><i class="bi bi-cash-coin me-2"></i>Nuovo movimento</a></li>
                     {% if quick_actions.nuova_comunicazione %}
                     <li><a class="dropdown-item" href="{{ quick_actions.nuova_comunicazione if can_mutate else '#' }}"><i class="bi bi-chat-left-text me-2"></i>Nuova comunicazione</a></li>
@@ -200,7 +191,7 @@
                                     {{ labelize(task.status) }} &middot; {{ labelize(task.priority) }}{% if task.due_date %} &middot; Scadenza {{ task.due_date|date_it }}{% endif %}
                                 </div>
                             </div>
-                            <span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span>
+                            {{ erp_badge("task_category", task.category) }}
                         </div>
                     </a>
                     {% endfor %}
@@ -266,6 +257,37 @@
         </section>
     </div>
 
+    <div class="col-12 col-xl-6">
+        <section class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-3 p-md-4">
+                {{ section_title("Prossime pubblicazioni editoriali", 10) }}
+                {% if editorial_publications %}
+                <div class="list-group list-group-flush">
+                    {% for publication in editorial_publications %}
+                    <a href="{{ url_for('editorial_calendar.editorial_edit', publication_id=publication.id) if can_mutate else '#' }}" class="list-group-item list-group-item-action px-0 py-3">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div class="min-w-0">
+                                <div class="fw-bold">{{ publication.title }}</div>
+                                <div class="small text-secondary text-break">
+                                    {{ publication.publication_date|date_it }} &middot; {{ labelize(publication.platform) }} &middot; {{ labelize(publication.content_type) }}
+                                </div>
+                                <div class="mt-2 d-flex flex-wrap gap-2">
+                                    {{ erp_badge("editorial_status", publication.status) }}
+                                    {{ erp_badge("editorial_client_approval", publication.client_approval_status) }}
+                                </div>
+                            </div>
+                            <i class="bi bi-calendar2-week text-secondary"></i>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ empty_state("Nessuna pubblicazione editoriale futura collegata a questo cliente.", quick_actions.nuova_pubblicazione, "Crea pubblicazione") }}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
     <div class="col-12">
         <section class="card border-0 shadow-sm">
             <div class="card-body p-3 p-md-4">
@@ -282,7 +304,7 @@
                                 </div>
                             </div>
                             <div class="text-end">
-                                {{ finance_badge(movimento) }}
+                                {{ erp_badge("finance_movement_type", movimento.movement_type) if movimento.movement_type == "uscita" else erp_badge("finance_income_status", movimento.movement_status, "Entrata " ~ ("effettiva" if movimento.movement_status == "effettiva" else "prevista")) }}
                                 <div class="fw-bold mt-1">{{ euro(movimento.amount|float) }}</div>
                             </div>
                         </div>
@@ -319,9 +341,7 @@
                                     &middot; {{ (mail_message.received_at or mail_message.sent_at or mail_message.created_at)|datetime_it }}
                                 </div>
                             </div>
-                            <span class="badge {{ 'text-bg-info' if mail_message.direction == 'inbound' else 'text-bg-success' }}">
-                                {{ "Inbound" if mail_message.direction == "inbound" else "Outbound" }}
-                            </span>
+                            {{ erp_badge("mail_direction", mail_message.direction) }}
                         </div>
                     </a>
                     {% endfor %}
@@ -355,9 +375,7 @@
                                     &middot; {{ email_log.sent_at|datetime_it if email_log.sent_at else "-" }}
                                 </div>
                             </div>
-                            <span class="badge {{ 'text-bg-info' if email_log.direction == 'inbound' else 'text-bg-success' }}">
-                                {{ "Inbound" if email_log.direction == "inbound" else "Outbound" }}
-                            </span>
+                            {{ erp_badge("mail_direction", email_log.direction) }}
                         </div>
                     </a>
                     {% endfor %}

@@ -1,8 +1,10 @@
+from datetime import date
+
 from flask import Blueprint, jsonify, render_template, request, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
-from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Preventivo, Task
+from ..models import CalendarEvent, Cliente, EditorialPublication, EmailLog, EmailMessage, FinancialMovement, Lavoro, Preventivo, Task
 
 
 bp = Blueprint("clienti", __name__)
@@ -93,6 +95,13 @@ def cliente_page(cliente_id):
         .limit(10)
         .all()
     )
+    editorial_publications = (
+        EditorialPublication.query.filter_by(cliente_id=cliente_id)
+        .filter(EditorialPublication.publication_date >= date.today())
+        .order_by(EditorialPublication.publication_date.asc(), EditorialPublication.id.asc())
+        .limit(10)
+        .all()
+    )
     preventivi = (
         Preventivo.query.filter_by(cliente_id=cliente_id)
         .order_by(Preventivo.data_creazione.desc())
@@ -129,6 +138,10 @@ def cliente_page(cliente_id):
         "nuovo_preventivo": url_for("nuovo_preventivo", cliente_id=cliente.id),
         "nuovo_movimento": url_for("finance.finance_new", cliente_id=cliente.id),
         "nuova_comunicazione": url_for("emails.emails_new", cliente_id=cliente.id),
+        "nuova_pubblicazione": url_for(
+            "editorial_calendar.editorial_new",
+            cliente_id=cliente.id,
+        ),
     }
 
     return render_template(
@@ -137,6 +150,7 @@ def cliente_page(cliente_id):
         lavori=lavori,
         tasks=tasks,
         eventi=eventi,
+        editorial_publications=editorial_publications,
         preventivi=preventivi,
         movimenti=movimenti,
         email_logs=email_logs,

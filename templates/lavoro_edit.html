@@ -28,8 +28,8 @@
             </div>
         </div>
         <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
-            <span class="badge rounded-pill text-bg-primary">{{ lavoro.stato or "-" }}</span>
-            <span class="badge rounded-pill text-bg-light border">{{ lavoro.priorita or "-" }}</span>
+            {{ erp_badge("work_status", lavoro.stato) }}
+            {{ erp_badge("work_priority", lavoro.priorita) }}
             <span class="text-secondary">
                 Cliente:
                 {% if lavoro.cliente %}

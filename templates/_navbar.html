@@ -40,6 +40,7 @@
             {{ nav_item("Lavori", "bi-briefcase", url_for('lavori'), is_active(endpoint='lavori')) }}
             {{ nav_item("Task", "bi-list-check", url_for('tasks.tasks'), is_active(endpoint_prefix='tasks.')) }}
             {{ nav_item("Calendario", "bi-calendar3", url_for('calendar.calendar_index'), is_active(endpoint_prefix='calendar.')) }}
+            {{ nav_item("Calendario Editoriale", "bi-calendar2-week", url_for('editorial_calendar.editorial_index'), is_active(endpoint_prefix='editorial_calendar.')) }}
 
             {{ section("Commerciale") }}
             {{ nav_item("Preventivi", "bi-receipt", url_for('preventivi'), is_active(endpoint='preventivi')) }}
@@ -98,6 +99,7 @@
             {{ nav_item("Lavori", "bi-briefcase", url_for('lavori'), is_active(endpoint='lavori')) }}
             {{ nav_item("Task", "bi-list-check", url_for('tasks.tasks'), is_active(endpoint_prefix='tasks.')) }}
             {{ nav_item("Calendario", "bi-calendar3", url_for('calendar.calendar_index'), is_active(endpoint_prefix='calendar.')) }}
+            {{ nav_item("Calendario Editoriale", "bi-calendar2-week", url_for('editorial_calendar.editorial_index'), is_active(endpoint_prefix='editorial_calendar.')) }}
 
             {{ section("Commerciale") }}
             {{ nav_item("Preventivi", "bi-receipt", url_for('preventivi'), is_active(endpoint='preventivi')) }}

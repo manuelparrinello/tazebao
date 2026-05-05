@@ -6,14 +6,6 @@
 {{ value.replace("_", " ").title() }}
 {%- endmacro %}
 
-{% macro event_badge(event) -%}
-{% if event.source == "task_due_date" %}
-<span class="badge rounded-pill text-bg-warning">Task</span>
-{% else %}
-<span class="badge rounded-pill bg-primary">{{ labelize(event.event_type) }}</span>
-{% endif %}
-{%- endmacro %}
-
 {% block content %}
 {% set can_mutate = current_user and current_user.role != "readonly" %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
@@ -38,8 +30,8 @@
         <div>
             <h4 class="fw-bolder mb-1">{{ month_name }} {{ current_year }}</h4>
             <div class="d-flex align-items-center gap-3 small">
-                <span class="badge rounded-pill bg-primary">Evento</span>
-                <span class="badge rounded-pill text-bg-warning">Task</span>
+                {{ erp_badge("event_type", "appuntamento", "Evento") }}
+                {{ erp_badge("event_type", "task_due_date", "Task") }}
             </div>
         </div>
         <div class="d-inline-flex gap-2">
@@ -67,7 +59,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="fw-bold {% if day.is_today %}text-primary{% endif %}">{{ day.day }}</span>
                             {% if day.is_today %}
-                            <span class="badge rounded-pill bg-primary">Oggi</span>
+                            {{ erp_badge("event_type", "appuntamento", "Oggi") }}
                             {% endif %}
                         </div>
 
@@ -76,7 +68,7 @@
                             <a class="d-block rounded-2 border p-2 bg-white text-dark small" href="{{ event.edit_url if can_mutate else '#' }}">
                                 <div class="d-flex align-items-center justify-content-between gap-2">
                                     <span class="fw-bold text-truncate">{{ event.title }}</span>
-                                    {{ event_badge(event) }}
+                                    {{ erp_badge("event_type", event.event_type) if event.source == "calendar_event" else erp_badge("event_type", "task_due_date", "Task") }}
                                 </div>
                                 {% if event.time %}
                                 <div class="text-secondary">{{ event.time }}</div>
@@ -129,7 +121,7 @@
                                 <div class="small text-secondary">{{ event.description }}</div>
                                 {% endif %}
                             </td>
-                            <td>{{ event_badge(event) }}</td>
+                            <td>{{ erp_badge("event_type", event.event_type) if event.source == "calendar_event" else erp_badge("event_type", "task_due_date", "Task") }}</td>
                             <td>{{ event.cliente.name if event.cliente else "-" }}</td>
                             <td>{{ event.lavoro.descrizione if event.lavoro else "-" }}</td>
                             <td>{{ event.task.name if event.task else "-" }}</td>
@@ -162,7 +154,7 @@
                         <div class="min-w-0">
                             <div class="d-flex align-items-center gap-2 mb-1">
                                 <span class="fw-bold text-truncate">{{ event.title }}</span>
-                                {{ event_badge(event) }}
+                                {{ erp_badge("event_type", event.event_type) if event.source == "calendar_event" else erp_badge("event_type", "task_due_date", "Task") }}
                             </div>
                             <div class="small text-secondary">{{ event.date|date_it }}{% if event.time %} &middot; {{ event.time }}{% endif %}</div>
                             <div class="small text-secondary text-truncate">

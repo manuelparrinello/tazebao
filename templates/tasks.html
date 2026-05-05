@@ -50,9 +50,9 @@
                             <td>
                                 <a class="fw-bold a-no-color" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}">{{ task.name }}</a>
                             </td>
-                            <td class="mobile-priority-low"><span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span></td>
-                            <td><span class="badge rounded-pill bg-primary">{{ labelize(task.status) }}</span></td>
-                            <td class="mobile-priority-low"><span class="badge rounded-pill text-bg-warning">{{ labelize(task.priority) }}</span></td>
+                            <td class="mobile-priority-low">{{ erp_badge("task_category", task.category) }}</td>
+                            <td>{{ erp_badge("task_status", task.status) }}</td>
+                            <td class="mobile-priority-low">{{ erp_badge("task_priority", task.priority) }}</td>
                             <td>{{ task.due_date|date_it if task.due_date else "-" }}</td>
                             <td class="mobile-hide">{{ task.cliente.name if task.cliente else "-" }}</td>
                             <td class="mobile-hide">{{ task.lavoro.descrizione if task.lavoro else "-" }}</td>
@@ -86,8 +86,8 @@
                         <div class="min-w-0">
                             <div class="d-flex align-items-center gap-2 mb-1">
                                 <span class="fw-bold mobile-row-title">{{ task.name }}</span>
-                                <span class="badge rounded-pill bg-primary flex-shrink-0">{{ labelize(task.status) }}</span>
-                                <span class="badge rounded-pill text-bg-warning flex-shrink-0">{{ labelize(task.priority) }}</span>
+                                {{ erp_badge("task_status", task.status) }}
+                                {{ erp_badge("task_priority", task.priority) }}
                             </div>
                             <div class="mobile-row-muted">
                                 {% if task.due_date %}Scadenza {{ task.due_date|date_it }}{% else %}Nessuna scadenza{% endif %}

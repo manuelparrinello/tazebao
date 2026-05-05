@@ -4,6 +4,7 @@ from datetime import date as date_cls, datetime as datetime_cls
 
 from flask import Flask
 from dotenv import load_dotenv
+from markupsafe import Markup, escape
 
 from .auth import register_auth_guards
 from .cli import register_cli
@@ -58,7 +59,7 @@ def create_app():
     register_cli(app)
 
     from . import models  # noqa: F401
-    from .routes import api, auth, calendar, clienti, emails, finance, lavori, mail, main, preventivi, tasks, users
+    from .routes import api, auth, calendar, clienti, editorial_calendar, emails, finance, lavori, mail, main, preventivi, tasks, users
 
     register_auth_endpoint_aliases(app)
     register_legacy_endpoint_aliases(app)
@@ -69,6 +70,7 @@ def create_app():
     app.register_blueprint(preventivi.bp)
     app.register_blueprint(tasks.bp)
     app.register_blueprint(calendar.bp)
+    app.register_blueprint(editorial_calendar.bp)
     app.register_blueprint(finance.bp)
     app.register_blueprint(emails.bp)
     app.register_blueprint(mail.bp)
@@ -146,6 +148,164 @@ def register_template_filters(app):
         if text:
             return text.replace("\n", "<br>\n")
         return ""
+
+    def _normalize_badge_key(value):
+        if value is None:
+            return ""
+        return str(value).strip().lower().replace(" ", "_")
+
+    def _titleize(value):
+        if value in (None, ""):
+            return "-"
+        return str(value).replace("_", " ").replace("-", " ").title()
+
+    def _badge_payload(kind, value):
+        key = _normalize_badge_key(value)
+        mapping = {
+            "work_status": {
+                "completato": ("success", "Completato"),
+                "completata": ("success", "Completato"),
+                "in_corso": ("primary", "In corso"),
+                "in_attesa": ("warning", "In attesa"),
+                "da_iniziare": ("secondary", "Da iniziare"),
+                "annullata": ("secondary", "Annullata"),
+            },
+            "work_priority": {
+                "urgente": ("danger", "Urgente"),
+                "alta": ("danger", "Alta"),
+                "media": ("warning", "Media"),
+                "bassa": ("success", "Bassa"),
+            },
+            "task_status": {
+                "da_fare": ("primary", "Da fare"),
+                "in_corso": ("primary", "In corso"),
+                "in_revisione": ("warning", "In revisione"),
+                "completata": ("success", "Completata"),
+                "annullata": ("secondary", "Annullata"),
+            },
+            "task_priority": {
+                "urgente": ("danger", "Urgente"),
+                "alta": ("danger", "Alta"),
+                "media": ("warning", "Media"),
+                "bassa": ("success", "Bassa"),
+            },
+            "task_category": {
+                "social_media": ("text-bg-light border", "Social media"),
+                "grafica": ("text-bg-light border", "Grafica"),
+                "amministrazione": ("text-bg-light border", "Amministrazione"),
+                "fotografia": ("text-bg-light border", "Fotografia"),
+                "web": ("text-bg-light border", "Web"),
+                "commerciale": ("text-bg-light border", "Commerciale"),
+                "generale": ("text-bg-light border", "Generale"),
+            },
+            "quote_status": {
+                "bozza": ("warning", "Bozza"),
+                "draft": ("warning", "Bozza"),
+                "inviato": ("primary", "Inviato"),
+                "inviata": ("primary", "Inviato"),
+                "accettato": ("success", "Accettato"),
+                "accettata": ("success", "Accettato"),
+                "approvato": ("success", "Accettato"),
+                "approvata": ("success", "Accettato"),
+                "rifiutato": ("danger", "Rifiutato"),
+                "rifiutata": ("danger", "Rifiutato"),
+                "annullato": ("secondary", "Annullato"),
+                "annullata": ("secondary", "Annullato"),
+            },
+            "event_type": {
+                "appuntamento": ("primary", "Appuntamento"),
+                "scadenza": ("warning", "Scadenza"),
+                "impegno_cliente": ("info", "Impegno cliente"),
+                "promemoria": ("secondary", "Promemoria"),
+                "generale": ("text-bg-light border", "Generale"),
+                "task_due_date": ("warning", "Task"),
+            },
+            "editorial_status": {
+                "idea": ("text-bg-light border", "Idea"),
+                "da_produrre": ("primary", "Da produrre"),
+                "in_revisione": ("warning", "In revisione"),
+                "approvato": ("success", "Approvato"),
+                "programmato": ("info", "Programmato"),
+                "pubblicato": ("success", "Pubblicato"),
+                "annullato": ("secondary", "Annullato"),
+            },
+            "editorial_platform": {
+                "instagram": ("text-bg-light border", "Instagram"),
+                "facebook": ("text-bg-light border", "Facebook"),
+            },
+            "editorial_content_type": {
+                "post_grafico": ("text-bg-light border", "Post grafico"),
+                "post_fotografico": ("text-bg-light border", "Post fotografico"),
+                "storia": ("text-bg-light border", "Storia"),
+                "carousel": ("text-bg-light border", "Carousel"),
+                "reel": ("text-bg-light border", "Reel"),
+                "video": ("text-bg-light border", "Video"),
+            },
+            "editorial_client_approval": {
+                "da_approvare": ("warning", "Da approvare"),
+                "approvato": ("success", "Approvato"),
+                "modifiche_richieste": ("danger", "Modifiche richieste"),
+            },
+            "finance_income_status": {
+                "effettiva": ("success", "Effettiva"),
+                "prevista": ("warning", "Prevista"),
+            },
+            "finance_expense_type": {
+                "fissa": ("secondary", "Fissa"),
+                "variabile": ("warning", "Variabile"),
+            },
+            "finance_category": {
+                "pagamento_cliente": ("text-bg-light border", "Pagamento cliente"),
+                "fornitore": ("text-bg-light border", "Fornitore"),
+                "software": ("text-bg-light border", "Software"),
+                "advertising": ("text-bg-light border", "Advertising"),
+                "consulenza": ("text-bg-light border", "Consulenza"),
+                "attrezzatura": ("text-bg-light border", "Attrezzatura"),
+                "tasse": ("text-bg-light border", "Tasse"),
+                "stipendio": ("text-bg-light border", "Stipendio"),
+                "commercialista": ("text-bg-light border", "Commercialista"),
+                "banca": ("text-bg-light border", "Banca"),
+                "costituzione_societa": ("text-bg-light border", "Costituzione società"),
+                "generale": ("text-bg-light border", "Generale"),
+            },
+            "finance_movement_type": {
+                "entrata": ("success", "Entrata"),
+                "uscita": ("danger", "Uscita"),
+            },
+            "mail_read_status": {
+                "read": ("success", "Letta"),
+                "unread": ("warning", "Non letta"),
+                "inviata": ("primary", "Inviata"),
+            },
+            "mail_direction": {
+                "inbound": ("info", "Ricevuta"),
+                "outbound": ("success", "Inviata"),
+            },
+            "user_role": {
+                "admin": ("primary", "Admin"),
+                "operatore": ("primary", "Operatore"),
+                "readonly": ("secondary", "Readonly"),
+            },
+            "user_state": {
+                "active": ("success", "Attivo"),
+                "inactive": ("secondary", "Non attivo"),
+            },
+        }
+        return mapping.get(kind, {}).get(key)
+
+    @app.template_global("erp_badge")
+    def erp_badge(kind, value=None, text=None):
+        payload = _badge_payload(kind, value)
+        if payload:
+            variant, default_text = payload
+        else:
+            variant, default_text = "text-bg-light border", _titleize(value)
+
+        label = text or default_text
+        classes = ["badge", "rounded-pill", "erp-badge"]
+        if variant:
+            classes.extend(str(variant).split())
+        return Markup(f'<span class="{" ".join(classes)}">{escape(label)}</span>')
 
 
 def register_auth_endpoint_aliases(app):

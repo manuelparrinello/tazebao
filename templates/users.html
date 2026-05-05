@@ -2,24 +2,6 @@
 
 {% block title %}Utenti{% endblock %}
 
-{% macro role_badge(role) -%}
-{% if role == "admin" %}
-<span class="badge rounded-pill text-bg-danger">Admin</span>
-{% elif role == "operatore" %}
-<span class="badge rounded-pill text-bg-primary">Operatore</span>
-{% else %}
-<span class="badge rounded-pill text-bg-secondary">Readonly</span>
-{% endif %}
-{%- endmacro %}
-
-{% macro state_badge(user) -%}
-{% if user.is_active %}
-<span class="badge rounded-pill text-bg-success">Attivo</span>
-{% else %}
-<span class="badge rounded-pill text-bg-secondary">Non attivo</span>
-{% endif %}
-{%- endmacro %}
-
 {% block content %}
 <div class="row mx-auto w-100 align-items-center g-3">
     <div class="col-12 col-lg-6 px-0">
@@ -67,8 +49,8 @@
                         <td class="mobile-hide">
                             <div class="users-truncate" title="{{ user.email }}">{{ user.email }}</div>
                         </td>
-                        <td class="text-nowrap">{{ role_badge(user.role) }}</td>
-                        <td class="text-nowrap">{{ state_badge(user) }}</td>
+                        <td class="text-nowrap">{{ erp_badge("user_role", user.role) }}</td>
+                        <td class="text-nowrap">{{ erp_badge("user_state", "active" if user.is_active else "inactive") }}</td>
                         <td class="text-end">
                             <div class="erp-actions">
                                 <a class="btn btn-sm btn-outline-primary" href="{{ url_for('users.users_edit', user_id=user.id) }}">

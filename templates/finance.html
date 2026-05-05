@@ -20,14 +20,6 @@
 {{ value.replace("_", " ").title() if value else "-" }}
 {%- endmacro %}
 
-{% macro income_status_badge(status) -%}
-{% if status == "effettiva" %}
-<span class="badge rounded-pill text-bg-success finance-status-badge"><i class="bi bi-check-circle-fill"></i> Effettiva</span>
-{% else %}
-<span class="badge rounded-pill text-bg-warning finance-status-badge"><i class="bi bi-hourglass-split"></i> Prevista</span>
-{% endif %}
-{%- endmacro %}
-
 {% macro movement_table(movements, kind) -%}
 {% if movements %}
 <div class="table-responsive">
@@ -52,12 +44,12 @@
                     <div class="small text-secondary">{{ movement.description }}</div>
                     {% endif %}
                 </td>
-                <td class="mobile-priority-low"><span class="badge rounded-pill text-bg-light border">{{ labelize(movement.category) }}</span></td>
+                <td class="mobile-priority-low">{{ erp_badge("finance_category", movement.category) }}</td>
                 <td>
                     {% if kind == "entrata" %}
-                    {{ income_status_badge(movement.movement_status) }}
+                    {{ erp_badge("finance_income_status", movement.movement_status, "Entrata " ~ ("effettiva" if movement.movement_status == "effettiva" else "prevista")) }}
                     {% else %}
-                    <span class="badge rounded-pill text-bg-warning">{{ labelize(movement.expense_type) }}</span>
+                    {{ erp_badge("finance_expense_type", movement.expense_type) }}
                     {% endif %}
                 </td>
                 <td class="text-end fw-bold">{{ euro(movement.amount|float) }}</td>

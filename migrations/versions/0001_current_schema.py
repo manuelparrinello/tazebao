@@ -209,6 +209,78 @@ def upgrade():
     )
 
     op.create_table(
+        "erp_editorial_publications",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("cliente_id", sa.Integer(), nullable=False),
+        sa.Column("publication_date", sa.Date(), nullable=False),
+        sa.Column("platform", sa.String(length=40), nullable=False),
+        sa.Column("content_type", sa.String(length=40), nullable=False),
+        sa.Column("title", sa.String(length=180), nullable=False),
+        sa.Column("caption", sa.Text(), nullable=True),
+        sa.Column("preview_image_path", sa.String(length=500), nullable=True),
+        sa.Column("status", sa.String(length=40), nullable=False),
+        sa.Column("assigned_user_id", sa.Integer(), nullable=True),
+        sa.Column("client_approval_status", sa.String(length=40), nullable=False),
+        sa.Column("internal_notes", sa.Text(), nullable=True),
+        sa.Column("asset_url", sa.String(length=1000), nullable=True),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
+        sa.Column("updated_at", sa.DateTime(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["assigned_user_id"],
+            ["users.id"],
+            name=op.f("fk_erp_editorial_publications_assigned_user_id_users"),
+        ),
+        sa.ForeignKeyConstraint(
+            ["cliente_id"],
+            ["clienti.id"],
+            name=op.f("fk_erp_editorial_publications_cliente_id_clienti"),
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_erp_editorial_publications")),
+    )
+    op.create_index(
+        op.f("ix_erp_editorial_publications_assigned_user_id"),
+        "erp_editorial_publications",
+        ["assigned_user_id"],
+        unique=False,
+    )
+    op.create_index(
+        op.f("ix_erp_editorial_publications_cliente_id"),
+        "erp_editorial_publications",
+        ["cliente_id"],
+        unique=False,
+    )
+    op.create_index(
+        op.f("ix_erp_editorial_publications_platform"),
+        "erp_editorial_publications",
+        ["platform"],
+        unique=False,
+    )
+    op.create_index(
+        op.f("ix_erp_editorial_publications_publication_date"),
+        "erp_editorial_publications",
+        ["publication_date"],
+        unique=False,
+    )
+    op.create_index(
+        op.f("ix_erp_editorial_publications_status"),
+        "erp_editorial_publications",
+        ["status"],
+        unique=False,
+    )
+    op.create_index(
+        "ix_editorial_publications_cliente_date",
+        "erp_editorial_publications",
+        ["cliente_id", "publication_date"],
+        unique=False,
+    )
+    op.create_index(
+        "ix_editorial_publications_cliente_date_platform",
+        "erp_editorial_publications",
+        ["cliente_id", "publication_date", "platform"],
+        unique=False,
+    )
+
+    op.create_table(
         "erp_financial_movements",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("title", sa.String(length=160), nullable=False),
@@ -419,6 +491,35 @@ def downgrade():
     op.drop_index(op.f("ix_erp_email_logs_email_address"), table_name="erp_email_logs")
     op.drop_table("erp_email_logs")
     op.drop_table("erp_financial_movements")
+    op.drop_index(
+        "ix_editorial_publications_cliente_date_platform",
+        table_name="erp_editorial_publications",
+    )
+    op.drop_index(
+        "ix_editorial_publications_cliente_date",
+        table_name="erp_editorial_publications",
+    )
+    op.drop_index(
+        op.f("ix_erp_editorial_publications_status"),
+        table_name="erp_editorial_publications",
+    )
+    op.drop_index(
+        op.f("ix_erp_editorial_publications_publication_date"),
+        table_name="erp_editorial_publications",
+    )
+    op.drop_index(
+        op.f("ix_erp_editorial_publications_platform"),
+        table_name="erp_editorial_publications",
+    )
+    op.drop_index(
+        op.f("ix_erp_editorial_publications_cliente_id"),
+        table_name="erp_editorial_publications",
+    )
+    op.drop_index(
+        op.f("ix_erp_editorial_publications_assigned_user_id"),
+        table_name="erp_editorial_publications",
+    )
+    op.drop_table("erp_editorial_publications")
     op.drop_table("erp_calendar_events")
     op.drop_table("righe_preventivo")
     op.drop_table("preventivi")

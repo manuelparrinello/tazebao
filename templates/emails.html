@@ -6,14 +6,6 @@
 {{ value.replace("_", " ").title() if value else "-" }}
 {%- endmacro %}
 
-{% macro direction_badge(direction) -%}
-{% if direction == "inbound" %}
-<span class="badge text-bg-info">Ricevuta</span>
-{% else %}
-<span class="badge text-bg-success">Inviata</span>
-{% endif %}
-{%- endmacro %}
-
 {% block content %}
 {% set can_mutate = current_user and current_user.role != "readonly" %}
 <div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
@@ -67,7 +59,7 @@
                         <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) if can_mutate else '#' }}" class="fw-bold text-decoration-none">{{ email_log.subject }}</a>
                         <div class="small text-secondary">{{ email_log.email_address }}</div>
                     </td>
-                    <td>{{ direction_badge(email_log.direction) }}</td>
+                    <td>{{ erp_badge("mail_direction", email_log.direction) }}</td>
                     <td class="small mobile-hide">
                         {% if email_log.cliente %}
                         <a href="{{ url_for('cliente_page', cliente_id=email_log.cliente.id) }}">{{ email_log.cliente.name }}</a>
@@ -116,7 +108,7 @@
                     <div class="min-w-0">
                         <div class="d-flex align-items-center gap-2 mb-1">
                             <span class="fw-bold mobile-row-title" title="{{ email_log.subject }}">{{ email_log.subject }}</span>
-                            {{ direction_badge(email_log.direction) }}
+                            {{ erp_badge("mail_direction", email_log.direction) }}
                         </div>
                         <div class="mobile-row-muted text-truncate" title="{{ email_log.email_address }}">{{ email_log.email_address }}</div>
                         <div class="mobile-row-muted small mt-1">{{ email_log.sent_at|datetime_it if email_log.sent_at else "-" }}</div>

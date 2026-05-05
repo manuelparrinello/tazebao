@@ -16,7 +16,7 @@
         <h3 class="fw-bolder">Modifica preventivo</h3>
         <p class="mb-2">Aggiorna cliente, stato, righe e totali del preventivo.</p>
         <div class="d-flex flex-wrap align-items-center gap-2">
-            <span class="badge rounded-pill text-bg-primary">{{ preventivo.stato.replace("_", " ").title() if preventivo.stato else "Sconosciuto" }}</span>
+            {{ erp_badge("quote_status", preventivo.stato) }}
             <span class="text-secondary">Cliente: <span class="fw-semibold text-dark">{{ preventivo.cliente.name }}</span></span>
             {% if preventivo.descrizione %}
             <span class="text-secondary text-break">&middot; {{ preventivo.descrizione }}</span>

@@ -35,6 +35,32 @@ CALENDAR_EVENT_TYPES = (
     "promemoria",
     "generale",
 )
+EDITORIAL_PLATFORMS = (
+    "instagram",
+    "facebook",
+)
+EDITORIAL_CONTENT_TYPES = (
+    "post_grafico",
+    "post_fotografico",
+    "storia",
+    "carousel",
+    "reel",
+    "video",
+)
+EDITORIAL_STATUSES = (
+    "idea",
+    "da_produrre",
+    "in_revisione",
+    "approvato",
+    "programmato",
+    "pubblicato",
+    "annullato",
+)
+EDITORIAL_CLIENT_APPROVAL_STATUSES = (
+    "da_approvare",
+    "approvato",
+    "modifiche_richieste",
+)
 FINANCE_MOVEMENT_TYPES = ("entrata", "uscita")
 FINANCE_MOVEMENT_STATUSES = ("prevista", "effettiva")
 FINANCE_EXPENSE_TYPES = ("fissa", "variabile")
@@ -275,6 +301,73 @@ class CalendarEvent(db.Model):
                 if self.assigned_user
                 else None
             ),
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
+class EditorialPublication(db.Model):
+    __tablename__ = "erp_editorial_publications"
+
+    id = db.Column(db.Integer, primary_key=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False, index=True)
+    publication_date = db.Column(db.Date, nullable=False, index=True)
+    platform = db.Column(db.String(40), nullable=False, default="instagram", index=True)
+    content_type = db.Column(db.String(40), nullable=False, default="post_grafico")
+    title = db.Column(db.String(180), nullable=False)
+    caption = db.Column(db.Text, nullable=True)
+    preview_image_path = db.Column(db.String(500), nullable=True)
+    status = db.Column(db.String(40), nullable=False, default="idea", index=True)
+    assigned_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True, index=True)
+    client_approval_status = db.Column(
+        db.String(40),
+        nullable=False,
+        default="da_approvare",
+    )
+    internal_notes = db.Column(db.Text, nullable=True)
+    asset_url = db.Column(db.String(1000), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+    cliente = db.relationship("Cliente", backref="editorial_publications")
+    assigned_user = db.relationship("User", backref="assigned_editorial_publications")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "cliente_id": self.cliente_id,
+            "cliente": (
+                {"id": self.cliente.id, "name": self.cliente.name}
+                if self.cliente
+                else None
+            ),
+            "publication_date": (
+                self.publication_date.isoformat() if self.publication_date else None
+            ),
+            "platform": self.platform,
+            "content_type": self.content_type,
+            "title": self.title,
+            "caption": self.caption,
+            "preview_image_path": self.preview_image_path,
+            "status": self.status,
+            "assigned_user_id": self.assigned_user_id,
+            "assigned_user": (
+                {
+                    "id": self.assigned_user.id,
+                    "name": self.assigned_user.name,
+                    "email": self.assigned_user.email,
+                }
+                if self.assigned_user
+                else None
+            ),
+            "client_approval_status": self.client_approval_status,
+            "internal_notes": self.internal_notes,
+            "asset_url": self.asset_url,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

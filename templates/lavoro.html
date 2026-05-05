@@ -36,44 +36,6 @@
 </div>
 {%- endmacro %}
 
-{% macro status_badge(status) -%}
-{% set normalized = (status or "")|lower %}
-{% if normalized == "completato" %}
-<span class="badge rounded-pill text-bg-success">{{ status }}</span>
-{% elif normalized == "in corso" %}
-<span class="badge rounded-pill text-bg-warning">{{ status }}</span>
-{% elif normalized == "in attesa" %}
-<span class="badge rounded-pill text-bg-secondary">{{ status }}</span>
-{% elif normalized == "da iniziare" %}
-<span class="badge rounded-pill text-bg-info">{{ status }}</span>
-{% else %}
-<span class="badge rounded-pill text-bg-light border">{{ status or "-" }}</span>
-{% endif %}
-{%- endmacro %}
-
-{% macro priority_badge(priority) -%}
-{% set normalized = (priority or "")|lower %}
-{% if normalized == "alta" or normalized == "urgente" %}
-<span class="badge rounded-pill text-bg-danger">{{ priority }}</span>
-{% elif normalized == "media" %}
-<span class="badge rounded-pill text-bg-warning">{{ priority }}</span>
-{% elif normalized == "bassa" %}
-<span class="badge rounded-pill text-bg-success">{{ priority }}</span>
-{% else %}
-<span class="badge rounded-pill text-bg-light border">{{ priority or "-" }}</span>
-{% endif %}
-{%- endmacro %}
-
-{% macro finance_badge(movement) -%}
-{% if movement.movement_type == "entrata" and movement.movement_status == "effettiva" %}
-<span class="badge rounded-pill text-bg-success">Entrata effettiva</span>
-{% elif movement.movement_type == "entrata" %}
-<span class="badge rounded-pill text-bg-warning">Entrata prevista</span>
-{% else %}
-<span class="badge rounded-pill text-bg-danger">Uscita</span>
-{% endif %}
-{%- endmacro %}
-
 {% block content %}
 <div class="row align-items-start g-3 mb-4">
     <div class="col-12 col-xl-7">
@@ -92,8 +54,8 @@
                 {% endif %}
             </div>
             <div class="d-flex flex-wrap gap-2">
-                {{ status_badge(lavoro.stato) }}
-                {{ priority_badge(lavoro.priorita) }}
+                {{ erp_badge("work_status", lavoro.stato) }}
+                {{ erp_badge("work_priority", lavoro.priorita) }}
             </div>
         </div>
     </div>
@@ -154,11 +116,11 @@
                     </div>
                     <div class="col-12 col-md-4">
                         <div class="text-secondary small">Stato</div>
-                        <div>{{ status_badge(lavoro.stato) }}</div>
+                        <div>{{ erp_badge("work_status", lavoro.stato) }}</div>
                     </div>
                     <div class="col-12 col-md-4">
                         <div class="text-secondary small">Priorita</div>
-                        <div>{{ priority_badge(lavoro.priorita) }}</div>
+                        <div>{{ erp_badge("work_priority", lavoro.priorita) }}</div>
                     </div>
                     <div class="col-12 col-md-4">
                         <div class="text-secondary small">Preventivato</div>
@@ -211,7 +173,7 @@
                                     {{ labelize(task.status) }} &middot; {{ labelize(task.priority) }}{% if task.due_date %} &middot; Scadenza {{ task.due_date|date_it }}{% endif %}
                                 </div>
                             </div>
-                            <span class="badge rounded-pill text-bg-light border">{{ labelize(task.category) }}</span>
+                            {{ erp_badge("task_category", task.category) }}
                         </div>
                     </a>
                     {% endfor %}
@@ -247,7 +209,7 @@
                             <div class="small fw-bold text-secondary mb-2">File collegati</div>
                             <div class="d-flex flex-wrap gap-2">
                                 {% for file in task.files %}
-                                <span class="badge rounded-pill text-bg-light border">
+                                <span class="badge rounded-pill text-bg-light border erp-badge">
                                     <i class="bi bi-paperclip"></i> {{ file.filename }}
                                 </span>
                                 {% endfor %}
@@ -334,7 +296,7 @@
                                 </div>
                             </div>
                             <div class="text-end">
-                                {{ finance_badge(movimento) }}
+                                {{ erp_badge("finance_movement_type", movimento.movement_type) if movimento.movement_type == "uscita" else erp_badge("finance_income_status", movimento.movement_status, "Entrata " ~ ("effettiva" if movimento.movement_status == "effettiva" else "prevista")) }}
                                 <div class="fw-bold mt-1">{{ euro(movimento.amount|float) }}</div>
                             </div>
                         </div>

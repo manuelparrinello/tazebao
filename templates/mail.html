@@ -6,16 +6,6 @@
 {% set can_mutate = current_user and current_user.role != "readonly" %}
 {% set can_admin = current_user and current_user.role == "admin" %}
 
-{% macro read_badge(message) -%}
-{% if message.direction == "inbound" and not message.is_read %}
-<span class="badge rounded-pill text-bg-warning">Non letta</span>
-{% elif message.direction == "inbound" %}
-<span class="badge rounded-pill text-bg-success">Letta</span>
-{% else %}
-<span class="badge rounded-pill text-bg-primary">Inviata</span>
-{% endif %}
-{%- endmacro %}
-
 <div class="row mx-auto w-100 align-items-center g-3">
     <div class="col-12 col-lg-6 px-0">
         <h6 class="text-primary fw-bold" style="letter-spacing: 1.2px">EMAIL ERP</h6>
@@ -94,7 +84,7 @@
                         {{ (message.received_at or message.sent_at or message.created_at)|datetime_it }}
                     </td>
                     <td class="text-nowrap">
-                        {{ read_badge(message) }}
+                        {{ erp_badge("mail_read_status", "unread" if message.direction == "inbound" and not message.is_read else "read" if message.direction == "inbound" else "inviata") }}
                     </td>
                     <td class="text-nowrap mobile-hide">{{ message.account.label if message.account else "-" }}</td>
                     <td>
@@ -134,7 +124,7 @@
                     <div class="min-w-0">
                         <div class="d-flex align-items-center gap-2 mb-1">
                             <span class="fw-bold mobile-row-title {% if message.direction == 'inbound' and not message.is_read %}text-dark{% endif %}" title="{{ message.subject or '(senza oggetto)' }}">{{ message.subject or '(senza oggetto)' }}</span>
-                            {{ read_badge(message) }}
+                            {{ erp_badge("mail_read_status", "unread" if message.direction == "inbound" and not message.is_read else "read" if message.direction == "inbound" else "inviata") }}
                         </div>
                         <div class="mobile-row-muted text-truncate {% if message.direction == 'inbound' and not message.is_read %}fw-semibold text-dark{% endif %}" title="{{ message.from_address if message.direction == 'inbound' else message.to_addresses }}">
                             {{ message.from_address if message.direction == "inbound" else message.to_addresses }}

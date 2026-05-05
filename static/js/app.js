@@ -208,7 +208,16 @@ function erpBadgeLabel(kind, value, text = null) {
 
 function erpBadgeHtml(kind, value, text = null) {
   const payload = erpBadgePayload(kind, value);
-  const variant = payload ? payload[0] : "text-bg-light border";
+  const normalizedVariants = {
+    primary: "text-bg-primary",
+    success: "text-bg-success",
+    warning: "text-bg-warning",
+    danger: "text-bg-danger",
+    info: "text-bg-info",
+    secondary: "text-bg-secondary",
+  };
+  const rawVariant = payload ? payload[0] : "text-bg-light border";
+  const variant = normalizedVariants[rawVariant] || rawVariant;
   const label = escapeHtml(erpBadgeLabel(kind, value, text));
   return `<span class="badge rounded-pill erp-badge ${variant}">${label}</span>`;
 }

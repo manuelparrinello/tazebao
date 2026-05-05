@@ -48,6 +48,15 @@
 </div>
 {%- endmacro %}
 
+{% macro mobile_month_pill(publication) -%}
+{% set can_mutate = current_user and current_user.role != "readonly" %}
+{% set publication_platforms = publication.get_platforms() %}
+{% set pill_class = "editorial-mobile-month-pill-multi" if publication_platforms|length > 1 else "editorial-mobile-month-pill-instagram" if "instagram" in publication_platforms else "editorial-mobile-month-pill-facebook" if "facebook" in publication_platforms else "editorial-mobile-month-pill-generic" %}
+<a class="editorial-mobile-month-pill {{ pill_class }}" href="{{ url_for('editorial_calendar.editorial_edit', publication_id=publication.id) if can_mutate else '#' }}">
+    <span class="editorial-mobile-month-pill-title">{{ publication.title }}</span>
+</a>
+{%- endmacro %}
+
 {% macro publication_card(publication) -%}
 {% set can_mutate = current_user and current_user.role != "readonly" %}
 <a class="editorial-calendar-item" href="{{ url_for('editorial_calendar.editorial_edit', publication_id=publication.id) if can_mutate else '#' }}">
@@ -148,6 +157,46 @@
     </div>
 
     <div class="d-md-none">
+        <ul class="nav nav-pills editorial-mobile-tabs mb-3" id="editorialMobileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="editorial-mobile-month-tab" data-bs-toggle="pill" data-bs-target="#editorial-mobile-month" type="button" role="tab" aria-controls="editorial-mobile-month" aria-selected="true">
+                    Mese
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="editorial-mobile-list-tab" data-bs-toggle="pill" data-bs-target="#editorial-mobile-list" type="button" role="tab" aria-controls="editorial-mobile-list" aria-selected="false">
+                    Lista
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="editorial-mobile-month" role="tabpanel" aria-labelledby="editorial-mobile-month-tab" tabindex="0">
+                <div class="editorial-mobile-month-weekdays">
+                    {% for day_name in ["L", "M", "M", "G", "V", "S", "D"] %}
+                    <div>{{ day_name }}</div>
+                    {% endfor %}
+                </div>
+                <div class="editorial-mobile-month-grid">
+                    {% for week in weeks %}
+                        {% for day in week %}
+                        <div class="editorial-mobile-month-cell {% if not day.in_month %}editorial-mobile-month-muted{% endif %}">
+                            <div class="editorial-mobile-month-day {% if day.is_today %}editorial-mobile-month-today{% endif %}">{{ day.day }}</div>
+                            <div class="editorial-mobile-month-items">
+                                {% for publication in day.publications[:3] %}
+                                {{ mobile_month_pill(publication) }}
+                                {% endfor %}
+                                {% if day.publications|length > 3 %}
+                                <span class="editorial-mobile-month-more">+{{ day.publications|length - 3 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="editorial-mobile-list" role="tabpanel" aria-labelledby="editorial-mobile-list-tab" tabindex="0">
         {% if grouped_publications %}
         <div class="mobile-list">
             {% for group in grouped_publications %}
@@ -164,6 +213,8 @@
         {% else %}
         <div class="border rounded-3 bg-light px-3 py-4 text-secondary">Nessuna pubblicazione presente nel mese.</div>
         {% endif %}
+            </div>
+        </div>
     </div>
 </section>
 {% endif %}

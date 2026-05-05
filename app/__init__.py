@@ -305,7 +305,15 @@ def register_template_filters(app):
         label = text or default_text
         classes = ["badge", "rounded-pill", "erp-badge"]
         if variant:
-            classes.extend(str(variant).split())
+            normalized_variants = {
+                "primary": "text-bg-primary",
+                "success": "text-bg-success",
+                "warning": "text-bg-warning",
+                "danger": "text-bg-danger",
+                "info": "text-bg-info",
+                "secondary": "text-bg-secondary",
+            }
+            classes.extend(normalized_variants.get(str(variant), str(variant)).split())
         return Markup(f'<span class="{" ".join(classes)}">{escape(label)}</span>')
 
 

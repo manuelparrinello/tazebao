@@ -1574,6 +1574,117 @@ body.loaded {
 }
 
 /* =========================
+   PREVENTIVI SCHEDA CLIENTE
+========================= */
+
+.prev-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.prev-card {
+  display: block;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.85rem 1rem;
+  color: inherit;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.prev-card:hover {
+  background: var(--sidebar-hover);
+  text-decoration: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.prev-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.prev-ref {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--app-primary);
+  display: inline-flex;
+  align-items: center;
+}
+
+.prev-ref i {
+  font-size: 0.8rem;
+}
+
+.prev-date {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--sidebar-muted);
+  display: inline-flex;
+  align-items: center;
+}
+
+.prev-date i {
+  font-size: 0.8rem;
+}
+
+.prev-card-body {
+  margin-bottom: 0.5rem;
+}
+
+.prev-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prev-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.prev-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.prev-total {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #111;
+  white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+  .prev-card {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .prev-title {
+    font-size: 0.88rem;
+  }
+
+  .prev-total {
+    font-size: 0.92rem;
+  }
+
+  .prev-ref,
+  .prev-date {
+    font-size: 0.72rem;
+  }
+}
+
+/* =========================
    CTA EDITORIAL - SCHEDA LAVORO
 ========================= */
 
@@ -2106,5 +2217,164 @@ table td {
   75%,
   100% {
     clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%);
+  }
+}
+
+/* =========================
+   CALENDARIO EDITORIALE - HEADER
+========================= */
+
+.editorial-page-header {
+  padding-right: 1rem;
+}
+
+/* =========================
+   CALENDARIO EDITORIALE - NESSUN CLIENTE
+========================= */
+
+.editorial-no-cliente-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border: 2px dashed rgba(17, 17, 17, 0.12);
+  border-radius: 14px;
+  background: #f8f9fa;
+}
+
+.editorial-no-cliente-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--app-primary);
+  color: #111;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.editorial-no-cliente-body {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.editorial-no-cliente-body h6 {
+  font-size: 1rem;
+}
+
+@media (max-width: 575.98px) {
+  .editorial-no-cliente-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem 1.25rem;
+  }
+
+  .editorial-no-cliente-body .d-flex {
+    justify-content: center;
+  }
+}
+
+/* =========================
+   CALENDARIO EDITORIALE - LISTA HEADER
+========================= */
+
+.editorial-list-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 767.98px) {
+  .editorial-list-header {
+    flex-direction: column;
+  }
+}
+
+/* =========================
+   CALENDARIO EDITORIALE - FILTRI
+========================= */
+
+.editorial-filter-bar .form-label {
+  margin-bottom: 0.3rem;
+  font-size: 0.82rem;
+}
+
+.editorial-filter-bar .form-control,
+.editorial-filter-bar .form-select {
+  font-size: 0.88rem;
+}
+
+@media (min-width: 768px) {
+  .editorial-filter-bar .col-xl-3 {
+    background: rgba(32, 227, 127, 0.06);
+    border-radius: 8px;
+    padding: 0.45rem 0.6rem;
+  }
+
+  .editorial-filter-bar .col-xl-3 .form-select {
+    border-color: rgba(32, 227, 127, 0.35);
+    background-color: #fff;
+  }
+
+  .editorial-filter-bar .col-xl-3 .form-label {
+    color: var(--app-primary);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .editorial-filter-bar .col-12 > .btn {
+    min-height: 42px;
+  }
+}
+
+/* =========================
+   CALENDARIO EDITORIALE - EMPTY STATE
+========================= */
+
+.editorial-empty-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  text-align: left;
+}
+
+.editorial-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #e9ecef;
+  color: var(--sidebar-muted);
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.editorial-empty-body {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.editorial-empty-body h6 {
+  font-size: 1rem;
+}
+
+@media (max-width: 575.98px) {
+  .editorial-empty-state {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.25rem;
+  }
+
+  .editorial-empty-body .btn {
+    width: 100%;
   }
 }

@@ -1573,6 +1573,46 @@ body.loaded {
   }
 }
 
+/* =========================
+   CTA EDITORIAL - SCHEDA LAVORO
+========================= */
+
+.editorial-cta-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.editorial-cta-info {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.editorial-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 767.98px) {
+  .editorial-cta-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .editorial-cta-actions {
+    justify-content: stretch;
+  }
+
+  .editorial-cta-actions .btn {
+    flex: 1 1 calc(50% - 0.25rem);
+    text-align: center;
+  }
+}
+
 @media (max-width: 575.98px) {
   .editorial-preview-box {
     align-items: flex-start;

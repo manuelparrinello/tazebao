@@ -1574,6 +1574,127 @@ body.loaded {
 }
 
 /* =========================
+   LAVORI SCHEDA CLIENTE
+========================= */
+
+.lav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.lav-card {
+  display: block;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.85rem 1rem;
+  color: inherit;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lav-card:hover {
+  background: var(--sidebar-hover);
+  text-decoration: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.lav-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.lav-ref {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--app-primary);
+  display: inline-flex;
+  align-items: center;
+}
+
+.lav-ref i {
+  font-size: 0.8rem;
+}
+
+.lav-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.lav-card-body {
+  margin-bottom: 0.5rem;
+}
+
+.lav-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lav-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.lav-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.lav-meta-item {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--sidebar-muted);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.lav-meta-item i {
+  font-size: 0.8rem;
+}
+
+.lav-total {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #111;
+  white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+  .lav-card {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .lav-title {
+    font-size: 0.88rem;
+  }
+
+  .lav-total {
+    font-size: 0.88rem;
+  }
+
+  .lav-ref {
+    font-size: 0.72rem;
+  }
+
+  .lav-meta-item {
+    font-size: 0.72rem;
+  }
+}
+
+/* =========================
    PREVENTIVI SCHEDA CLIENTE
 ========================= */
 

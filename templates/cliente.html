@@ -152,19 +152,50 @@
     <div class="col-12 col-xl-6">
         <section class="card h-100 border-0 shadow-sm">
             <div class="card-body p-3 p-md-4">
-                {{ section_title("Lavori recenti", 10) }}
+                <div class="d-flex align-items-start justify-content-between gap-3 mb-1">
+                    <div>
+                        <h5 class="fw-bolder mb-1"><i class="bi bi-briefcase me-2 text-primary"></i>Lavori</h5>
+                        <div class="small text-secondary">Ultimi 10 lavori attivi per questo cliente.</div>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% if can_mutate and quick_actions.nuovo_lavoro %}
+                    <a href="{{ quick_actions.nuovo_lavoro }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus-lg me-1"></i>Nuovo lavoro
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('lavori') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-list-ul me-1"></i>Vedi tutti i lavori
+                    </a>
+                </div>
                 {% if lavori %}
-                <div class="list-group list-group-flush">
+                <div class="lav-list">
                     {% for lavoro in lavori %}
-                    <a href="{{ url_for('lavoro_page', lavoro_id=lavoro.id) }}" class="list-group-item list-group-item-action px-0 py-3">
-                        <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div class="min-w-0">
-                                <div class="fw-bold">{{ lavoro.descrizione }}</div>
-                                <div class="small text-secondary text-break">
-                                    Stato {{ lavoro.stato or "-" }} &middot; Priorita {{ lavoro.priorita or "-" }}
-                                </div>
+                    <a href="{{ url_for('lavoro_page', lavoro_id=lavoro.id) }}" class="lav-card">
+                        <div class="lav-card-header">
+                            <span class="lav-ref">
+                                <i class="bi bi-hash me-1"></i>#{{ lavoro.id }}
+                            </span>
+                            <div class="lav-badges">
+                                {{ erp_badge("work_status", lavoro.stato) }}
+                                {{ erp_badge("work_priority", lavoro.priorita) }}
                             </div>
-                            <i class="bi bi-chevron-right text-secondary"></i>
+                        </div>
+                        <div class="lav-card-body">
+                            <div class="lav-title">{{ lavoro.descrizione }}</div>
+                        </div>
+                        <div class="lav-card-footer">
+                            <div class="lav-meta">
+                                {% if lavoro.data_inizio %}
+                                <span class="lav-meta-item"><i class="bi bi-calendar-event me-1"></i>Inizio {{ lavoro.data_inizio|date_it }}</span>
+                                {% endif %}
+                                {% if lavoro.data_fine %}
+                                <span class="lav-meta-item"><i class="bi bi-calendar-check me-1"></i>Fine {{ lavoro.data_fine|date_it }}</span>
+                                {% endif %}
+                            </div>
+                            {% if lavoro.preventivato and lavoro.preventivato > 0 %}
+                            <div class="lav-total">{{ euro(lavoro.preventivato) }}</div>
+                            {% endif %}
                         </div>
                     </a>
                     {% endfor %}

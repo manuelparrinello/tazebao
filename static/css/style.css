@@ -1683,6 +1683,91 @@ body.loaded {
 }
 
 /* =========================
+   EVENTI CALENDARIO SCHEDA CLIENTE
+========================= */
+
+.evt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.evt-card {
+  display: block;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.85rem 1rem;
+  color: inherit;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.evt-card:hover {
+  background: var(--sidebar-hover);
+  text-decoration: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.evt-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.evt-datetime {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--app-primary);
+  display: inline-flex;
+  align-items: center;
+}
+
+.evt-datetime i {
+  font-size: 0.8rem;
+}
+
+.evt-card-body {
+  margin-bottom: 0;
+}
+
+.evt-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 0.2rem;
+}
+
+.evt-desc {
+  font-size: 0.82rem;
+  color: var(--sidebar-muted);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 575.98px) {
+  .evt-card {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .evt-title {
+    font-size: 0.88rem;
+  }
+
+  .evt-desc {
+    font-size: 0.78rem;
+  }
+
+  .evt-datetime {
+    font-size: 0.72rem;
+  }
+}
+
+/* =========================
    LAVORI SCHEDA CLIENTE
 ========================= */
 

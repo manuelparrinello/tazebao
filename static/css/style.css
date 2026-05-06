@@ -1423,6 +1423,156 @@ body.loaded {
   margin: 0.85rem auto 0 auto;
 }
 
+/* =========================
+   PUBBLICAZIONI SCHEDA CLIENTE
+========================= */
+
+.pub-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.pub-card {
+  display: block;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.85rem 1rem;
+  color: inherit;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pub-card:hover {
+  background: var(--sidebar-hover);
+  text-decoration: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.pub-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.pub-date {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--app-primary);
+  display: inline-flex;
+  align-items: center;
+}
+
+.pub-date i {
+  font-size: 0.82rem;
+}
+
+.pub-card-body {
+  margin-bottom: 0.5rem;
+}
+
+.pub-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  margin-bottom: 0.4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pub-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.pub-platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.pub-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.pub-pill i {
+  font-size: 0.76rem;
+}
+
+.pub-pill-ig {
+  color: #7a123d;
+  background: #ffe3ef;
+  border-color: #f2a6c5;
+}
+
+.pub-pill-fb {
+  color: #084298;
+  background: #dbeafe;
+  border-color: #9ec5fe;
+}
+
+.pub-pill-generic {
+  color: #111;
+  background: #f8f9fa;
+  border-color: rgba(17, 17, 17, 0.12);
+}
+
+.pub-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pub-assignee {
+  font-size: 0.74rem;
+  color: var(--sidebar-muted);
+  display: inline-flex;
+  align-items: center;
+}
+
+.pub-assignee i {
+  font-size: 0.78rem;
+}
+
+@media (max-width: 575.98px) {
+  .pub-card {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .pub-title {
+    font-size: 0.88rem;
+  }
+
+  .pub-pill {
+    padding: 0.18rem 0.45rem;
+    font-size: 0.64rem;
+  }
+
+  .pub-pill i {
+    font-size: 0.7rem;
+  }
+
+  .pub-date {
+    font-size: 0.74rem;
+  }
+}
+
 @media (max-width: 575.98px) {
   .editorial-preview-box {
     align-items: flex-start;

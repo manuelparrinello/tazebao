@@ -257,26 +257,65 @@
         </section>
     </div>
 
+{% macro pub_platform_pill(platform) -%}
+{% if platform == "instagram" %}
+<span class="pub-pill pub-pill-ig"><i class="bi bi-instagram"></i>IG</span>
+{% elif platform == "facebook" %}
+<span class="pub-pill pub-pill-fb"><i class="bi bi-facebook"></i>FB</span>
+{% else %}
+<span class="pub-pill pub-pill-generic">{{ labelize(platform) }}</span>
+{% endif %}
+{%- endmacro %}
+
+{% macro pub_platform_pills(pub) -%}
+<div class="pub-platforms">
+    {% for p in pub.get_platforms() %}
+    {{ pub_platform_pill(p) }}
+    {% endfor %}
+</div>
+{%- endmacro %}
+
     <div class="col-12 col-xl-6">
         <section class="card h-100 border-0 shadow-sm">
             <div class="card-body p-3 p-md-4">
-                {{ section_title("Prossime pubblicazioni editoriali", 10) }}
+                <div class="d-flex align-items-start justify-content-between gap-3 mb-1">
+                    <div>
+                        <h5 class="fw-bolder mb-1"><i class="bi bi-calendar2-week me-2 text-primary"></i>Piano editoriale</h5>
+                        <div class="small text-secondary">Prossime pubblicazioni programmate per questo cliente.</div>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% if can_mutate and quick_actions.nuova_pubblicazione %}
+                    <a href="{{ quick_actions.nuova_pubblicazione }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus-lg me-1"></i>Nuova pubblicazione
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('editorial_calendar.client_calendar', cliente_id=cliente.id) }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-grid-3x3-gap me-1"></i>Apri calendario editoriale
+                    </a>
+                </div>
                 {% if editorial_publications %}
-                <div class="list-group list-group-flush">
+                <div class="pub-list">
                     {% for publication in editorial_publications %}
-                    <a href="{{ url_for('editorial_calendar.editorial_edit', publication_id=publication.id) if can_mutate else '#' }}" class="list-group-item list-group-item-action px-0 py-3">
-                        <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div class="min-w-0">
-                                <div class="fw-bold">{{ publication.title }}</div>
-                                <div class="small text-secondary text-break">
-                                    {{ publication.publication_date|date_it }} &middot; {{ labelize(publication.platform) }} &middot; {{ labelize(publication.content_type) }}
-                                </div>
-                                <div class="mt-2 d-flex flex-wrap gap-2">
-                                    {{ erp_badge("editorial_status", publication.status) }}
-                                    {{ erp_badge("editorial_client_approval", publication.client_approval_status) }}
-                                </div>
+                    <a href="{{ url_for('editorial_calendar.editorial_edit', publication_id=publication.id) if can_mutate else '#' }}" class="pub-card">
+                        <div class="pub-card-header">
+                            <span class="pub-date">
+                                <i class="bi bi-calendar3 me-1"></i>{{ publication.publication_date|date_it }}
+                            </span>
+                            {{ erp_badge("editorial_status", publication.status) }}
+                        </div>
+                        <div class="pub-card-body">
+                            <div class="pub-title">{{ publication.title }}</div>
+                            <div class="pub-meta">
+                                {{ pub_platform_pills(publication) }}
+                                {{ erp_badge("editorial_content_type", publication.content_type) }}
                             </div>
-                            <i class="bi bi-calendar2-week text-secondary"></i>
+                        </div>
+                        <div class="pub-card-footer">
+                            {{ erp_badge("editorial_client_approval", publication.client_approval_status) }}
+                            {% if publication.assigned_user %}
+                            <span class="pub-assignee"><i class="bi bi-person-fill me-1"></i>{{ publication.assigned_user.name }}</span>
+                            {% endif %}
                         </div>
                     </a>
                     {% endfor %}

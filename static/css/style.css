@@ -1235,6 +1235,7 @@ body.loaded {
   flex-direction: column;
   gap: 0.18rem;
   min-width: 0;
+  overflow: hidden;
 }
 
 .editorial-mobile-month-pill {
@@ -1249,6 +1250,7 @@ body.loaded {
   font-weight: 800;
   line-height: 1.15;
   text-decoration: none !important;
+  overflow: hidden;
 }
 
 .editorial-mobile-month-pill-title {
@@ -1284,7 +1286,7 @@ body.loaded {
 }
 
 .editorial-mobile-month-more {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;

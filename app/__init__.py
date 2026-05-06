@@ -33,7 +33,10 @@ def configure_environment(app):
 
 def create_app():
     load_dotenv()
-    locale.setlocale(locale.LC_TIME, "it_IT.UTF-8")
+    try:
+        locale.setlocale(locale.LC_TIME, "it_IT.UTF-8")
+    except locale.Error:
+        pass  # fallback sulla locale di sistema se it_IT non è installata
 
     app = Flask(
         __name__,

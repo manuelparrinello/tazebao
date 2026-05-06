@@ -1768,6 +1768,159 @@ body.loaded {
 }
 
 /* =========================
+   MOVIMENTI ECONOMICI SCHEDA CLIENTE
+========================= */
+
+.fin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.fin-card {
+  display: block;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.85rem 1rem;
+  color: inherit;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fin-card:hover {
+  background: var(--sidebar-hover);
+  text-decoration: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.fin-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.fin-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.fin-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.fin-type-badge i {
+  font-size: 0.76rem;
+}
+
+.fin-type-entrata {
+  color: #0f5132;
+  background: #d1e7dd;
+}
+
+.fin-type-uscita {
+  color: #842029;
+  background: #f8d7da;
+}
+
+.fin-amount {
+  font-size: 1.05rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.fin-amount-entrata {
+  color: #0f5132;
+}
+
+.fin-amount-uscita {
+  color: #842029;
+}
+
+.fin-card-body {
+  margin-bottom: 0.5rem;
+}
+
+.fin-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fin-desc {
+  font-size: 0.82rem;
+  color: var(--sidebar-muted);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.fin-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.fin-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.fin-meta-item {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--sidebar-muted);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.fin-meta-item i {
+  font-size: 0.8rem;
+}
+
+@media (max-width: 575.98px) {
+  .fin-card {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .fin-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .fin-amount {
+    font-size: 0.95rem;
+  }
+
+  .fin-title {
+    font-size: 0.88rem;
+  }
+
+  .fin-desc {
+    font-size: 0.78rem;
+  }
+
+  .fin-meta-item {
+    font-size: 0.72rem;
+  }
+}
+
+/* =========================
    LAVORI SCHEDA CLIENTE
 ========================= */
 

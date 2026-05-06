@@ -431,21 +431,52 @@
     <div class="col-12">
         <section class="card border-0 shadow-sm">
             <div class="card-body p-3 p-md-4">
-                {{ section_title("Movimenti economici recenti", 10) }}
+                <div class="d-flex align-items-start justify-content-between gap-3 mb-1">
+                    <div>
+                        <h5 class="fw-bolder mb-1"><i class="bi bi-cash-stack me-2 text-primary"></i>Movimenti economici</h5>
+                        <div class="small text-secondary">Ultimi 10 movimenti finanziari collegati a questo cliente.</div>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% if can_mutate and quick_actions.nuovo_movimento %}
+                    <a href="{{ quick_actions.nuovo_movimento }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus-lg me-1"></i>Nuovo movimento
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('finance.finance_index') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-bar-chart me-1"></i>Apri finanze
+                    </a>
+                </div>
                 {% if movimenti %}
-                <div class="list-group list-group-flush">
+                <div class="fin-list">
                     {% for movimento in movimenti %}
-                    <a href="{{ url_for('finance.finance_edit', movement_id=movimento.id) if can_mutate else '#' }}" class="list-group-item list-group-item-action px-0 py-3">
-                        <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div class="min-w-0">
-                                <div class="fw-bold">{{ movimento.title }}</div>
-                                <div class="small text-secondary text-break">
-                                    {{ labelize(movimento.category) }} &middot; {{ movimento.movement_date|date_it }}
-                                </div>
-                            </div>
-                            <div class="text-end">
+                    <a href="{{ url_for('finance.finance_edit', movement_id=movimento.id) if can_mutate else '#' }}" class="fin-card">
+                        <div class="fin-card-header">
+                            <div class="fin-badges">
+                                {% if movimento.movement_type == "entrata" %}
+                                <span class="fin-type-badge fin-type-entrata"><i class="bi bi-arrow-down-left me-1"></i>Entrata</span>
+                                {% else %}
+                                <span class="fin-type-badge fin-type-uscita"><i class="bi bi-arrow-up-right me-1"></i>Uscita</span>
+                                {% endif %}
                                 {{ erp_badge("finance_movement_type", movimento.movement_type) if movimento.movement_type == "uscita" else erp_badge("finance_income_status", movimento.movement_status, "Entrata " ~ ("effettiva" if movimento.movement_status == "effettiva" else "prevista")) }}
-                                <div class="fw-bold mt-1">{{ euro(movimento.amount|float) }}</div>
+                            </div>
+                            <span class="fin-amount {% if movimento.movement_type == 'entrata' %}fin-amount-entrata{% else %}fin-amount-uscita{% endif %}">
+                                {% if movimento.movement_type == 'entrata' %}+{% else %}−{% endif %}{{ euro(movimento.amount|float) }}
+                            </span>
+                        </div>
+                        <div class="fin-card-body">
+                            <div class="fin-title">{{ movimento.title }}</div>
+                            {% if movimento.description %}
+                            <div class="fin-desc">{{ movimento.description|truncate(120) }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="fin-card-footer">
+                            <div class="fin-meta">
+                                <span class="fin-meta-item"><i class="bi bi-calendar3 me-1"></i>{{ movimento.movement_date|date_it }}</span>
+                                {{ erp_badge("finance_category", movimento.category) }}
+                                {% if movimento.expense_type %}
+                                <span class="fin-meta-item"><i class="bi bi-tag me-1"></i>{{ labelize(movimento.expense_type) }}</span>
+                                {% endif %}
                             </div>
                         </div>
                     </a>

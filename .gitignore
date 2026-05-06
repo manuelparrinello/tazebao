@@ -1,4 +1,5 @@
 venv/
+.venv/
 .vs/
 __pycache__/
 *.pyc
@@ -7,4 +8,4 @@ backups/
 .env
 instance/
 node_modules/
-dist/
+dist/.venv/ 

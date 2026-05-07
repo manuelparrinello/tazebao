@@ -9,3 +9,4 @@ backups/
 instance/
 node_modules/
 dist/.venv/ 
+app.db

@@ -45,22 +45,26 @@ def nuovo_cliente():
         )
         db.session.add(nuovo_cliente)
         db.session.commit()
-        return (
-            jsonify(
-                {
-                    "message": "Cliente aggiunto con successo!",
-                    "data": {
-                        "nome": nome,
-                        "ragsoc": ragsoc,
-                        "telefono": telefono,
-                        "email": email,
-                        "note": note,
-                        "colore": colore,
-                    },
-                }
-            ),
-            201,
-        )
+
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.accept_mimetypes.best == "application/json":
+            return (
+                jsonify(
+                    {
+                        "message": "Cliente aggiunto con successo!",
+                        "data": {
+                            "nome": nome,
+                            "ragsoc": ragsoc,
+                            "telefono": telefono,
+                            "email": email,
+                            "note": note,
+                            "colore": colore,
+                        },
+                    }
+                ),
+                201,
+            )
+
+        return redirect(url_for("clienti.cliente_page", cliente_id=nuovo_cliente.id))
 
     if request.method == "GET":
         return render_template("cliente_new.html")

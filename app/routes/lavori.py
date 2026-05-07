@@ -53,15 +53,15 @@ def apply_lavoro_form(lavoro):
 @role_required("admin", "operatore")
 def nuovo_lavoro():
     if request.method == "POST":
-        descrizione = request.form.get("descrizione")
+        descrizione = (request.form.get("descrizione") or "").strip()
         data_inizio = request.form.get("data_inizio")
         data_fine = request.form.get("data_fine")
         data_pagamento = request.form.get("data_pagamento")
-        cliente_id = request.form.get("cliente_id")
-        priorita = request.form.get("priorita")
-        stato = request.form.get("stato")
+        cliente_id = parse_optional_id(request.form.get("cliente_id"))
+        priorita = (request.form.get("priorita") or "").strip().lower() or None
+        stato = (request.form.get("stato") or "").strip() or None
         preventivato = parse_optional_float(request.form.get("preventivato"))
-        note = request.form.get("note")
+        note = (request.form.get("note") or "").strip() or None
 
         def convertToDate(data_string):
             if data_string:
@@ -72,8 +72,12 @@ def nuovo_lavoro():
         data_fine_obj = convertToDate(data_fine)
         data_pagamento_obj = convertToDate(data_pagamento)
 
+        if not descrizione:
+            return jsonify({"success": False, "error": "La descrizione lavoro e obbligatoria."}), 400
+        if not cliente_id:
+            return jsonify({"success": False, "error": "Il cliente e obbligatorio."}), 400
         if stato not in status_lavori:
-            return
+            return jsonify({"success": False, "error": "Stato lavoro non valido."}), 400
 
         nuovo_lavoro = Lavoro(
             descrizione=descrizione,
@@ -88,37 +92,41 @@ def nuovo_lavoro():
         )
         db.session.add(nuovo_lavoro)
         db.session.commit()
-        return (
-            jsonify(
-                {
-                    "message": "Lavoro aggiunto con successo!",
-                    "data": {
-                        "descrizione": descrizione,
-                        "data_inizio": (
-                            data_inizio_obj.strftime("%d/%m/%Y")
-                            if data_inizio_obj
-                            else None
-                        ),
-                        "data_fine": (
-                            data_fine_obj.strftime("%d/%m/%Y")
-                            if data_fine_obj
-                            else None
-                        ),
-                        "data_pagamento": (
-                            data_pagamento_obj.strftime("%d/%m/%Y")
-                            if data_pagamento_obj
-                            else None
-                        ),
-                        "cliente_id": cliente_id,
-                        "priorita": priorita,
-                        "stato": stato,
-                        "preventivato": preventivato,
-                        "note": note,
-                    },
-                }
-            ),
-            201,
-        )
+
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.accept_mimetypes.best == "application/json":
+            return (
+                jsonify(
+                    {
+                        "message": "Lavoro aggiunto con successo!",
+                        "data": {
+                            "descrizione": descrizione,
+                            "data_inizio": (
+                                data_inizio_obj.strftime("%d/%m/%Y")
+                                if data_inizio_obj
+                                else None
+                            ),
+                            "data_fine": (
+                                data_fine_obj.strftime("%d/%m/%Y")
+                                if data_fine_obj
+                                else None
+                            ),
+                            "data_pagamento": (
+                                data_pagamento_obj.strftime("%d/%m/%Y")
+                                if data_pagamento_obj
+                                else None
+                            ),
+                            "cliente_id": cliente_id,
+                            "priorita": priorita,
+                            "stato": stato,
+                            "preventivato": preventivato,
+                            "note": note,
+                        },
+                    }
+                ),
+                201,
+            )
+
+        return redirect(url_for("lavori.lavoro_page", lavoro_id=nuovo_lavoro.id))
 
     if request.method == "GET":
         clienti_list = Cliente.query.all()

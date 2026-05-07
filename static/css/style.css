@@ -1801,35 +1801,16 @@ body.loaded {
   margin-bottom: 0.45rem;
 }
 
-.fin-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.fin-type-badge {
+.fin-ref {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--app-primary);
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-  font-size: 0.68rem;
-  font-weight: 800;
-  line-height: 1;
-  white-space: nowrap;
 }
 
-.fin-type-badge i {
-  font-size: 0.76rem;
-}
-
-.fin-type-entrata {
-  color: #0f5132;
-  background: #d1e7dd;
-}
-
-.fin-type-uscita {
-  color: #842029;
-  background: #f8d7da;
+.fin-ref i {
+  font-size: 0.8rem;
 }
 
 .fin-amount {
@@ -1870,7 +1851,41 @@ body.loaded {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 0.4rem;
+}
+
+.fin-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.fin-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.fin-type-badge i {
+  font-size: 0.76rem;
+}
+
+.fin-type-entrata {
+  color: #0f5132;
+  background: #d1e7dd;
+  border: 1px solid #a3cfbb;
+}
+
+.fin-type-uscita {
+  color: #842029;
+  background: #f8d7da;
+  border: 1px solid #f1aeb5;
 }
 
 .fin-meta {
@@ -1904,7 +1919,7 @@ body.loaded {
   }
 
   .fin-amount {
-    font-size: 0.95rem;
+    font-size: 1.1rem;
   }
 
   .fin-title {
@@ -1913,6 +1928,10 @@ body.loaded {
 
   .fin-desc {
     font-size: 0.78rem;
+  }
+
+  .fin-ref {
+    font-size: 0.72rem;
   }
 
   .fin-meta-item {

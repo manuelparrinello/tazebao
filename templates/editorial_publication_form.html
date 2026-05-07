@@ -15,7 +15,11 @@
 {%- endmacro %}
 
 {% macro checked_platform(publication, value) -%}
-{% if value in publication.get_platforms() %}checked{% endif %}
+{% if form_platforms %}
+{%- if value in form_platforms %}checked{% endif %}
+{%- else %}
+{%- if value in publication.get_platforms() %}checked{% endif %}
+{%- endif %}
 {%- endmacro %}
 
 {% block content %}
@@ -59,13 +63,14 @@
                         <select class="form-control form-select" id="cliente_id" name="cliente_id" required>
                             <option value="">Seleziona cliente</option>
                             {% for cliente in clienti %}
-                            <option value="{{ cliente.id }}" {{ selected(publication.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
+                            {% set sel_cliente_id = form_data.get('cliente_id', publication.cliente_id) %}
+                            <option value="{{ cliente.id }}" {{ selected(sel_cliente_id|string, cliente.id|string) }}>{{ cliente.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="col-12 col-md-6 col-lg-3">
                         <label for="publication_date" class="form-label fw-bold">Data pubblicazione</label>
-                        <input type="date" class="form-control" id="publication_date" name="publication_date" value="{{ date_value(publication.publication_date) }}" required>
+                        <input type="date" class="form-control" id="publication_date" name="publication_date" value="{{ form_data.get('publication_date', date_value(publication.publication_date)) }}" required>
                     </div>
                     <div class="col-12 col-md-6 col-lg-5">
                         <div class="form-label fw-bold">Piattaforme</div>
@@ -86,7 +91,8 @@
                         <label for="content_type" class="form-label fw-bold">Tipo contenuto</label>
                         <select class="form-control form-select" id="content_type" name="content_type">
                             {% for content_type in content_types %}
-                            <option value="{{ content_type }}" {{ selected(publication.content_type or 'post_grafico', content_type) }}>{{ labelize(content_type) }}</option>
+                            {% set sel_content_type = form_data.get('content_type', publication.content_type or 'post_grafico') %}
+                            <option value="{{ content_type }}" {{ selected(sel_content_type, content_type) }}>{{ labelize(content_type) }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -102,15 +108,15 @@
                 <div class="row g-3">
                     <div class="col-12">
                         <label for="title" class="form-label fw-bold">Tema/titolo interno</label>
-                        <input type="text" class="form-control" id="title" name="title" value="{{ publication.title or '' }}" required>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ form_data.get('title', publication.title or '') }}" required>
                     </div>
                     <div class="col-12">
                         <label for="caption" class="form-label fw-bold">Caption breve</label>
-                        <textarea class="form-control" id="caption" name="caption" rows="3">{{ publication.caption or '' }}</textarea>
+                        <textarea class="form-control" id="caption" name="caption" rows="3">{{ form_data.get('caption', publication.caption or '') }}</textarea>
                     </div>
                     <div class="col-12">
                         <label for="internal_notes" class="form-label fw-bold">Note interne</label>
-                        <textarea class="form-control" id="internal_notes" name="internal_notes" rows="4">{{ publication.internal_notes or '' }}</textarea>
+                        <textarea class="form-control" id="internal_notes" name="internal_notes" rows="4">{{ form_data.get('internal_notes', publication.internal_notes or '') }}</textarea>
                     </div>
                 </div>
             </section>
@@ -118,35 +124,58 @@
             <section class="editorial-form-section">
                 <div class="editorial-form-section-heading">
                     <h5>Asset e materiali</h5>
-                    <p>Preview grafica e materiali di lavoro collegati.</p>
+                    <p>Immagini, preview e materiali di lavoro collegati.</p>
                 </div>
 
                 <div class="row g-3 align-items-start">
-                    <div class="col-12 col-lg-5">
-                        <label for="preview_image" class="form-label fw-bold">Immagine preview</label>
+                    <div class="col-12 col-lg-6">
+                        <label for="preview_image" class="form-label fw-bold">Nuova immagine preview</label>
                         <input type="file" class="form-control" id="preview_image" name="preview_image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
-                        <div class="form-text">Formati supportati: jpg, jpeg, png, webp.</div>
+                        <div class="form-text">Formati supportati: jpg, jpeg, png, webp. Sostituisce l'immagine principale.</div>
                     </div>
-                    <div class="col-12 col-lg-7">
-                        <div class="form-label fw-bold">Preview attuale</div>
-                        <div class="editorial-preview-box">
-                            {% if publication.preview_image_path %}
-                            <img class="editorial-preview-current" src="{{ url_for('static', filename=publication.preview_image_path) }}" alt="">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="remove_preview" name="remove_preview">
-                                <label class="form-check-label" for="remove_preview">Rimuovi immagine preview</label>
-                            </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="form-label fw-bold">Immagini aggiuntive (carousel)</div>
+                        <input type="file" class="form-control" id="additional_images" name="additional_images" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple>
+                        <div class="form-text">Seleziona più immagini per carousel o galleria.</div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-label fw-bold">Immagini caricate</div>
+                        <div class="editorial-images-grid" id="editorial-images-grid">
+                            {% set all_urls = [] %}
+                            {% for p in publication.get_image_paths() %}
+                                {% if all_urls.append(url_for('static', filename=p)) %}{% endif %}
+                            {% endfor %}
+                            {% set has_multi = publication.images and publication.images|length > 0 %}
+                            {% if has_multi %}
+                                {% for img in publication.images %}
+                                <div class="editorial-image-item {% if loop.first %}editorial-image-primary{% endif %}" data-id="{{ img.id }}" data-path="{{ img.image_path }}">
+                                    <img class="editorial-image-thumb js-editorial-lightbox-trigger" src="{{ url_for('static', filename=img.image_path) }}" alt="Immagine {{ loop.index }}" loading="lazy" data-images='{{ all_urls|tojson }}'>
+                                    {% if loop.first and publication.images|length > 1 %}<div class="editorial-image-badge">Copertina</div>{% endif %}
+                                    <div class="form-check mt-1">
+                                        <input class="form-check-input" type="checkbox" value="{{ img.id }}" id="remove_image_{{ img.id }}" name="remove_image_ids">
+                                        <label class="form-check-label small" for="remove_image_{{ img.id }}">Rimuovi</label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% elif publication.preview_image_path %}
+                                <div class="editorial-image-item" data-path="{{ publication.preview_image_path }}">
+                                    <img class="editorial-image-thumb js-editorial-lightbox-trigger" src="{{ url_for('static', filename=publication.preview_image_path) }}" alt="Preview" loading="lazy" data-images='{{ all_urls|tojson }}'>
+                                    <div class="form-check mt-1">
+                                        <input class="form-check-input" type="checkbox" value="1" id="remove_preview" name="remove_preview">
+                                        <label class="form-check-label small" for="remove_preview">Rimuovi</label>
+                                    </div>
+                                </div>
                             {% else %}
-                            <div class="editorial-preview-placeholder">
-                                <i class="bi bi-image"></i>
-                            </div>
-                            <span class="text-secondary">Nessuna immagine caricata.</span>
+                                <div class="editorial-preview-placeholder">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                                <span class="text-secondary">Nessuna immagine caricata.</span>
                             {% endif %}
                         </div>
                     </div>
                     <div class="col-12">
                         <label for="asset_url" class="form-label fw-bold">Materiali di lavoro</label>
-                        <input type="url" class="form-control" id="asset_url" name="asset_url" value="{{ publication.asset_url or '' }}" placeholder="https://">
+                        <input type="url" class="form-control" id="asset_url" name="asset_url" value="{{ form_data.get('asset_url', publication.asset_url or '') }}" placeholder="https://">
                         <div class="form-text">Link a Drive, Canva, Dropbox, cartella sorgenti o file di produzione.</div>
                     </div>
                 </div>
@@ -163,7 +192,8 @@
                         <label for="status" class="form-label fw-bold">Stato</label>
                         <select class="form-control form-select" id="status" name="status">
                             {% for status in statuses %}
-                            <option value="{{ status }}" {{ selected(publication.status or 'idea', status) }}>{{ labelize(status) }}</option>
+                            {% set sel_status = form_data.get('status', publication.status or 'idea') %}
+                            <option value="{{ status }}" {{ selected(sel_status, status) }}>{{ labelize(status) }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -171,7 +201,8 @@
                         <label for="client_approval_status" class="form-label fw-bold">Approvazione cliente</label>
                         <select class="form-control form-select" id="client_approval_status" name="client_approval_status">
                             {% for approval_status in client_approval_statuses %}
-                            <option value="{{ approval_status }}" {{ selected(publication.client_approval_status or 'da_approvare', approval_status) }}>{{ labelize(approval_status) }}</option>
+                            {% set sel_approval = form_data.get('client_approval_status', publication.client_approval_status or 'da_approvare') %}
+                            <option value="{{ approval_status }}" {{ selected(sel_approval, approval_status) }}>{{ labelize(approval_status) }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -180,7 +211,8 @@
                         <select class="form-control form-select" id="assigned_user_id" name="assigned_user_id">
                             <option value="">Nessun assegnatario</option>
                             {% for user in users %}
-                            <option value="{{ user.id }}" {{ selected(publication.assigned_user_id, user.id) }}>{{ user.name or user.email }}</option>
+                            {% set sel_user = form_data.get('assigned_user_id', publication.assigned_user_id) %}
+                            <option value="{{ user.id }}" {{ selected(sel_user|string, user.id|string) }}>{{ user.name or user.email }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -199,6 +231,105 @@
     </div>
 </form>
 
+<div class="modal fade" id="editorialLightboxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered mw-100 mx-2 mx-lg-auto">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body p-0 d-flex flex-column" style="min-height:50vh;">
+                <div class="lightbox-layout">
+                    <button class="lightbox-arrow" type="button" data-bs-target="#lightboxCarousel" data-bs-slide="prev" id="lightboxPrevBtn">
+                        <span class="carousel-control-prev-icon bg-dark bg-opacity-75 rounded-circle p-3"></span>
+                    </button>
+                    <div id="lightboxCarousel" class="carousel slide" data-bs-interval="false">
+                        <div class="carousel-inner" id="lightboxCarouselInner"></div>
+                    </div>
+                    <button class="lightbox-arrow" type="button" data-bs-target="#lightboxCarousel" data-bs-slide="next" id="lightboxNextBtn">
+                        <span class="carousel-control-next-icon bg-dark bg-opacity-75 rounded-circle p-3"></span>
+                    </button>
+                </div>
+                <div class="lightbox-footer">
+                    <span class="badge bg-dark bg-opacity-75 fs-6" id="lightboxCounter"></span>
+                    <button type="button" class="btn btn-sm btn-light mt-2 d-block mx-auto" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if publication.id %}
+<div class="mt-4">
+    <button type="button" class="btn btn-outline-info" data-bs-toggle="collapse" data-bs-target="#editorialMockupPreview" aria-expanded="false" aria-controls="editorialMockupPreview">
+        <i class="bi bi-eye"></i>&nbsp;Anteprima piattaforma
+    </button>
+</div>
+
+<div class="collapse mt-3" id="editorialMockupPreview">
+    <div class="card border-light-subtle">
+        <div class="card-body p-4">
+            <ul class="nav nav-pills mb-3" id="mockupPlatformTabs" role="tablist">
+                {% for platform in publication.get_platforms() %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {{ 'active' if loop.first else '' }}" id="mockup-tab-{{ platform }}" data-bs-toggle="pill" data-bs-target="#mockup-panel-{{ platform }}" type="button" role="tab" aria-controls="mockup-panel-{{ platform }}" aria-selected="{{ 'true' if loop.first else 'false' }}">
+                        {% if platform == "instagram" %}<i class="bi bi-instagram"></i>{% elif platform == "facebook" %}<i class="bi bi-facebook"></i>{% endif %}
+                        &nbsp;{{ labelize(platform) }}
+                    </button>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="tab-content" id="mockupPlatformContent">
+                {% for platform in publication.get_platforms() %}
+                <div class="tab-pane fade {{ 'show active' if loop.first else '' }}" id="mockup-panel-{{ platform }}" role="tabpanel" aria-labelledby="mockup-tab-{{ platform }}">
+                    <div class="editorial-mockup editorial-mockup-{{ platform }}">
+                        <div class="editorial-mockup-header">
+                            <div class="editorial-mockup-avatar">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <div class="editorial-mockup-user">
+                                <strong>{{ publication.cliente.name if publication.cliente else 'Azienda' }}</strong>
+                                <span class="text-secondary small">Pubblicazione</span>
+                            </div>
+                        </div>
+                        <div class="editorial-mockup-image">
+                            {% set mockup_paths = publication.get_image_paths() %}
+                            {% set mockup_img = mockup_paths[0] if mockup_paths else None %}
+                            {% if mockup_img %}
+                            <img src="{{ url_for('static', filename=mockup_img) }}" alt="Mockup {{ platform }}" loading="lazy">
+                            {% else %}
+                            <div class="editorial-mockup-image-placeholder">
+                                <i class="bi bi-image" style="font-size:2rem;color:#ccc;"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="editorial-mockup-body">
+                            <div class="editorial-mockup-actions">
+                                <i class="bi bi-heart"></i>
+                                <i class="bi bi-chat"></i>
+                                <i class="bi bi-share"></i>
+                            </div>
+                            <div class="editorial-mockup-caption">
+                                <strong>{{ publication.cliente.name if publication.cliente else 'Azienda' }}</strong>
+                                {% if publication.caption %}
+                                <span>{{ publication.caption }}</span>
+                                {% endif %}
+                            </div>
+                            {% if publication.title %}
+                            <div class="mt-1 small text-secondary">{{ publication.title }}</div>
+                            {% endif %}
+                            <div class="mt-1">
+                                {{ erp_badge("editorial_content_type", publication.content_type) }}
+                            </div>
+                            <div class="mt-2 text-secondary small">
+                                <i class="bi bi-clock"></i>&nbsp;{{ publication.publication_date|date_it if publication.publication_date else '' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% if can_delete %}
 <form action="{{ url_for('editorial_calendar.editorial_delete', publication_id=publication.id) }}" method="post" class="editorial-form-danger-action">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -207,4 +338,68 @@
     </button>
 </form>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var lightboxModal = document.getElementById('editorialLightboxModal');
+    if (!lightboxModal) return;
+    var carouselInner = document.getElementById('lightboxCarouselInner');
+    var counter = document.getElementById('lightboxCounter');
+
+    lightboxModal.addEventListener('hidden.bs.modal', function () {
+        if (carouselInner) carouselInner.innerHTML = '';
+        if (counter) counter.textContent = '';
+    });
+
+    document.querySelectorAll('.js-editorial-lightbox-trigger').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var imagesJson = this.getAttribute('data-images');
+            if (!imagesJson) return;
+            var images;
+            try { images = JSON.parse(imagesJson); } catch(e) { return; }
+            if (!images || images.length === 0) return;
+
+            if (!carouselInner) return;
+            carouselInner.innerHTML = '';
+            images.forEach(function (src, index) {
+                var item = document.createElement('div');
+                item.className = 'carousel-item' + (index === 0 ? ' active' : '');
+                var wrapper = document.createElement('div');
+                wrapper.className = 'lightbox-img-wrapper';
+                var img = document.createElement('img');
+                img.className = 'editorial-lightbox-img';
+                img.src = src;
+                img.alt = 'Immagine ' + (index + 1);
+                wrapper.appendChild(img);
+                item.appendChild(wrapper);
+                carouselInner.appendChild(item);
+            });
+
+            if (counter) {
+                counter.textContent = '1 / ' + images.length;
+            }
+
+            var showArrows = images.length > 1;
+            var prevBtn = document.getElementById('lightboxPrevBtn');
+            var nextBtn = document.getElementById('lightboxNextBtn');
+            if (prevBtn) prevBtn.style.display = showArrows ? '' : 'none';
+            if (nextBtn) nextBtn.style.display = showArrows ? '' : 'none';
+
+            bootstrap.Modal.getOrCreateInstance(lightboxModal).show();
+        });
+    });
+
+    lightboxModal.addEventListener('slid.bs.carousel', function () {
+        var activeIndex = Array.from(carouselInner.children).indexOf(carouselInner.querySelector('.carousel-item.active'));
+        if (counter && activeIndex >= 0) {
+            counter.textContent = (activeIndex + 1) + ' / ' + carouselInner.children.length;
+        }
+    });
+});
+</script>
 {% endblock %}

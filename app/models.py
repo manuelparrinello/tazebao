@@ -359,6 +359,17 @@ class EditorialPublication(db.Model):
     def has_platform(self, platform):
         return platform in self.get_platforms()
 
+    def get_image_paths(self):
+        seen = set()
+        paths = []
+        for img in (self.images or []):
+            if img.image_path and img.image_path not in seen:
+                paths.append(img.image_path)
+                seen.add(img.image_path)
+        if not paths and self.preview_image_path:
+            paths.append(self.preview_image_path)
+        return paths
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -394,6 +405,23 @@ class EditorialPublication(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
+
+
+class EditorialPublicationImage(db.Model):
+    __tablename__ = "erp_editorial_publication_images"
+
+    id = db.Column(db.Integer, primary_key=True)
+    publication_id = db.Column(
+        db.Integer,
+        db.ForeignKey("erp_editorial_publications.id"),
+        nullable=False,
+        index=True,
+    )
+    image_path = db.Column(db.String(500), nullable=False)
+    sort_order = db.Column(db.Integer, nullable=False, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    publication = db.relationship("EditorialPublication", backref="images")
 
 
 class FinancialMovement(db.Model):

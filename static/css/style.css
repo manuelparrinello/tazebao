@@ -3031,3 +3031,242 @@ table td {
     width: 100%;
   }
 }
+
+/* =========================
+   EDITORIAL CALENDAR - ADJACENT MONTH DAYS
+========================= */
+.editorial-day-cell-inactive {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.editorial-day-cell-inactive .editorial-day-add {
+  display: none;
+}
+
+.editorial-day-cell-inactive .editorial-calendar-item {
+  opacity: 0.7;
+}
+
+/* =========================
+   EDITORIAL IMAGES GRID (mult immagine)
+========================= */
+.editorial-images-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
+  min-height: 60px;
+}
+
+.editorial-image-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 120px;
+}
+
+.editorial-image-primary {
+  position: relative;
+}
+
+.editorial-image-badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+.editorial-image-thumb {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--bs-border-color);
+  background: #f8f9fa;
+}
+
+.editorial-image-thumb:hover {
+  border-color: var(--app-primary);
+  box-shadow: 0 0 0 2px rgba(32, 227, 127, 0.25);
+}
+
+/* =========================
+   LIGHTBOX
+========================= */
+.editorial-lightbox-img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+/* layout frecce esterne: [<] [immagine] [>] */
+.lightbox-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  gap: 0.25rem;
+}
+
+.lightbox-arrow {
+  flex: 0 0 auto;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  z-index: 5;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+  line-height: 0;
+}
+
+.lightbox-arrow:hover {
+  opacity: 1;
+}
+
+#lightboxCarousel {
+  flex: 1 1 auto;
+  max-width: 100%;
+  min-width: 0;
+}
+
+#lightboxCarouselInner {
+  min-height: 40vh;
+}
+
+#editorialLightboxModal .carousel-item {
+  text-align: center;
+}
+
+.lightbox-img-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+}
+
+@media (max-width: 576px) {
+  .lightbox-img-wrapper {
+    min-height: 25vh;
+  }
+  #lightboxCarouselInner {
+    min-height: 25vh;
+  }
+  .lightbox-arrow {
+    padding: 0.75rem 0.5rem;
+  }
+  .lightbox-layout {
+    gap: 0.125rem;
+  }
+}
+
+.lightbox-footer {
+  flex: 0 0 auto;
+  text-align: center;
+  padding: 0.5rem 1rem 1rem;
+}
+
+/* =========================
+   PLATFORM MOCKUP
+========================= */
+.editorial-mockup {
+  max-width: 420px;
+  margin: 0 auto;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  font-size: 0.92rem;
+}
+
+.editorial-mockup-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+}
+
+.editorial-mockup-avatar {
+  font-size: 1.8rem;
+  color: #ccc;
+  flex: 0 0 auto;
+}
+
+.editorial-mockup-user {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+
+.editorial-mockup-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.editorial-mockup-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editorial-mockup-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editorial-mockup-body {
+  padding: 0.75rem 1rem;
+}
+
+.editorial-mockup-actions {
+  display: flex;
+  gap: 1rem;
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.editorial-mockup-caption {
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.editorial-mockup-caption strong {
+  margin-right: 0.3rem;
+}
+
+.editorial-mockup-facebook {
+  max-width: 520px;
+}
+
+.editorial-mockup-facebook .editorial-mockup-image {
+  aspect-ratio: auto;
+  max-height: 360px;
+}
+
+.editorial-mockup-facebook .editorial-mockup-actions {
+  border-top: 1px solid var(--bs-border-color);
+  border-bottom: 1px solid var(--bs-border-color);
+  padding: 0.4rem 0;
+  margin-bottom: 0.5rem;
+}

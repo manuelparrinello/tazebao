@@ -16,6 +16,7 @@ from ..models import (
     EDITORIAL_STATUSES,
     Cliente,
     EditorialPublication,
+    EditorialPublicationImage,
     User,
 )
 
@@ -321,6 +322,14 @@ def editorial_index():
     )
 
 
+def adjacent_month_padding(year, month):
+    first_day = date(year, month, 1)
+    last_day = date(year, month, monthrange(year, month)[1])
+    grid_start = first_day - timedelta(days=first_day.weekday())
+    grid_end = last_day + timedelta(days=(6 - last_day.weekday()))
+    return grid_start, grid_end
+
+
 @bp.get("/editorial-calendar/clienti/<int:cliente_id>")
 @login_required
 def client_calendar(cliente_id):
@@ -333,11 +342,11 @@ def client_calendar(cliente_id):
         current_year = today.year
         current_month = today.month
 
-    first_day, last_day, _ = month_bounds(current_year, current_month)
+    grid_start, grid_end = adjacent_month_padding(current_year, current_month)
     publications = (
         EditorialPublication.query.filter_by(cliente_id=cliente.id)
-        .filter(EditorialPublication.publication_date >= first_day)
-        .filter(EditorialPublication.publication_date <= last_day)
+        .filter(EditorialPublication.publication_date >= grid_start)
+        .filter(EditorialPublication.publication_date <= grid_end)
         .order_by(EditorialPublication.publication_date.asc(), EditorialPublication.id.asc())
         .all()
     )
@@ -381,11 +390,18 @@ def editorial_new():
         publication_date=publication_date,
     )
     error = None
+    form_data = {}
+    form_platforms = []
 
     if request.method == "POST":
+        for key in request.form.keys():
+            vals = request.form.getlist(key)
+            form_data[key] = vals if len(vals) != 1 else vals[0]
+        form_platforms = request.form.getlist("platforms")
         try:
             apply_editorial_form(publication)
             db.session.add(publication)
+            handle_publication_images(publication)
             db.session.commit()
             return redirect(
                 url_for(
@@ -403,6 +419,8 @@ def editorial_new():
         "editorial_publication_form.html",
         publication=publication,
         error=error,
+        form_data=form_data,
+        form_platforms=form_platforms,
         form_action=url_for("editorial_calendar.editorial_new"),
         page_title="Nuova pubblicazione",
         submit_label="Crea pubblicazione",
@@ -410,15 +428,56 @@ def editorial_new():
     )
 
 
+def handle_publication_images(publication):
+    """Handle additional image uploads and removals for a publication.
+    Must be called after db.session.add(publication) and before commit."""
+    if publication.id is None:
+        db.session.flush()
+
+    additional_files = request.files.getlist("additional_images")
+    for file_storage in additional_files:
+        path = save_preview_file(file_storage)
+        if path:
+            max_order = (
+                db.session.query(
+                    db.func.coalesce(db.func.max(EditorialPublicationImage.sort_order), -1)
+                )
+                .filter(EditorialPublicationImage.publication_id == publication.id)
+                .scalar()
+            )
+            img = EditorialPublicationImage(
+                publication_id=publication.id,
+                image_path=path,
+                sort_order=max_order + 1,
+            )
+            db.session.add(img)
+
+    remove_ids = request.form.getlist("remove_image_ids")
+    for rid in remove_ids:
+        try:
+            img = EditorialPublicationImage.query.get(int(rid))
+            if img and img.publication_id == publication.id:
+                db.session.delete(img)
+        except (ValueError, TypeError):
+            pass
+
+
 @bp.route("/editorial-calendar/<int:publication_id>/edit", methods=["GET", "POST"])
 @role_required("admin", "operatore")
 def editorial_edit(publication_id):
     publication = EditorialPublication.query.get_or_404(publication_id)
     error = None
+    form_data = {}
+    form_platforms = []
 
     if request.method == "POST":
+        for key in request.form.keys():
+            vals = request.form.getlist(key)
+            form_data[key] = vals if len(vals) != 1 else vals[0]
+        form_platforms = request.form.getlist("platforms")
         try:
             apply_editorial_form(publication)
+            handle_publication_images(publication)
             db.session.commit()
             return redirect(
                 url_for(
@@ -436,6 +495,8 @@ def editorial_edit(publication_id):
         "editorial_publication_form.html",
         publication=publication,
         error=error,
+        form_data=form_data,
+        form_platforms=form_platforms,
         form_action=url_for(
             "editorial_calendar.editorial_edit",
             publication_id=publication.id,

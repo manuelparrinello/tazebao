@@ -11,8 +11,12 @@
 {%- endmacro %}
 
 {% macro publication_thumb(publication, size="sm") -%}
-{% if publication.preview_image_path %}
-<img class="editorial-thumb editorial-thumb-{{ size }}" src="{{ url_for('static', filename=publication.preview_image_path) }}" alt="">
+{% set paths = publication.get_image_paths() %}
+{% set thumb_path = paths[0] if paths else None %}
+{% if thumb_path %}
+{% set image_urls = [] %}
+{% for p in paths %}{% if image_urls.append(url_for('static', filename=p)) %}{% endif %}{% endfor %}
+<img class="editorial-thumb editorial-thumb-{{ size }} js-editorial-lightbox-trigger" src="{{ url_for('static', filename=thumb_path) }}" alt="" data-images='{{ image_urls|tojson }}'>
 {% else %}
 <div class="editorial-thumb editorial-thumb-{{ size }} editorial-thumb-placeholder">
     <i class="bi bi-image"></i>
@@ -158,7 +162,7 @@
             <div class="editorial-calendar-grid">
                 {% for week in weeks %}
                     {% for day in week %}
-                    <div class="editorial-day-cell {% if not day.in_month %}bg-light text-secondary{% endif %}">
+                    <div class="editorial-day-cell {% if not day.in_month %}editorial-day-cell-inactive{% endif %}">
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <span class="fw-bold {% if day.is_today %}text-primary{% endif %}">{{ day.day }}</span>
                             {% if can_mutate and day.in_month %}
@@ -397,4 +401,92 @@
         </div>
     </div>
 </section>
+
+<div class="modal fade" id="editorialLightboxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered mw-100 mx-2 mx-lg-auto">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body p-0 d-flex flex-column" style="min-height:50vh;">
+                <div class="lightbox-layout">
+                    <button class="lightbox-arrow" type="button" data-bs-target="#lightboxCarousel" data-bs-slide="prev" id="lightboxPrevBtn">
+                        <span class="carousel-control-prev-icon bg-dark bg-opacity-75 rounded-circle p-3"></span>
+                    </button>
+                    <div id="lightboxCarousel" class="carousel slide" data-bs-interval="false">
+                        <div class="carousel-inner" id="lightboxCarouselInner"></div>
+                    </div>
+                    <button class="lightbox-arrow" type="button" data-bs-target="#lightboxCarousel" data-bs-slide="next" id="lightboxNextBtn">
+                        <span class="carousel-control-next-icon bg-dark bg-opacity-75 rounded-circle p-3"></span>
+                    </button>
+                </div>
+                <div class="lightbox-footer">
+                    <span class="badge bg-dark bg-opacity-75 fs-6" id="lightboxCounter"></span>
+                    <button type="button" class="btn btn-sm btn-light mt-2 d-block mx-auto" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var lightboxModal = document.getElementById('editorialLightboxModal');
+    if (!lightboxModal) return;
+    var carouselInner = document.getElementById('lightboxCarouselInner');
+    var counter = document.getElementById('lightboxCounter');
+
+    lightboxModal.addEventListener('hidden.bs.modal', function () {
+        if (carouselInner) carouselInner.innerHTML = '';
+        if (counter) counter.textContent = '';
+    });
+
+    document.querySelectorAll('.js-editorial-lightbox-trigger').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var imagesJson = this.getAttribute('data-images');
+            if (!imagesJson) return;
+            var images;
+            try { images = JSON.parse(imagesJson); } catch(e) { return; }
+            if (!images || images.length === 0) return;
+
+            if (!carouselInner) return;
+            carouselInner.innerHTML = '';
+            images.forEach(function (src, index) {
+                var item = document.createElement('div');
+                item.className = 'carousel-item' + (index === 0 ? ' active' : '');
+                var wrapper = document.createElement('div');
+                wrapper.className = 'lightbox-img-wrapper';
+                var img = document.createElement('img');
+                img.className = 'editorial-lightbox-img';
+                img.src = src;
+                img.alt = 'Immagine ' + (index + 1);
+                wrapper.appendChild(img);
+                item.appendChild(wrapper);
+                carouselInner.appendChild(item);
+            });
+
+            if (counter) {
+                counter.textContent = '1 / ' + images.length;
+            }
+
+            var showArrows = images.length > 1;
+            var prevBtn = document.getElementById('lightboxPrevBtn');
+            var nextBtn = document.getElementById('lightboxNextBtn');
+            if (prevBtn) prevBtn.style.display = showArrows ? '' : 'none';
+            if (nextBtn) nextBtn.style.display = showArrows ? '' : 'none';
+
+            bootstrap.Modal.getOrCreateInstance(lightboxModal).show();
+        });
+    });
+
+    lightboxModal.addEventListener('slid.bs.carousel', function () {
+        var activeIndex = Array.from(carouselInner.children).indexOf(carouselInner.querySelector('.carousel-item.active'));
+        if (counter && activeIndex >= 0) {
+            counter.textContent = (activeIndex + 1) + ' / ' + carouselInner.children.length;
+        }
+    });
+});
+</script>
+{% endblock %}
 {% endblock %}

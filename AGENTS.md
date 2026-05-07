@@ -42,3 +42,11 @@ python run.py                                      # dev server on :5000
 - Italian naming throughout (routes, models, templates, UI). Preserve it.
 - Templates at `templates/`, static at `static/`. Flask configured with `../templates` and `../static` relative to `app/`.
 - `FLASK_ENV=development` enables dev fallback secret key; any other value requires real `SECRET_KEY`.
+
+## Migration policy
+
+- Do not touch migrations/versions_archive/.
+- For schema changes, create a new Alembic migration.
+- Current active migrations are the source of truth for rebuilding the dev DB.
+- If the project is still in local/dev consolidation and explicitly requested, keep the baseline migration aligned with current models.
+- Never edit active migrations casually after they have been pushed unless explicitly instructed.

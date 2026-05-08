@@ -1,6 +1,8 @@
+import os
 from datetime import datetime
 
-from flask import Blueprint, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, jsonify, redirect, render_template, request, url_for
+from werkzeug.utils import secure_filename
 
 from ..auth import login_required, role_required
 from ..extensions import db
@@ -8,6 +10,33 @@ from ..models import CalendarEvent, Cliente, FinancialMovement, Lavoro, Preventi
 
 
 bp = Blueprint("lavori", __name__)
+
+UPLOAD_SUBDIR = "uploads/lavori_preventivi"
+ALLOWED_PDF_EXTENSIONS = {".pdf"}
+
+
+def ensure_upload_dir():
+    path = os.path.join(current_app.static_folder, UPLOAD_SUBDIR)
+    os.makedirs(path, exist_ok=True)
+    return path
+
+
+def save_preventivo_pdf(lavoro_id):
+    file = request.files.get("preventivo_pdf")
+    if not file or not file.filename:
+        return None
+
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in ALLOWED_PDF_EXTENSIONS:
+        raise ValueError("Il file caricato non è un PDF. Sono accettati solo file con estensione .pdf.")
+
+    ensure_upload_dir()
+    safe_name = secure_filename(file.filename)
+    storage_name = f"{lavoro_id}_{int(datetime.utcnow().timestamp())}_{safe_name}"
+    rel_path = os.path.join(UPLOAD_SUBDIR, storage_name)
+    abs_path = os.path.join(current_app.static_folder, rel_path)
+    file.save(abs_path)
+    return rel_path.replace("\\", "/")
 
 status_lavori = ["Completato", "In corso", "In attesa", "Da iniziare"]
 
@@ -92,6 +121,14 @@ def nuovo_lavoro():
         )
         db.session.add(nuovo_lavoro)
         db.session.commit()
+
+        try:
+            pdf_path = save_preventivo_pdf(nuovo_lavoro.id)
+            if pdf_path:
+                nuovo_lavoro.preventivo_pdf_path = pdf_path
+                db.session.commit()
+        except ValueError as e:
+            return jsonify({"success": False, "error": str(e)}), 400
 
         if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.accept_mimetypes.best == "application/json":
             return (
@@ -217,7 +254,24 @@ def lavoro_edit(lavoro_id):
     if request.method == "POST":
         try:
             apply_lavoro_form(lavoro)
+
+            if request.form.get("remove_pdf") == "1" and lavoro.preventivo_pdf_path:
+                old_path = os.path.join(current_app.static_folder, lavoro.preventivo_pdf_path)
+                if os.path.exists(old_path):
+                    os.remove(old_path)
+                lavoro.preventivo_pdf_path = None
+
             db.session.commit()
+
+            pdf_path = save_preventivo_pdf(lavoro.id)
+            if pdf_path:
+                if lavoro.preventivo_pdf_path:
+                    old_path = os.path.join(current_app.static_folder, lavoro.preventivo_pdf_path)
+                    if os.path.exists(old_path):
+                        os.remove(old_path)
+                lavoro.preventivo_pdf_path = pdf_path
+                db.session.commit()
+
             return redirect(url_for("lavori.lavoro_page", lavoro_id=lavoro.id))
         except ValueError as exc:
             db.session.rollback()
@@ -233,6 +287,19 @@ def lavoro_edit(lavoro_id):
         page_title="Modifica lavoro",
         submit_label="Salva modifiche",
     )
+
+
+@bp.post("/lavori/<int:lavoro_id>/remove-pdf")
+@role_required("admin", "operatore")
+def lavoro_remove_pdf(lavoro_id):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    if lavoro.preventivo_pdf_path:
+        old_path = os.path.join(current_app.static_folder, lavoro.preventivo_pdf_path)
+        if os.path.exists(old_path):
+            os.remove(old_path)
+        lavoro.preventivo_pdf_path = None
+        db.session.commit()
+    return redirect(url_for("lavori.lavoro_edit", lavoro_id=lavoro.id))
 
 
 @bp.delete("/lavori/<int:lavoro_id>")

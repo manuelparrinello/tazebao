@@ -1,64 +1,71 @@
 {% extends "base.html" %}
 {% block title %}Preventivi{% endblock %}
-
 {% block content %}
 {% set can_mutate = current_user and current_user.role != "readonly" %}
-<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-    <div class="col-12 col-lg-4 px-0">
-        <h3 class="fw-bold">Tutti i preventivi</h3>
-        <p>Elenco di tutti i preventivi aggiunti a sistema.</p>
+<div class="row mx-auto w-100 align-items-start g-3">
+    <div class="col-12 col-xl-7 px-0">
+        <div class="editorial-page-header">
+            <h3 class="fw-bolder mb-1">
+                <i class="bi bi-file-text me-2 text-primary"></i>Tutti i preventivi
+            </h3>
+            <p class="text-secondary mb-0">Elenco di tutti i preventivi presenti nel sistema.</p>
+        </div>
     </div>
-    {% if can_mutate %}
-    <div class="col-12 col-lg-8 d-inline-flex justify-content-lg-end px-0">
-        <a href="{{ url_for('nuovo_preventivo') }}"><button class="button-61"><span><i
-                        class="bi bi-journal-plus"></i></span>&nbsp;Nuovo preventivo</button></a>
+    <div class="col-12 col-xl-5 px-0">
+        <div class="erp-action-bar justify-content-xl-end">
+            {% if can_mutate %}
+            <a class="btn btn-primary erp-action-primary" href="{{ url_for('nuovo_preventivo') }}">
+                <i class="bi bi-journal-plus"></i>&nbsp;Nuovo preventivo
+            </a>
+            {% endif %}
+        </div>
     </div>
-    {% endif %}
 </div>
 <hr>
 <div class="mt-5" id="preventivi" v-cloak>
     <div v-if="preventivi.length > 0">
         <div class="card rounded-3 border border-light-subtle">
-            <div class="card-body p-4">
-                <div class="table-responsive d-none d-md-block">
-                    <table class="table my-0 sortable table-hover rounded-3 p-2 no-last-border erp-table">
-                        <thead>
-                            <tr>
-                                <th class="fw-bold col-id mobile-hide">ID</th>
-                                <th class="fw-bold">Descrizione</th>
-                                <th class="fw-bold mobile-hide">Cliente</th>
-                                <th class="fw-bold col-date">Data creazione</th>
-                                <th class="fw-bold col-money text-end">Totale</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="preventivo in preventivi" class="pointer" @click="openPreventivo(preventivo.id)">
-                                <td class="mobile-hide">[[ preventivo.id ]]</td>
-                                <td>
-                                    <a :href="'/preventivi/visualizza/' + preventivo.id" class="a-no-color fw-bold" @click.stop>
-                                        [[ preventivo.descrizione ]]
-                                    </a>
-                                </td>
-                                <td class="mobile-hide">[[ preventivo.cliente ]]</td>
-                                <td>[[ formatDate(preventivo.data_creazione) ]]</td>
-                                <td class="text-end">[[ preventivo.totale_preventivo ]] &euro;</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="card-body p-0 p-md-4">
+                <table class="table my-0 sortable table-hover rounded-3 no-last-border preventivi-table d-none d-md-table">
+                    <thead>
+                        <tr>
+                            <th class="fw-bold pointer col-descrizione" scope="col">Descrizione</th>
+                            <th class="fw-bold pointer col-cliente" scope="col">Cliente</th>
+                            <th class="fw-bold pointer col-data" scope="col">Data</th>
+                            <th class="fw-bold pointer col-stato" scope="col">Stato</th>
+                            <th class="fw-bold pointer col-totale text-end" scope="col">Totale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="preventivo in preventivi" class="pointer" @click="openPreventivo(preventivo.id)">
+                            <td class="col-descrizione-cell">
+                                <a :href="'/preventivi/visualizza/' + preventivo.id" class="fw-bold text-decoration-none a-no-color d-block text-truncate" @click.stop>
+                                    [[ preventivo.descrizione ]]
+                                </a>
+                            </td>
+                            <td class="col-cliente-cell text-truncate">[[ preventivo.cliente ]]</td>
+                            <td class="col-data-cell">[[ formatDate(preventivo.data_creazione) ]]</td>
+                            <td class="col-stato-cell" v-html="statoBadgeHtml(preventivo.stato)"></td>
+                            <td class="col-totale-cell text-end fw-bold preventivo-importo" v-html="formatEuro(preventivo.totale_preventivo)"></td>
+                        </tr>
+                    </tbody>
+                </table>
                 <div class="d-md-none mobile-list">
                     <a v-for="preventivo in preventivi" :key="preventivo.id" class="mobile-list-item mobile-row-link" :href="'/preventivi/visualizza/' + preventivo.id">
                         <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div class="min-w-0">
-                                <div class="fw-bold mobile-row-title" :title="preventivo.descrizione">[[ preventivo.descrizione ]]</div>
-                                <div class="mobile-row-meta mobile-row-muted">
-                                    <span>[[ preventivo.cliente ]]</span>
-                                    <span>[[ formatDate(preventivo.data_creazione) ]]</span>
+                            <div class="min-w-0 flex-grow-1">
+                                <div class="fw-bold mobile-row-title mb-1" :title="preventivo.descrizione">[[ preventivo.descrizione ]]</div>
+                                <div class="mobile-row-meta mb-1">
+                                    <span class="mobile-row-muted">[[ preventivo.cliente ]]</span>
+                                    <span class="mobile-row-muted ms-2">[[ formatDate(preventivo.data_creazione) ]]</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span v-html="statoBadgeHtml(preventivo.stato)"></span>
                                 </div>
                             </div>
                             <div class="text-end flex-shrink-0">
-                                <div class="fw-bold">[[ preventivo.totale_preventivo ]] &euro;</div>
-                                <i class="bi bi-chevron-right text-secondary"></i>
+                                <div class="fw-bold preventivo-importo" v-html="formatEuro(preventivo.totale_preventivo)"></div>
+                                <i class="bi bi-chevron-right text-secondary mt-1"></i>
                             </div>
                         </div>
                     </a>
@@ -66,12 +73,12 @@
             </div>
         </div>
     </div>
-    <div v-else>
-        Nessun preventivo presente
+    <div v-else class="text-center text-secondary py-5">
+        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+        <span>Nessun preventivo presente</span>
     </div>
 </div>
 {% endblock %}
-
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/preventivi.js') }}"></script>
 {% endblock %}

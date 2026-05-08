@@ -3430,6 +3430,11 @@ table td {
   text-align: center;
 }
 
+.lavori-table .col-pdf {
+  width: 60px;
+  text-align: center;
+}
+
 .lavori-table .col-status {
   width: 130px;
 }
@@ -3438,6 +3443,174 @@ table td {
   font-size: 1rem;
   color: #7e508d !important;
   cursor: help;
+}
+
+/* =========================
+   CLIENTI - TABELLA
+========================= */
+
+.clienti-table {
+  min-width: 900px;
+  table-layout: fixed;
+}
+
+.clienti-table th,
+.clienti-table td {
+  vertical-align: middle !important;
+}
+
+.clienti-table .col-nominativo {
+  width: 28%;
+}
+
+.clienti-table .col-contatti {
+  width: 18%;
+}
+
+.clienti-table .col-citta {
+  width: 10%;
+}
+
+.clienti-table .col-piva {
+  width: 13%;
+}
+
+.clienti-table .col-pec-sdi {
+  width: 14%;
+}
+
+.clienti-table .col-note {
+  width: 80px;
+  text-align: center;
+}
+
+.clienti-table .col-nominativo-cell a {
+  min-width: 0;
+}
+
+/* =========================
+   PREVENTIVI - TABELLA
+========================= */
+
+.preventivi-table {
+  min-width: 820px;
+  table-layout: fixed;
+}
+
+.preventivi-table th,
+.preventivi-table td {
+  vertical-align: middle !important;
+}
+
+.preventivi-table .col-descrizione {
+  width: 30%;
+}
+
+.preventivi-table .col-cliente {
+  width: 22%;
+}
+
+.preventivi-table .col-data {
+  width: 16%;
+}
+
+.preventivi-table .col-stato {
+  width: 18%;
+}
+
+.preventivi-table .col-totale {
+  width: 14%;
+}
+
+.preventivo-importo {
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+/* =========================
+   MAIL - TABELLA
+========================= */
+
+.mail-table {
+  min-width: 860px;
+  table-layout: fixed;
+}
+
+.mail-table th,
+.mail-table td {
+  vertical-align: middle !important;
+}
+
+.mail-table .col-data {
+  width: 15%;
+}
+
+.mail-table .col-stato {
+  width: 11%;
+}
+
+.mail-table .col-mittente {
+  width: 38%;
+}
+
+.mail-table .col-account {
+  width: 14%;
+}
+
+.mail-table .col-collegamenti {
+  width: 14%;
+}
+
+.mail-table .col-azioni {
+  width: 8%;
+}
+
+.mail-row-unread {
+  background: rgba(32, 227, 127, 0.04) !important;
+}
+
+.mail-row-unread .fw-bold {
+  color: #111;
+}
+
+/* Mobile card unread usa accento verde invece di bordo warning */
+.mobile-list .mail-card-unread {
+  border-left: 3px solid var(--app-primary);
+  background: rgba(32, 227, 127, 0.04);
+}
+
+/* =========================
+   EMAIL LOG / REGISTRO - TABELLA
+========================= */
+
+.emails-table {
+  min-width: 820px;
+  table-layout: fixed;
+}
+
+.emails-table th,
+.emails-table td {
+  vertical-align: middle !important;
+}
+
+.emails-table .col-data {
+  width: 15%;
+}
+
+.emails-table .col-comunicazione {
+  width: 35%;
+}
+
+.emails-table .col-direzione {
+  width: 12%;
+}
+
+.emails-table .col-collegamenti {
+  width: 22%;
+}
+
+.emails-table .col-azioni {
+  width: 16%;
 }
 
 .loading-container {

@@ -1,42 +1,70 @@
 const TabellaClienti = {
   props: ["clienti_data"],
   template: `
-    <table class="table my-0 sortable table-hover rounded-3 p-2 no-last-border erp-table d-none d-md-table">
+    <table class="table my-0 sortable table-hover rounded-3 no-last-border clienti-table d-none d-md-table">
       <thead>
         <tr>
           <th class="fw-bold pointer col-nominativo" scope="col">Nominativo</th>
-          <th class="fw-bold pointer col-email mobile-hide" scope="col">Email</th>
-          <th class="fw-bold pointer col-date mobile-hide" scope="col">Telefono</th>
+          <th class="fw-bold pointer col-contatti" scope="col">Contatti</th>
+          <th class="fw-bold pointer col-citta" scope="col">Citt&agrave;</th>
+          <th class="fw-bold pointer col-piva" scope="col">P.IVA</th>
+          <th class="fw-bold pointer col-pec-sdi" scope="col">PEC / SDI</th>
           <th class="fw-bold pointer text-center col-note" scope="col">Note</th>
         </tr>
       </thead>
       <tbody>
         <template v-if="clienti_data.length > 0">
           <tr v-for="cliente in clienti_data">
-            <td>
-              <a class="fw-bold text-decoration-none d-block text-truncate" :href="'/clienti/' + cliente.id" :title="cliente.nome">
-                <i :style="{ color: cliente.colore }" class="bi bi-person-circle me-2"></i>[[ cliente.nome ]]
+            <td class="col-nominativo-cell">
+              <a class="fw-bold text-decoration-none d-flex align-items-center gap-2" :href="'/clienti/' + cliente.id" :title="cliente.nome">
+                <i :style="{ color: cliente.colore }" class="bi bi-person-circle flex-shrink-0"></i>
+                <span class="text-truncate">[[ cliente.nome ]]</span>
               </a>
             </td>
-            <td class="text-nowrap mobile-hide">[[ cliente.email ]]</td>
-            <td class="mobile-hide">[[ cliente.telefono ]]</td>
+            <td class="col-contatti-cell">
+              <div v-if="cliente.email" class="text-truncate">[[ cliente.email ]]</div>
+              <small v-if="cliente.telefono" class="text-secondary d-block text-truncate">[[ cliente.telefono ]]</small>
+              <span v-if="!cliente.email && !cliente.telefono" class="text-secondary">-</span>
+            </td>
+            <td class="col-citta-cell">[[ cliente.citta || '-' ]]</td>
+            <td class="col-piva-cell">[[ cliente.p_iva || '-' ]]</td>
+            <td class="col-pec-sdi-cell">
+              <template v-if="cliente.pec || cliente.sdi">
+                <div v-if="cliente.pec" class="text-truncate">[[ cliente.pec ]]</div>
+                <small v-if="cliente.sdi" class="text-secondary d-block text-truncate">SDI: [[ cliente.sdi ]]</small>
+              </template>
+              <span v-else class="text-secondary">-</span>
+            </td>
             <td class="text-center" v-html="renderNoteIcon(cliente.note)"></td>
           </tr>
         </template>
         <tr v-else>
-          <td colspan="4" class="text-center">Nessun cliente trovato.</td>
+          <td colspan="6" class="text-center">Nessun cliente trovato.</td>
         </tr>
       </tbody>
     </table>
     <div class="mobile-list d-md-none">
       <template v-if="clienti_data.length > 0">
         <a v-for="cliente in clienti_data" :key="cliente.id" class="mobile-list-item mobile-row-link" :href="'/clienti/' + cliente.id">
-          <div class="d-flex align-items-center justify-content-between gap-3">
-            <div class="d-flex align-items-center gap-2 min-w-0">
-              <i :style="{ color: cliente.colore }" class="bi bi-person-circle flex-shrink-0"></i>
-              <span class="fw-bold mobile-row-title" :title="cliente.nome">[[ cliente.nome ]]</span>
+          <div class="d-flex align-items-start justify-content-between gap-3">
+            <div class="min-w-0 flex-grow-1">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <i :style="{ color: cliente.colore }" class="bi bi-person-circle flex-shrink-0"></i>
+                <span class="fw-bold mobile-row-title">[[ cliente.nome ]]</span>
+              </div>
+              <div class="mobile-row-meta">
+                <span v-if="cliente.email" class="mobile-row-muted">
+                  <i class="bi bi-envelope me-1"></i>[[ cliente.email ]]
+                </span>
+                <span v-if="cliente.telefono" class="mobile-row-muted ms-2">
+                  <i class="bi bi-telephone me-1"></i>[[ cliente.telefono ]]
+                </span>
+              </div>
+              <div v-if="cliente.citta" class="mobile-row-muted mt-1">
+                <i class="bi bi-geo-alt me-1"></i>[[ cliente.citta ]]
+              </div>
             </div>
-            <i class="bi bi-chevron-right text-secondary flex-shrink-0"></i>
+            <i class="bi bi-chevron-right text-secondary flex-shrink-0 mt-1"></i>
           </div>
         </a>
       </template>

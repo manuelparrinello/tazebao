@@ -643,6 +643,7 @@ def get_lavori():
                     "name": l.cliente.name,
                 },
                 "note": l.note,
+                "preventivo_pdf_path": l.preventivo_pdf_path,
             }
             for l in lavori
         ]

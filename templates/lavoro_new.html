@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <form id="formLavoro" class="erp-boxed-form" method="POST" action="{{ url_for('lavori.nuovo_lavoro') }}" @submit.prevent="submitForm()" data-selected-cliente-id="{{ selected_cliente_id or '' }}">
+    <form id="formLavoro" class="erp-boxed-form" method="POST" action="{{ url_for('lavori.nuovo_lavoro') }}" @submit.prevent="submitForm()" data-selected-cliente-id="{{ selected_cliente_id or '' }}" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <div class="card erp-form-card">
@@ -99,6 +99,19 @@
                     </div>
                     <label for="note" class="fw-bold form-label">Note</label>
                     <textarea v-model="note" class="form-control" id="note" name="note" rows="4"></textarea>
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Preventivo esterno PDF</h5>
+                        <p>Allega un file PDF di preventivo realizzato fuori dalla piattaforma.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <label for="preventivo_pdf" class="form-label fw-bold">Carica PDF</label>
+                            <input type="file" class="form-control" id="preventivo_pdf" name="preventivo_pdf" accept=".pdf,application/pdf">
+                        </div>
+                    </div>
                 </section>
 
                 <div class="erp-form-footer-actions">

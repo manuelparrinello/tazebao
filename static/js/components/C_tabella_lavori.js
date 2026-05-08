@@ -15,6 +15,7 @@ const TabellaLavori = {
           <th class="fw-bold pointer col-cliente mobile-hide" scope="col">Cliente</th>
           <th class="fw-bold pointer text-center col-payment mobile-hide" scope="col">Pagamento</th>
           <th class="fw-bold pointer text-center col-note mobile-hide" scope="col">Note</th>
+          <th class="fw-bold pointer text-center col-pdf" scope="col">PDF</th>
           <th class="fw-bold pointer text-center col-status" scope="col">Stato</th>
         </tr>
       </thead>
@@ -34,6 +35,7 @@ const TabellaLavori = {
             </td>
             <td class="text-center mobile-hide">[[ formatDate(lavoro.data_pagamento) ]]</td>
             <td class="text-center mobile-hide note-td" v-html="renderNoteIcon(lavoro.note)"></td>
+            <td class="text-center col-pdf" v-html="pdfIcon(lavoro.preventivo_pdf_path)"></td>
             <td class="text-center">
               <template v-if="canMutate()">
                 <select :class="statusColor(lavoro.stato)" @change="update_status($event, lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
@@ -48,7 +50,7 @@ const TabellaLavori = {
           </tr>
         </template>
         <tr v-else>
-          <td colspan="7" class="text-center">Nessun lavoro trovato.</td>
+          <td colspan="8" class="text-center">Nessun lavoro trovato.</td>
         </tr>
       </tbody>
     </table>
@@ -69,6 +71,9 @@ const TabellaLavori = {
                 <template v-if="lavoro.preventivato > 0">
                   <span class="ms-2"><i class="bi bi-currency-euro me-1"></i>[[ lavoro.preventivato ]]</span>
                 </template>
+                <span v-if="lavoro.preventivo_pdf_path" class="ms-2 text-success">
+                  <i class="bi bi-file-earmark-pdf-fill me-1"></i>PDF
+                </span>
               </div>
             </div>
             <i class="bi bi-chevron-right text-secondary flex-shrink-0 mt-1"></i>
@@ -116,6 +121,12 @@ const TabellaLavori = {
       return "";
     },
 
+    pdfIcon(path) {
+      if (path) {
+        return '<span class="lavoro-pdf-icon text-success"><i class="bi bi-file-earmark-pdf-fill"></i></span>';
+      }
+      return '<span class="lavoro-pdf-icon text-secondary">&mdash;</span>';
+    },
     renderNoteIcon(note) {
       if (note) {
         return `<i data-bs-placement="left" data-bs-toggle="tooltip" data-bs-title="${note}" class="bi bi-stickies" style="font-size: 1rem; color: #7e508d !important;"></i>`;

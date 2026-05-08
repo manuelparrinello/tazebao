@@ -126,6 +126,14 @@
                         <div class="text-secondary small">Preventivato</div>
                         <div class="fw-bold">{{ euro(lavoro.preventivato|default(0)) }}</div>
                     </div>
+                    {% if lavoro.preventivo_pdf_path %}
+                    <div class="col-12">
+                        <div class="text-secondary small">Preventivo esterno PDF</div>
+                        <a href="{{ url_for('static', filename=lavoro.preventivo_pdf_path) }}" target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                            <i class="bi bi-file-earmark-pdf-fill me-1"></i>Apri PDF preventivo
+                        </a>
+                    </div>
+                    {% endif %}
                     <div class="col-12">
                         <div class="text-secondary small">Note</div>
                         <div class="descrizione-preventivo text-break">{{ lavoro.note|default("-", true) }}</div>

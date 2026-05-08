@@ -6,55 +6,26 @@ const getAllClienti = Vue.createApp({
     return {
       clienti: [],
       loading: true,
-      error: null,
-      deletingID: null,
     };
   },
   methods: {
-    async loadClienti() {
-      const url = `/api/clienti/getall`;
-
-      try {
-        const response = await fetch(url, {
-          method: "get",
-          headers: {
-            Accept: "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Errore richiesta! (HTTP ${response.status})`);
-        }
-        this.clienti = await response.json();
-      } catch (errore) {
-        this.error = errore.message || "Errore imprevisto";
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async clickForDeleteCliente(cliente_id) {
+    clickForDeleteCliente(cliente_id) {
       const url = `/clienti/${cliente_id}`;
       if (window.confirm('Vuoi davvero cancellare il cliente?')) {
-        try {
-          const response = await fetch(url, {
-            method: 'delete',
-            headers: csrfHeaders(),
-          })
-          if (!response.ok) {
-            throw new Error(`Errore richiesta! HTTP(${response.status})`)
-          }
+        fetch(url, {
+          method: 'delete',
+          headers: csrfHeaders(),
+        }).then(response => {
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
           alert('Cliente eliminato con successo!');
           window.location.href = '/clienti';
-        } catch (error) {
-          console.log(error)
-        }
+        }).catch(error => console.log(error));
       }
-      return
     }
   },
   mounted() {
-    this.loadClienti();
-    console.log(this.loadClienti());
+    this.clienti = window.CLIENTI_DATA || [];
+    this.loading = false;
   },
   delimiters: ["[[", "]]"],
 }).mount("#clientiPage");

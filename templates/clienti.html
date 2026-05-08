@@ -1,29 +1,61 @@
-{% extends "base.html" %} {% block title %}Tutti i clienti{% endblock %} {% block content %}
+{% extends "base.html" %}
+{% block title %}Tutti i clienti{% endblock %}
+{% block content %}
 {% set can_mutate = current_user and current_user.role != "readonly" %}
-<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-    <div class="col-12 col-lg-4 px-0">
-        <h3 class="fw-bolder">Tutti i clienti</h3>
-        <p>Elenco di tutti i clienti presenti nel sistema.</p>
+<div class="row mx-auto w-100 align-items-start g-3">
+    <div class="col-12 col-xl-7 px-0">
+        <div class="editorial-page-header">
+            <h3 class="fw-bolder mb-1">
+                <i class="bi bi-people me-2 text-primary"></i>Tutti i clienti
+            </h3>
+            <p class="text-secondary mb-0">Elenco di tutti i clienti presenti nel sistema.</p>
+        </div>
     </div>
-    {% if can_mutate %}
-    <div class="col-12 col-lg-8 d-inline-flex justify-content-lg-end px-0">
-        <a href="{{ url_for('nuovo_cliente') }}"><button class="button-61">
-                <span><i class="bi bi-person-plus-fill"></i></span>&nbsp;Nuovo
-                cliente
-            </button></a>
+    <div class="col-12 col-xl-5 px-0">
+        <div class="erp-action-bar justify-content-xl-end">
+            {% if can_mutate %}
+            <a class="btn btn-primary erp-action-primary" href="{{ url_for('nuovo_cliente') }}">
+                <i class="bi bi-person-plus-fill"></i>&nbsp;Nuovo cliente
+            </a>
+            {% endif %}
+        </div>
     </div>
-    {% endif %}
 </div>
 <hr>
 
 <div id="clientiPage" class="mt-5" v-cloak>
-    <div class="card rounded-3 border border-light-subtle">
-        <div class="card-body">
-            <tabella-clienti :clienti_data="clienti" @delete="clickForDeleteCliente"></tabella-clienti>
+    <div v-if="loading" class="loading-container">
+        <span class="loader"></span>
+    </div>
+    <div v-else>
+        <div class="card rounded-3 border border-light-subtle">
+            <div class="card-body p-0 p-md-4">
+                <tabella-clienti :clienti_data="clienti" @delete="clickForDeleteCliente"></tabella-clienti>
+            </div>
         </div>
     </div>
 </div>
-{% endblock %} {% block scripts %}
+{% endblock %}
+{% block scripts %}
+<script>
+window.CLIENTI_DATA = [
+    {% for c in clienti %}
+    {
+        "id": {{ c.id }},
+        "nome": {{ c.name|tojson }},
+        "telefono": {{ c.telefono|tojson }},
+        "email": {{ c.email|tojson }},
+        "citta": {{ c.citta|tojson }},
+        "p_iva": {{ c.p_iva|tojson }},
+        "pec": {{ c.pec|tojson }},
+        "sdi": {{ c.sdi|tojson }},
+        "note": {{ c.note|tojson }},
+        "colore": {{ c.colore|tojson }},
+        "count_lavori": {{ c.lavori|length }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+];
+</script>
 <script src="{{ url_for('static', filename='js/components/C_tabella_clienti.js') }}"></script>
 <script src="{{ url_for('static', filename='js/clienti.js') }}"></script>
 {% endblock %}

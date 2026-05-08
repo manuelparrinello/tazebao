@@ -14,6 +14,12 @@ function formatPreventivoDate(value) {
     .join("");
 }
 
+function formatPreventivoEuro(value) {
+  if (value == null || isNaN(value)) return "&euro; 0,00";
+  const num = Number(value);
+  return "&euro; " + num.toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 const preventivi = Vue.createApp({
   data() {
     return {
@@ -34,9 +40,7 @@ const preventivi = Vue.createApp({
           throw new Error("Errore HTTP:" + response.status);
         }
         const data = await response.json();
-        // console.log(data);
         this.preventivi = data;
-        console.log(this.preventivi);
       } catch (err) {
         console.log(err);
       }
@@ -47,6 +51,20 @@ const preventivi = Vue.createApp({
     },
     formatDate(value) {
       return formatPreventivoDate(value);
+    },
+    formatEuro(value) {
+      return formatPreventivoEuro(value);
+    },
+    statoBadgeHtml(stato) {
+      if (!stato) return '<span class="erp-badge badge text-bg-secondary">-</span>';
+      const map = {
+        bozza: "secondary",
+        inviato: "primary",
+        accettato: "success",
+        rifiutato: "danger",
+      };
+      const cls = map[stato] || "secondary";
+      return `<span class="erp-badge badge text-bg-${cls}">${stato}</span>`;
     },
   },
   delimiters: ["[[", "]]"],

@@ -6,20 +6,25 @@
 {% set can_mutate = current_user and current_user.role != "readonly" %}
 {% set can_admin = current_user and current_user.role == "admin" %}
 
-<div class="row mx-auto w-100 align-items-center g-3">
-    <div class="col-12 col-lg-6 px-0">
-        <h6 class="text-primary fw-bold" style="letter-spacing: 1.2px">EMAIL ERP</h6>
-        <h3 class="fw-bolder">Client email</h3>
-        <p>Inbox e invio email tramite account IMAP/SMTP configurati.</p>
+<div class="row mx-auto w-100 align-items-start g-3">
+    <div class="col-12 col-xl-7 px-0">
+        <div class="editorial-page-header">
+            <h3 class="fw-bolder mb-1">
+                <i class="bi bi-envelope me-2 text-primary"></i>Client email
+            </h3>
+            <p class="text-secondary mb-0">Posta elettronica integrata via account IMAP/SMTP configurati.</p>
+        </div>
     </div>
-    <div class="col-12 col-lg-6 d-inline-flex flex-wrap justify-content-lg-end gap-2 px-0">
-        {% if can_mutate %}
-        <a href="{{ url_for('mail.mail_new') }}" class="btn btn-primary"><i class="bi bi-pencil-square"></i>&nbsp;Nuova email</a>
-        {% endif %}
-        {% if can_admin %}
-        <a href="{{ url_for('mail.mail_accounts') }}" class="btn btn-outline-secondary"><i class="bi bi-gear"></i>&nbsp;Account</a>
-        {% endif %}
-        <a href="{{ url_for('emails.emails_index') }}" class="btn btn-outline-secondary"><i class="bi bi-journal-text"></i>&nbsp;Registro email</a>
+    <div class="col-12 col-xl-5 px-0">
+        <div class="erp-action-bar justify-content-xl-end">
+            {% if can_mutate %}
+            <a href="{{ url_for('mail.mail_new') }}" class="btn btn-primary erp-action-primary"><i class="bi bi-pencil-square"></i>&nbsp;Nuova email</a>
+            {% endif %}
+            {% if can_admin %}
+            <a href="{{ url_for('mail.mail_accounts') }}" class="btn btn-outline-secondary"><i class="bi bi-gear"></i>&nbsp;Account</a>
+            {% endif %}
+            <a href="{{ url_for('emails.emails_index') }}" class="btn btn-outline-secondary"><i class="bi bi-journal-text"></i>&nbsp;Registro</a>
+        </div>
     </div>
 </div>
 <hr>
@@ -27,7 +32,7 @@
 <form method="get" action="{{ url_for('mail.mail_index') }}" class="row g-2 align-items-end mt-4">
     <input type="hidden" name="per_page" value="{{ per_page }}">
     <div class="col-12 col-md-3">
-        <label for="account_id" class="form-label fw-bold">Account</label>
+        <label for="account_id" class="form-label fw-bold small">Account</label>
         <select class="form-control form-select" id="account_id" name="account_id">
             <option value="">Tutti</option>
             {% for account in accounts %}
@@ -36,7 +41,7 @@
         </select>
     </div>
     <div class="col-12 col-md-3">
-        <label for="cliente_id" class="form-label fw-bold">Cliente</label>
+        <label for="cliente_id" class="form-label fw-bold small">Cliente</label>
         <select class="form-control form-select" id="cliente_id" name="cliente_id">
             <option value="">Tutti</option>
             {% for cliente in clienti %}
@@ -45,7 +50,7 @@
         </select>
     </div>
     <div class="col-12 col-md-3">
-        <label for="lavoro_id" class="form-label fw-bold">Lavoro</label>
+        <label for="lavoro_id" class="form-label fw-bold small">Lavoro</label>
         <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
             <option value="">Tutti</option>
             {% for lavoro in lavori %}
@@ -54,55 +59,62 @@
         </select>
     </div>
     <div class="col-12 col-md-3">
-        <label for="q" class="form-label fw-bold">Cerca</label>
+        <label for="q" class="form-label fw-bold small">Cerca</label>
         <input type="search" class="form-control" id="q" name="q" value="{{ q }}" placeholder="Oggetto, mittente, destinatario">
     </div>
-    <div class="col-12 col-md-auto">
-        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i>&nbsp;Filtra</button>
-        <a href="{{ url_for('mail.mail_index') }}" class="btn btn-outline-secondary">Reset</a>
+    <div class="col-12 col-md-auto d-flex gap-2">
+        <button type="submit" class="btn btn-outline-primary flex-fill flex-md-grow-0"><i class="bi bi-search"></i>&nbsp;Filtra</button>
+        <a href="{{ url_for('mail.mail_index') }}" class="btn btn-outline-secondary flex-fill flex-md-grow-0">Reset</a>
     </div>
 </form>
 
 <div class="card rounded-3 border border-light-subtle mt-4">
-    <div class="card-body p-4">
-    <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover my-0 erp-table">
+    <div class="card-body p-0 p-md-4">
+    <div class="d-none d-md-block">
+        <table class="table table-hover my-0 mail-table">
             <thead>
                 <tr>
-                    <th class="col-datetime fw-bold">Data</th>
-                    <th class="col-status fw-bold">Stato</th>
-                    <th class="col-cliente fw-bold mobile-hide">Account</th>
-                    <th class="fw-bold">Mittente / Oggetto</th>
-                    <th class="fw-bold mobile-hide">Collegamenti</th>
-                    <th class="text-end col-actions fw-bold">Azioni</th>
+                    <th class="fw-bold pointer col-data">Data</th>
+                    <th class="fw-bold pointer col-stato">Stato</th>
+                    <th class="fw-bold pointer col-mittente">Mittente / Oggetto</th>
+                    <th class="fw-bold pointer col-account mobile-hide">Account</th>
+                    <th class="fw-bold pointer col-collegamenti mobile-hide">Collegamenti</th>
+                    <th class="fw-bold text-end col-azioni">Azioni</th>
                 </tr>
             </thead>
             <tbody>
                 {% for message in messages %}
-                <tr class="{% if message.direction == 'inbound' and not message.is_read %}table-warning-subtle{% endif %}">
-                    <td class="text-nowrap">
-                        {{ (message.received_at or message.sent_at or message.created_at)|datetime_it }}
+                <tr class="mail-row {% if message.direction == 'inbound' and not message.is_read %}mail-row-unread{% endif %}">
+                    <td class="col-data">
+                        <span class="text-nowrap small">{{ (message.received_at or message.sent_at or message.created_at)|datetime_it }}</span>
                     </td>
-                    <td class="text-nowrap">
+                    <td class="col-stato">
                         {{ erp_badge("mail_read_status", "unread" if message.direction == "inbound" and not message.is_read else "read" if message.direction == "inbound" else "inviata") }}
                     </td>
-                    <td class="text-nowrap mobile-hide">{{ message.account.label if message.account else "-" }}</td>
-                    <td>
-                        <a href="{{ url_for('mail.mail_detail', message_id=message.id) }}" class="{% if message.direction == 'inbound' and not message.is_read %}fw-bold{% else %}text-decoration-none{% endif %}">
-                            {{ message.subject or "(senza oggetto)" }}
+                    <td class="col-mittente">
+                        <a href="{{ url_for('mail.mail_detail', message_id=message.id) }}" class="text-decoration-none d-block min-w-0">
+                            <span class="d-block text-truncate {% if message.direction == 'inbound' and not message.is_read %}fw-semibold text-dark{% else %}small text-secondary{% endif %}" title="{{ message.from_address if message.direction == 'inbound' else message.to_addresses }}">
+                                <i class="bi {% if message.direction == 'inbound' %}bi-arrow-down-left{% else %}bi-arrow-up-right{% endif %} me-1"></i>
+                                {{ message.from_address if message.direction == "inbound" else message.to_addresses }}
+                            </span>
+                            <span class="d-block text-truncate fw-bold {% if message.direction == 'inbound' and not message.is_read %}text-dark{% endif %}">
+                                {{ message.subject or "(senza oggetto)" }}
+                            </span>
                         </a>
-                        <div class="small {% if message.direction == 'inbound' and not message.is_read %}fw-semibold text-dark{% else %}text-secondary{% endif %} text-truncate" title="{{ message.from_address if message.direction == 'inbound' else message.to_addresses }}">
-                            {{ message.from_address if message.direction == "inbound" else message.to_addresses }}
+                    </td>
+                    <td class="col-account mobile-hide">
+                        <span class="small text-secondary">{{ message.account.label if message.account else "-" }}</span>
+                    </td>
+                    <td class="col-collegamenti mobile-hide">
+                        <div class="small text-truncate">
+                            {% if message.cliente %}<a href="{{ url_for('cliente_page', cliente_id=message.cliente.id) }}" class="fw-semibold">{{ message.cliente.name }}</a>{% endif %}
+                            {% if message.lavoro %}<span class="text-secondary mx-1">/</span> <a href="{{ url_for('lavoro_page', lavoro_id=message.lavoro.id) }}">{{ message.lavoro.descrizione }}</a>{% endif %}
+                            {% if not message.cliente and not message.lavoro %}<span class="text-secondary">—</span>{% endif %}
                         </div>
                     </td>
-                    <td class="small mobile-hide">
-                        {% if message.cliente %}<a href="{{ url_for('cliente_page', cliente_id=message.cliente.id) }}">{{ message.cliente.name }}</a>{% endif %}
-                        {% if message.lavoro %}<span class="text-secondary">/</span> <a href="{{ url_for('lavoro_page', lavoro_id=message.lavoro.id) }}">{{ message.lavoro.descrizione }}</a>{% endif %}
-                        {% if not message.cliente and not message.lavoro %}<span class="text-secondary">Nessun collegamento</span>{% endif %}
-                    </td>
-                    <td class="text-end">
+                    <td class="col-azioni text-end">
                         <div class="erp-actions">
-                            <a href="{{ url_for('mail.mail_detail', message_id=message.id) }}" class="btn btn-sm btn-outline-primary">
+                            <a href="{{ url_for('mail.mail_detail', message_id=message.id) }}" class="btn btn-sm btn-outline-primary" aria-label="Apri">
                                 <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
@@ -119,24 +131,23 @@
     <div class="d-md-none mobile-list">
         {% if messages %}
             {% for message in messages %}
-            <a class="mobile-list-item mobile-row-link {% if message.direction == 'inbound' and not message.is_read %}border-warning{% endif %}" href="{{ url_for('mail.mail_detail', message_id=message.id) }}">
-                <div class="d-flex align-items-start justify-content-between gap-3">
-                    <div class="min-w-0">
+            <a class="mobile-list-item mobile-row-link {% if message.direction == 'inbound' and not message.is_read %}mail-card-unread{% endif %}" href="{{ url_for('mail.mail_detail', message_id=message.id) }}">
+                <div class="d-flex align-items-start justify-content-between gap-2">
+                    <div class="min-w-0 flex-grow-1">
                         <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="fw-bold mobile-row-title {% if message.direction == 'inbound' and not message.is_read %}text-dark{% endif %}" title="{{ message.subject or '(senza oggetto)' }}">{{ message.subject or '(senza oggetto)' }}</span>
+                            <span class="fw-bold mobile-row-title flex-grow-1 min-w-0" title="{{ message.subject or '(senza oggetto)' }}">{{ message.subject or '(senza oggetto)' }}</span>
                             {{ erp_badge("mail_read_status", "unread" if message.direction == "inbound" and not message.is_read else "read" if message.direction == "inbound" else "inviata") }}
                         </div>
-                        <div class="mobile-row-muted text-truncate {% if message.direction == 'inbound' and not message.is_read %}fw-semibold text-dark{% endif %}" title="{{ message.from_address if message.direction == 'inbound' else message.to_addresses }}">
+                        <div class="mobile-row-muted text-truncate mb-1">
+                            <i class="bi {% if message.direction == 'inbound' %}bi-arrow-down-left{% else %}bi-arrow-up-right{% endif %} me-1"></i>
                             {{ message.from_address if message.direction == "inbound" else message.to_addresses }}
                         </div>
-                        <div class="mobile-row-meta mobile-row-muted mt-1">
-                            <span class="fw-semibold">{{ message.account.label if message.account else "-" }}</span>
-                            <span>{{ (message.received_at or message.sent_at or message.created_at)|datetime_it }}</span>
-                            {% if message.cliente %}<span>{{ message.cliente.name }}</span>{% endif %}
-                            {% if message.lavoro %}<span>{{ message.lavoro.descrizione }}</span>{% endif %}
+                        <div class="mobile-row-meta">
+                            <span class="mobile-row-muted">{{ (message.received_at or message.sent_at or message.created_at)|datetime_it }}</span>
+                            <span class="mobile-row-muted ms-2">{{ message.account.label if message.account else "-" }}</span>
                         </div>
                     </div>
-                    <i class="bi bi-chevron-right text-secondary flex-shrink-0"></i>
+                    <i class="bi bi-chevron-right text-secondary flex-shrink-0 mt-1"></i>
                 </div>
             </a>
             {% endfor %}
@@ -148,7 +159,7 @@
 </div>
 
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mt-4">
-    <div class="text-secondary">
+    <div class="text-secondary small">
         Totale messaggi: <strong>{{ total_messages }}</strong> &middot; Pagina <strong>{{ current_page }}</strong> di <strong>{{ total_pages }}</strong>
     </div>
     <nav aria-label="Paginazione mail">
@@ -161,7 +172,7 @@
                 {% endif %}
             </li>
             <li class="page-item disabled">
-                <span class="page-link">Pagina {{ current_page }} / {{ total_pages }}</span>
+                <span class="page-link small">Pagina {{ current_page }} / {{ total_pages }}</span>
             </li>
             <li class="page-item {% if not next_url %}disabled{% endif %}">
                 {% if next_url %}

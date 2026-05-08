@@ -11,86 +11,114 @@
 {%- endmacro %}
 
 {% block content %}
-<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-    <div class="col-12 col-lg-6 px-0">
-        <h3 class="fw-bolder">{{ page_title }}</h3>
-        <p>Registra manualmente una comunicazione email collegata al gestionale.</p>
+{% set can_mutate = current_user and current_user.role != "readonly" %}
+<div class="erp-form-page">
+    <div class="erp-form-header">
+        <h4 class="fw-bolder erp-form-title">
+            <i class="bi bi-journal-text me-2 text-primary"></i>{{ page_title }}
+        </h4>
+        <p class="erp-form-subtitle">Registra manualmente una comunicazione email collegata al gestionale.</p>
     </div>
-    <div class="col-12 col-lg-6 d-inline-flex justify-content-lg-end px-0">
-        <a href="{{ url_for('emails.emails_index') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i>&nbsp;Torna alle comunicazioni
-        </a>
-    </div>
-</div>
-<hr>
 
-{% if error %}
-<div class="alert alert-danger mt-4">{{ error }}</div>
-{% endif %}
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
 
-<form action="{{ form_action }}" method="post" class="mt-5">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div class="card rounded-3 border border-light-subtle">
-        <div class="card-body p-4">
-            <div class="row g-3">
-                <div class="col-12 col-lg-6">
-                    <label for="subject" class="form-label fw-bold">Oggetto</label>
-                    <input type="text" class="form-control" id="subject" name="subject" value="{{ email_log.subject or '' }}" required>
-                </div>
-                <div class="col-12 col-md-6 col-lg-3">
-                    <label for="direction" class="form-label fw-bold">Direzione</label>
-                    <select class="form-control form-select" id="direction" name="direction">
-                        <option value="outbound" {{ selected(email_log.direction or 'outbound', 'outbound') }}>Inviata</option>
-                        <option value="inbound" {{ selected(email_log.direction, 'inbound') }}>Ricevuta</option>
-                    </select>
-                </div>
-                <div class="col-12 col-md-6 col-lg-3">
-                    <label for="sent_at" class="form-label fw-bold">Data comunicazione</label>
-                    <input type="datetime-local" class="form-control" id="sent_at" name="sent_at" value="{{ datetime_value(email_log.sent_at) }}" required>
-                </div>
-
-                <div class="col-12 col-md-6 col-lg-4">
-                    <label for="email_address" class="form-label fw-bold">Indirizzo email</label>
-                    <input type="email" class="form-control" id="email_address" name="email_address" value="{{ email_log.email_address or '' }}" required>
-                </div>
-                <div class="col-12 col-md-6 col-lg-4">
-                    <label for="cliente_id" class="form-label fw-bold">Cliente</label>
-                    <select class="form-control form-select" id="cliente_id" name="cliente_id">
-                        <option value="">Nessun cliente</option>
-                        {% for cliente in clienti %}
-                        <option value="{{ cliente.id }}" {{ selected(email_log.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-12 col-md-6 col-lg-4">
-                    <label for="lavoro_id" class="form-label fw-bold">Lavoro</label>
-                    <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
-                        <option value="">Nessun lavoro</option>
-                        {% for lavoro in lavori %}
-                        <option value="{{ lavoro.id }}" {{ selected(email_log.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-12 col-md-6 col-lg-4">
-                    <label for="task_id" class="form-label fw-bold">Task</label>
-                    <select class="form-control form-select" id="task_id" name="task_id">
-                        <option value="">Nessuna task</option>
-                        {% for task in tasks %}
-                        <option value="{{ task.id }}" {{ selected(email_log.task_id, task.id) }}>{{ task.name }}</option>
-                        {% endfor %}
-                    </select>
+    <form action="{{ form_action }}" method="post" class="erp-boxed-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="card erp-form-card">
+            <div class="card-body px-4 py-4">
+                <div class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Dettagli comunicazione</h5>
+                        <p>Oggetto, direzione e data della comunicazione.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-lg-6">
+                            <label for="subject" class="form-label fw-bold">Oggetto</label>
+                            <input type="text" class="form-control" id="subject" name="subject" value="{{ email_log.subject or '' }}" required>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="direction" class="form-label fw-bold">Direzione</label>
+                            <select class="form-control form-select" id="direction" name="direction">
+                                <option value="outbound" {{ selected(email_log.direction or 'outbound', 'outbound') }}>Inviata</option>
+                                <option value="inbound" {{ selected(email_log.direction, 'inbound') }}>Ricevuta</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="sent_at" class="form-label fw-bold">Data comunicazione</label>
+                            <input type="datetime-local" class="form-control" id="sent_at" name="sent_at" value="{{ datetime_value(email_log.sent_at) }}" required>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="col-12">
-                    <label for="body" class="form-label fw-bold">Corpo / note comunicazione</label>
-                    <textarea class="form-control" id="body" name="body" rows="7">{{ email_log.body or '' }}</textarea>
+                <div class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Destinatario / mittente</h5>
+                        <p>Indirizzo email coinvolto nella comunicazione.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <label for="email_address" class="form-label fw-bold">Indirizzo email</label>
+                            <input type="email" class="form-control" id="email_address" name="email_address" value="{{ email_log.email_address or '' }}" required>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+                <div class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Collegamenti</h5>
+                        <p>Associa la comunicazione a cliente, lavoro e/o task.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <label for="cliente_id" class="form-label fw-bold">Cliente</label>
+                            <select class="form-control form-select" id="cliente_id" name="cliente_id">
+                                <option value="">Nessun cliente</option>
+                                {% for cliente in clienti %}
+                                <option value="{{ cliente.id }}" {{ selected(email_log.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <label for="lavoro_id" class="form-label fw-bold">Lavoro</label>
+                            <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
+                                <option value="">Nessun lavoro</option>
+                                {% for lavoro in lavori %}
+                                <option value="{{ lavoro.id }}" {{ selected(email_log.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <label for="task_id" class="form-label fw-bold">Task</label>
+                            <select class="form-control form-select" id="task_id" name="task_id">
+                                <option value="">Nessuna task</option>
+                                {% for task in tasks %}
+                                <option value="{{ task.id }}" {{ selected(email_log.task_id, task.id) }}>{{ task.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Corpo della comunicazione</h5>
+                        <p>Testo o note della comunicazione.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <textarea class="form-control" id="body" name="body" rows="7" placeholder="Inserisci il contenuto della comunicazione...">{{ email_log.body or '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="erp-form-footer-actions">
+                    <a href="{{ url_for('emails.emails_index') }}" class="btn btn-outline-secondary">Annulla</a>
+                    <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+                </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 {% endblock %}

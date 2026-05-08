@@ -6,11 +6,11 @@ const TabellaLavori = {
     filtro_stati: Function,
   },
   template: `
-    <table class="table sortable my-0 table-hover rounded-3 no-last-border erp-table d-none d-md-table" id="tabellaLavori">
+    <table class="table sortable my-0 table-hover rounded-3 no-last-border lavori-table d-none d-md-table" id="tabellaLavori">
       <thead>
         <tr>
           <th class="fw-bold pointer text-center col-prio" scope="col">Prio</th>
-          <th class="fw-bold pointer col-desc" scope="col">Descrizione</th>
+          <th class="fw-bold pointer col-title" scope="col">Descrizione</th>
           <th class="fw-bold pointer col-money text-end" scope="col">Prezzo</th>
           <th class="fw-bold pointer col-cliente mobile-hide" scope="col">Cliente</th>
           <th class="fw-bold pointer text-center col-payment mobile-hide" scope="col">Pagamento</th>
@@ -29,11 +29,11 @@ const TabellaLavori = {
             </td>
             <td :sorttable_customkey="lavoro.preventivato" class="text-end">[[ lavoro.preventivato ]] &euro;</td>
             <td class="mobile-hide">
-              <i :style="{ color: lavoro.cliente.colore }" class="bi bi-person-circle me-2"></i>
+              <span class="cliente-bullet" :style="{ backgroundColor: lavoro.cliente.colore || '#adb5bd' }"></span>
               <a :href="'/clienti/' + lavoro.cliente.id" class="text-decoration-none a-no-color">[[ lavoro.cliente.name ]]</a>
             </td>
             <td class="text-center mobile-hide">[[ formatDate(lavoro.data_pagamento) ]]</td>
-            <td class="text-center mobile-hide" id="note_td" v-html="renderNoteIcon(lavoro.note)"></td>
+            <td class="text-center mobile-hide note-td" v-html="renderNoteIcon(lavoro.note)"></td>
             <td class="text-center">
               <template v-if="canMutate()">
                 <select :class="statusColor(lavoro.stato)" @change="update_status($event, lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
@@ -57,12 +57,21 @@ const TabellaLavori = {
         <a v-for="lavoro in lavori_data" :key="lavoro.id" class="mobile-list-item mobile-row-link" :href="'/lavori/' + lavoro.id">
           <div class="d-flex align-items-start justify-content-between gap-3">
             <div class="min-w-0">
-              <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="fw-bold mobile-row-title" :title="lavoro.descrizione">[[ lavoro.descrizione ]]</span>
-                <span v-html="badgeHtml('work_status', lavoro.stato)" class="flex-shrink-0"></span>
+              <div class="fw-bold mobile-row-title mb-1" :title="lavoro.descrizione">[[ lavoro.descrizione ]]</div>
+              <div class="d-flex flex-wrap gap-1 mb-1">
+                <span v-html="badgeHtml('work_status', lavoro.stato)"></span>
+                <span v-html="badgeHtml('work_priority', lavoro.priorita)"></span>
+              </div>
+              <div class="mobile-row-muted">
+                <template v-if="lavoro.cliente">
+                  <span><i class="bi bi-person me-1"></i>[[ lavoro.cliente.name ]]</span>
+                </template>
+                <template v-if="lavoro.preventivato > 0">
+                  <span class="ms-2"><i class="bi bi-currency-euro me-1"></i>[[ lavoro.preventivato ]]</span>
+                </template>
               </div>
             </div>
-            <i class="bi bi-chevron-right text-secondary flex-shrink-0"></i>
+            <i class="bi bi-chevron-right text-secondary flex-shrink-0 mt-1"></i>
           </div>
         </a>
       </template>

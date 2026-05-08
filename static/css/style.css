@@ -3356,4 +3356,95 @@ table td {
   width: 14%;
 }
 
+/* =========================
+   TASK ERP - TABELLA
+========================= */
+
+.tasks-table {
+  min-width: 1100px;
+  table-layout: fixed;
+}
+
+.tasks-table th,
+.tasks-table td {
+  vertical-align: middle !important;
+}
+
+.tasks-table .col-title {
+  width: 24%;
+}
+
+.tasks-table .col-pills {
+  width: 100px;
+}
+
+.tasks-table .col-date {
+  width: 110px;
+}
+
+.tasks-table .col-refs {
+  width: 12%;
+}
+
+.tasks-table .col-actions {
+  width: 96px;
+}
+
+/* =========================
+   LAVORI ERP - TABELLA
+========================= */
+
+.lavori-table {
+  min-width: 1000px;
+  table-layout: fixed;
+}
+
+.lavori-table th,
+.lavori-table td {
+  vertical-align: middle !important;
+}
+
+.lavori-table .col-title {
+  width: 28%;
+}
+
+.lavori-table .col-prio {
+  width: 72px;
+  text-align: center;
+}
+
+.lavori-table .col-money {
+  width: 110px;
+}
+
+.lavori-table .col-refs {
+  width: 18%;
+}
+
+.lavori-table .col-payment {
+  width: 120px;
+}
+
+.lavori-table .col-note {
+  width: 80px;
+  text-align: center;
+}
+
+.lavori-table .col-status {
+  width: 130px;
+}
+
+.lavoro-note-icon {
+  font-size: 1rem;
+  color: #7e508d !important;
+  cursor: help;
+}
+
+.loading-container {
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 

@@ -8,98 +8,143 @@
 
 {% block content %}
 {% set can_mutate = current_user is defined and current_user is not none and current_user.role in ("admin", "operatore") %}
-<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-    <div class="col-12 col-lg-5 px-0">
-        <h3 class="fw-bolder">Task</h3>
-        <p>Elenco delle task ERP operative.</p>
+<div class="row mx-auto w-100 align-items-start g-3">
+    <div class="col-12 col-xl-7 px-0">
+        <div class="editorial-page-header">
+            <h3 class="fw-bolder mb-1">
+                <i class="bi bi-list-check me-2 text-primary"></i>Task
+            </h3>
+            <p class="text-secondary mb-0">Elenco delle task ERP operative.</p>
+        </div>
     </div>
-    {% if can_mutate %}
-    <div class="col-12 col-lg-7 d-inline-flex justify-content-lg-end px-0">
-        <a href="{{ url_for('tasks.task_new') }}">
-            <button class="button-61">
-                <span><i class="bi bi-plus-lg"></i></span>&nbsp;Nuovo task
-            </button>
-        </a>
-    </div>
-    {% endif %}
-</div>
-<hr>
-
-<div class="mt-5">
-    <div class="card rounded-3 border border-light-subtle">
-        <div class="card-body p-4">
-            {% if tasks %}
-            <div class="table-responsive d-none d-md-block">
-                    <table class="table table-hover my-0 erp-table">
-                        <thead>
-                            <tr>
-                                <th class="fw-bold">Task</th>
-                                <th class="fw-bold col-status mobile-priority-low">Categoria</th>
-                                <th class="fw-bold col-status">Stato</th>
-                                <th class="fw-bold col-prio mobile-priority-low">Priorita</th>
-                                <th class="fw-bold col-date">Scadenza</th>
-                                <th class="fw-bold mobile-hide">Cliente</th>
-                                <th class="fw-bold mobile-hide">Lavoro</th>
-                                <th class="fw-bold mobile-hide">Assegnata a</th>
-                                <th class="fw-bold text-end col-actions">Azioni</th>
-                            </tr>
-                        </thead>
-                    <tbody>
-                        {% for task in tasks %}
-                        <tr>
-                            <td>
-                                <a class="fw-bold a-no-color" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}">{{ task.name }}</a>
-                            </td>
-                            <td class="mobile-priority-low">{{ erp_badge("task_category", task.category) }}</td>
-                            <td>{{ erp_badge("task_status", task.status) }}</td>
-                            <td class="mobile-priority-low">{{ erp_badge("task_priority", task.priority) }}</td>
-                            <td>{{ task.due_date|date_it if task.due_date else "-" }}</td>
-                            <td class="mobile-hide">{{ task.cliente.name if task.cliente else "-" }}</td>
-                            <td class="mobile-hide">{{ task.lavoro.descrizione if task.lavoro else "-" }}</td>
-                            <td class="mobile-hide">{{ task.assignee.name or task.assignee.email if task.assignee else "-" }}</td>
-                            <td class="text-end">
-                                {% if current_user and current_user.role in ("admin", "operatore") %}
-                                <div class="erp-actions">
-                                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('tasks.task_edit', task_id=task.id) }}">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <form action="{{ url_for('tasks.task_delete', task_id=task.id) }}" method="post" class="d-inline" onsubmit="return confirm('Eliminare questo task?');">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            <i class="bi bi-x-lg"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        </tbody>
-                </table>
-            </div>
-            <div class="d-md-none mobile-list">
-                {% for task in tasks %}
-                <a class="mobile-list-item mobile-row-link" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}">
-                    <div class="d-flex align-items-start justify-content-between gap-3">
-                        <div class="min-w-0">
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="fw-bold mobile-row-title">{{ task.name }}</span>
-                                {{ erp_badge("task_status", task.status) }}
-                                {{ erp_badge("task_priority", task.priority) }}
-                            </div>
-                            <div class="mobile-row-muted">
-                                {% if task.due_date %}Scadenza {{ task.due_date|date_it }}{% else %}Nessuna scadenza{% endif %}
-                            </div>
-                        </div>
-                        <i class="bi bi-chevron-right text-secondary flex-shrink-0"></i>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="mb-0 text-secondary">Nessuna task presente.</p>
+    <div class="col-12 col-xl-5 px-0">
+        <div class="erp-action-bar justify-content-xl-end">
+            {% if can_mutate %}
+            <a class="btn btn-primary erp-action-primary" href="{{ url_for('tasks.task_new') }}">
+                <i class="bi bi-plus-lg"></i>&nbsp;Nuovo task
+            </a>
             {% endif %}
         </div>
     </div>
 </div>
+<hr>
+
+{% if tasks %}
+<div class="mt-5">
+    <div class="card rounded-3 border border-light-subtle">
+        <div class="card-body p-0 p-md-4">
+            <div class="table-responsive d-none d-md-block">
+                <table class="table table-hover my-0 tasks-table">
+                    <thead>
+                        <tr>
+                            <th class="fw-bold col-title">Task</th>
+                            <th class="fw-bold col-pills">Categoria</th>
+                            <th class="fw-bold col-pills">Stato</th>
+                            <th class="fw-bold col-pills">Priorit&agrave;</th>
+                            <th class="fw-bold col-date">Scadenza</th>
+                            <th class="fw-bold col-refs mobile-hide">Cliente</th>
+                            <th class="fw-bold col-refs mobile-hide">Lavoro</th>
+                            <th class="fw-bold col-refs mobile-hide">Assegnata a</th>
+                            <th class="fw-bold col-actions">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td>
+                                <a class="fw-bold a-no-color d-block text-truncate" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}">{{ task.name }}</a>
+                            </td>
+                            <td>{{ erp_badge("task_category", task.category) }}</td>
+                            <td>{{ erp_badge("task_status", task.status) }}</td>
+                            <td>{{ erp_badge("task_priority", task.priority) }}</td>
+                            <td>{{ task.due_date|date_it if task.due_date else "-" }}</td>
+                            <td class="mobile-hide"><span class="text-truncate d-block">{{ task.cliente.name if task.cliente else "-" }}</span></td>
+                            <td class="mobile-hide"><span class="text-truncate d-block">{{ task.lavoro.descrizione if task.lavoro else "-" }}</span></td>
+                            <td class="mobile-hide"><span class="text-truncate d-block">{{ task.assignee.name or task.assignee.email if task.assignee else "-" }}</span></td>
+                            <td>
+                                <div class="erp-actions">
+                                    <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}" aria-label="Modifica">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% if can_mutate %}
+                                    <form action="{{ url_for('tasks.task_delete', task_id=task.id) }}" method="post" class="d-inline" onsubmit="return confirm('Eliminare questo task?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Elimina">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-md-none mobile-list p-3">
+                {% for task in tasks %}
+                <div class="border rounded-3 bg-white p-3">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                        <div class="min-w-0">
+                            <a class="fw-bold a-no-color d-block text-truncate" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}">{{ task.name }}</a>
+                        </div>
+                        <div class="d-flex gap-1 flex-shrink-0">
+                            {% if can_mutate %}
+                            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('tasks.task_edit', task_id=task.id) }}" aria-label="Modifica">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="{{ url_for('tasks.task_delete', task_id=task.id) }}" method="post" class="d-inline" onsubmit="return confirm('Eliminare questo task?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Elimina">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-1 mb-2">
+                        {{ erp_badge("task_category", task.category) }}
+                        {{ erp_badge("task_status", task.status) }}
+                        {{ erp_badge("task_priority", task.priority) }}
+                    </div>
+                    <div class="small text-secondary">
+                        {% if task.due_date %}
+                        <span><i class="bi bi-calendar3 me-1"></i>{{ task.due_date|date_it }}</span>
+                        {% endif %}
+                        {% if task.cliente %}
+                        <span class="ms-2"><i class="bi bi-person me-1"></i>{{ task.cliente.name }}</span>
+                        {% endif %}
+                        {% if task.assignee %}
+                        <span class="ms-2"><i class="bi bi-person-fill me-1"></i>{{ task.assignee.name }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="mt-5">
+    <div class="card rounded-3 border border-light-subtle">
+        <div class="card-body p-4">
+            <div class="editorial-empty-state">
+                <div class="editorial-empty-icon">
+                    <i class="bi bi-inbox"></i>
+                </div>
+                <div class="editorial-empty-body">
+                    <h6 class="fw-bolder mb-1">Nessun task trovato</h6>
+                    <p class="text-secondary mb-3 small">Non ci sono task ERP presenti. Creane uno nuovo per iniziare.</p>
+                    {% if can_mutate %}
+                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('tasks.task_new') }}">
+                        <i class="bi bi-plus-lg me-1"></i>Nuovo task
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

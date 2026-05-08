@@ -162,7 +162,6 @@ def editorial_publication_row(publication):
             "caption": publication.caption,
             "preview_image_path": publication.preview_image_path,
             "status": publication.status,
-            "assigned_user_id": publication.assigned_user_id,
             "client_approval_status": publication.client_approval_status,
             "internal_notes": publication.internal_notes,
             "asset_url": publication.asset_url,

@@ -187,19 +187,11 @@ def apply_editorial_form(publication):
     publication.title = (request.form.get("title") or "").strip()
     publication.caption = (request.form.get("caption") or "").strip() or None
     publication.status = request.form.get("status") or "idea"
-    publication.assigned_user_id = parse_optional_id(request.form.get("assigned_user_id"))
     publication.client_approval_status = (
         request.form.get("client_approval_status") or "da_approvare"
     )
     publication.internal_notes = (request.form.get("internal_notes") or "").strip() or None
     publication.asset_url = (request.form.get("asset_url") or "").strip() or None
-
-    preview_path = save_preview_file(request.files.get("preview_image"))
-    if preview_path:
-        publication.preview_image_path = preview_path
-
-    if request.form.get("remove_preview") == "1":
-        publication.preview_image_path = None
 
     if not publication.cliente_id:
         raise ValueError("Il cliente e obbligatorio.")
@@ -221,8 +213,6 @@ def apply_publication_filters(query):
     month = request.args.get("month", type=int)
     platform = request.args.get("platform")
     status = request.args.get("status")
-    assigned_user_id = request.args.get("assigned_user_id", type=int)
-
     if cliente_id:
         query = query.filter(EditorialPublication.cliente_id == cliente_id)
     if year and month and 1 <= month <= 12:
@@ -241,15 +231,12 @@ def apply_publication_filters(query):
         )
     if status in EDITORIAL_STATUSES:
         query = query.filter(EditorialPublication.status == status)
-    if assigned_user_id:
-        query = query.filter(EditorialPublication.assigned_user_id == assigned_user_id)
 
     return query
 
 
 def current_filter_context(default_cliente_id=None, default_year=None, default_month=None):
     active_cliente_id = request.args.get("cliente_id", default_cliente_id, type=int)
-    active_assigned_user_id = request.args.get("assigned_user_id", type=int)
     active_platform = request.args.get("platform")
     active_status = request.args.get("status")
 
@@ -269,8 +256,6 @@ def current_filter_context(default_cliente_id=None, default_year=None, default_m
         list_query_params["platform"] = active_platform
     if active_status:
         list_query_params["status"] = active_status
-    if active_assigned_user_id:
-        list_query_params["assigned_user_id"] = active_assigned_user_id
 
     calendar_query_params = {
         key: value
@@ -280,7 +265,6 @@ def current_filter_context(default_cliente_id=None, default_year=None, default_m
 
     return {
         "active_cliente_id": active_cliente_id,
-        "active_assigned_user_id": active_assigned_user_id,
         "active_platform": active_platform,
         "active_status": active_status,
         "list_filter_params": list_query_params,
@@ -391,7 +375,7 @@ def editorial_new():
     )
     error = None
     form_data = {}
-    form_platforms = []
+    form_platforms = None
 
     if request.method == "POST":
         for key in request.form.keys():
@@ -468,7 +452,7 @@ def editorial_edit(publication_id):
     publication = EditorialPublication.query.get_or_404(publication_id)
     error = None
     form_data = {}
-    form_platforms = []
+    form_platforms = None
 
     if request.method == "POST":
         for key in request.form.keys():
@@ -507,6 +491,17 @@ def editorial_edit(publication_id):
     )
 
 
+def delete_image_file(image_path):
+    if not image_path:
+        return
+    upload_prefix = f"{PREVIEW_UPLOAD_FOLDER}/"
+    if not image_path.startswith(upload_prefix):
+        return
+    full_path = os.path.join(current_app.static_folder, image_path)
+    if os.path.isfile(full_path):
+        os.remove(full_path)
+
+
 @bp.post("/editorial-calendar/<int:publication_id>/images/<int:image_id>/delete")
 @role_required("admin", "operatore")
 def editorial_image_delete(publication_id, image_id):
@@ -514,6 +509,7 @@ def editorial_image_delete(publication_id, image_id):
     img = EditorialPublicationImage.query.get_or_404(image_id)
     if img.publication_id != publication.id:
         return redirect(request.referrer or url_for("editorial_calendar.editorial_index"))
+    delete_image_file(img.image_path)
     db.session.delete(img)
     db.session.commit()
     return redirect(request.referrer or url_for("editorial_calendar.editorial_index"))

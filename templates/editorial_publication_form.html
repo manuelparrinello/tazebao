@@ -15,7 +15,7 @@
 {%- endmacro %}
 
 {% macro checked_platform(publication, value) -%}
-{% if form_platforms %}
+{% if form_platforms is not none %}
 {%- if value in form_platforms %}checked{% endif %}
 {%- else %}
 {%- if value in publication.get_platforms() %}checked{% endif %}
@@ -226,16 +226,6 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-12 col-lg-4">
-                        <label for="assigned_user_id" class="form-label fw-bold">Assegnato a</label>
-                        <select class="form-control form-select" id="assigned_user_id" name="assigned_user_id">
-                            <option value="">Nessun assegnatario</option>
-                            {% for user in users %}
-                            {% set sel_user = form_data.get('assigned_user_id', publication.assigned_user_id) %}
-                            <option value="{{ user.id }}" {{ selected(sel_user|string, user.id|string) }}>{{ user.name or user.email }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
                 </div>
             </section>
 
@@ -274,81 +264,6 @@
         </div>
     </div>
 </div>
-
-{% if publication.id %}
-<div class="mt-4">
-    <button type="button" class="btn btn-outline-info" data-bs-toggle="collapse" data-bs-target="#editorialMockupPreview" aria-expanded="false" aria-controls="editorialMockupPreview">
-        <i class="bi bi-eye"></i>&nbsp;Anteprima piattaforma
-    </button>
-</div>
-
-<div class="collapse mt-3" id="editorialMockupPreview">
-    <div class="card border-light-subtle">
-        <div class="card-body p-4">
-            <ul class="nav nav-pills mb-3" id="mockupPlatformTabs" role="tablist">
-                {% for platform in publication.get_platforms() %}
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link {{ 'active' if loop.first else '' }}" id="mockup-tab-{{ platform }}" data-bs-toggle="pill" data-bs-target="#mockup-panel-{{ platform }}" type="button" role="tab" aria-controls="mockup-panel-{{ platform }}" aria-selected="{{ 'true' if loop.first else 'false' }}">
-                        {% if platform == "instagram" %}<i class="bi bi-instagram"></i>{% elif platform == "facebook" %}<i class="bi bi-facebook"></i>{% endif %}
-                        &nbsp;{{ labelize(platform) }}
-                    </button>
-                </li>
-                {% endfor %}
-            </ul>
-            <div class="tab-content" id="mockupPlatformContent">
-                {% for platform in publication.get_platforms() %}
-                <div class="tab-pane fade {{ 'show active' if loop.first else '' }}" id="mockup-panel-{{ platform }}" role="tabpanel" aria-labelledby="mockup-tab-{{ platform }}">
-                    <div class="editorial-mockup editorial-mockup-{{ platform }}">
-                        <div class="editorial-mockup-header">
-                            <div class="editorial-mockup-avatar">
-                                <i class="bi bi-person-circle"></i>
-                            </div>
-                            <div class="editorial-mockup-user">
-                                <strong>{{ publication.cliente.name if publication.cliente else 'Azienda' }}</strong>
-                                <span class="text-secondary small">Pubblicazione</span>
-                            </div>
-                        </div>
-                        <div class="editorial-mockup-image">
-                            {% set mockup_paths = publication.get_image_paths() %}
-                            {% set mockup_img = mockup_paths[0] if mockup_paths else None %}
-                            {% if mockup_img %}
-                            <img src="{{ url_for('static', filename=mockup_img) }}" alt="Mockup {{ platform }}" loading="lazy">
-                            {% else %}
-                            <div class="editorial-mockup-image-placeholder">
-                                <i class="bi bi-image" style="font-size:2rem;color:#ccc;"></i>
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="editorial-mockup-body">
-                            <div class="editorial-mockup-actions">
-                                <i class="bi bi-heart"></i>
-                                <i class="bi bi-chat"></i>
-                                <i class="bi bi-share"></i>
-                            </div>
-                            <div class="editorial-mockup-caption">
-                                <strong>{{ publication.cliente.name if publication.cliente else 'Azienda' }}</strong>
-                                {% if publication.caption %}
-                                <span>{{ publication.caption }}</span>
-                                {% endif %}
-                            </div>
-                            {% if publication.title %}
-                            <div class="mt-1 small text-secondary">{{ publication.title }}</div>
-                            {% endif %}
-                            <div class="mt-1">
-                                {{ erp_badge("editorial_content_type", publication.content_type) }}
-                            </div>
-                            <div class="mt-2 text-secondary small">
-                                <i class="bi bi-clock"></i>&nbsp;{{ publication.publication_date|date_it if publication.publication_date else '' }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
 
 {% if can_delete %}
 <form action="{{ url_for('editorial_calendar.editorial_delete', publication_id=publication.id) }}" method="post" class="editorial-form-danger-action">

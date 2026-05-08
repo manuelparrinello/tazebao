@@ -414,9 +414,6 @@
                         </div>
                         <div class="pub-card-footer">
                             {{ erp_badge("editorial_client_approval", publication.client_approval_status) }}
-                            {% if publication.assigned_user %}
-                            <span class="pub-assignee"><i class="bi bi-person-fill me-1"></i>{{ publication.assigned_user.name }}</span>
-                            {% endif %}
                         </div>
                     </a>
                     {% endfor %}

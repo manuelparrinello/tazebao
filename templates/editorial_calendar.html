@@ -265,7 +265,7 @@
             <div class="editorial-list-header">
                 <div>
                     <h5 class="fw-bolder mb-1">Vista lista</h5>
-                    <div class="small text-secondary">Filtra per cliente, mese, piattaforma e stato.</div>
+                    <div class="small text-secondary">Filtra per cliente, periodo, piattaforma, tipo, stato e approvazione.</div>
                 </div>
                 {% if active_cliente_id %}
                 <a class="btn btn-sm btn-outline-primary" href="{{ url_for('editorial_calendar.client_calendar', cliente_id=active_cliente_id, **calendar_filter_params) }}">
@@ -275,7 +275,7 @@
             </div>
 
             <form class="editorial-filter-bar row g-2 align-items-end mb-4" method="get" action="{{ url_for('editorial_calendar.editorial_index') }}" id="editorial-cliente-filter">
-                <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                <div class="col-12 col-md-6 col-xl-3">
                     <label class="form-label fw-bold" for="cliente_id">Cliente</label>
                     <select class="form-control form-select" id="cliente_id" name="cliente_id">
                         <option value="">Tutti i clienti</option>
@@ -284,7 +284,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-6 col-sm-3 col-md-2 col-xl-1">
+                <div class="col-6 col-md-3 col-xl-1">
                     <label class="form-label fw-bold" for="month">Mese</label>
                     <select class="form-control form-select" id="month" name="month">
                         {% for month_number, month_label in months %}
@@ -294,11 +294,11 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-6 col-sm-3 col-md-2 col-xl-1">
+                <div class="col-6 col-md-3 col-xl-1">
                     <label class="form-label fw-bold" for="year">Anno</label>
                     <input class="form-control" id="year" name="year" type="number" value="{{ current_year }}">
                 </div>
-                <div class="col-12 col-sm-6 col-md-4 col-xl-2">
+                <div class="col-12 col-md-6 col-xl-2">
                     <label class="form-label fw-bold" for="platform">Piattaforma</label>
                     <select class="form-control form-select" id="platform" name="platform">
                         <option value="">Tutte</option>
@@ -307,7 +307,16 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-12 col-sm-6 col-md-4 col-xl-2">
+                <div class="col-12 col-md-6 col-xl-2">
+                    <label class="form-label fw-bold" for="content_type">Tipo contenuto</label>
+                    <select class="form-control form-select" id="content_type" name="content_type">
+                        <option value="">Tutti</option>
+                        {% for content_type in content_types %}
+                        <option value="{{ content_type }}" {{ selected(active_content_type, content_type) }}>{{ labelize(content_type) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-6 col-xl-1">
                     <label class="form-label fw-bold" for="status">Stato</label>
                     <select class="form-control form-select" id="status" name="status">
                         <option value="">Tutti</option>
@@ -316,10 +325,22 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-12 col-xl-1">
-                    <button class="btn btn-primary w-100" type="submit">
+                <div class="col-12 col-md-6 col-xl-2">
+                    <label class="form-label fw-bold" for="client_approval_status">Approvazione</label>
+                    <select class="form-control form-select" id="client_approval_status" name="client_approval_status">
+                        <option value="">Tutte</option>
+                        {% for approval_status in client_approval_statuses %}
+                        <option value="{{ approval_status }}" {{ selected(active_client_approval_status, approval_status) }}>{{ labelize(approval_status) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 mt-2 d-flex gap-2 justify-content-xl-end">
+                    <button class="btn btn-primary flex-fill flex-xl-grow-0" type="submit">
                         <i class="bi bi-funnel"></i>&nbsp;Filtra
                     </button>
+                    <a class="btn btn-outline-secondary flex-fill flex-xl-grow-0" href="{{ url_for('editorial_calendar.editorial_index') }}">
+                        <i class="bi bi-x-lg"></i>&nbsp;Reset
+                    </a>
                 </div>
             </form>
 

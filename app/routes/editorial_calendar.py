@@ -17,7 +17,6 @@ from ..models import (
     Cliente,
     EditorialPublication,
     EditorialPublicationImage,
-    User,
 )
 
 
@@ -137,7 +136,6 @@ def group_publications_by_day(publications):
 def editorial_form_choices():
     return {
         "clienti": Cliente.query.order_by(Cliente.name.asc()).all(),
-        "users": User.query.order_by(User.name.asc(), User.email.asc()).all(),
         "platforms": EDITORIAL_PLATFORMS,
         "content_types": EDITORIAL_CONTENT_TYPES,
         "statuses": EDITORIAL_STATUSES,
@@ -213,6 +211,8 @@ def apply_publication_filters(query):
     month = request.args.get("month", type=int)
     platform = request.args.get("platform")
     status = request.args.get("status")
+    content_type = request.args.get("content_type")
+    client_approval_status = request.args.get("client_approval_status")
     if cliente_id:
         query = query.filter(EditorialPublication.cliente_id == cliente_id)
     if year and month and 1 <= month <= 12:
@@ -231,6 +231,10 @@ def apply_publication_filters(query):
         )
     if status in EDITORIAL_STATUSES:
         query = query.filter(EditorialPublication.status == status)
+    if content_type in EDITORIAL_CONTENT_TYPES:
+        query = query.filter(EditorialPublication.content_type == content_type)
+    if client_approval_status in EDITORIAL_CLIENT_APPROVAL_STATUSES:
+        query = query.filter(EditorialPublication.client_approval_status == client_approval_status)
 
     return query
 
@@ -239,11 +243,17 @@ def current_filter_context(default_cliente_id=None, default_year=None, default_m
     active_cliente_id = request.args.get("cliente_id", default_cliente_id, type=int)
     active_platform = request.args.get("platform")
     active_status = request.args.get("status")
+    active_content_type = request.args.get("content_type")
+    active_client_approval_status = request.args.get("client_approval_status")
 
     if active_platform not in EDITORIAL_PLATFORMS:
         active_platform = None
     if active_status not in EDITORIAL_STATUSES:
         active_status = None
+    if active_content_type not in EDITORIAL_CONTENT_TYPES:
+        active_content_type = None
+    if active_client_approval_status not in EDITORIAL_CLIENT_APPROVAL_STATUSES:
+        active_client_approval_status = None
 
     list_query_params = {}
     if active_cliente_id:
@@ -256,6 +266,10 @@ def current_filter_context(default_cliente_id=None, default_year=None, default_m
         list_query_params["platform"] = active_platform
     if active_status:
         list_query_params["status"] = active_status
+    if active_content_type:
+        list_query_params["content_type"] = active_content_type
+    if active_client_approval_status:
+        list_query_params["client_approval_status"] = active_client_approval_status
 
     calendar_query_params = {
         key: value
@@ -267,6 +281,8 @@ def current_filter_context(default_cliente_id=None, default_year=None, default_m
         "active_cliente_id": active_cliente_id,
         "active_platform": active_platform,
         "active_status": active_status,
+        "active_content_type": active_content_type,
+        "active_client_approval_status": active_client_approval_status,
         "list_filter_params": list_query_params,
         "calendar_filter_params": calendar_query_params,
     }

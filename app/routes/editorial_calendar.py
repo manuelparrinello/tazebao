@@ -429,13 +429,13 @@ def editorial_new():
 
 
 def handle_publication_images(publication):
-    """Handle additional image uploads and removals for a publication.
+    """Handle image uploads and removals for a publication.
     Must be called after db.session.add(publication) and before commit."""
     if publication.id is None:
         db.session.flush()
 
-    additional_files = request.files.getlist("additional_images")
-    for file_storage in additional_files:
+    images = request.files.getlist("images")
+    for file_storage in images:
         path = save_preview_file(file_storage)
         if path:
             max_order = (
@@ -505,6 +505,18 @@ def editorial_edit(publication_id):
         submit_label="Salva modifiche",
         **editorial_form_choices(),
     )
+
+
+@bp.post("/editorial-calendar/<int:publication_id>/images/<int:image_id>/delete")
+@role_required("admin", "operatore")
+def editorial_image_delete(publication_id, image_id):
+    publication = EditorialPublication.query.get_or_404(publication_id)
+    img = EditorialPublicationImage.query.get_or_404(image_id)
+    if img.publication_id != publication.id:
+        return redirect(request.referrer or url_for("editorial_calendar.editorial_index"))
+    db.session.delete(img)
+    db.session.commit()
+    return redirect(request.referrer or url_for("editorial_calendar.editorial_index"))
 
 
 @bp.post("/editorial-calendar/<int:publication_id>/delete")

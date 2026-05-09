@@ -378,6 +378,10 @@ if (document.getElementById("app")) {
         if (!value) return "-";
         return value.replaceAll("_", " ");
       },
+      badgeHtml(kind, value, text) {
+        const html = window.erpBadge?.html(kind, value, text);
+        return html || `<span class="badge rounded-pill erp-badge text-bg-light border">${window.erpBadge?.label(kind, value, text) || value || '-'}</span>`;
+      },
     },
     template: `
       <section class="container-fluid px-0">
@@ -392,7 +396,7 @@ if (document.getElementById("app")) {
           </button>
         </div>
 
-        <div v-if="loading" class="d-flex align-items-center justify-content-center" style="min-height: 360px;">
+        <div v-if="loading" class="d-flex align-items-center justify-content-center dashboard-loading">
           <span class="loader"></span>
         </div>
 
@@ -402,16 +406,16 @@ if (document.getElementById("app")) {
         </div>
 
         <div v-else>
-          <div class="row g-4">
+          <div class="row g-3">
             <div class="col-12 col-md-6 col-xl-3" v-for="card in kpiCards" :key="card.title">
-              <article class="card h-100 border-0 shadow-sm">
+              <article class="card h-100 rounded-3 border border-light-subtle">
                 <div class="card-body p-4">
                   <div class="d-flex align-items-start justify-content-between gap-3">
-                    <div>
+                    <div class="min-w-0">
                       <p class="text-secondary small mb-2">[[ card.title ]]</p>
-                      <div class="display-6 fw-bold">[[ card.value ]]</div>
+                      <div class="display-6 fw-bold text-truncate">[[ card.value ]]</div>
                     </div>
-                    <div class="rounded-3 bg-primary text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
+                    <div class="dashboard-icon-box rounded-3 bg-primary d-inline-flex align-items-center justify-content-center flex-shrink-0">
                       <i class="bi" :class="card.icon"></i>
                     </div>
                   </div>
@@ -420,21 +424,21 @@ if (document.getElementById("app")) {
             </div>
           </div>
 
-          <div class="mt-5">
+          <div class="mt-4">
             <div class="d-flex align-items-center justify-content-between mb-3">
               <h2 class="h5 mb-0">Finanze</h2>
               <a class="btn btn-sm btn-outline-primary" href="/finance">Apri finanze</a>
             </div>
-            <div class="row g-4">
+            <div class="row g-3">
               <div class="col-12 col-md-6 col-xl-3" v-for="card in financeCards" :key="card.title">
-                <article class="card h-100 border-0 shadow-sm">
+                <article class="card h-100 rounded-3 border border-light-subtle">
                   <div class="card-body p-4">
                     <div class="d-flex align-items-start justify-content-between gap-3">
-                      <div>
+                      <div class="min-w-0">
                         <p class="text-secondary small mb-2">[[ card.title ]]</p>
-                        <div class="h3 fw-bold mb-0">[[ card.value ]]</div>
+                        <div class="h3 fw-bold mb-0 text-truncate">[[ card.value ]]</div>
                       </div>
-                      <div class="rounded-3 bg-primary text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
+                      <div class="dashboard-icon-box rounded-3 bg-primary d-inline-flex align-items-center justify-content-center flex-shrink-0">
                         <i class="bi" :class="card.icon"></i>
                       </div>
                     </div>
@@ -444,44 +448,69 @@ if (document.getElementById("app")) {
             </div>
           </div>
 
-          <div class="row g-4 mt-1">
+          <div class="row g-3 mt-3">
             <div class="col-12 col-xl-4">
-              <article class="card h-100 border-0 shadow-sm">
+              <article class="card h-100 rounded-3 border border-light-subtle">
                 <div class="card-body p-4">
                   <h2 class="h5 mb-3">Prossimi eventi</h2>
-                  <div v-if="summary.upcoming_events.length === 0" class="text-secondary">Nessun evento nei prossimi 7 giorni.</div>
-                  <a v-for="event in summary.upcoming_events" :key="event.id" :href="event.url" class="d-block border-bottom py-3 text-dark">
-                    <div class="fw-bold">[[ event.title ]]</div>
-                    <div class="small text-secondary">[[ formatDateTime(event.start_datetime) ]] · [[ labelize(event.event_type) ]]</div>
-                    <div v-if="event.cliente" class="small text-secondary">[[ event.cliente.name ]]</div>
+                  <div v-if="summary.upcoming_events.length === 0" class="text-secondary py-3 text-center">
+                    <i class="bi bi-calendar2-week d-block fs-2 text-secondary mb-2"></i>
+                    <span>Nessun evento nei prossimi 7 giorni.</span>
+                  </div>
+                  <a v-for="event in summary.upcoming_events" :key="event.id" :href="event.url" class="dashboard-list-item">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
+                      <div class="fw-bold text-truncate min-w-0">[[ event.title ]]</div>
+                      <span v-html="badgeHtml('event_type', event.event_type)" class="flex-shrink-0"></span>
+                    </div>
+                    <div class="small text-secondary d-flex flex-wrap gap-2">
+                      <span><i class="bi bi-calendar3 me-1"></i>[[ formatDateTime(event.start_datetime) ]]</span>
+                      <span v-if="event.cliente"><i class="bi bi-person me-1"></i>[[ event.cliente.name ]]</span>
+                    </div>
                   </a>
                 </div>
               </article>
             </div>
 
             <div class="col-12 col-xl-4">
-              <article class="card h-100 border-0 shadow-sm">
+              <article class="card h-100 rounded-3 border border-light-subtle">
                 <div class="card-body p-4">
                   <h2 class="h5 mb-3">Task recenti</h2>
-                  <div v-if="summary.recent_tasks.length === 0" class="text-secondary">Nessuna task presente.</div>
-                  <a v-for="task in summary.recent_tasks" :key="task.id" :href="task.url" class="d-block border-bottom py-3 text-dark">
-                    <div class="fw-bold">[[ task.name ]]</div>
-                    <div class="small text-secondary">[[ labelize(task.status) ]] · [[ labelize(task.priority) ]]</div>
-                    <div class="small" :class="task.due_date ? 'text-secondary' : 'text-muted'">Scadenza: [[ formatDate(task.due_date) ]]</div>
+                  <div v-if="summary.recent_tasks.length === 0" class="text-secondary py-3 text-center">
+                    <i class="bi bi-list-check d-block fs-2 text-secondary mb-2"></i>
+                    <span>Nessuna task presente.</span>
+                  </div>
+                  <a v-for="task in summary.recent_tasks" :key="task.id" :href="task.url" class="dashboard-list-item">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
+                      <div class="fw-bold text-truncate min-w-0">[[ task.name ]]</div>
+                      <span v-html="badgeHtml('task_status', task.status)" class="flex-shrink-0"></span>
+                    </div>
+                    <div class="small text-secondary d-flex flex-wrap gap-2">
+                      <span v-if="task.due_date"><i class="bi bi-calendar3 me-1"></i>Scadenza: [[ formatDate(task.due_date) ]]</span>
+                      <span><i class="bi bi-flag me-1"></i>[[ labelize(task.priority) ]]</span>
+                    </div>
                   </a>
                 </div>
               </article>
             </div>
 
             <div class="col-12 col-xl-4">
-              <article class="card h-100 border-0 shadow-sm">
+              <article class="card h-100 rounded-3 border border-light-subtle">
                 <div class="card-body p-4">
                   <h2 class="h5 mb-3">Preventivi recenti</h2>
-                  <div v-if="summary.recent_quotes.length === 0" class="text-secondary">Nessun preventivo presente.</div>
-                  <a v-for="quote in summary.recent_quotes" :key="quote.id" :href="quote.url" class="d-block border-bottom py-3 text-dark">
-                    <div class="fw-bold">[[ quote.descrizione ]]</div>
-                    <div class="small text-secondary">[[ quote.cliente ? quote.cliente.name : '-' ]] · [[ labelize(quote.stato) ]]</div>
-                    <div class="small text-secondary">[[ formatDate(quote.data_creazione) ]] · [[ formatCurrency(quote.totale_preventivo) ]]</div>
+                  <div v-if="summary.recent_quotes.length === 0" class="text-secondary py-3 text-center">
+                    <i class="bi bi-file-earmark-text d-block fs-2 text-secondary mb-2"></i>
+                    <span>Nessun preventivo presente.</span>
+                  </div>
+                  <a v-for="quote in summary.recent_quotes" :key="quote.id" :href="quote.url" class="dashboard-list-item">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
+                      <div class="fw-bold text-truncate min-w-0">[[ quote.descrizione ]]</div>
+                      <span v-html="badgeHtml('quote_status', quote.stato)" class="flex-shrink-0"></span>
+                    </div>
+                    <div class="small text-secondary d-flex flex-wrap gap-2">
+                      <span v-if="quote.cliente"><i class="bi bi-person me-1"></i>[[ quote.cliente.name ]]</span>
+                      <span><i class="bi bi-calendar3 me-1"></i>[[ formatDate(quote.data_creazione) ]]</span>
+                      <span class="fw-bold">[[ formatCurrency(quote.totale_preventivo) ]]</span>
+                    </div>
                   </a>
                 </div>
               </article>

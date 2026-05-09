@@ -923,7 +923,8 @@ body.loaded {
 
 .bg-primary.text-white,
 .bg-primary .text-white,
-.badge.bg-primary {
+.badge.bg-primary,
+.badge.text-bg-primary {
   color: #111 !important;
 }
 
@@ -1341,7 +1342,7 @@ body.loaded {
 }
 
 .editorial-table {
-  min-width: 1160px;
+  min-width: 0;
   table-layout: fixed;
 }
 
@@ -2946,6 +2947,47 @@ table td {
   100% {
     clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%);
   }
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+
+.dashboard-loading {
+  min-height: 360px;
+}
+
+.dashboard-icon-box {
+  width: 44px;
+  height: 44px;
+  color: #111;
+}
+
+.dashboard-list-item {
+  display: block;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--bs-border-color);
+  color: #111;
+  transition: background 0.12s ease;
+  text-decoration: none !important;
+}
+
+.dashboard-list-item:first-child {
+  padding-top: 0;
+}
+
+.dashboard-list-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.dashboard-list-item:hover {
+  color: #111;
+  opacity: 0.75;
+}
+
+.dashboard-list-item .badge {
+  font-size: 0.7rem;
 }
 
 /* =========================

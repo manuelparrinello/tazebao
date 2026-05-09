@@ -37,32 +37,30 @@
 {%- endmacro %}
 
 {% block content %}
-<div class="row align-items-start g-3 mb-4">
-    <div class="col-12 col-xl-7">
-        <div class="d-flex flex-column gap-2">
-            <div class="text-uppercase text-secondary small fw-bold">
+<div class="row mx-auto w-100 align-items-start g-3">
+    <div class="col-12 col-xl-7 px-0">
+        <div class="editorial-page-header">
+            <div class="text-uppercase text-secondary small fw-bold mb-1">
                 <a class="a-no-color" href="{{ url_for('lavori') }}">Lavori</a>
             </div>
-            <h2 class="fw-bold mb-0 text-break">{{ lavoro.descrizione }}</h2>
-            <div class="d-flex flex-wrap align-items-center gap-2">
+            <h2 class="fw-bolder mb-1 text-break">{{ lavoro.descrizione }}</h2>
+            <p class="text-secondary mb-0">
                 {% if lavoro.cliente %}
-                <a href="{{ url_for('cliente_page', cliente_id=lavoro.cliente.id) }}" class="fw-semibold text-decoration-none">
-                    {{ lavoro.cliente.name }}
-                </a>
+                <a href="{{ url_for('cliente_page', cliente_id=lavoro.cliente.id) }}" class="fw-semibold text-decoration-none">{{ lavoro.cliente.name }}</a>
                 {% else %}
                 <span class="text-secondary">Nessun cliente collegato</span>
                 {% endif %}
-            </div>
-            <div class="d-flex flex-wrap gap-2">
+            </p>
+            <div class="d-flex flex-wrap gap-2 mt-2">
                 {{ erp_badge("work_status", lavoro.stato) }}
                 {{ erp_badge("work_priority", lavoro.priorita) }}
             </div>
         </div>
     </div>
 
-    <div class="col-12 col-xl-5">
+    <div class="col-12 col-xl-5 px-0">
         {% if can_mutate %}
-        <div class="erp-action-bar d-flex flex-wrap justify-content-xl-end align-items-stretch gap-2">
+        <div class="erp-action-bar justify-content-xl-end">
             <a href="{{ quick_actions.modifica }}" class="btn btn-primary erp-action-primary">
                 <i class="bi bi-pencil-square"></i>&nbsp;Modifica lavoro
             </a>
@@ -94,11 +92,11 @@
         {% endif %}
     </div>
 </div>
-<hr class="mb-4">
+<hr>
 
 <div class="row g-4 mt-1">
     <div class="col-12 col-xl-7">
-        <section class="card h-100 border-0 shadow-sm">
+        <section class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-3 p-md-4">
                 <h5 class="fw-bolder mb-3">Dati principali lavoro</h5>
                 <div class="row g-3">
@@ -144,7 +142,7 @@
     </div>
 
     <div class="col-12 col-xl-5">
-        <section class="card h-100 border-0 shadow-sm">
+        <section class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-3 p-md-4">
                 <h5 class="fw-bolder mb-3">Cliente collegato</h5>
                 {% if lavoro.cliente %}
@@ -168,7 +166,7 @@
 
     {% if lavoro.cliente %}
     <div class="col-12">
-        <section class="card border-0 shadow-sm">
+        <section class="card rounded-3 border border-light-subtle">
             <div class="card-body p-3 p-md-4">
                 <div class="d-flex align-items-start justify-content-between gap-3">
                     <div>
@@ -192,21 +190,30 @@
     {% endif %}
 
     <div class="col-12 col-xl-6">
-        <section class="card h-100 border-0 shadow-sm">
+        <section class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-3 p-md-4">
                 {{ section_title("Task ERP recenti") }}
                 {% if tasks %}
-                <div class="list-group list-group-flush">
+                <div class="task-list">
                     {% for task in tasks %}
-                    <a href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}" class="list-group-item list-group-item-action px-0 py-3">
-                        <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div class="min-w-0">
-                                <div class="fw-bold">{{ task.name }}</div>
-                                <div class="small text-secondary text-break">
-                                    {{ labelize(task.status) }} &middot; {{ labelize(task.priority) }}{% if task.due_date %} &middot; Scadenza {{ task.due_date|date_it }}{% endif %}
-                                </div>
+                    <a href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}" class="task-card">
+                        <div class="task-card-header">
+                            <span class="task-ref"><i class="bi bi-hash me-1"></i>#{{ task.id }}</span>
+                            <div class="task-badges">
+                                {{ erp_badge("task_status", task.status) }}
+                                {{ erp_badge("task_priority", task.priority) }}
                             </div>
-                            {{ erp_badge("task_category", task.category) }}
+                        </div>
+                        <div class="task-card-body">
+                            <div class="task-title">{{ task.name }}</div>
+                        </div>
+                        <div class="task-card-footer">
+                            <div class="task-meta">
+                                {{ erp_badge("task_category", task.category) }}
+                                {% if task.due_date %}
+                                <span class="task-meta-item"><i class="bi bi-calendar-event me-1"></i>{{ task.due_date|date_it }}</span>
+                                {% endif %}
+                            </div>
                         </div>
                     </a>
                     {% endfor %}
@@ -219,21 +226,25 @@
     </div>
 
     <div class="col-12 col-xl-6">
-        <section class="card h-100 border-0 shadow-sm">
+        <section class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-3 p-md-4">
                 {{ section_title("Preventivi recenti") }}
                 {% if preventivi %}
-                <div class="list-group list-group-flush">
+                <div class="prev-list">
                     {% for preventivo in preventivi %}
-                    <a href="{{ url_for('visualizza_preventivo', id=preventivo.id) }}" class="list-group-item list-group-item-action px-0 py-3">
-                        <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div class="min-w-0">
-                                <div class="fw-bold">{{ preventivo.descrizione }}</div>
-                                <div class="small text-secondary text-break">
-                                    {{ labelize(preventivo.stato) }} &middot; {{ preventivo.data_creazione|date_it }}
-                                </div>
+                    <a href="{{ url_for('visualizza_preventivo', id=preventivo.id) }}" class="prev-card">
+                        <div class="prev-card-header">
+                            <span class="prev-ref"><i class="bi bi-hash me-1"></i>#{{ preventivo.id }}</span>
+                            <span class="prev-date"><i class="bi bi-calendar3 me-1"></i>{{ preventivo.data_creazione|date_it }}</span>
+                        </div>
+                        <div class="prev-card-body">
+                            <div class="prev-title">{{ preventivo.descrizione }}</div>
+                        </div>
+                        <div class="prev-card-footer">
+                            <div class="prev-badges">
+                                {{ erp_badge("quote_status", preventivo.stato) }}
                             </div>
-                            <div class="fw-bold text-end">{{ euro(preventivo.totale_preventivo) }}</div>
+                            <div class="prev-total">{{ euro(preventivo.totale_preventivo) }}</div>
                         </div>
                     </a>
                     {% endfor %}
@@ -246,21 +257,22 @@
     </div>
 
     <div class="col-12 col-xl-6">
-        <section class="card h-100 border-0 shadow-sm">
+        <section class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-3 p-md-4">
                 {{ section_title("Eventi calendario recenti") }}
                 {% if eventi %}
-                <div class="list-group list-group-flush">
+                <div class="evt-list">
                     {% for evento in eventi %}
-                    <a href="{{ url_for('calendar.calendar_edit', event_id=evento.id) if can_mutate else '#' }}" class="list-group-item list-group-item-action px-0 py-3">
-                        <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div class="min-w-0">
-                                <div class="fw-bold">{{ evento.title }}</div>
-                                <div class="small text-secondary text-break">
-                                    {{ labelize(evento.event_type) }} &middot; {{ datetime_value(evento.start_datetime) }}
-                                </div>
-                            </div>
-                            <i class="bi bi-calendar-event text-secondary"></i>
+                    <a href="{{ url_for('calendar.calendar_edit', event_id=evento.id) if can_mutate else '#' }}" class="evt-card">
+                        <div class="evt-card-header">
+                            <span class="evt-datetime"><i class="bi bi-calendar3 me-1"></i>{{ evento.start_datetime|datetime_it }}</span>
+                            {{ erp_badge("event_type", evento.event_type) }}
+                        </div>
+                        <div class="evt-card-body">
+                            <div class="evt-title">{{ evento.title }}</div>
+                            {% if evento.description %}
+                            <div class="evt-desc">{{ evento.description|truncate(120) }}</div>
+                            {% endif %}
                         </div>
                     </a>
                     {% endfor %}
@@ -274,26 +286,34 @@
 
     {% if movimenti %}
     <div class="col-12 col-xl-6">
-        <section class="card h-100 border-0 shadow-sm">
+        <section class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-3 p-md-4">
                 {{ section_title("Movimenti economici recenti") }}
-                <div class="list-group list-group-flush">
+                <div class="fin-list">
                     {% for movimento in movimenti[:5] %}
-                    <a href="{{ url_for('finance.finance_edit', movement_id=movimento.id) if can_mutate else '#' }}" class="list-group-item list-group-item-action px-0 py-3">
-                        <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div class="min-w-0">
-                                <div class="fw-bold">{{ movimento.title }}</div>
-                                <div class="small text-secondary text-break">
-                                    {{ labelize(movimento.category) }} &middot; {{ movimento.movement_date|date_it }}
-                                </div>
-                            </div>
-                            <div class="text-end">
+                    <a href="{{ url_for('finance.finance_edit', movement_id=movimento.id) if can_mutate else '#' }}" class="fin-card">
+                        <div class="fin-card-header">
+                            <span class="fin-ref"><i class="bi bi-hash me-1"></i>#{{ movimento.id }}</span>
+                            <span class="fin-amount {% if movimento.movement_type == 'entrata' %}fin-amount-entrata{% else %}fin-amount-uscita{% endif %}">
+                                {% if movimento.movement_type == 'entrata' %}+{% else %}−{% endif %}{{ euro(movimento.amount|float) }}
+                            </span>
+                        </div>
+                        <div class="fin-card-body">
+                            <div class="fin-title">{{ movimento.title }}</div>
+                            {% if movimento.description %}
+                            <div class="fin-desc">{{ movimento.description|truncate(120) }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="fin-card-footer">
+                            <div class="fin-badges">
                                 {% if movimento.movement_type == "entrata" %}
                                 <span class="fin-type-badge fin-type-entrata"><i class="bi bi-arrow-down-left me-1"></i>Entrata</span>
                                 {% else %}
                                 <span class="fin-type-badge fin-type-uscita"><i class="bi bi-arrow-up-right me-1"></i>Uscita</span>
                                 {% endif %}
-                                <div class="fw-bold mt-1">{{ euro(movimento.amount|float) }}</div>
+                            </div>
+                            <div class="fin-meta">
+                                <span class="fin-meta-item"><i class="bi bi-calendar3 me-1"></i>{{ movimento.movement_date|date_it }}</span>
                             </div>
                         </div>
                     </a>
@@ -314,7 +334,7 @@
     </div>
 
     <div class="col-12 col-xl-6">
-        <section class="card h-100 border-0 shadow-sm">
+        <section class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-3 p-md-4">
                 <div class="d-flex align-items-start justify-content-between gap-3">
                     <div>
@@ -337,7 +357,7 @@
     </div>
     {% else %}
     <div class="col-12">
-        <section class="card border-0 shadow-sm">
+        <section class="card rounded-3 border border-light-subtle">
             <div class="card-body p-3 p-md-4">
                 <div class="d-flex align-items-start justify-content-between gap-3">
                     <div>

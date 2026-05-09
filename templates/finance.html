@@ -16,22 +16,18 @@
 {% if amount > 0 %}text-success{% elif amount < 0 %}text-danger{% else %}text-secondary{% endif %}
 {%- endmacro %}
 
-{% macro labelize(value) -%}
-{{ value.replace("_", " ").title() if value else "-" }}
-{%- endmacro %}
-
-{% macro movement_table(movements, kind) -%}
+{% macro movement_section(movements, kind) -%}
+{% set _can_mutate = current_user and current_user.role != "readonly" %}
 {% if movements %}
-<div class="table-responsive">
-    <table class="table table-hover my-0 erp-table">
+<div class="d-none d-md-block">
+    <table class="table table-hover my-0 finance-table">
         <thead>
             <tr>
-                <th class="fw-bold col-date">Data</th>
+                <th class="fw-bold finance-col-date">Data</th>
                 <th class="fw-bold">Titolo</th>
-                <th class="fw-bold mobile-priority-low">Categoria</th>
-                <th class="fw-bold col-status">{{ "Stato" if kind == "entrata" else "Tipo" }}</th>
-                <th class="fw-bold text-end col-money">Importo</th>
-                <th class="fw-bold text-end col-actions">Azioni</th>
+                <th class="fw-bold finance-col-type">Tipo</th>
+                <th class="fw-bold text-end finance-col-amount">Importo</th>
+                <th class="fw-bold text-end finance-col-actions">Azioni</th>
             </tr>
         </thead>
         <tbody>
@@ -39,32 +35,42 @@
             <tr>
                 <td>{{ movement.movement_date|date_it }}</td>
                 <td>
-                    <a class="fw-bold a-no-color" href="{{ url_for('finance.finance_edit', movement_id=movement.id) if current_user and current_user.role != 'readonly' else '#' }}">{{ movement.title }}</a>
+                    <a class="fw-bold a-no-color" href="{{ url_for('finance.finance_edit', movement_id=movement.id) if _can_mutate else '#' }}">{{ movement.title }}</a>
                     {% if movement.description %}
                     <div class="small text-secondary">{{ movement.description }}</div>
                     {% endif %}
+                    <div class="d-flex flex-wrap gap-2 small text-secondary mt-1">
+                        {% if movement.cliente %}
+                        <span><i class="bi bi-person me-1"></i>{{ movement.cliente.name }}</span>
+                        {% endif %}
+                        {% if movement.lavoro %}
+                        <span><i class="bi bi-briefcase me-1"></i>{{ movement.lavoro.descrizione }}</span>
+                        {% endif %}
+                    </div>
                 </td>
-                <td class="mobile-priority-low">{{ erp_badge("finance_category", movement.category) }}</td>
                 <td>
                     {% if kind == "entrata" %}
-                    {{ erp_badge("finance_income_status", movement.movement_status, "Entrata " ~ ("effettiva" if movement.movement_status == "effettiva" else "prevista")) }}
+                    {{ erp_badge("finance_income_status", movement.movement_status) }}
                     {% else %}
                     {{ erp_badge("finance_expense_type", movement.expense_type) }}
                     {% endif %}
+                    <div class="mt-1">{{ erp_badge("finance_category", movement.category) }}</div>
                 </td>
-                <td class="text-end fw-bold">{{ euro(movement.amount|float) }}</td>
+                <td class="text-end fw-bold fs-6 {% if kind == 'entrata' %}text-success{% else %}text-danger{% endif %}">
+                    {{ euro(movement.amount|float) }}
+                </td>
                 <td class="text-end">
-                    {% if current_user and current_user.role != "readonly" %}
+                    {% if _can_mutate %}
                     <div class="erp-actions">
-                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('finance.finance_edit', movement_id=movement.id) }}">
-                        <i class="bi bi-pencil"></i>
-                    </a>
-                    <form action="{{ url_for('finance.finance_delete', movement_id=movement.id) }}" method="post" class="d-inline">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                            <i class="bi bi-trash3"></i>
-                        </button>
-                    </form>
+                        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('finance.finance_edit', movement_id=movement.id) }}" aria-label="Modifica">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form action="{{ url_for('finance.finance_delete', movement_id=movement.id) }}" method="post" class="d-inline" onsubmit="return confirm('Eliminare questo movimento?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Elimina">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </form>
                     </div>
                     {% endif %}
                 </td>
@@ -73,27 +79,78 @@
         </tbody>
     </table>
 </div>
+
+<div class="d-md-none">
+    {% for movement in movements %}
+    <div class="rounded-3 border border-light-subtle bg-white p-3 mb-3">
+        <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
+            <div class="min-w-0">
+                <a class="fw-bold a-no-color" href="{{ url_for('finance.finance_edit', movement_id=movement.id) if _can_mutate else '#' }}">{{ movement.title }}</a>
+            </div>
+            <div class="d-flex gap-1 flex-shrink-0">
+                {% if _can_mutate %}
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('finance.finance_edit', movement_id=movement.id) }}" aria-label="Modifica">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <form action="{{ url_for('finance.finance_delete', movement_id=movement.id) }}" method="post" class="d-inline" onsubmit="return confirm('Eliminare questo movimento?')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Elimina">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        <div class="fw-bold fs-5 mb-2 {% if kind == 'entrata' %}text-success{% else %}text-danger{% endif %}">
+            {{ euro(movement.amount|float) }}
+        </div>
+        <div class="d-flex flex-wrap gap-1 mb-2">
+            {% if kind == "entrata" %}
+            <span class="fin-type-badge fin-type-entrata"><i class="bi bi-arrow-down-left me-1"></i>Entrata</span>
+            {{ erp_badge("finance_income_status", movement.movement_status) }}
+            {% else %}
+            <span class="fin-type-badge fin-type-uscita"><i class="bi bi-arrow-up-right me-1"></i>Uscita</span>
+            {{ erp_badge("finance_expense_type", movement.expense_type) }}
+            {% endif %}
+            {{ erp_badge("finance_category", movement.category) }}
+        </div>
+        <div class="small text-secondary d-flex flex-wrap gap-2">
+            <span><i class="bi bi-calendar3 me-1"></i>{{ movement.movement_date|date_it }}</span>
+            {% if movement.cliente %}
+            <span><i class="bi bi-person me-1"></i>{{ movement.cliente.name }}</span>
+            {% endif %}
+            {% if movement.lavoro %}
+            <span><i class="bi bi-briefcase me-1"></i>{{ movement.lavoro.descrizione }}</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% else %}
-<p class="mb-0 text-secondary">Nessun movimento presente.</p>
+<p class="mb-0 text-secondary py-3">Nessun movimento presente.</p>
 {% endif %}
 {%- endmacro %}
 
 {% block content %}
 {% set can_mutate = current_user and current_user.role != "readonly" %}
-<div class="row mx-auto w-100 display-flex align-items-center justify-content-space-between">
-    <div class="col-12 col-lg-5 px-0">
-        <h3 class="fw-bolder">Finanze</h3>
-        <p>Riepilogo budget, entrate, uscite e saldo interno.</p>
+<div class="row mx-auto w-100 align-items-start g-3">
+    <div class="col-12 col-xl-7 px-0">
+        <div class="editorial-page-header">
+            <h3 class="fw-bolder mb-1">
+                <i class="bi bi-currency-euro me-2 text-primary"></i>Finanze
+            </h3>
+            <p class="text-secondary mb-0">Riepilogo budget, entrate, uscite e saldo interno.</p>
+        </div>
     </div>
-    {% if can_mutate %}
-    <div class="col-12 col-lg-7 d-inline-flex justify-content-lg-end px-0">
-        <a href="{{ url_for('finance.finance_new') }}">
-            <button class="button-61">
-                <span><i class="bi bi-plus-lg"></i></span>&nbsp;Nuovo movimento
-            </button>
-        </a>
+    <div class="col-12 col-xl-5 px-0">
+        <div class="erp-action-bar justify-content-xl-end">
+            {% if can_mutate %}
+            <a class="btn btn-primary erp-action-primary" href="{{ url_for('finance.finance_new') }}">
+                <i class="bi bi-plus-lg"></i>&nbsp;Nuovo movimento
+            </a>
+            {% endif %}
+        </div>
     </div>
-    {% endif %}
 </div>
 <hr>
 
@@ -117,57 +174,57 @@
     </div>
 </form>
 
-<div class="row g-4 mt-4">
-    <div class="col-12 col-xl-3">
-        <div class="card h-100 border-0 shadow-sm">
+<div class="row g-3 mt-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-4">
                 <p class="text-secondary small mb-2">In cassa</p>
                 <div class="display-6 fw-bold {{ balance_class(summary.current_balance) }}">{{ signed_euro(summary.current_balance) }}</div>
             </div>
         </div>
     </div>
-    <div class="col-12 col-xl-3">
-        <div class="card h-100 border-0 shadow-sm">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-4">
                 <p class="text-secondary small mb-2">Bilancio mese</p>
                 <div class="display-6 fw-bold">{{ euro(summary.month_balance) }}</div>
             </div>
         </div>
     </div>
-    <div class="col-12 col-xl-3">
-        <div class="card h-100 border-0 shadow-sm">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-4">
                 <p class="text-secondary small mb-2">Entrate effettive</p>
-                <div class="h2 fw-bold mb-0">{{ euro(summary.month_income_effective) }}</div>
-                <div class="text-secondary small">Previste: {{ euro(summary.month_income_expected) }}</div>
+                <div class="h2 fw-bold mb-0 text-success">{{ euro(summary.month_income_effective) }}</div>
+                <div class="text-secondary small mt-1">Previste: {{ euro(summary.month_income_expected) }}</div>
             </div>
         </div>
     </div>
-    <div class="col-12 col-xl-3">
-        <div class="card h-100 border-0 shadow-sm">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-4">
                 <p class="text-secondary small mb-2">Uscite mese</p>
-                <div class="h2 fw-bold mb-0">{{ euro(summary.month_expenses_total) }}</div>
-                <div class="text-secondary small">Fisse {{ euro(summary.month_expenses_fixed) }} &middot; Variabili {{ euro(summary.month_expenses_variable) }}</div>
+                <div class="h2 fw-bold mb-0 text-danger">{{ euro(summary.month_expenses_total) }}</div>
+                <div class="text-secondary small mt-1">Fisse {{ euro(summary.month_expenses_fixed) }} &middot; Variabili {{ euro(summary.month_expenses_variable) }}</div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row g-4 mt-1">
+<div class="row g-3 mt-3">
     <div class="col-12 col-xl-6">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body p-4">
+        <div class="card h-100 rounded-3 border border-light-subtle">
+            <div class="card-body p-3 p-md-4">
                 <h5 class="fw-bolder mb-3">Entrate {{ summary.month_name }} {{ summary.year }}</h5>
-                {{ movement_table(income_movements, "entrata") }}
+                {{ movement_section(income_movements, "entrata") }}
             </div>
         </div>
     </div>
     <div class="col-12 col-xl-6">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body p-4">
+        <div class="card h-100 rounded-3 border border-light-subtle">
+            <div class="card-body p-3 p-md-4">
                 <h5 class="fw-bolder mb-3">Uscite {{ summary.month_name }} {{ summary.year }}</h5>
-                {{ movement_table(expense_movements, "uscita") }}
+                {{ movement_section(expense_movements, "uscita") }}
             </div>
         </div>
     </div>

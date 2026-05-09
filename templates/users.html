@@ -3,15 +3,21 @@
 {% block title %}Utenti{% endblock %}
 
 {% block content %}
-<div class="row mx-auto w-100 align-items-center g-3">
-    <div class="col-12 col-lg-6 px-0">
-        <h3 class="fw-bolder">Utenti</h3>
-        <p>Gestione base degli utenti e dei ruoli ERP.</p>
+<div class="row mx-auto w-100 align-items-start g-3">
+    <div class="col-12 col-xl-7 px-0">
+        <div class="editorial-page-header">
+            <h3 class="fw-bolder mb-1">
+                <i class="bi bi-people me-2 text-primary"></i>Utenti
+            </h3>
+            <p class="text-secondary mb-0">Gestione degli utenti e dei ruoli ERP.</p>
+        </div>
     </div>
-    <div class="col-12 col-lg-6 d-inline-flex justify-content-lg-end px-0">
-        <a href="{{ url_for('users.users_new') }}" class="btn btn-primary">
-            <i class="bi bi-person-plus"></i>&nbsp;Nuovo utente
-        </a>
+    <div class="col-12 col-xl-5 px-0">
+        <div class="erp-action-bar justify-content-xl-end">
+            <a href="{{ url_for('users.users_new') }}" class="btn btn-primary erp-action-primary">
+                <i class="bi bi-person-plus"></i>&nbsp;Nuovo utente
+            </a>
+        </div>
     </div>
 </div>
 <hr>
@@ -27,71 +33,127 @@
 {% endwith %}
 
 <div class="card rounded-3 border border-light-subtle mt-4">
-    <div class="card-body p-4">
-        <div class="table-responsive">
-            <table class="table table-hover my-0 erp-table users-table">
-                <thead>
-                    <tr>
-                        <th class="fw-bold col-user">Utente</th>
-                        <th class="fw-bold col-email mobile-hide">Email</th>
-                        <th class="fw-bold col-status">Ruolo</th>
-                        <th class="fw-bold col-status">Stato</th>
-                        <th class="fw-bold text-end col-actions">Azioni</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                    <tr>
-                        <td>
-                            <div class="fw-bold users-truncate" title="{{ user.name or '-' }}">{{ user.name or "-" }}</div>
-                            <div class="small text-secondary">ID {{ user.id }}</div>
-                        </td>
-                        <td class="mobile-hide">
-                            <div class="users-truncate" title="{{ user.email }}">{{ user.email }}</div>
-                        </td>
-                        <td class="text-nowrap">{{ erp_badge("user_role", user.role) }}</td>
-                        <td class="text-nowrap">{{ erp_badge("user_state", "active" if user.is_active else "inactive") }}</td>
-                        <td class="text-end">
-                            <div class="erp-actions">
-                                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('users.users_edit', user_id=user.id) }}">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('users.users_password', user_id=user.id) }}">
-                                    <i class="bi bi-key"></i>
-                                </a>
-                                {% if user.is_active %}
-                                <form action="{{ url_for('users.users_deactivate', user_id=user.id) }}" method="post" class="d-inline">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" {% if current_user and current_user.id == user.id %}disabled title="Non puoi disattivare il tuo account"{% endif %}>
-                                        <i class="bi bi-person-x"></i>
-                                    </button>
-                                </form>
-                                {% else %}
-                                <form action="{{ url_for('users.users_activate', user_id=user.id) }}" method="post" class="d-inline">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-success">
-                                        <i class="bi bi-person-check"></i>
-                                    </button>
-                                </form>
-                                {% endif %}
-                                <form action="{{ url_for('users.users_destroy', user_id=user.id) }}" method="post" class="d-inline" onsubmit="return confirm('Questa azione è irreversibile. Eliminare definitivamente l’utente?')">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger users-destroy-btn" {% if current_user and current_user.id == user.id %}disabled title="Non puoi eliminare definitivamente il tuo account"{% endif %}>
-                                        <i class="bi bi-trash3"></i>
-                                        <span class="users-destroy-label">Elimina definitivamente</span>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
+    <div class="card-body p-0 p-md-4">
+
+        <table class="table table-hover my-0 users-table d-none d-md-table">
+            <thead>
+                <tr>
+                    <th class="fw-bold pointer col-user" scope="col">Utente</th>
+                    <th class="fw-bold pointer col-email mobile-hide" scope="col">Email</th>
+                    <th class="fw-bold pointer col-status text-center" scope="col">Ruolo</th>
+                    <th class="fw-bold pointer col-status text-center" scope="col">Stato</th>
+                    <th class="fw-bold text-end col-actions" scope="col">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td class="col-user">
+                        <div class="fw-bold text-truncate" title="{{ user.name or '-' }}">{{ user.name or "-" }}</div>
+                        <div class="small text-secondary">ID {{ user.id }}</div>
+                    </td>
+                    <td class="col-email mobile-hide">
+                        <div class="text-truncate" title="{{ user.email }}">{{ user.email }}</div>
+                    </td>
+                    <td class="col-status text-center">{{ erp_badge("user_role", user.role) }}</td>
+                    <td class="col-status text-center">{{ erp_badge("user_state", "active" if user.is_active else "inactive") }}</td>
+                    <td class="col-actions text-end">
+                        <div class="erp-actions">
+                            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('users.users_edit', user_id=user.id) }}" aria-label="Modifica">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('users.users_password', user_id=user.id) }}" aria-label="Reset password">
+                                <i class="bi bi-key"></i>
+                            </a>
+                            {% if user.is_active %}
+                            <form action="{{ url_for('users.users_deactivate', user_id=user.id) }}" method="post" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-outline-warning" {% if current_user and current_user.id == user.id %}disabled title="Non puoi disattivare il tuo account"{% endif %} aria-label="Disattiva">
+                                    <i class="bi bi-person-x"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <form action="{{ url_for('users.users_activate', user_id=user.id) }}" method="post" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-outline-success" aria-label="Attiva">
+                                    <i class="bi bi-person-check"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                            <form action="{{ url_for('users.users_destroy', user_id=user.id) }}" method="post" class="d-inline" onsubmit="return confirm('Questa azione è irreversibile. Eliminare definitivamente l\'utente?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger users-destroy-btn" {% if current_user and current_user.id == user.id %}disabled title="Non puoi eliminare definitivamente il tuo account"{% endif %} aria-label="Elimina definitivamente">
+                                    <i class="bi bi-trash3"></i>
+                                    <span class="users-destroy-label">Elimina definitivamente</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-secondary py-5">Nessun utente presente.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="d-md-none mobile-list">
+            {% for user in users %}
+            <div class="mobile-list-item users-mobile-card">
+                <div class="d-flex align-items-start justify-content-between gap-3">
+                    <div class="min-w-0 flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="fw-bold mobile-row-title flex-grow-1 min-w-0 text-truncate">{{ user.name or "-" }}</span>
+                            {{ erp_badge("user_role", user.role) }}
+                            {{ erp_badge("user_state", "active" if user.is_active else "inactive") }}
+                        </div>
+                        <div class="mobile-row-muted text-truncate mb-1">
+                            <i class="bi bi-envelope me-1"></i>{{ user.email }}
+                        </div>
+                        <div class="mobile-row-meta">
+                            <span class="mobile-row-muted">ID {{ user.id }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="users-mobile-actions mt-2 pt-2 border-top">
+                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('users.users_edit', user_id=user.id) }}" aria-label="Modifica">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('users.users_password', user_id=user.id) }}" aria-label="Reset password">
+                        <i class="bi bi-key"></i>
+                    </a>
+                    {% if user.is_active %}
+                    <form action="{{ url_for('users.users_deactivate', user_id=user.id) }}" method="post" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-outline-warning" {% if current_user and current_user.id == user.id %}disabled title="Non puoi disattivare il tuo account"{% endif %} aria-label="Disattiva">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                    </form>
                     {% else %}
-                    <tr>
-                        <td colspan="5" class="text-center text-secondary py-5">Nessun utente presente.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    <form action="{{ url_for('users.users_activate', user_id=user.id) }}" method="post" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-outline-success" aria-label="Attiva">
+                            <i class="bi bi-person-check"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                    <form action="{{ url_for('users.users_destroy', user_id=user.id) }}" method="post" class="d-inline" onsubmit="return confirm('Questa azione è irreversibile. Eliminare definitivamente l\'utente?')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger users-destroy-btn" {% if current_user and current_user.id == user.id %}disabled title="Non puoi eliminare definitivamente il tuo account"{% endif %} aria-label="Elimina definitivamente">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center text-secondary py-5">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                <span>Nessun utente presente.</span>
+            </div>
+            {% endfor %}
         </div>
-</div>
+
+    </div>
 </div>
 {% endblock %}

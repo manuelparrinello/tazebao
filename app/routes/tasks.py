@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
@@ -8,7 +8,9 @@ from ..models import (
     TASK_CATEGORIES,
     TASK_PRIORITIES,
     TASK_STATUSES,
+    CalendarEvent,
     Cliente,
+    EmailLog,
     Lavoro,
     Task,
     User,
@@ -148,6 +150,9 @@ def task_delete(task_id):
     task = Task.query.get_or_404(task_id)
     for moodboard in task.moodboards:
         moodboard.task_id = None
+    CalendarEvent.query.filter_by(task_id=task_id).update({CalendarEvent.task_id: None})
+    EmailLog.query.filter_by(task_id=task_id).update({EmailLog.task_id: None})
     db.session.delete(task)
     db.session.commit()
+    flash("Task eliminata con successo.", "success")
     return redirect(url_for("tasks.tasks"))

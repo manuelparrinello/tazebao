@@ -11,8 +11,8 @@ const TabellaLavori = {
         <tr>
           <th class="fw-bold pointer text-center col-prio" scope="col">Prio</th>
           <th class="fw-bold pointer col-title" scope="col">Descrizione</th>
-          <th class="fw-bold pointer col-money text-end" scope="col">Prezzo</th>
           <th class="fw-bold pointer col-cliente mobile-hide" scope="col">Cliente</th>
+          <th class="fw-bold pointer col-money text-end" scope="col">Prezzo</th>
           <th class="fw-bold pointer text-center col-payment mobile-hide" scope="col">Pagamento</th>
           <th class="fw-bold pointer text-center col-note mobile-hide" scope="col">Note</th>
           <th class="fw-bold pointer text-center col-pdf" scope="col">PDF</th>
@@ -28,11 +28,11 @@ const TabellaLavori = {
             <td>
               <a class="fw-bold text-decoration-underline" :href="'/lavori/' + lavoro.id">[[ lavoro.descrizione ]]</a>
             </td>
-            <td :sorttable_customkey="lavoro.preventivato" class="text-end">[[ lavoro.preventivato ]] &euro;</td>
             <td class="mobile-hide">
               <span class="cliente-bullet" :style="{ backgroundColor: lavoro.cliente.colore || '#adb5bd' }"></span>
               <a :href="'/clienti/' + lavoro.cliente.id" class="text-decoration-none a-no-color">[[ lavoro.cliente.name ]]</a>
             </td>
+            <td :sorttable_customkey="lavoro.preventivato" class="text-end">[[ lavoro.preventivato ]] &euro;</td>
             <td class="text-center mobile-hide">[[ formatDate(lavoro.data_pagamento) ]]</td>
             <td class="text-center mobile-hide note-td" v-html="renderNoteIcon(lavoro.note)"></td>
             <td class="text-center col-pdf" v-html="pdfIcon(lavoro.preventivo_pdf_path)"></td>

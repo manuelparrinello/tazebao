@@ -299,6 +299,7 @@ def lavoro_remove_pdf(lavoro_id):
             os.remove(old_path)
         lavoro.preventivo_pdf_path = None
         db.session.commit()
+        flash("PDF preventivo rimosso.", "success")
     return redirect(url_for("lavori.lavoro_edit", lavoro_id=lavoro.id))
 
 
@@ -330,6 +331,14 @@ def lavoro_delete(lavoro_id):
         db.session.delete(evt)
     for mb in Moodboard.query.filter_by(lavoro_id=lavoro_id).all():
         db.session.delete(mb)
+    task_ids = [t.id for t in Task.query.filter_by(lavoro_id=lavoro_id).all()]
+    if task_ids:
+        CalendarEvent.query.filter(CalendarEvent.task_id.in_(task_ids)).update(
+            {CalendarEvent.task_id: None}, synchronize_session=False
+        )
+        EmailLog.query.filter(EmailLog.task_id.in_(task_ids)).update(
+            {EmailLog.task_id: None}, synchronize_session=False
+        )
     for task in Task.query.filter_by(lavoro_id=lavoro_id).all():
         db.session.delete(task)
 

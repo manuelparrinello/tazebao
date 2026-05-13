@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Blueprint, g, redirect, render_template, request, url_for
+from flask import Blueprint, flash, g, redirect, render_template, request, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
@@ -136,4 +136,5 @@ def emails_delete(email_id):
     email_log = EmailLog.query.get_or_404(email_id)
     db.session.delete(email_log)
     db.session.commit()
+    flash("Comunicazione eliminata con successo.", "success")
     return redirect(url_for("emails.emails_index"))

@@ -23,7 +23,6 @@
     <table class="table table-hover my-0 finance-table">
         <thead>
             <tr>
-                <th class="fw-bold finance-col-date">Data</th>
                 <th class="fw-bold">Titolo</th>
                 <th class="fw-bold finance-col-type">Tipo</th>
                 <th class="fw-bold text-end finance-col-amount">Importo</th>
@@ -33,7 +32,6 @@
         <tbody>
             {% for movement in movements %}
             <tr>
-                <td>{{ movement.movement_date|date_it }}</td>
                 <td>
                     <a class="fw-bold a-no-color" href="{{ url_for('finance.finance_edit', movement_id=movement.id) if _can_mutate else '#' }}">{{ movement.title }}</a>
                     {% if movement.description %}
@@ -49,12 +47,21 @@
                     </div>
                 </td>
                 <td>
-                    {% if kind == "entrata" %}
-                    {{ erp_badge("finance_income_status", movement.movement_status) }}
-                    {% else %}
-                    {{ erp_badge("finance_expense_type", movement.expense_type) }}
-                    {% endif %}
-                    <div class="mt-1">{{ erp_badge("finance_category", movement.category) }}</div>
+                    <div class="d-flex align-items-center gap-1">
+                        {% if kind == "entrata" %}
+                            {% if movement.movement_status == "effettiva" %}
+                            <span class="fin-status-pill fin-status-effective" title="Effettiva"><span class="fin-status-dot"></span>E</span>
+                            {% else %}
+                            <span class="fin-status-pill fin-status-expected" title="Prevista"><span class="fin-status-dot"></span>P</span>
+                            {% endif %}
+                        {% else %}
+                            {% if movement.expense_type == "fissa" %}
+                            <span class="fin-status-pill fin-status-fixed" title="Fissa"><span class="fin-status-dot"></span>F</span>
+                            {% else %}
+                            <span class="fin-status-pill fin-status-variable" title="Variabile"><span class="fin-status-dot"></span>V</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
                 </td>
                 <td class="text-end fw-bold fs-6 {% if kind == 'entrata' %}text-success{% else %}text-danger{% endif %}">
                     {{ euro(movement.amount|float) }}
@@ -104,15 +111,22 @@
         <div class="fw-bold fs-5 mb-2 {% if kind == 'entrata' %}text-success{% else %}text-danger{% endif %}">
             {{ euro(movement.amount|float) }}
         </div>
-        <div class="d-flex flex-wrap gap-1 mb-2">
+        <div class="d-flex align-items-center gap-2 mb-2">
             {% if kind == "entrata" %}
             <span class="fin-type-badge fin-type-entrata"><i class="bi bi-arrow-down-left me-1"></i>Entrata</span>
-            {{ erp_badge("finance_income_status", movement.movement_status) }}
+            {% if movement.movement_status == "effettiva" %}
+            <span class="fin-status-pill fin-status-effective" title="Effettiva"><span class="fin-status-dot"></span>E</span>
+            {% else %}
+            <span class="fin-status-pill fin-status-expected" title="Prevista"><span class="fin-status-dot"></span>P</span>
+            {% endif %}
             {% else %}
             <span class="fin-type-badge fin-type-uscita"><i class="bi bi-arrow-up-right me-1"></i>Uscita</span>
-            {{ erp_badge("finance_expense_type", movement.expense_type) }}
+            {% if movement.expense_type == "fissa" %}
+            <span class="fin-status-pill fin-status-fixed" title="Fissa"><span class="fin-status-dot"></span>F</span>
+            {% else %}
+            <span class="fin-status-pill fin-status-variable" title="Variabile"><span class="fin-status-dot"></span>V</span>
             {% endif %}
-            {{ erp_badge("finance_category", movement.category) }}
+            {% endif %}
         </div>
         <div class="small text-secondary d-flex flex-wrap gap-2">
             <span><i class="bi bi-calendar3 me-1"></i>{{ movement.movement_date|date_it }}</span>

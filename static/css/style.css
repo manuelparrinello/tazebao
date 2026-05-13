@@ -717,12 +717,8 @@ body {
   vertical-align: middle !important;
 }
 
-.finance-col-date {
-  width: 130px;
-}
-
 .finance-col-type {
-  width: 140px;
+  width: 80px;
 }
 
 .finance-col-amount {
@@ -733,6 +729,33 @@ body {
   width: 100px;
   min-width: 100px;
 }
+
+.fin-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.fin-status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.fin-status-effective { color: #198754; }
+.fin-status-effective .fin-status-dot { background-color: #198754; }
+.fin-status-expected { color: #b8860b; }
+.fin-status-expected .fin-status-dot { background-color: #ffc107; }
+.fin-status-fixed { color: #6c757d; }
+.fin-status-fixed .fin-status-dot { background-color: #6c757d; }
+.fin-status-variable { color: #b8860b; }
+.fin-status-variable .fin-status-dot { background-color: #ffc107; }
 
 .col-desc {
   width: 280px !important;
@@ -3494,7 +3517,7 @@ table td {
 }
 
 .lavori-table .col-prio {
-  width: 72px;
+  width: 60px;
   text-align: center;
 }
 

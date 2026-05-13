@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from uuid import uuid4
 
-from flask import Blueprint, current_app, g, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, g, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
 from ..auth import login_required, role_required
@@ -192,6 +192,7 @@ def moodboard_delete(id):
             delete_image_file(image.image_path)
     db.session.delete(moodboard)
     db.session.commit()
+    flash("Moodboard eliminata con successo.", "success")
     return redirect(url_for("moodboards.moodboard_index"))
 
 
@@ -266,6 +267,7 @@ def moodboard_delete_image(id, image_id):
         delete_image_file(image.image_path)
     db.session.delete(image)
     db.session.commit()
+    flash("Immagine rimossa dalla moodboard.", "success")
     return redirect(url_for("moodboards.moodboard_detail", id=moodboard.id))
 
 

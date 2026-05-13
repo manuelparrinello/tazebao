@@ -543,6 +543,7 @@ def editorial_image_delete(publication_id, image_id):
     delete_image_file(img.image_path)
     db.session.delete(img)
     db.session.commit()
+    flash("Immagine rimossa dalla pubblicazione.", "success")
     return redirect(request.referrer or url_for("editorial_calendar.editorial_index"))
 
 
@@ -552,6 +553,7 @@ def editorial_delete(publication_id):
     publication = EditorialPublication.query.get_or_404(publication_id)
     publication.status = "annullato"
     db.session.commit()
+    flash("Pubblicazione annullata.", "success")
     return redirect(
         url_for(
             "editorial_calendar.client_calendar",

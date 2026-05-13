@@ -1,6 +1,6 @@
 from datetime import date
 
-from flask import Blueprint, g, redirect, render_template, request, url_for
+from flask import Blueprint, flash, g, redirect, render_template, request, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
@@ -143,4 +143,5 @@ def finance_delete(movement_id):
     month = movement.month
     delete_financial_movement(movement)
     db.session.commit()
+    flash("Movimento eliminato con successo.", "success")
     return redirect(url_for("finance.finance_index", year=year, month=month))

@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta
 import os
 from uuid import uuid4
 
-from flask import Blueprint, current_app, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 
@@ -558,5 +558,32 @@ def editorial_delete(publication_id):
             cliente_id=publication.cliente_id,
             year=publication.publication_date.year,
             month=publication.publication_date.month,
+        )
+    )
+
+
+@bp.post("/editorial-calendar/<int:publication_id>/purge")
+@role_required("admin", "operatore")
+def editorial_purge(publication_id):
+    publication = EditorialPublication.query.get_or_404(publication_id)
+    cliente_id = publication.cliente_id
+    pub_date = publication.publication_date
+
+    for img in list(publication.images or []):
+        delete_image_file(img.image_path)
+        db.session.delete(img)
+
+    if publication.preview_image_path:
+        delete_image_file(publication.preview_image_path)
+
+    db.session.delete(publication)
+    db.session.commit()
+    flash("Pubblicazione eliminata definitivamente.", "success")
+    return redirect(
+        url_for(
+            "editorial_calendar.client_calendar",
+            cliente_id=cliente_id,
+            year=pub_date.year,
+            month=pub_date.month,
         )
     )

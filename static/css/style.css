@@ -718,7 +718,7 @@ body {
 }
 
 .finance-col-date {
-  width: 100px;
+  width: 130px;
 }
 
 .finance-col-type {
@@ -3081,9 +3081,7 @@ table td {
 
 @media (min-width: 768px) {
   .editorial-filter-bar .col-xl-3 {
-    background: rgba(32, 227, 127, 0.06);
     border-radius: 8px;
-    padding: 0.45rem 0.6rem;
   }
 
   .editorial-filter-bar .col-xl-3 .form-select {
@@ -3284,17 +3282,20 @@ table td {
   opacity: 1;
 }
 
-#lightboxCarousel {
+#lightboxCarousel,
+#moodboardLightboxCarousel {
   flex: 1 1 auto;
   max-width: 100%;
   min-width: 0;
 }
 
-#lightboxCarouselInner {
+#lightboxCarouselInner,
+#moodboardLightboxInner {
   min-height: 40vh;
 }
 
-#editorialLightboxModal .carousel-item {
+#editorialLightboxModal .carousel-item,
+#moodboardLightboxModal .carousel-item {
   text-align: center;
 }
 
@@ -3309,7 +3310,8 @@ table td {
   .lightbox-img-wrapper {
     min-height: 25vh;
   }
-  #lightboxCarouselInner {
+  #lightboxCarouselInner,
+  #moodboardLightboxInner {
     min-height: 25vh;
   }
   .lightbox-arrow {
@@ -3749,22 +3751,22 @@ table td {
 }
 
 .moodboard-index-card-body {
-  padding: 0.35rem 0.4rem 0.4rem;
+  padding: 0.5rem 0.55rem 0.55rem;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.3rem;
 }
 
 .moodboard-index-card-title {
-  font-size: 0.75rem;
   font-weight: 700;
   margin: 0;
-  line-height: 1.25;
+  margin-bottom: 0.3rem;
+  line-height: 1.3;
 }
 
 .moodboard-index-card-body .badge {
-  font-size: 0.64rem;
-  padding: 0.1rem 0.35rem;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;

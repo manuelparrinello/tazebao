@@ -1,12 +1,12 @@
 import os
 from datetime import datetime
 
-from flask import Blueprint, current_app, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
 from ..auth import login_required, role_required
 from ..extensions import db
-from ..models import CalendarEvent, Cliente, FinancialMovement, Lavoro, Preventivo, Task
+from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
 
 
 bp = Blueprint("lavori", __name__)
@@ -302,13 +302,46 @@ def lavoro_remove_pdf(lavoro_id):
     return redirect(url_for("lavori.lavoro_edit", lavoro_id=lavoro.id))
 
 
-@bp.delete("/lavori/<int:lavoro_id>")
+@bp.post("/lavori/<int:lavoro_id>/delete")
 @role_required("admin", "operatore")
 def lavoro_delete(lavoro_id):
     lavoro = Lavoro.query.get_or_404(lavoro_id)
+    lavoro_descrizione = lavoro.descrizione
+
+    blocco = []
+    n_preventivi = Preventivo.query.filter_by(lavoro_id=lavoro_id).count()
+    if n_preventivi:
+        blocco.append(f"{n_preventivi} preventiv{'i' if n_preventivi > 1 else 'o'}")
+    n_finance = FinancialMovement.query.filter_by(lavoro_id=lavoro_id).count()
+    if n_finance:
+        blocco.append(f"{n_finance} moviment{'i finanziari' if n_finance > 1 else 'o finanziario'}")
+    n_emaillog = EmailLog.query.filter_by(lavoro_id=lavoro_id).count()
+    if n_emaillog:
+        blocco.append(f"{n_emaillog} email log")
+    n_emailmsg = EmailMessage.query.filter_by(lavoro_id=lavoro_id).count()
+    if n_emailmsg:
+        blocco.append(f"{n_emailmsg} messagg{'i' if n_emailmsg > 1 else 'gio'} email")
+
+    if blocco:
+        flash("Impossibile eliminare il lavoro: presenti " + ", ".join(blocco) + " collegati.", "danger")
+        return redirect(url_for("lavori.lavoro_page", lavoro_id=lavoro_id))
+
+    for evt in CalendarEvent.query.filter_by(lavoro_id=lavoro_id).all():
+        db.session.delete(evt)
+    for mb in Moodboard.query.filter_by(lavoro_id=lavoro_id).all():
+        db.session.delete(mb)
+    for task in Task.query.filter_by(lavoro_id=lavoro_id).all():
+        db.session.delete(task)
+
+    if lavoro.preventivo_pdf_path:
+        pdf_path = os.path.join(current_app.static_folder, lavoro.preventivo_pdf_path)
+        if os.path.exists(pdf_path):
+            os.remove(pdf_path)
+
     db.session.delete(lavoro)
     db.session.commit()
-    return jsonify({"message": f"Lavoro '{lavoro.descrizione}' eliminato con successo"})
+    flash(f"Lavoro '{lavoro_descrizione}' eliminato con successo.", "success")
+    return redirect(url_for("lavori.lavori"))
 
 
 @bp.patch("/lavori/<int:lavoro_id>")

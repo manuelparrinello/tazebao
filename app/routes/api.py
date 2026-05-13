@@ -729,32 +729,61 @@ def get_ID_by_name(nome):
 @login_required
 def get_preventivi():
     preventivi = Preventivo.query.all()
-    return jsonify(
-        [
-            {
-                "id": p.id,
-                "descrizione": p.descrizione,
-                "data": p.data_creazione,
-                "cliente": Cliente.query.filter_by(id=p.cliente_id).first_or_404().name,
-                "stato": p.stato,
-                "totale_preventivo": p.totale_preventivo,
-                "data_creazione": p.data_creazione.isoformat(),
-                "lavoro": {"id": p.lavoro.id, "descrizione": p.lavoro.descrizione} if p.lavoro else None,
-                "righe": [
-                    {
-                        "id": riga.id,
-                        "qty": riga.qty,
-                        "descrizione": riga.descrizione,
-                        "prezzo_ie": riga.prezzo_ie,
-                        "prezzo_ii": riga.prezzo_ii,
-                        "totale_riga": riga.totale_riga,
-                    }
-                    for riga in p.righe
-                ],
-            }
-            for p in preventivi
-        ]
-    )
+    from flask import url_for
+    lavori_con_pdf = Lavoro.query.filter(
+        Lavoro.preventivo_pdf_path.isnot(None),
+        Lavoro.preventivo_pdf_path != "",
+    ).all()
+
+    result = [
+        {
+            "id": p.id,
+            "descrizione": p.descrizione,
+            "data": p.data_creazione,
+            "cliente": Cliente.query.filter_by(id=p.cliente_id).first_or_404().name,
+            "stato": p.stato,
+            "totale_preventivo": p.totale_preventivo,
+            "data_creazione": p.data_creazione.isoformat(),
+            "lavoro": {"id": p.lavoro.id, "descrizione": p.lavoro.descrizione} if p.lavoro else None,
+            "source": "erp",
+            "pdf_url": None,
+            "righe": [
+                {
+                    "id": riga.id,
+                    "qty": riga.qty,
+                    "descrizione": riga.descrizione,
+                    "prezzo_ie": riga.prezzo_ie,
+                    "prezzo_ii": riga.prezzo_ii,
+                    "totale_riga": riga.totale_riga,
+                }
+                for riga in p.righe
+            ],
+        }
+        for p in preventivi
+    ]
+
+    for lavoro in lavori_con_pdf:
+        cliente_name = lavoro.cliente.name if lavoro.cliente else "-"
+        data_pdf = None
+        if lavoro.data_inizio:
+            data_pdf = lavoro.data_inizio.isoformat()
+        elif lavoro.data_fine:
+            data_pdf = lavoro.data_fine.isoformat()
+        result.append({
+            "id": f"ext_{lavoro.id}",
+            "descrizione": lavoro.descrizione,
+            "data": data_pdf,
+            "cliente": cliente_name,
+            "stato": "pdf_esterno",
+            "totale_preventivo": lavoro.preventivato,
+            "data_creazione": data_pdf,
+            "lavoro": {"id": lavoro.id, "descrizione": lavoro.descrizione},
+            "source": "pdf_esterno",
+            "pdf_url": url_for("static", filename=lavoro.preventivo_pdf_path),
+            "righe": [],
+        })
+
+    return jsonify(result)
 
 
 @bp.get("/api/preventivi/get/<int:id>")

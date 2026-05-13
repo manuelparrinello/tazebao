@@ -37,9 +37,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="preventivo in preventivi" class="pointer" @click="openPreventivo(preventivo.id)">
+                        <tr v-for="preventivo in preventivi" class="pointer" @click="openPreventivo(preventivo)">
                             <td class="col-descrizione-cell">
-                                <a :href="'/preventivi/visualizza/' + preventivo.id" class="fw-bold text-decoration-none a-no-color d-block text-truncate" @click.stop>
+                                <a :href="preventivo.source === 'pdf_esterno' ? preventivo.pdf_url : '/preventivi/visualizza/' + preventivo.id" class="fw-bold text-decoration-none a-no-color d-block text-truncate" @click.stop="openPreventivo(preventivo)" :target="preventivo.source === 'pdf_esterno' ? '_blank' : '_self'">
+                                    <i v-if="preventivo.source === 'pdf_esterno'" class="bi bi-filetype-pdf me-1 text-danger"></i>
                                     [[ preventivo.descrizione ]]
                                 </a>
                             </td>
@@ -51,10 +52,13 @@
                     </tbody>
                 </table>
                 <div class="d-md-none mobile-list">
-                    <a v-for="preventivo in preventivi" :key="preventivo.id" class="mobile-list-item mobile-row-link" :href="'/preventivi/visualizza/' + preventivo.id">
+                    <a v-for="preventivo in preventivi" :key="preventivo.id" class="mobile-list-item mobile-row-link" :href="preventivo.source === 'pdf_esterno' ? preventivo.pdf_url : '/preventivi/visualizza/' + preventivo.id" :target="preventivo.source === 'pdf_esterno' ? '_blank' : '_self'" @click.stop>
                         <div class="d-flex align-items-start justify-content-between gap-3">
                             <div class="min-w-0 flex-grow-1">
-                                <div class="fw-bold mobile-row-title mb-1" :title="preventivo.descrizione">[[ preventivo.descrizione ]]</div>
+                                <div class="fw-bold mobile-row-title mb-1" :title="preventivo.descrizione">
+                                    <i v-if="preventivo.source === 'pdf_esterno'" class="bi bi-filetype-pdf me-1 text-danger"></i>
+                                    [[ preventivo.descrizione ]]
+                                </div>
                                 <div class="mobile-row-meta mb-1">
                                     <span class="mobile-row-muted">[[ preventivo.cliente ]]</span>
                                     <span class="mobile-row-muted ms-2">[[ formatDate(preventivo.data_creazione) ]]</span>

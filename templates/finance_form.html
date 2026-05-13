@@ -118,7 +118,7 @@
                             <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
                                 <option value="">Nessun lavoro</option>
                                 {% for lavoro in lavori %}
-                                <option value="{{ lavoro.id }}" {{ selected(movement.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
+                                <option value="{{ lavoro.id }}" data-cliente-id="{{ lavoro.cliente_id or '' }}" {{ selected(movement.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -144,4 +144,35 @@
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var clienteSelect = document.getElementById('cliente_id');
+    var lavoroSelect = document.getElementById('lavoro_id');
+    if (!clienteSelect || !lavoroSelect) return;
+
+    var lavoroOptions = Array.from(lavoroSelect.options).slice(1);
+
+    function filterLavori() {
+        var clienteId = clienteSelect.value;
+        var currentValue = lavoroSelect.value;
+        var hasVisibleOption = false;
+
+        lavoroOptions.forEach(function (opt) {
+            var match = !clienteId || opt.getAttribute('data-cliente-id') === clienteId;
+            opt.style.display = match ? '' : 'none';
+            if (match && opt.value === currentValue) hasVisibleOption = true;
+        });
+
+        if (currentValue && !hasVisibleOption) {
+            lavoroSelect.value = '';
+        }
+    }
+
+    clienteSelect.addEventListener('change', filterLavori);
+    filterLavori();
+});
+</script>
 {% endblock %}

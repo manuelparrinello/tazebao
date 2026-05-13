@@ -250,11 +250,10 @@ async function clickForDeleteCliente(event, idCliente) {
     const response = await deleteCliente(idCliente);
     console.log("DELETE status:", response.status);
     if (response.ok === false) {
-      const corpoRispostaComeTesto = await response.text();
-      console.error("Errore response:", corpoRispostaComeTesto);
-      throw new Error(
-        `Errore durante l'eliminazione (HTTP ${response.status})`
-      );
+      var errData;
+      try { errData = await response.json(); } catch (_) { errData = null; }
+      var msg = errData && errData.message ? errData.message : `Errore HTTP ${response.status}`;
+      throw new Error(msg);
     }
     alert("Cliente eliminato con successo!");
     window.location.href = "/clienti";

@@ -45,9 +45,13 @@ const preventivi = Vue.createApp({
         console.log(err);
       }
     },
-    openPreventivo(id) {
-      if (!id) return;
-      window.location.href = `/preventivi/visualizza/${id}`;
+    openPreventivo(preventivo) {
+      if (!preventivo) return;
+      if (preventivo.source === "pdf_esterno" && preventivo.pdf_url) {
+        window.open(preventivo.pdf_url, "_blank");
+      } else {
+        window.location.href = `/preventivi/visualizza/${preventivo.id}`;
+      }
     },
     formatDate(value) {
       return formatPreventivoDate(value);
@@ -57,6 +61,7 @@ const preventivi = Vue.createApp({
     },
     statoBadgeHtml(stato) {
       if (!stato) return '<span class="erp-badge badge text-bg-secondary">-</span>';
+      if (stato === "pdf_esterno") return '<span class="erp-badge badge text-bg-warning"><i class="bi bi-filetype-pdf me-1"></i>PDF esterno</span>';
       const map = {
         bozza: "secondary",
         inviato: "primary",

@@ -66,7 +66,7 @@
                                 <i class="bi bi-key"></i>
                             </a>
                             {% if user.is_active %}
-                            <form action="{{ url_for('users.users_deactivate', user_id=user.id) }}" method="post" class="d-inline">
+                            <form action="{{ url_for('users.users_deactivate', user_id=user.id) }}" method="post" class="d-inline" onsubmit="return confirm('Disattivare questo utente? Non potra piu accedere alla piattaforma.')">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn btn-sm btn-outline-warning" {% if current_user and current_user.id == user.id %}disabled title="Non puoi disattivare il tuo account"{% endif %} aria-label="Disattiva">
                                     <i class="bi bi-person-x"></i>
@@ -124,7 +124,7 @@
                         <i class="bi bi-key"></i>
                     </a>
                     {% if user.is_active %}
-                    <form action="{{ url_for('users.users_deactivate', user_id=user.id) }}" method="post" class="d-inline">
+                    <form action="{{ url_for('users.users_deactivate', user_id=user.id) }}" method="post" class="d-inline" onsubmit="return confirm('Disattivare questo utente? Non potra piu accedere alla piattaforma.')">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-sm btn-outline-warning" {% if current_user and current_user.id == user.id %}disabled title="Non puoi disattivare il tuo account"{% endif %} aria-label="Disattiva">
                             <i class="bi bi-person-x"></i>

@@ -53,12 +53,17 @@
 </div>
 <hr>
 
+{% set all_image_srcs = [] %}
+{% for image in images %}
+  {% set src = url_for('static', filename=image.image_path) if image.image_path else image.image_url %}
+  {% if all_image_srcs.append(src) %}{% endif %}
+{% endfor %}
+
 {% if images %}
 <div class="moodboard-images-grid mt-4">
     {% for image in images %}
     <div class="moodboard-card">
-        {% set lightbox_src = url_for('static', filename=image.image_path) if image.image_path else image.image_url %}
-        <div class="moodboard-card-img-wrap js-moodboard-lightbox-trigger" role="button" data-images='{{ [lightbox_src]|tojson }}'>
+        <div class="moodboard-card-img-wrap js-moodboard-lightbox-trigger" role="button" data-images='{{ all_image_srcs|tojson }}' data-index='{{ loop.index0 }}'>
             {% if image.image_path %}
             <img src="{{ url_for('static', filename=image.image_path) }}" alt="{{ image.title or moodboard.title }}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'moodboard-card-placeholder\'><i class=\'bi bi-image\'></i></div>'">
             {% elif image.image_url %}
@@ -127,7 +132,7 @@
                             <input type="radio" class="btn-check" name="source_type" id="source-upload" value="upload" checked>
                             <label class="btn btn-outline-primary" for="source-upload"><i class="bi bi-upload me-1"></i>Carica file</label>
                             <input type="radio" class="btn-check" name="source_type" id="source-url" value="url">
-                            <label class="btn btn-outline-primary" for="source-url"><i class="bi bi-link-45deg me-1"></i>URL esterno</label>
+                            <label class="ms-2 btn btn-outline-primary" for="source-url"><i class="bi bi-link-45deg me-1"></i>URL esterno</label>
                         </div>
                     </div>
 
@@ -173,11 +178,18 @@
         <div class="modal-content bg-transparent border-0">
             <div class="modal-body p-0 d-flex flex-column" style="min-height:50vh;">
                 <div class="lightbox-layout">
+                    <button class="lightbox-arrow" type="button" data-bs-target="#moodboardLightboxCarousel" data-bs-slide="prev" id="moodboardLightboxPrev">
+                        <span class="carousel-control-prev-icon bg-dark bg-opacity-75 rounded-circle p-3"></span>
+                    </button>
                     <div id="moodboardLightboxCarousel" class="carousel slide" data-bs-interval="false">
                         <div class="carousel-inner" id="moodboardLightboxInner"></div>
                     </div>
+                    <button class="lightbox-arrow" type="button" data-bs-target="#moodboardLightboxCarousel" data-bs-slide="next" id="moodboardLightboxNext">
+                        <span class="carousel-control-next-icon bg-dark bg-opacity-75 rounded-circle p-3"></span>
+                    </button>
                 </div>
                 <div class="lightbox-footer">
+                    <span class="badge bg-dark bg-opacity-75 fs-6" id="moodboardLightboxCounter"></span>
                     <button type="button" class="btn btn-sm btn-light mt-2 d-block mx-auto" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Chiudi</button>
                 </div>
             </div>
@@ -211,15 +223,18 @@ document.addEventListener('DOMContentLoaded', function () {
     var lightboxModal = document.getElementById('moodboardLightboxModal');
     if (!lightboxModal) return;
     var carouselInner = document.getElementById('moodboardLightboxInner');
+    var counter = document.getElementById('moodboardLightboxCounter');
 
     lightboxModal.addEventListener('hidden.bs.modal', function () {
         if (carouselInner) carouselInner.innerHTML = '';
+        if (counter) counter.textContent = '';
     });
 
     document.querySelectorAll('.js-moodboard-lightbox-trigger').forEach(function (el) {
         el.addEventListener('click', function (e) {
             e.preventDefault();
             var imagesJson = this.getAttribute('data-images');
+            var startIndex = parseInt(this.getAttribute('data-index'), 10) || 0;
             if (!imagesJson) return;
             var images;
             try { images = JSON.parse(imagesJson); } catch(e) { return; }
@@ -227,23 +242,58 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!carouselInner) return;
             carouselInner.innerHTML = '';
-            images.forEach(function (src, index) {
+            images.forEach(function (src, i) {
                 var item = document.createElement('div');
-                item.className = 'carousel-item' + (index === 0 ? ' active' : '');
+                item.className = 'carousel-item' + (i === startIndex ? ' active' : '');
                 var wrapper = document.createElement('div');
                 wrapper.className = 'lightbox-img-wrapper';
                 var img = document.createElement('img');
                 img.className = 'editorial-lightbox-img';
                 img.src = src;
-                img.alt = 'Immagine ' + (index + 1);
+                img.alt = 'Immagine ' + (i + 1);
                 wrapper.appendChild(img);
                 item.appendChild(wrapper);
                 carouselInner.appendChild(item);
             });
 
+            if (counter) {
+                counter.textContent = (startIndex + 1) + ' / ' + images.length;
+            }
+
+            var showArrows = images.length > 1;
+            var prevBtn = document.getElementById('moodboardLightboxPrev');
+            var nextBtn = document.getElementById('moodboardLightboxNext');
+            if (prevBtn) prevBtn.style.display = showArrows ? '' : 'none';
+            if (nextBtn) nextBtn.style.display = showArrows ? '' : 'none';
+
             bootstrap.Modal.getOrCreateInstance(lightboxModal).show();
         });
     });
+
+    lightboxModal.addEventListener('slid.bs.carousel', function () {
+        var activeIndex = Array.from(carouselInner.children).indexOf(carouselInner.querySelector('.carousel-item.active'));
+        if (counter && activeIndex >= 0) {
+            counter.textContent = (activeIndex + 1) + ' / ' + carouselInner.children.length;
+        }
+    });
+
+    var carouselEl = document.getElementById('moodboardLightboxCarousel');
+    if (carouselEl && carouselInner) {
+        function onMoodboardKeydown(e) {
+            if (e.target.matches('input, textarea, select')) return;
+            if (carouselInner.children.length <= 1) return;
+            var inst = bootstrap.Carousel.getInstance(carouselEl);
+            if (!inst) return;
+            if (e.key === 'ArrowLeft') { e.preventDefault(); inst.prev(); }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); inst.next(); }
+        }
+        lightboxModal.addEventListener('shown.bs.modal', function () {
+            document.addEventListener('keydown', onMoodboardKeydown);
+        });
+        lightboxModal.addEventListener('hidden.bs.modal', function () {
+            document.removeEventListener('keydown', onMoodboardKeydown);
+        });
+    }
 });
 </script>
 {% endblock %}

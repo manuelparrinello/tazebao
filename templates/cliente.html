@@ -282,7 +282,7 @@
                         <i class="bi bi-list-ul me-1"></i>Vedi tutti i preventivi
                     </a>
                 </div>
-                {% if preventivi %}
+                {% if preventivi or preventivi_esterni %}
                 <div class="prev-list">
                     {% for preventivo in preventivi %}
                     <a href="{{ url_for('visualizza_preventivo', id=preventivo.id) }}" class="prev-card">
@@ -302,6 +302,31 @@
                                 {{ erp_badge("quote_status", preventivo.stato) }}
                             </div>
                             <div class="prev-total">{{ euro(preventivo.totale_preventivo) }}</div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                    {% for lavoro in preventivi_esterni %}
+                    <a href="{{ url_for('static', filename=lavoro.preventivo_pdf_path) }}" target="_blank" class="prev-card">
+                        <div class="prev-card-header">
+                            <span class="prev-ref">
+                                <i class="bi bi-filetype-pdf text-danger me-1"></i>PDF esterno
+                            </span>
+                            <span class="prev-date">
+                                {% if lavoro.data_inizio %}
+                                <i class="bi bi-calendar3 me-1"></i>{{ lavoro.data_inizio|date_it }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="prev-card-body">
+                            <div class="prev-title">{{ lavoro.descrizione }}</div>
+                        </div>
+                        <div class="prev-card-footer">
+                            <div class="prev-badges">
+                                <span class="erp-badge badge text-bg-warning">PDF esterno</span>
+                            </div>
+                            {% if lavoro.preventivato and lavoro.preventivato > 0 %}
+                            <div class="prev-total">{{ euro(lavoro.preventivato) }}</div>
+                            {% endif %}
                         </div>
                     </a>
                     {% endfor %}

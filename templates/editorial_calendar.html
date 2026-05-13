@@ -508,6 +508,24 @@ document.addEventListener('DOMContentLoaded', function () {
             counter.textContent = (activeIndex + 1) + ' / ' + carouselInner.children.length;
         }
     });
+
+    var carouselEl = document.getElementById('lightboxCarousel');
+    if (carouselEl && carouselInner) {
+        function onEditorialKeydown(e) {
+            if (e.target.matches('input, textarea, select')) return;
+            if (carouselInner.children.length <= 1) return;
+            var inst = bootstrap.Carousel.getInstance(carouselEl);
+            if (!inst) return;
+            if (e.key === 'ArrowLeft') { e.preventDefault(); inst.prev(); }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); inst.next(); }
+        }
+        lightboxModal.addEventListener('shown.bs.modal', function () {
+            document.addEventListener('keydown', onEditorialKeydown);
+        });
+        lightboxModal.addEventListener('hidden.bs.modal', function () {
+            document.removeEventListener('keydown', onEditorialKeydown);
+        });
+    }
 });
 </script>
 {% endblock %}

@@ -146,6 +146,8 @@ def task_edit(task_id):
 @role_required("admin", "operatore")
 def task_delete(task_id):
     task = Task.query.get_or_404(task_id)
-    task.status = "annullata"
+    for moodboard in task.moodboards:
+        moodboard.task_id = None
+    db.session.delete(task)
     db.session.commit()
     return redirect(url_for("tasks.tasks"))

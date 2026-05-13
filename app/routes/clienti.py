@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, redirect, render_template, request, url_fo
 
 from ..auth import login_required, role_required
 from ..extensions import db
-from ..models import CalendarEvent, Cliente, EditorialPublication, EmailLog, EmailMessage, FinancialMovement, Lavoro, Preventivo, Task
+from ..models import CalendarEvent, Cliente, EditorialPublication, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
 
 
 bp = Blueprint("clienti", __name__)
@@ -112,6 +112,16 @@ def cliente_page(cliente_id):
         .limit(10)
         .all()
     )
+    preventivi_esterni = (
+        Lavoro.query.filter(
+            Lavoro.cliente_id == cliente_id,
+            Lavoro.preventivo_pdf_path.isnot(None),
+            Lavoro.preventivo_pdf_path != "",
+        )
+        .order_by(Lavoro.data_inizio.desc().nullslast(), Lavoro.id.desc())
+        .limit(10)
+        .all()
+    )
     movimenti = (
         FinancialMovement.query.filter_by(cliente_id=cliente_id)
         .order_by(FinancialMovement.movement_date.desc(), FinancialMovement.id.desc())
@@ -157,6 +167,7 @@ def cliente_page(cliente_id):
         eventi=eventi,
         editorial_publications=editorial_publications,
         preventivi=preventivi,
+        preventivi_esterni=preventivi_esterni,
         movimenti=movimenti,
         email_logs=email_logs,
         mail_messages=mail_messages,
@@ -168,6 +179,33 @@ def cliente_page(cliente_id):
 @role_required("admin", "operatore")
 def cliente_delete(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
+
+    editorial_count = EditorialPublication.query.filter_by(cliente_id=cliente_id).count()
+    if editorial_count > 0:
+        return jsonify({
+            "message": f"Impossibile eliminare il cliente: ci sono {editorial_count} pubblicazioni editoriali collegate. Rimuovi prima i collegamenti.",
+            "error": "cliente_has_editorial_publications",
+        }), 400
+
+    CalendarEvent.query.filter_by(cliente_id=cliente_id).update(
+        {CalendarEvent.cliente_id: None}
+    )
+    FinancialMovement.query.filter_by(cliente_id=cliente_id).update(
+        {FinancialMovement.cliente_id: None}
+    )
+    EmailLog.query.filter_by(cliente_id=cliente_id).update(
+        {EmailLog.cliente_id: None}
+    )
+    EmailMessage.query.filter_by(cliente_id=cliente_id).update(
+        {EmailMessage.cliente_id: None}
+    )
+    Moodboard.query.filter_by(cliente_id=cliente_id).update(
+        {Moodboard.cliente_id: None}
+    )
+    Task.query.filter_by(cliente_id=cliente_id).update(
+        {Task.cliente_id: None}
+    )
+
     db.session.delete(cliente)
     db.session.commit()
     return jsonify({"message": "Cliente eliminato con successo"})

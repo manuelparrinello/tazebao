@@ -50,3 +50,30 @@ python run.py                                      # dev server on :5000
 - Current active migrations are the source of truth for rebuilding the dev DB.
 - If the project is still in local/dev consolidation and explicitly requested, keep the baseline migration aligned with current models.
 - Never edit active migrations casually after they have been pushed unless explicitly instructed.
+
+
+## Safety UX Rules
+
+Tutte le azioni distruttive devono sempre richiedere conferma esplicita.
+
+Esempi:
+- eliminazione clienti
+- eliminazione lavori
+- eliminazione task
+- eliminazione pubblicazioni editoriali (anche soft-delete / annullamento)
+- eliminazione moodboard
+- eliminazione immagini editoriali
+- eliminazione immagini moodboard
+- eliminazione utenti (disattivazione ed eliminazione definitiva)
+- purge definitivo
+- rimozione file importanti (PDF, allegati)
+
+Regola obbligatoria:
+- Ogni form/submit che esegue una delete distruttiva DEVE avere `onsubmit="return confirm('...')"`
+- Le chiamate API fetch/JS DEVONO chiamare `confirm()` prima di inviare la richiesta
+- Non implementare mai delete “one click” senza conferma
+- Non scrivere codice che aggiri la conferma
+
+Eccezioni consentite:
+- Endpoint API pubblici/esterni (nessun UI HTML) — ma il chiamante JS deve comunque chiedere conferma
+- Operazioni bulk fatte via script interno (CLI) — non accessibili da browser

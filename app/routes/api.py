@@ -206,7 +206,7 @@ def serialize_dashboard_quote(preventivo):
             if preventivo.data_creazione
             else None
         ),
-        "totale_preventivo": preventivo.totale_preventivo,
+        "totale_preventivo": float(preventivo.totale_preventivo) if preventivo.totale_preventivo is not None else None,
         "cliente": (
             {"id": preventivo.cliente.id, "name": preventivo.cliente.name}
             if preventivo.cliente
@@ -372,7 +372,7 @@ def create_finance_movement():
     movement = FinancialMovement()
 
     try:
-        apply_financial_payload(movement, data)
+        apply_financial_payload(movement, data, created_by=g.current_user.id if g.get("current_user") else None)
         db.session.add(movement)
         db.session.commit()
     except ValueError as exc:
@@ -739,7 +739,7 @@ def get_preventivi():
                 "stato": p.stato,
                 "totale_preventivo": p.totale_preventivo,
                 "data_creazione": p.data_creazione.isoformat(),
-                "lavoro": p.lavoro,
+                "lavoro": {"id": p.lavoro.id, "descrizione": p.lavoro.descrizione} if p.lavoro else None,
                 "righe": [
                     {
                         "id": riga.id,
@@ -764,11 +764,10 @@ def get_preventivo_byID(id):
     return jsonify(
         {
             "id": preventivo.id,
-            "cliente": preventivo.cliente,
             "data": preventivo.data_creazione,
             "stato": preventivo.stato,
-            "lavoro": preventivo.lavoro,
-            "totale_preventivo": float(preventivo.totale_preventivo),
+            "lavoro": {"id": preventivo.lavoro.id, "descrizione": preventivo.lavoro.descrizione} if preventivo.lavoro else None,
+            "totale_preventivo": float(preventivo.totale_preventivo) if preventivo.totale_preventivo is not None else None,
             "cliente": {
                 "nome": preventivo.cliente.name,
                 "ragsoc": preventivo.cliente.ragsoc,

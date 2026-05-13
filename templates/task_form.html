@@ -122,6 +122,27 @@
                     </div>
                 </section>
 
+                {% if task.id %}
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Moodboard</h5>
+                        <p>Raccolta visiva associata a questa task.</p>
+                    </div>
+                    {% set moodboard = task.moodboards[0] if task.moodboards else None %}
+                    {% if moodboard %}
+                    <a class="btn btn-outline-primary" href="{{ url_for('moodboards.moodboard_detail', id=moodboard.id) }}">
+                        <i class="bi bi-images me-1"></i>Apri moodboard
+                    </a>
+                    {% elif can_mutate %}
+                    <a class="btn btn-outline-primary" href="{{ url_for('moodboards.moodboard_new', task_id=task.id) }}">
+                        <i class="bi bi-plus-lg me-1"></i>Crea moodboard
+                    </a>
+                    {% else %}
+                    <p class="text-secondary small mb-0">Nessuna moodboard collegata.</p>
+                    {% endif %}
+                </section>
+                {% endif %}
+
                 <div class="erp-form-footer-actions">
                     <a href="{{ url_for('tasks.tasks') }}" class="btn btn-outline-secondary">
                         <i class="bi bi-x-lg"></i>&nbsp;Annulla

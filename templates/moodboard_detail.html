@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}{{ moodboard.title }} - Moodboard{% endblock %}
+
+{% macro labelize(value) -%}
+{{ value.replace("_", " ").title() if value else "-" }}
+{%- endmacro %}
+
+{% block content %}
+{% set can_mutate = current_user is defined and current_user is not none and current_user.role in ("admin", "operatore") %}
+
+<div class="row mx-auto w-100 align-items-start g-3">
+    <div class="col-12 col-xl-7 px-0">
+        <div class="editorial-page-header">
+            <h3 class="fw-bolder mb-1">
+                <i class="bi bi-images me-2 text-primary"></i>{{ moodboard.title }}
+            </h3>
+            {% if moodboard.description %}
+            <p class="text-secondary mb-0">{{ moodboard.description }}</p>
+            {% endif %}
+            <div class="d-flex flex-wrap gap-2 mt-1 small text-secondary">
+                <span>{{ images|length }} {{ "immagine" if images|length == 1 else "immagini" }}</span>
+                {% if moodboard.cliente %}
+                <span>&middot; {{ moodboard.cliente.name }}</span>
+                {% endif %}
+                {% if moodboard.lavoro %}
+                <span>&middot; {{ moodboard.lavoro.descrizione }}</span>
+                {% endif %}
+                {% if moodboard.task %}
+                <span>&middot; <a href="{{ url_for('tasks.task_edit', task_id=moodboard.task.id) if can_mutate else '#' }}">{{ moodboard.task.name }}</a></span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-5 px-0">
+        <div class="erp-action-bar justify-content-xl-end">
+            <a class="btn btn-outline-secondary erp-action-secondary" href="{{ url_for('moodboards.moodboard_index') }}">
+                <i class="bi bi-arrow-left"></i>&nbsp;Tutte le moodboard
+            </a>
+            {% if can_mutate %}
+            <a class="btn btn-outline-secondary erp-action-secondary" href="{{ url_for('moodboards.moodboard_edit', id=moodboard.id) }}">
+                <i class="bi bi-pencil"></i>&nbsp;Modifica
+            </a>
+            <form action="{{ url_for('moodboards.moodboard_delete', id=moodboard.id) }}" method="post" class="d-inline" onsubmit="return confirm('Eliminare questa moodboard e tutte le sue immagini?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-outline-danger erp-action-secondary">
+                    <i class="bi bi-trash3"></i>&nbsp;Elimina
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<hr>
+
+{% if images %}
+<div class="moodboard-images-grid mt-4">
+    {% for image in images %}
+    <div class="moodboard-card">
+        {% set lightbox_src = url_for('static', filename=image.image_path) if image.image_path else image.image_url %}
+        <div class="moodboard-card-img-wrap js-moodboard-lightbox-trigger" role="button" data-images='{{ [lightbox_src]|tojson }}'>
+            {% if image.image_path %}
+            <img src="{{ url_for('static', filename=image.image_path) }}" alt="{{ image.title or moodboard.title }}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'moodboard-card-placeholder\'><i class=\'bi bi-image\'></i></div>'">
+            {% elif image.image_url %}
+            <img src="{{ image.image_url }}" alt="{{ image.title or moodboard.title }}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'moodboard-card-placeholder\'><i class=\'bi bi-image\'></i></div>'">
+            {% endif %}
+        </div>
+        {% if can_mutate %}
+        <div class="moodboard-card-delete">
+            <form action="{{ url_for('moodboards.moodboard_delete_image', id=moodboard.id, image_id=image.id) }}" method="post" onsubmit="return confirm('Rimuovere questa immagine?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger" aria-label="Rimuovi">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </form>
+        </div>
+        {% endif %}
+        <div class="moodboard-card-body">
+            {% if image.title %}
+            <h6 class="fw-bolder text-truncate">{{ image.title }}</h6>
+            {% endif %}
+            {% if image.note %}
+            <p class="text-truncate">{{ image.note }}</p>
+            {% endif %}
+            {% if image.source_url %}
+            <a href="{{ image.source_url }}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i> Fonte</a>
+            {% endif %}
+            {% if image.image_url and image.source_type == "url" %}
+            <a href="{{ image.image_url }}" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right"></i> Originale</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="mt-5">
+    <div class="card rounded-3 border border-light-subtle">
+        <div class="card-body p-4">
+            <div class="editorial-empty-state">
+                <div class="editorial-empty-icon">
+                    <i class="bi bi-inbox"></i>
+                </div>
+                <div class="editorial-empty-body">
+                    <h6 class="fw-bolder mb-1">Nessuna immagine</h6>
+                    <p class="text-secondary mb-3 small">Questa moodboard non contiene ancora immagini. Aggiungine una usando il modulo qui sotto.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if can_mutate %}
+<hr class="mt-5">
+<section class="mt-4" id="add-image-form">
+    <div class="card rounded-3 border border-light-subtle">
+        <div class="card-body p-3 p-md-4">
+            <h5 class="fw-bolder mb-1">Aggiungi immagine</h5>
+            <p class="small text-secondary mb-3">Carica un file dal computer o inserisci un URL esterno.</p>
+
+            <form action="{{ url_for('moodboards.moodboard_add_image', id=moodboard.id) }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="source_type" id="source-upload" value="upload" checked>
+                            <label class="btn btn-outline-primary" for="source-upload"><i class="bi bi-upload me-1"></i>Carica file</label>
+                            <input type="radio" class="btn-check" name="source_type" id="source-url" value="url">
+                            <label class="btn btn-outline-primary" for="source-url"><i class="bi bi-link-45deg me-1"></i>URL esterno</label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6" id="upload-field">
+                        <label class="form-label fw-bold" for="image_file">File immagine</label>
+                        <input class="form-control" type="file" id="image_file" name="image_file" accept=".jpg,.jpeg,.png,.webp">
+                    </div>
+
+                    <div class="col-12 col-md-6 d-none" id="url-field">
+                        <label class="form-label fw-bold" for="image_url">URL immagine</label>
+                        <input class="form-control" type="url" id="image_url" name="image_url" placeholder="https://...">
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold" for="image-title">Titolo (opzionale)</label>
+                        <input class="form-control" type="text" id="image-title" name="title" placeholder="Descrizione breve">
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold" for="image-source-url">URL fonte (opzionale)</label>
+                        <input class="form-control" type="url" id="image-source-url" name="source_url" placeholder="https://pinterest.com/pin/...">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-bold" for="image-note">Note (opzionale)</label>
+                        <textarea class="form-control" id="image-note" name="note" rows="2" placeholder="Colore, riferimento, link, note personali..."></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i>&nbsp;Aggiungi immagine
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<div class="modal fade" id="moodboardLightboxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered mw-100 mx-2 mx-lg-auto">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body p-0 d-flex flex-column" style="min-height:50vh;">
+                <div class="lightbox-layout">
+                    <div id="moodboardLightboxCarousel" class="carousel slide" data-bs-interval="false">
+                        <div class="carousel-inner" id="moodboardLightboxInner"></div>
+                    </div>
+                </div>
+                <div class="lightbox-footer">
+                    <button type="button" class="btn btn-sm btn-light mt-2 d-block mx-auto" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var uploadRadio = document.getElementById('source-upload');
+    var urlRadio = document.getElementById('source-url');
+    var uploadField = document.getElementById('upload-field');
+    var urlField = document.getElementById('url-field');
+
+    if (uploadRadio && urlRadio && uploadField && urlField) {
+        function toggleSource() {
+            if (urlRadio.checked) {
+                uploadField.classList.add('d-none');
+                urlField.classList.remove('d-none');
+            } else {
+                uploadField.classList.remove('d-none');
+                urlField.classList.add('d-none');
+            }
+        }
+        uploadRadio.addEventListener('change', toggleSource);
+        urlRadio.addEventListener('change', toggleSource);
+    }
+
+    var lightboxModal = document.getElementById('moodboardLightboxModal');
+    if (!lightboxModal) return;
+    var carouselInner = document.getElementById('moodboardLightboxInner');
+
+    lightboxModal.addEventListener('hidden.bs.modal', function () {
+        if (carouselInner) carouselInner.innerHTML = '';
+    });
+
+    document.querySelectorAll('.js-moodboard-lightbox-trigger').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+            e.preventDefault();
+            var imagesJson = this.getAttribute('data-images');
+            if (!imagesJson) return;
+            var images;
+            try { images = JSON.parse(imagesJson); } catch(e) { return; }
+            if (!images || images.length === 0) return;
+
+            if (!carouselInner) return;
+            carouselInner.innerHTML = '';
+            images.forEach(function (src, index) {
+                var item = document.createElement('div');
+                item.className = 'carousel-item' + (index === 0 ? ' active' : '');
+                var wrapper = document.createElement('div');
+                wrapper.className = 'lightbox-img-wrapper';
+                var img = document.createElement('img');
+                img.className = 'editorial-lightbox-img';
+                img.src = src;
+                img.alt = 'Immagine ' + (index + 1);
+                wrapper.appendChild(img);
+                item.appendChild(wrapper);
+                carouselInner.appendChild(item);
+            });
+
+            bootstrap.Modal.getOrCreateInstance(lightboxModal).show();
+        });
+    });
+});
+</script>
+{% endblock %}

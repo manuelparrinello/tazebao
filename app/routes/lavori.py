@@ -319,14 +319,14 @@ def status_lavoro_update(lavoro_id):
     new_status = data["new_status"]
     if new_status not in status_lavori:
         db.session.rollback()
-        return
+        return jsonify({"error": "Stato lavoro non valido."}), 400
     lavoro.stato = new_status
     db.session.commit()
     return jsonify(
         {
             "lavoro_id": lavoro.id,
             "lavoro_descrizione": lavoro.descrizione,
-            "cliente": lavoro.cliente.name,
+            "cliente": lavoro.cliente.name if lavoro.cliente else None,
             "nuovo_stato": new_status,
         }
     )

@@ -422,7 +422,7 @@ class EditorialPublicationImage(db.Model):
     sort_order = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    publication = db.relationship("EditorialPublication", backref="images")
+    publication = db.relationship("EditorialPublication", backref=db.backref("images", order_by="EditorialPublicationImage.sort_order"))
 
 
 class FinancialMovement(db.Model):
@@ -682,3 +682,54 @@ class RigaPreventivo(db.Model):
     preventivo_id = db.Column(
         db.Integer, db.ForeignKey("preventivi.id"), nullable=False
     )
+
+
+class Moodboard(db.Model):
+    __tablename__ = "erp_moodboards"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(160), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    task_id = db.Column(db.Integer, db.ForeignKey("erp_tasks.id"), nullable=True, index=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=True, index=True)
+    lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=True, index=True)
+    created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+    task = db.relationship("Task", backref="moodboards")
+    cliente = db.relationship("Cliente", backref="moodboards")
+    lavoro = db.relationship("Lavoro", backref="moodboards")
+    creator = db.relationship("User", backref="moodboards")
+    images = db.relationship(
+        "MoodboardImage",
+        backref="moodboard",
+        lazy=True,
+        cascade="all, delete-orphan",
+        order_by="MoodboardImage.sort_order",
+    )
+
+
+class MoodboardImage(db.Model):
+    __tablename__ = "erp_moodboard_images"
+
+    id = db.Column(db.Integer, primary_key=True)
+    moodboard_id = db.Column(
+        db.Integer,
+        db.ForeignKey("erp_moodboards.id"),
+        nullable=False,
+        index=True,
+    )
+    title = db.Column(db.String(160), nullable=True)
+    image_path = db.Column(db.String(500), nullable=True)
+    image_url = db.Column(db.String(2000), nullable=True)
+    source_type = db.Column(db.String(10), nullable=False, default="upload")
+    source_url = db.Column(db.String(2000), nullable=True)
+    note = db.Column(db.Text, nullable=True)
+    sort_order = db.Column(db.Integer, nullable=False, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

@@ -50,7 +50,10 @@ def parse_optional_id(value):
 def parse_date(value):
     if not value:
         return None
-    return datetime.strptime(value, "%Y-%m-%d").date()
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except (ValueError, TypeError):
+        return None
 
 
 def month_bounds(year, month):
@@ -262,6 +265,7 @@ def current_filter_context(default_cliente_id=None, default_year=None, default_m
         list_query_params["year"] = default_year
     if default_month:
         list_query_params["month"] = default_month
+    list_query_params["view"] = "list"
     if active_platform:
         list_query_params["platform"] = active_platform
     if active_status:
@@ -274,7 +278,7 @@ def current_filter_context(default_cliente_id=None, default_year=None, default_m
     calendar_query_params = {
         key: value
         for key, value in list_query_params.items()
-        if key != "cliente_id"
+        if key not in ("cliente_id", "view")
     }
 
     return {
@@ -297,6 +301,15 @@ def editorial_index():
     if selected_month < 1 or selected_month > 12:
         selected_year = today.year
         selected_month = today.month
+
+    cliente_id = request.args.get("cliente_id", type=int)
+    if cliente_id and request.args.get("view") != "list":
+        return redirect(url_for(
+            "editorial_calendar.client_calendar",
+            cliente_id=cliente_id,
+            year=selected_year,
+            month=selected_month,
+        ))
 
     publications = (
         apply_publication_filters(EditorialPublication.query)
@@ -435,28 +448,30 @@ def handle_publication_images(publication):
         db.session.flush()
 
     images = request.files.getlist("images")
+    next_order = (
+        db.session.query(
+            db.func.coalesce(db.func.max(EditorialPublicationImage.sort_order), -1)
+        )
+        .filter(EditorialPublicationImage.publication_id == publication.id)
+        .scalar()
+    ) + 1
     for file_storage in images:
         path = save_preview_file(file_storage)
         if path:
-            max_order = (
-                db.session.query(
-                    db.func.coalesce(db.func.max(EditorialPublicationImage.sort_order), -1)
-                )
-                .filter(EditorialPublicationImage.publication_id == publication.id)
-                .scalar()
-            )
             img = EditorialPublicationImage(
                 publication_id=publication.id,
                 image_path=path,
-                sort_order=max_order + 1,
+                sort_order=next_order,
             )
             db.session.add(img)
+            next_order += 1
 
     remove_ids = request.form.getlist("remove_image_ids")
     for rid in remove_ids:
         try:
             img = EditorialPublicationImage.query.get(int(rid))
             if img and img.publication_id == publication.id:
+                delete_image_file(img.image_path)
                 db.session.delete(img)
         except (ValueError, TypeError):
             pass

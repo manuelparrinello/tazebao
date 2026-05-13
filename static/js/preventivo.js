@@ -140,6 +140,10 @@ const preventivo = Vue.createApp({
     async sendForm(e) {
       e.preventDefault();
       const url = `/preventivi/nuovo`;
+      if (!this.clienteData || !this.clienteData.id) {
+        window.alert("Seleziona un cliente valido e attendi il caricamento dei dati.");
+        return;
+      }
       const dataToSend_raw = {
         titolo_preventivo: this.titoloPreventivo,
         cliente_id: this.clienteData.id,

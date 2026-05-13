@@ -1,6 +1,6 @@
 from datetime import date
 
-from flask import Blueprint, jsonify, render_template, request, url_for
+from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
@@ -142,11 +142,12 @@ def cliente_page(cliente_id):
         "nuovo_preventivo": url_for("nuovo_preventivo", cliente_id=cliente.id),
         "nuovo_movimento": url_for("finance.finance_new", cliente_id=cliente.id),
         "nuova_comunicazione": url_for("emails.emails_new", cliente_id=cliente.id),
-        "nuova_pubblicazione": url_for(
-            "editorial_calendar.editorial_new",
-            cliente_id=cliente.id,
-        ),
-    }
+            "nuova_pubblicazione": url_for(
+                "editorial_calendar.editorial_new",
+                cliente_id=cliente.id,
+            ),
+            "nuova_email": url_for("mail.mail_new", cliente_id=cliente.id),
+        }
 
     return render_template(
         "cliente.html",
@@ -181,8 +182,7 @@ def cliente_edit(cliente_id):
     if request.method == "PUT":
         dataFromJS = request.get_json()
         if not dataFromJS:
-            return "Errore", 404
-        print(dataFromJS)
+            return jsonify({"messaggio": "Nessun dato ricevuto"}), 400
         cliente.name = dataFromJS.get("nomeCliente", cliente.name)
         cliente.email = dataFromJS.get("email", cliente.email)
         cliente.telefono = dataFromJS.get("telefono", cliente.telefono)
@@ -198,4 +198,4 @@ def cliente_edit(cliente_id):
             )
         except Exception as e:
             db.session.rollback()
-            return {"Errore nell'aggiornamento dei dati!": str(e)}, 500
+            return jsonify({"messaggio": f"Errore: {str(e)}"}), 500

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% macro selected(current, value) -%}
+{% if current == value %}selected{% endif %}
+{%- endmacro %}
+
+{% macro labelize(value) -%}
+{{ value.replace("_", " ").title() }}
+{%- endmacro %}
+
+{% block content %}
+<div class="erp-form-page">
+    <div class="erp-form-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2">
+            <div>
+                <h3 class="fw-bolder erp-form-title">{{ page_title }}</h3>
+                <p class="erp-form-subtitle">Raccolta visiva ispirazionale per progetti e task.</p>
+            </div>
+            <a href="{{ url_for('moodboards.moodboard_index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i>&nbsp;Tutte le moodboard
+            </a>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger mt-4">{{ error }}</div>
+    {% endif %}
+
+    <form action="{{ form_action }}" method="post" class="erp-boxed-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="card erp-form-card">
+            <div class="card-body p-3 p-md-4">
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Dati moodboard</h5>
+                        <p>Titolo e descrizione della raccolta.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="title" class="form-label fw-bold">Titolo</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ moodboard.title or '' }}" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="description" class="form-label fw-bold">Descrizione (opzionale)</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ moodboard.description or '' }}</textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Collegamenti</h5>
+                        <p>Task, cliente e lavoro associati (opzionali).</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label for="task_id" class="form-label fw-bold">Task</label>
+                            <select class="form-control form-select" id="task_id" name="task_id">
+                                <option value="">Nessun task</option>
+                                {% for task in tasks %}
+                                <option value="{{ task.id }}" {{ selected(moodboard.task_id, task.id) }}>{{ task.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="cliente_id" class="form-label fw-bold">Cliente</label>
+                            <select class="form-control form-select" id="cliente_id" name="cliente_id">
+                                <option value="">Nessun cliente</option>
+                                {% for cliente in clienti %}
+                                <option value="{{ cliente.id }}" {{ selected(moodboard.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="lavoro_id" class="form-label fw-bold">Lavoro</label>
+                            <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
+                                <option value="">Nessun lavoro</option>
+                                {% for lavoro in lavori %}
+                                <option value="{{ lavoro.id }}" {{ selected(moodboard.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="erp-form-footer-actions">
+                    <a href="{{ url_for('moodboards.moodboard_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg"></i>&nbsp;Annulla
+                    </a>
+                    <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

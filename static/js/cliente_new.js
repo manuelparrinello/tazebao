@@ -51,14 +51,15 @@ const nuovoClienteApp = Vue.createApp({
                     body: formData,
                     headers: csrfHeaders(),
                 })
+                const data = await response.json();
                 if (!response.ok) {
-                    throw new Error('Errore richiesta! HTTP' + response.status);
+                    throw new Error(data.message || 'Errore richiesta! HTTP ' + response.status);
                 }
+                window.alert(data.message || 'Cliente aggiunto!');
+                window.location.href = '/clienti';
             } catch (error) {
                 console.error(error);
-            } finally {
-                window.alert('Cliente aggiunto!');
-                window.location.href = '/clienti';
+                window.alert('Errore: ' + error.message);
             }
         },
     },

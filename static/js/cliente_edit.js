@@ -89,11 +89,11 @@ const getSingleCliente = Vue.createApp({
           throw new Error(`Errore nella richiesta: HTTP ${response.status} `);
         }
         const data = await response.json();
-        console.log(data["messaggio"]);
-        window.alert(`Cliente ${this.cliente.nome} aggiornato con successo!`);
+        window.alert(data.messaggio || `Cliente ${this.cliente.nome} aggiornato con successo!`);
         window.location.href = "/clienti";
-      } catch {
-      } finally {
+      } catch (error) {
+        console.error(error);
+        window.alert("Errore durante il salvataggio: " + (error.message || "errore sconosciuto"));
       }
     },
   },

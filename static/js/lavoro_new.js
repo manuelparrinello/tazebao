@@ -45,7 +45,7 @@ const nuovoLavoroApp = Vue.createApp({
           return;
         }
 
-        window.alert("Lavoro aggiunto con successo");
+        window.alert(data.message || "Lavoro aggiunto con successo");
         window.location.href = "/clienti/" + cliente_id;
       } catch (error) {
         window.alert("Errore durante il salvataggio: " + error.message);

@@ -63,9 +63,11 @@
                             <td class="mobile-hide"><span class="text-truncate d-block">{{ task.assignee.name or task.assignee.email if task.assignee else "-" }}</span></td>
                             <td>
                                 <div class="erp-actions">
-                                    <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}" aria-label="Modifica">
+                                    {% if can_mutate %}
+                                    <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('tasks.task_edit', task_id=task.id) }}" aria-label="Modifica">
                                         <i class="bi bi-pencil"></i>
                                     </a>
+                                    {% endif %}
                                     {% if can_mutate %}
                                     <form action="{{ url_for('tasks.task_delete', task_id=task.id) }}" method="post" class="d-inline" onsubmit="return confirm('Eliminare questo task?');">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

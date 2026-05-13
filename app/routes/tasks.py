@@ -41,6 +41,13 @@ def task_form_choices():
     }
 
 
+def validate_fk_id(model, id_value, label):
+    if id_value is not None:
+        obj = db.session.get(model, id_value)
+        if obj is None:
+            raise ValueError(f"{label} con ID {id_value} non trovato.")
+    return id_value
+
 def apply_task_form(task):
     task.name = (request.form.get("name") or "").strip()
     task.note = (request.form.get("note") or "").strip() or None
@@ -48,9 +55,9 @@ def apply_task_form(task):
     task.status = request.form.get("status") or "da_fare"
     task.priority = request.form.get("priority") or "media"
     task.due_date = parse_optional_date(request.form.get("due_date"))
-    task.cliente_id = parse_optional_id(request.form.get("cliente_id"))
-    task.lavoro_id = parse_optional_id(request.form.get("lavoro_id"))
-    task.assignee_id = parse_optional_id(request.form.get("assignee_id"))
+    task.cliente_id = validate_fk_id(Cliente, parse_optional_id(request.form.get("cliente_id")), "Cliente")
+    task.lavoro_id = validate_fk_id(Lavoro, parse_optional_id(request.form.get("lavoro_id")), "Lavoro")
+    task.assignee_id = validate_fk_id(User, parse_optional_id(request.form.get("assignee_id")), "Utente")
 
     if not task.name:
         raise ValueError("Il titolo task e obbligatorio.")
@@ -139,6 +146,6 @@ def task_edit(task_id):
 @role_required("admin", "operatore")
 def task_delete(task_id):
     task = Task.query.get_or_404(task_id)
-    db.session.delete(task)
+    task.status = "annullata"
     db.session.commit()
     return redirect(url_for("tasks.tasks"))

@@ -505,8 +505,8 @@
                     <a href="{{ url_for('mail.mail_index', cliente_id=cliente.id) }}" class="btn btn-sm btn-outline-primary">
                         <i class="bi bi-box-arrow-up-right me-1"></i>Apri client email
                     </a>
-                    {% if can_mutate and quick_actions.nuova_email %}
-                    <a href="{{ quick_actions.nuova_email }}" class="btn btn-sm btn-outline-primary">
+                    {% if can_mutate %}
+                    <a href="{{ url_for('mail.mail_new', cliente_id=cliente.id) }}" class="btn btn-sm btn-outline-primary">
                         <i class="bi bi-plus-lg me-1"></i>Nuova email
                     </a>
                     {% endif %}

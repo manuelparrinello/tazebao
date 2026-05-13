@@ -128,14 +128,15 @@ def preventivi():
     return render_template("preventivi.html")
 
 
-@bp.get("/presentivi/addrow")
-@bp.get("/preventivi/addrow")
+@bp.post("/presentivi/addrow")
+@bp.post("/preventivi/addrow")
 @login_required
 def render_row():
-    id_riga = request.form.get("idRiga")
-    qty = request.form.get("qty")
-    descrizione = request.form.get("descrizione")
-    prezzo = float(request.form.get("prezzo"))
+    data = request.get_json(silent=True) or {}
+    id_riga = data.get("idRiga")
+    qty = float(data.get("qty", 0))
+    descrizione = data.get("descrizione", "")
+    prezzo = float(data.get("prezzo", 0))
     return jsonify(
         {"id_riga": id_riga, "qty": qty, "descrizione": descrizione, "prezzo": prezzo}
     )

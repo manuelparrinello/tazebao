@@ -7,7 +7,8 @@ function getCSRFToken() {
 
 function csrfHeaders(headers = {}) {
   const token = getCSRFToken();
-  return token ? { ...headers, "X-CSRFToken": token } : headers;
+  const base = token ? { ...headers, "X-CSRFToken": token } : headers;
+  return { ...base, "X-Requested-With": "XMLHttpRequest" };
 }
 
 function parseDateLike(value) {

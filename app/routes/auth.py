@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
 from ..models import User
@@ -21,9 +23,11 @@ def login():
         session["user_id"] = user.id
 
         next_url = request.args.get("next")
-        if next_url and next_url.startswith("/"):
-            return redirect(next_url)
-        return redirect(url_for("index"))
+        if next_url:
+            parsed = urlparse(next_url)
+            if not parsed.netloc and parsed.path.startswith("/"):
+                return redirect(next_url)
+        return redirect(url_for("main.app_shell"))
 
     return render_template("login.html")
 

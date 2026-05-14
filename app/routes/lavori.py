@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
-from ..storage_utils import build_breadcrumb, get_lavoro_relative_path, list_entries, normalize_subdir, resolve_collision, safe_path, slugify, ensure_storage_dir
+from ..storage_utils import build_breadcrumb, create_subfolder, get_lavoro_relative_path, list_entries, normalize_subdir, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
 
 
 bp = Blueprint("lavori", __name__)
@@ -449,6 +449,68 @@ def lavoro_cartella(lavoro_id):
         subdir=subdir,
         breadcrumb=breadcrumb,
     )
+
+
+@bp.route("/lavori/<int:lavoro_id>/cartella/upload", methods=["POST"])
+@role_required("admin", "operatore")
+def lavoro_cartella_upload(lavoro_id):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    if not lavoro.folder_path:
+        flash("Nessuna cartella creata per questo lavoro.", "warning")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    subdir = normalize_subdir(request.args.get("subdir", ""))
+    if subdir is None:
+        flash("Percorso non valido.", "danger")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    rel_path = os.path.join(lavoro.folder_path, subdir).replace("\\", "/") if subdir else lavoro.folder_path
+    abs_path = safe_path(rel_path)
+    if not abs_path or not os.path.isdir(abs_path):
+        flash("Cartella non trovata.", "warning")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    file = request.files.get("file")
+    if not file or not file.filename:
+        flash("Nessun file selezionato.", "warning")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id, subdir=subdir or None))
+
+    try:
+        save_uploaded_storage_file(file, abs_path)
+        flash("File caricato correttamente.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+
+    return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id, subdir=subdir or None))
+
+
+@bp.route("/lavori/<int:lavoro_id>/cartella/sottocartella/crea", methods=["POST"])
+@role_required("admin", "operatore")
+def lavoro_cartella_sottocartella_crea(lavoro_id):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    if not lavoro.folder_path:
+        flash("Nessuna cartella creata per questo lavoro.", "warning")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    subdir = normalize_subdir(request.args.get("subdir", ""))
+    if subdir is None:
+        flash("Percorso non valido.", "danger")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    rel_path = os.path.join(lavoro.folder_path, subdir).replace("\\", "/") if subdir else lavoro.folder_path
+    abs_path = safe_path(rel_path)
+    if not abs_path or not os.path.isdir(abs_path):
+        flash("Cartella non trovata.", "warning")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    folder_name = request.form.get("nome_cartella", "")
+    try:
+        create_subfolder(abs_path, folder_name)
+        flash("Cartella creata correttamente.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+
+    return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id, subdir=subdir or None))
 
 
 @bp.route("/lavori/<int:lavoro_id>/cartella/download/<path:filename>")

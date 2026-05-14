@@ -3,6 +3,7 @@ import re
 import unicodedata
 
 from flask import current_app
+from werkzeug.utils import secure_filename
 
 
 MAX_SLUG_LENGTH = 60
@@ -102,3 +103,71 @@ def list_entries(abs_path):
         })
     entries.sort(key=lambda e: (not e["is_dir"], e["name"].lower()))
     return entries
+
+
+ALLOWED_STORAGE_EXTENSIONS = {
+    '.pdf', '.doc', '.docx', '.odt', '.xls', '.xlsx', '.csv',
+    '.txt', '.md', '.ppt', '.pptx',
+    '.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg',
+    '.ai', '.psd', '.eps', '.indd', '.idml', '.tiff', '.tif',
+    '.mp4', '.mov', '.avi', '.mkv', '.webm',
+    '.mp3', '.wav', '.aiff', '.flac',
+    '.zip', '.rar', '.7z',
+    '.blend', '.aep', '.prproj',
+}
+
+
+def allowed_storage_file(filename):
+    ext = os.path.splitext(filename)[1].lower()
+    return ext in ALLOWED_STORAGE_EXTENSIONS
+
+
+def unique_filename(directory, filename):
+    name, ext = os.path.splitext(filename)
+    counter = 1
+    candidate = filename
+    while os.path.exists(os.path.join(directory, candidate)):
+        candidate = f"{name}_{counter}{ext}"
+        counter += 1
+    return candidate
+
+
+def save_uploaded_storage_file(file, target_dir):
+    original_name = secure_filename(file.filename or "file")
+    if not original_name:
+        raise ValueError("Nessun file selezionato.")
+    if not allowed_storage_file(original_name):
+        raise ValueError("Estensione non consentita.")
+    safe_name = unique_filename(target_dir, original_name)
+    abs_path = os.path.join(target_dir, safe_name)
+    file.save(abs_path)
+    return safe_name
+
+
+def safe_folder_name(name):
+    name = name.strip()
+    if not name:
+        return None
+    if "/" in name or "\\" in name:
+        return None
+    if ".." in name:
+        return None
+    if os.path.isabs(name):
+        return None
+    if name.startswith("."):
+        return None
+    return name
+
+
+def create_subfolder(base_dir, folder_name):
+    safe_name = safe_folder_name(folder_name)
+    if not safe_name:
+        raise ValueError("Inserisci un nome cartella valido.")
+    target = os.path.join(base_dir, safe_name)
+    if os.path.exists(target):
+        raise ValueError("Cartella già esistente.")
+    try:
+        os.makedirs(target)
+    except OSError as e:
+        raise ValueError(f"Errore nella creazione della cartella: {str(e)}")
+    return safe_name

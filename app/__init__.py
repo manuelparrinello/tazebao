@@ -51,6 +51,13 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+
+    storage_root = os.environ.get("ERP_STORAGE_ROOT", "").strip()
+    if not storage_root:
+        storage_root = os.path.join(basedir, "storage")
+        os.makedirs(storage_root, exist_ok=True)
+    app.config["ERP_STORAGE_ROOT"] = os.path.abspath(storage_root)
+
     configure_environment(app)
 
     db.init_app(app)

@@ -1,10 +1,12 @@
+import os
 from datetime import date
 
-from flask import Blueprint, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, jsonify, redirect, render_template, request, send_file, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import CalendarEvent, Cliente, EditorialPublication, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
+from ..storage_utils import get_cliente_relative_path, resolve_collision, safe_path, slugify, ensure_storage_dir
 
 
 bp = Blueprint("clienti", __name__)
@@ -237,3 +239,62 @@ def cliente_edit(cliente_id):
         except Exception as e:
             db.session.rollback()
             return jsonify({"messaggio": f"Errore: {str(e)}"}), 500
+
+
+@bp.route("/clienti/<int:cliente_id>/cartella/crea", methods=["POST"])
+@role_required("admin", "operatore")
+def cliente_cartella_crea(cliente_id):
+    cliente = Cliente.query.get_or_404(cliente_id)
+    if cliente.folder_path:
+        return jsonify({"messaggio": "Cartella gia esistente.", "folder_path": cliente.folder_path}), 200
+
+    slug = slugify(cliente.name) or f"cliente-{cliente.id}"
+    rel_path = get_cliente_relative_path(cliente.id, slug)
+    rel_path = resolve_collision(rel_path)
+
+    abs_path = ensure_storage_dir(rel_path)
+    cliente.folder_path = rel_path
+    db.session.commit()
+    return jsonify({"messaggio": "Cartella creata con successo.", "folder_path": rel_path}), 201
+
+
+@bp.route("/clienti/<int:cliente_id>/cartella")
+@login_required
+def cliente_cartella(cliente_id):
+    cliente = Cliente.query.get_or_404(cliente_id)
+    entries = []
+    folder_active = bool(cliente.folder_path)
+
+    if folder_active:
+        abs_path = safe_path(cliente.folder_path)
+        if abs_path and os.path.isdir(abs_path):
+            for name in sorted(os.listdir(abs_path)):
+                full = os.path.join(abs_path, name)
+                entries.append({
+                    "name": name,
+                    "is_dir": os.path.isdir(full),
+                    "size": os.path.getsize(full) if os.path.isfile(full) else None,
+                    "mtime": os.path.getmtime(full),
+                })
+
+    return render_template(
+        "cliente_cartella.html",
+        cliente=cliente,
+        entries=entries,
+        folder_active=folder_active,
+    )
+
+
+@bp.route("/clienti/<int:cliente_id>/cartella/download/<path:filename>")
+@login_required
+def cliente_cartella_download(cliente_id, filename):
+    cliente = Cliente.query.get_or_404(cliente_id)
+    if not cliente.folder_path:
+        return jsonify({"error": "Cartella non esistente."}), 404
+
+    rel_path = os.path.join(cliente.folder_path, filename).replace("\\", "/")
+    abs_path = safe_path(rel_path)
+    if not abs_path or not os.path.isfile(abs_path):
+        return jsonify({"error": "File non trovato."}), 404
+
+    return send_file(abs_path, as_attachment=False)

@@ -1,12 +1,13 @@
 import os
 from datetime import datetime
 
-from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, send_file, url_for
 from werkzeug.utils import secure_filename
 
 from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
+from ..storage_utils import get_lavoro_relative_path, resolve_collision, safe_path, slugify, ensure_storage_dir
 
 
 bp = Blueprint("lavori", __name__)
@@ -372,3 +373,62 @@ def status_lavoro_update(lavoro_id):
             "nuovo_stato": new_status,
         }
     )
+
+
+@bp.route("/lavori/<int:lavoro_id>/cartella/crea", methods=["POST"])
+@role_required("admin", "operatore")
+def lavoro_cartella_crea(lavoro_id):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    if lavoro.folder_path:
+        return jsonify({"messaggio": "Cartella gia esistente.", "folder_path": lavoro.folder_path}), 200
+
+    slug = slugify(lavoro.descrizione) or f"lavoro-{lavoro.id}"
+    rel_path = get_lavoro_relative_path(lavoro.id, slug)
+    rel_path = resolve_collision(rel_path)
+
+    abs_path = ensure_storage_dir(rel_path)
+    lavoro.folder_path = rel_path
+    db.session.commit()
+    return jsonify({"messaggio": "Cartella creata con successo.", "folder_path": rel_path}), 201
+
+
+@bp.route("/lavori/<int:lavoro_id>/cartella")
+@login_required
+def lavoro_cartella(lavoro_id):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    entries = []
+    folder_active = bool(lavoro.folder_path)
+
+    if folder_active:
+        abs_path = safe_path(lavoro.folder_path)
+        if abs_path and os.path.isdir(abs_path):
+            for name in sorted(os.listdir(abs_path)):
+                full = os.path.join(abs_path, name)
+                entries.append({
+                    "name": name,
+                    "is_dir": os.path.isdir(full),
+                    "size": os.path.getsize(full) if os.path.isfile(full) else None,
+                    "mtime": os.path.getmtime(full),
+                })
+
+    return render_template(
+        "lavoro_cartella.html",
+        lavoro=lavoro,
+        entries=entries,
+        folder_active=folder_active,
+    )
+
+
+@bp.route("/lavori/<int:lavoro_id>/cartella/download/<path:filename>")
+@login_required
+def lavoro_cartella_download(lavoro_id, filename):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    if not lavoro.folder_path:
+        return jsonify({"error": "Cartella non esistente."}), 404
+
+    rel_path = os.path.join(lavoro.folder_path, filename).replace("\\", "/")
+    abs_path = safe_path(rel_path)
+    if not abs_path or not os.path.isfile(abs_path):
+        return jsonify({"error": "File non trovato."}), 404
+
+    return send_file(abs_path, as_attachment=False)

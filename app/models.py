@@ -123,6 +123,7 @@ class Cliente(db.Model):
     colore = db.Column(db.String(20), nullable=True)
 
     note = db.Column(db.Text, nullable=True)
+    folder_path = db.Column(db.String(255), nullable=True, unique=True)
     lavori = db.relationship(
         "Lavoro", backref="cliente", lazy=True, cascade="all, delete, delete-orphan"
     )
@@ -152,6 +153,7 @@ class Lavoro(db.Model):
         lazy=True,
         cascade="all, delete, delete-orphan",
     )
+    folder_path = db.Column(db.String(255), nullable=True, unique=True)
     cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False)
     tasks = db.relationship(
         "TaskLavoro", backref="lavoro", lazy=True, cascade="all, delete, delete-orphan"

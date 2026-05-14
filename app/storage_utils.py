@@ -177,3 +177,26 @@ def create_subfolder(base_dir, folder_name):
     except OSError as e:
         raise ValueError(f"Errore nella creazione della cartella: {str(e)}")
     return safe_name
+
+
+def rename_storage_entry(base_dir, old_name, new_name):
+    if not old_name or not new_name:
+        raise ValueError("Nome non valido.")
+    safe_new = safe_folder_name(new_name)
+    if not safe_new:
+        raise ValueError("Nome non valido.")
+    old_path = os.path.join(base_dir, old_name)
+    new_path = os.path.join(base_dir, safe_new)
+    if os.path.realpath(old_path) == os.path.realpath(base_dir):
+        raise ValueError("Impossibile rinominare la cartella principale.")
+    if not os.path.exists(old_path):
+        raise ValueError("Elemento non trovato.")
+    if os.path.exists(new_path):
+        raise ValueError("Nome già esistente.")
+    if os.path.isfile(old_path) and not allowed_storage_file(safe_new):
+        raise ValueError("Estensione non consentita.")
+    try:
+        os.rename(old_path, new_path)
+    except OSError as e:
+        raise ValueError(f"Impossibile completare la rinomina: {str(e)}")
+    return safe_new

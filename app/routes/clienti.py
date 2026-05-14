@@ -7,7 +7,7 @@ from flask import Blueprint, flash, jsonify, redirect, render_template, request,
 from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import CalendarEvent, Cliente, EditorialPublication, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
-from ..storage_utils import build_breadcrumb, create_subfolder, get_cliente_relative_path, list_entries, normalize_subdir, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
+from ..storage_utils import build_breadcrumb, create_subfolder, get_cliente_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
 
 
 bp = Blueprint("clienti", __name__)
@@ -384,6 +384,38 @@ def cliente_cartella_sottocartella_crea(cliente_id):
     try:
         create_subfolder(abs_path, folder_name)
         flash("Cartella creata correttamente.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+
+    return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id, subdir=subdir or None))
+
+
+@bp.route("/clienti/<int:cliente_id>/cartella/rinomina", methods=["POST"])
+@role_required("admin", "operatore")
+def cliente_cartella_rename(cliente_id):
+    cliente = Cliente.query.get_or_404(cliente_id)
+    if not cliente.folder_path:
+        flash("Nessuna cartella creata per questo cliente.", "warning")
+        return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
+
+    subdir = normalize_subdir(request.args.get("subdir", ""))
+    if subdir is None:
+        flash("Percorso non valido.", "danger")
+        return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
+
+    rel_path = os.path.join(cliente.folder_path, subdir).replace("\\", "/") if subdir else cliente.folder_path
+    abs_path = safe_path(rel_path)
+    if not abs_path or not os.path.isdir(abs_path):
+        flash("Cartella non trovata.", "warning")
+        return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
+
+    old_name = request.form.get("old_name", "").strip()
+    new_name = request.form.get("new_name", "").strip()
+
+    is_file = os.path.isfile(os.path.join(abs_path, old_name)) if old_name else False
+    try:
+        rename_storage_entry(abs_path, old_name, new_name)
+        flash("File rinominato correttamente." if is_file else "Cartella rinominata correttamente.", "success")
     except ValueError as e:
         flash(str(e), "danger")
 

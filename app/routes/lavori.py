@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
-from ..storage_utils import build_breadcrumb, create_subfolder, get_lavoro_relative_path, list_entries, normalize_subdir, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
+from ..storage_utils import build_breadcrumb, create_subfolder, get_lavoro_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
 
 
 bp = Blueprint("lavori", __name__)
@@ -519,6 +519,38 @@ def lavoro_cartella_sottocartella_crea(lavoro_id):
     try:
         create_subfolder(abs_path, folder_name)
         flash("Cartella creata correttamente.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+
+    return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id, subdir=subdir or None))
+
+
+@bp.route("/lavori/<int:lavoro_id>/cartella/rinomina", methods=["POST"])
+@role_required("admin", "operatore")
+def lavoro_cartella_rename(lavoro_id):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    if not lavoro.folder_path:
+        flash("Nessuna cartella creata per questo lavoro.", "warning")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    subdir = normalize_subdir(request.args.get("subdir", ""))
+    if subdir is None:
+        flash("Percorso non valido.", "danger")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    rel_path = os.path.join(lavoro.folder_path, subdir).replace("\\", "/") if subdir else lavoro.folder_path
+    abs_path = safe_path(rel_path)
+    if not abs_path or not os.path.isdir(abs_path):
+        flash("Cartella non trovata.", "warning")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    old_name = request.form.get("old_name", "").strip()
+    new_name = request.form.get("new_name", "").strip()
+
+    is_file = os.path.isfile(os.path.join(abs_path, old_name)) if old_name else False
+    try:
+        rename_storage_entry(abs_path, old_name, new_name)
+        flash("File rinominato correttamente." if is_file else "Cartella rinominata correttamente.", "success")
     except ValueError as e:
         flash(str(e), "danger")
 

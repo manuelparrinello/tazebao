@@ -144,7 +144,7 @@
                 <th>Nome</th>
                 <th class="text-end" style="width:100px">Dimensione</th>
                 <th class="text-end d-none d-sm-table-cell" style="width:180px">Modificato</th>
-                <th style="width:60px"></th>
+                <th style="width:100px"></th>
             </tr>
         </thead>
         <tbody>
@@ -161,11 +161,16 @@
                 </td>
                 <td class="text-end text-secondary small">{{ format_size(entry.size) }}</td>
                 <td class="text-end text-secondary small d-none d-sm-table-cell">{{ format_date(entry.mtime) }}</td>
-                <td class="text-center">
+                <td class="text-center text-nowrap">
                     {% if not entry.is_dir %}
                     <a href="{{ url_for('lavori.lavoro_cartella_download', lavoro_id=lavoro.id, filename=(subdir + '/' + entry.name) if subdir else entry.name) }}" class="btn btn-sm btn-outline-primary" title="Scarica {{ entry.name }}">
                         <i class="bi bi-download"></i>
                     </a>
+                    {% endif %}
+                    {% if current_user.role != "readonly" %}
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#renameModal" data-old-name="{{ entry.name }}" title="Rinomina {{ entry.name }}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
                     {% endif %}
                 </td>
             </tr>
@@ -173,5 +178,43 @@
         </tbody>
     </table>
 </div>
+{% endif %}
+
+{% if folder_active and current_user.role != "readonly" %}
+<div class="modal fade" id="renameModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" action="{{ url_for('lavori.lavoro_cartella_rename', lavoro_id=lavoro.id, subdir=subdir or None) }}" onsubmit="return confirm('Confermi la rinomina?')">
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="bi bi-pencil me-1"></i>Rinomina</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="old_name" id="rename-old-name">
+                    <div class="mb-1 small text-secondary">Nuovo nome:</div>
+                    <input type="text" name="new_name" id="rename-new-name" class="form-control form-control-sm" required autofocus>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Rinomina</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var modal = document.getElementById('renameModal');
+    if (modal) {
+        modal.addEventListener('show.bs.modal', function(event) {
+            var btn = event.relatedTarget;
+            var oldName = btn.getAttribute('data-old-name');
+            document.getElementById('rename-old-name').value = oldName;
+            document.getElementById('rename-new-name').value = oldName;
+        });
+    }
+});
+</script>
 {% endif %}
 {% endblock %}

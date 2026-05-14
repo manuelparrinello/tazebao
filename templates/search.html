@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Ricerca{% endblock %}
+
+{% macro result_item(icon, title, subtitle, url) %}
+<a href="{{ url }}" class="search-result-item">
+    <div class="search-result-icon"><i class="bi {{ icon }}"></i></div>
+    <div class="search-result-body min-w-0">
+        <div class="search-result-title text-truncate">{{ title }}</div>
+        {% if subtitle %}<div class="search-result-subtitle text-truncate">{{ subtitle }}</div>{% endif %}
+    </div>
+    <div class="search-result-meta">
+        <i class="bi bi-chevron-right search-result-arrow"></i>
+    </div>
+</a>
+{% endmacro %}
+
+{% macro section_card(key, label, icon, endpoint, id_param) %}
+{% set items = results.get(key, []) %}
+<div class="card rounded-3 border border-light-subtle search-card">
+    <div class="search-card-header">
+        <i class="bi {{ icon }}"></i>
+        <span>{{ label }}</span>
+        {% if items %}<span class="badge rounded-pill bg-secondary search-card-count">{{ items|length }}</span>{% endif %}
+    </div>
+    {% if items %}
+    <div class="card-body p-0">
+        {% for item in items %}
+        {% set detail_url = url_for(endpoint, **{id_param: item.id}) %}
+        {% if key == "clienti" %}
+        {{ result_item(icon, item.name or item.ragsoc, item.citta, detail_url) }}
+        {% elif key == "lavori" %}
+        {{ result_item(icon, item.descrizione, item.cliente.name if item.cliente else '', detail_url) }}
+        {% elif key == "tasks" %}
+        {{ result_item(icon, item.name, item.cliente.name if item.cliente else '', detail_url) }}
+        {% elif key == "preventivi" %}
+        {{ result_item(icon, item.descrizione, item.cliente.name if item.cliente else '', detail_url) }}
+        {% elif key == "finance" %}
+        {{ result_item(icon, item.title, item.movement_type ~ ' · ' ~ item.amount ~ '€', detail_url) }}
+        {% elif key == "editoriali" %}
+        {{ result_item(icon, item.title, item.cliente.name if item.cliente else '', detail_url) }}
+        {% elif key == "calendario" %}
+        {{ result_item(icon, item.title, item.start_datetime|date_it if item.start_datetime else '', detail_url) }}
+        {% elif key == "email_log" %}
+        {{ result_item(icon, item.subject or '(nessun oggetto)', item.email_address ~ ' · ' ~ (item.sent_at|datetime_it if item.sent_at else ''), detail_url) }}
+        {% elif key == "email_messages" %}
+        {{ result_item(icon, item.subject or '(nessun oggetto)', (item.from_address or '(?)') ~ ' · ' ~ (item.received_at|datetime_it if item.received_at else ''), detail_url) }}
+        {% elif key == "moodboards" %}
+        {{ result_item(icon, item.title, item.cliente.name if item.cliente else '', detail_url) }}
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card-body search-card-empty">
+        <i class="bi bi-search d-block mb-1" style="font-size:1.1rem;opacity:.4"></i>
+        <span>Nessun risultato</span>
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% block content %}
+<div class="search-page">
+
+    {# --- HEADER + FORM --- #}
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="search-header-icon"><i class="bi bi-search"></i></div>
+        <div>
+            <h4 class="fw-bold mb-0">
+                {% if term %}
+                Risultati per <strong>"{{ term }}"</strong>
+                {% else %}
+                Ricerca globale
+                {% endif %}
+            </h4>
+            <p class="text-muted small mb-0">Cerca in tutte le entità del gestionale</p>
+        </div>
+    </div>
+
+    <div class="search-form-wrap mb-4">
+        <form action="{{ url_for('main.search') }}" method="get" role="search">
+            <div class="d-flex gap-2">
+                <input type="search" name="q" class="form-control form-control-lg" value="{{ term }}" placeholder="Cerca clienti, lavori, task, preventivi..." aria-label="Cerca">
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-search me-2"></i>Cerca
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {# --- HELP STATE: nessuna query --- #}
+    {% if not term %}
+    <div class="search-help">
+        <div class="search-help-icon"><i class="bi bi-search"></i></div>
+        <h5>Cosa vuoi cercare?</h5>
+        <p class="text-muted small mb-0">Digita almeno 2 caratteri per cercare tra:</p>
+        <div class="search-help-categories">
+            <span class="badge"><i class="bi bi-people me-1"></i>Clienti</span>
+            <span class="badge"><i class="bi bi-briefcase me-1"></i>Lavori</span>
+            <span class="badge"><i class="bi bi-list-check me-1"></i>Task</span>
+            <span class="badge"><i class="bi bi-receipt me-1"></i>Preventivi</span>
+            <span class="badge"><i class="bi bi-cash-coin me-1"></i>Movimenti</span>
+            <span class="badge"><i class="bi bi-calendar2-week me-1"></i>Editoriale</span>
+            <span class="badge"><i class="bi bi-calendar3 me-1"></i>Calendario</span>
+            <span class="badge"><i class="bi bi-journal-text me-1"></i>Registro email</span>
+            <span class="badge"><i class="bi bi-envelope me-1"></i>Email</span>
+            <span class="badge"><i class="bi bi-images me-1"></i>Moodboard</span>
+        </div>
+    </div>
+
+    {# --- TOO SHORT --- #}
+    {% elif term|length < 2 %}
+    <div class="alert alert-info d-flex align-items-center gap-2 py-2 px-3 mb-0">
+        <i class="bi bi-info-circle"></i>
+        <span>Inserisci almeno 2 caratteri per avviare la ricerca.</span>
+    </div>
+
+    {# --- RISULTATI --- #}
+    {% else %}
+
+    {% set sections = [
+        ("clienti", "Clienti", "bi-people", "cliente_page", "cliente_id"),
+        ("lavori", "Lavori", "bi-briefcase", "lavoro_page", "lavoro_id"),
+        ("tasks", "Task", "bi-list-check", "tasks.task_edit", "task_id"),
+        ("preventivi", "Preventivi", "bi-receipt", "visualizza_preventivo", "id"),
+        ("finance", "Movimenti finanziari", "bi-cash-coin", "finance.finance_edit", "movement_id"),
+        ("editoriali", "Calendario editoriale", "bi-calendar2-week", "editorial_calendar.editorial_edit", "publication_id"),
+        ("calendario", "Eventi calendario", "bi-calendar3", "calendar.calendar_edit", "event_id"),
+        ("email_log", "Registro email", "bi-journal-text", "emails.emails_edit", "email_id"),
+        ("email_messages", "Email", "bi-envelope", "mail.mail_detail", "message_id"),
+        ("moodboards", "Moodboard", "bi-images", "moodboards.moodboard_detail", "id"),
+    ] %}
+
+    {% set ns = namespace(total=0, cats=0) %}
+    {% for key, label, icon, endpoint, id_param in sections %}
+    {% set items = results.get(key, []) %}
+    {% if items %}
+    {% set ns.total = ns.total + items|length %}
+    {% set ns.cats = ns.cats + 1 %}
+    {% endif %}
+    {% endfor %}
+
+    {% if ns.total == 0 %}
+    <div class="search-help">
+        <div class="search-help-icon"><i class="bi bi-search"></i></div>
+        <h5>Nessun risultato per <strong>"{{ term }}"</strong></h5>
+        <p class="text-muted small">Prova con termini diversi o meno specifici.</p>
+    </div>
+    {% else %}
+    <div class="search-summary mb-4">
+        <span><strong>{{ ns.total }}</strong> {% if ns.total == 1 %}risultato trovato{% else %}risultati trovati{% endif %}</span>
+        <span>in <strong>{{ ns.cats }}</strong> categori{% if ns.cats == 1 %}a{% else %}e{% endif %}</span>
+    </div>
+
+    <div class="search-results-grid">
+        {% for key, label, icon, endpoint, id_param in sections %}
+        {{ section_card(key, label, icon, endpoint, id_param) }}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% endblock %}

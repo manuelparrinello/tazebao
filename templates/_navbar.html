@@ -29,6 +29,13 @@
         <img class="sidebar-brand-logo" src="{{ url_for('static', filename='img/Logo_W.png') }}" alt="ERP">
     </div>
 
+    <form class="sidebar-search" action="{{ url_for('main.search') }}" method="get" role="search">
+        <div class="search-input-wrap">
+            <i class="bi bi-search"></i>
+            <input type="search" name="q" class="form-control form-control-sm" placeholder="Cerca..." aria-label="Cerca">
+        </div>
+    </form>
+
     <nav class="sidebar-nav flex-grow-1">
         <ul class="nav flex-column">
             {{ nav_item("Dashboard ERP", "bi-grid-1x2", url_for('main.app_shell'), is_active(endpoint='main.app_shell')) }}
@@ -91,6 +98,12 @@
     </div>
 
     <div class="offcanvas-body sidebar-mobile-body">
+        <form class="sidebar-search mb-2" action="{{ url_for('main.search') }}" method="get" role="search">
+            <div class="search-input-wrap">
+                <i class="bi bi-search"></i>
+                <input type="search" name="q" class="form-control form-control-sm" placeholder="Cerca..." aria-label="Cerca">
+            </div>
+        </form>
         <ul class="nav flex-column">
             {{ nav_item("Dashboard ERP", "bi-grid-1x2", url_for('main.app_shell'), is_active(endpoint='main.app_shell')) }}
 

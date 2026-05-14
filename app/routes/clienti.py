@@ -1,12 +1,12 @@
 import os
 from datetime import date
 
-from flask import Blueprint, jsonify, redirect, render_template, request, send_file, url_for
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, send_file, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import CalendarEvent, Cliente, EditorialPublication, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
-from ..storage_utils import get_cliente_relative_path, resolve_collision, safe_path, slugify, ensure_storage_dir
+from ..storage_utils import build_breadcrumb, get_cliente_relative_path, list_entries, normalize_subdir, resolve_collision, safe_path, slugify, ensure_storage_dir
 
 
 bp = Blueprint("clienti", __name__)
@@ -245,43 +245,75 @@ def cliente_edit(cliente_id):
 @role_required("admin", "operatore")
 def cliente_cartella_crea(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
+
+    wants_json = (
+        request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        or request.accept_mimetypes.best == "application/json"
+    )
+
     if cliente.folder_path:
-        return jsonify({"messaggio": "Cartella gia esistente.", "folder_path": cliente.folder_path}), 200
+        if wants_json:
+            return jsonify({"messaggio": "Cartella gia esistente.", "folder_path": cliente.folder_path}), 200
+        flash("Cartella gia esistente.", "warning")
+        return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
 
-    slug = slugify(cliente.name) or f"cliente-{cliente.id}"
-    rel_path = get_cliente_relative_path(cliente.id, slug)
-    rel_path = resolve_collision(rel_path)
+    try:
+        slug = slugify(cliente.name) or f"cliente-{cliente.id}"
+        rel_path = get_cliente_relative_path(cliente.id, slug)
+        rel_path = resolve_collision(rel_path)
+        ensure_storage_dir(rel_path)
+    except (OSError, IOError) as e:
+        if wants_json:
+            return jsonify({"error": f"Errore filesystem: {str(e)}"}), 500
+        flash(f"Errore nella creazione della cartella: {str(e)}", "danger")
+        return redirect(url_for("cliente_page", cliente_id=cliente.id))
 
-    abs_path = ensure_storage_dir(rel_path)
     cliente.folder_path = rel_path
     db.session.commit()
-    return jsonify({"messaggio": "Cartella creata con successo.", "folder_path": rel_path}), 201
+
+    if wants_json:
+        return jsonify({"messaggio": "Cartella cliente creata correttamente.", "folder_path": rel_path}), 201
+
+    flash("Cartella cliente creata correttamente.", "success")
+    return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
 
 
 @bp.route("/clienti/<int:cliente_id>/cartella")
 @login_required
 def cliente_cartella(cliente_id):
     cliente = Cliente.query.get_or_404(cliente_id)
-    entries = []
     folder_active = bool(cliente.folder_path)
+    subdir = normalize_subdir(request.args.get("subdir", ""))
 
-    if folder_active:
+    if subdir is None:
+        flash("Percorso non valido.", "danger")
+        return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
+
+    if folder_active and subdir:
+        rel_path = os.path.join(cliente.folder_path, subdir).replace("\\", "/")
+        abs_path = safe_path(rel_path)
+        if not abs_path or not os.path.isdir(abs_path):
+            flash("Cartella non trovata.", "warning")
+            return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
+    elif folder_active:
         abs_path = safe_path(cliente.folder_path)
-        if abs_path and os.path.isdir(abs_path):
-            for name in sorted(os.listdir(abs_path)):
-                full = os.path.join(abs_path, name)
-                entries.append({
-                    "name": name,
-                    "is_dir": os.path.isdir(full),
-                    "size": os.path.getsize(full) if os.path.isfile(full) else None,
-                    "mtime": os.path.getmtime(full),
-                })
+    else:
+        abs_path = None
+
+    entries = list_entries(abs_path) if abs_path else []
+    breadcrumb = build_breadcrumb(
+        subdir,
+        lambda **kw: url_for("clienti.cliente_cartella", cliente_id=cliente.id, **kw),
+        "Cartella cliente",
+    )
 
     return render_template(
         "cliente_cartella.html",
         cliente=cliente,
         entries=entries,
         folder_active=folder_active,
+        subdir=subdir,
+        breadcrumb=breadcrumb,
     )
 
 
@@ -297,4 +329,5 @@ def cliente_cartella_download(cliente_id, filename):
     if not abs_path or not os.path.isfile(abs_path):
         return jsonify({"error": "File non trovato."}), 404
 
-    return send_file(abs_path, as_attachment=False)
+    download_name = os.path.basename(filename)
+    return send_file(abs_path, as_attachment=True, download_name=download_name)

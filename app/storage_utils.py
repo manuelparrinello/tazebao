@@ -56,3 +56,49 @@ def resolve_collision(base_rel_path):
         candidate = f"{name}_{counter}{ext}"
         counter += 1
     return candidate
+
+
+def normalize_subdir(subdir):
+    if not subdir:
+        return ""
+    raw = subdir.replace("\\", "/")
+    if raw.startswith("/"):
+        return None
+    if os.path.isabs(raw):
+        return None
+    normalized = raw.strip("/")
+    if ".." in normalized.split("/"):
+        return None
+    return normalized
+
+
+def build_breadcrumb(subdir, root_url_func, root_label):
+    segments = [{"label": root_label, "subdir": None, "url": root_url_func()}]
+    if not subdir:
+        return segments
+    parts = subdir.strip("/").split("/")
+    cumulative = ""
+    for part in parts:
+        cumulative = f"{cumulative}/{part}" if cumulative else part
+        segments.append({
+            "label": part,
+            "subdir": cumulative,
+            "url": root_url_func(subdir=cumulative),
+        })
+    return segments
+
+
+def list_entries(abs_path):
+    entries = []
+    if not abs_path or not os.path.isdir(abs_path):
+        return entries
+    for name in os.listdir(abs_path):
+        full = os.path.join(abs_path, name)
+        entries.append({
+            "name": name,
+            "is_dir": os.path.isdir(full),
+            "size": os.path.getsize(full) if os.path.isfile(full) else None,
+            "mtime": os.path.getmtime(full),
+        })
+    entries.sort(key=lambda e: (not e["is_dir"], e["name"].lower()))
+    return entries

@@ -1,6 +1,31 @@
 {% extends "base.html" %}
 {% block title %}Cartella cliente — {{ cliente.name }}{% endblock %}
 
+{% macro file_icon(filename) %}
+{%- set ext = filename.split('.')[-1]|lower if '.' in filename else '' -%}
+{%- set icon_map = {
+  'pdf':  ('bi-file-earmark-pdf-fill', 'text-danger'),
+  'jpg':  ('bi-file-earmark-image', 'text-info'),
+  'jpeg': ('bi-file-earmark-image', 'text-info'),
+  'png':  ('bi-file-earmark-image', 'text-info'),
+  'webp': ('bi-file-earmark-image', 'text-info'),
+  'gif':  ('bi-file-earmark-image', 'text-info'),
+  'doc':  ('bi-file-earmark-word', 'text-primary'),
+  'docx': ('bi-file-earmark-word', 'text-primary'),
+  'odt':  ('bi-file-earmark-word', 'text-primary'),
+  'xls':  ('bi-file-earmark-spreadsheet', 'text-success'),
+  'xlsx': ('bi-file-earmark-spreadsheet', 'text-success'),
+  'csv':  ('bi-file-earmark-spreadsheet', 'text-success'),
+  'zip':  ('bi-file-earmark-zip', 'text-warning'),
+  'rar':  ('bi-file-earmark-zip', 'text-warning'),
+  '7z':   ('bi-file-earmark-zip', 'text-warning'),
+  'txt':  ('bi-file-earmark-text', 'text-secondary'),
+  'md':   ('bi-file-earmark-text', 'text-secondary'),
+} -%}
+{%- set icon_data = icon_map.get(ext, ('bi-file-earmark', 'text-secondary')) -%}
+<i class="bi {{ icon_data[0] }} {{ icon_data[1] }} me-2"></i>
+{%- endmacro %}
+
 {% macro format_size(size) %}
 {%- if size is not none and size >= 1048576 %}{{ "%.1f"|format(size / 1048576) }} MB
 {%- elif size is not none and size >= 1024 %}{{ "%.1f"|format(size / 1024) }} KB
@@ -13,18 +38,29 @@
 {%- endmacro %}
 
 {% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small mb-0">
+        {% for crumb in breadcrumb %}
+        {% if loop.last %}
+        <li class="breadcrumb-item active" aria-current="page">{{ crumb.label }}</li>
+        {% else %}
+        <li class="breadcrumb-item"><a href="{{ crumb.url }}" class="text-decoration-none">{{ crumb.label }}</a></li>
+        {% endif %}
+        {% endfor %}
+    </ol>
+</nav>
+
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
     <div>
         <h4 class="fw-bolder mb-1"><i class="bi bi-folder me-2 text-primary"></i>Cartella cliente</h4>
-        <p class="text-secondary mb-0">
-            <a href="{{ url_for('cliente_page', cliente_id=cliente.id) }}" class="text-decoration-none">{{ cliente.name }}</a>
-            {% if cliente.folder_path %}
-            <span class="mx-1">&middot;</span>
-            <code class="small">{{ cliente.folder_path }}</code>
-            {% endif %}
-        </p>
+        <p class="text-secondary mb-0 text-break">{{ cliente.name }}</p>
     </div>
     <div class="d-flex gap-2">
+        {% if folder_active and subdir %}
+        <a href="{{ url_for('clienti.cliente_cartella', cliente_id=cliente.id) }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-up me-1"></i>Torna su
+        </a>
+        {% endif %}
         {% if not folder_active and current_user.role != "readonly" %}
         <form action="{{ url_for('clienti.cliente_cartella_crea', cliente_id=cliente.id) }}" method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -34,7 +70,7 @@
         </form>
         {% endif %}
         <a href="{{ url_for('cliente_page', cliente_id=cliente.id) }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i>Torna al cliente
+            <i class="bi bi-arrow-left me-1"></i>Indietro
         </a>
     </div>
 </div>
@@ -55,34 +91,36 @@
 {% elif not entries %}
 <div class="border rounded-3 bg-light px-3 py-5 text-center text-secondary">
     <i class="bi bi-folder2-open display-5 d-block mb-3"></i>
-    <div>Cartella vuota.</div>
+    <div>La cartella è vuota.</div>
 </div>
 {% else %}
 <div class="table-responsive">
-    <table class="table table-hover align-middle">
+    <table class="table table-hover align-middle file-browser-table">
         <thead class="table-light">
             <tr>
                 <th>Nome</th>
                 <th class="text-end" style="width:100px">Dimensione</th>
-                <th class="text-end" style="width:180px">Modificato</th>
+                <th class="text-end d-none d-sm-table-cell" style="width:180px">Modificato</th>
                 <th style="width:60px"></th>
             </tr>
         </thead>
         <tbody>
             {% for entry in entries %}
-            <tr>
-                <td>
+            <tr class="file-browser-row">
+                <td class="text-break">
                     {% if entry.is_dir %}
-                    <i class="bi bi-folder-fill text-warning me-2"></i>{{ entry.name }}
+                    <a href="{{ url_for('clienti.cliente_cartella', cliente_id=cliente.id, subdir=(subdir + '/' + entry.name) if subdir else entry.name) }}" class="text-decoration-none text-reset stretched-link-dir">
+                        <i class="bi bi-folder-fill text-warning me-2"></i><span class="fw-semibold">{{ entry.name }}</span>
+                    </a>
                     {% else %}
-                    <i class="bi bi-file-earmark me-2 text-secondary"></i>{{ entry.name }}
+                    {{ file_icon(entry.name) }}<span>{{ entry.name }}</span>
                     {% endif %}
                 </td>
                 <td class="text-end text-secondary small">{{ format_size(entry.size) }}</td>
-                <td class="text-end text-secondary small">{{ format_date(entry.mtime) }}</td>
+                <td class="text-end text-secondary small d-none d-sm-table-cell">{{ format_date(entry.mtime) }}</td>
                 <td class="text-center">
                     {% if not entry.is_dir %}
-                    <a href="{{ url_for('clienti.cliente_cartella_download', cliente_id=cliente.id, filename=entry.name) }}" class="btn btn-sm btn-outline-primary" title="Scarica">
+                    <a href="{{ url_for('clienti.cliente_cartella_download', cliente_id=cliente.id, filename=(subdir + '/' + entry.name) if subdir else entry.name) }}" class="btn btn-sm btn-outline-primary" title="Scarica {{ entry.name }}">
                         <i class="bi bi-download"></i>
                     </a>
                     {% endif %}

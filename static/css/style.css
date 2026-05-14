@@ -4395,4 +4395,30 @@ table td {
   justify-content: center;
 }
 
+/* =========================
+   FILE BROWSER
+========================= */
+
+.file-browser-table td:first-child i.bi {
+  font-size: 1.1rem;
+}
+
+.file-browser-row {
+  cursor: default;
+}
+
+.file-browser-row:has(td:first-child a.stretched-link-dir) {
+  cursor: pointer;
+}
+
+.file-browser-row:has(td:first-child a.stretched-link-dir):hover {
+  background: rgba(32, 227, 127, 0.05);
+}
+
+.file-browser-row td:first-child a.stretched-link-dir {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+}
+
 

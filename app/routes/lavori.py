@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
-from ..storage_utils import get_lavoro_relative_path, resolve_collision, safe_path, slugify, ensure_storage_dir
+from ..storage_utils import build_breadcrumb, get_lavoro_relative_path, list_entries, normalize_subdir, resolve_collision, safe_path, slugify, ensure_storage_dir
 
 
 bp = Blueprint("lavori", __name__)
@@ -379,43 +379,75 @@ def status_lavoro_update(lavoro_id):
 @role_required("admin", "operatore")
 def lavoro_cartella_crea(lavoro_id):
     lavoro = Lavoro.query.get_or_404(lavoro_id)
+
+    wants_json = (
+        request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        or request.accept_mimetypes.best == "application/json"
+    )
+
     if lavoro.folder_path:
-        return jsonify({"messaggio": "Cartella gia esistente.", "folder_path": lavoro.folder_path}), 200
+        if wants_json:
+            return jsonify({"messaggio": "Cartella gia esistente.", "folder_path": lavoro.folder_path}), 200
+        flash("Cartella gia esistente.", "warning")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
 
-    slug = slugify(lavoro.descrizione) or f"lavoro-{lavoro.id}"
-    rel_path = get_lavoro_relative_path(lavoro.id, slug)
-    rel_path = resolve_collision(rel_path)
+    try:
+        slug = slugify(lavoro.descrizione) or f"lavoro-{lavoro.id}"
+        rel_path = get_lavoro_relative_path(lavoro.id, slug)
+        rel_path = resolve_collision(rel_path)
+        ensure_storage_dir(rel_path)
+    except (OSError, IOError) as e:
+        if wants_json:
+            return jsonify({"error": f"Errore filesystem: {str(e)}"}), 500
+        flash(f"Errore nella creazione della cartella: {str(e)}", "danger")
+        return redirect(url_for("lavoro_page", lavoro_id=lavoro.id))
 
-    abs_path = ensure_storage_dir(rel_path)
     lavoro.folder_path = rel_path
     db.session.commit()
-    return jsonify({"messaggio": "Cartella creata con successo.", "folder_path": rel_path}), 201
+
+    if wants_json:
+        return jsonify({"messaggio": "Cartella lavoro creata correttamente.", "folder_path": rel_path}), 201
+
+    flash("Cartella lavoro creata correttamente.", "success")
+    return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
 
 
 @bp.route("/lavori/<int:lavoro_id>/cartella")
 @login_required
 def lavoro_cartella(lavoro_id):
     lavoro = Lavoro.query.get_or_404(lavoro_id)
-    entries = []
     folder_active = bool(lavoro.folder_path)
+    subdir = normalize_subdir(request.args.get("subdir", ""))
 
-    if folder_active:
+    if subdir is None:
+        flash("Percorso non valido.", "danger")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    if folder_active and subdir:
+        rel_path = os.path.join(lavoro.folder_path, subdir).replace("\\", "/")
+        abs_path = safe_path(rel_path)
+        if not abs_path or not os.path.isdir(abs_path):
+            flash("Cartella non trovata.", "warning")
+            return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+    elif folder_active:
         abs_path = safe_path(lavoro.folder_path)
-        if abs_path and os.path.isdir(abs_path):
-            for name in sorted(os.listdir(abs_path)):
-                full = os.path.join(abs_path, name)
-                entries.append({
-                    "name": name,
-                    "is_dir": os.path.isdir(full),
-                    "size": os.path.getsize(full) if os.path.isfile(full) else None,
-                    "mtime": os.path.getmtime(full),
-                })
+    else:
+        abs_path = None
+
+    entries = list_entries(abs_path) if abs_path else []
+    breadcrumb = build_breadcrumb(
+        subdir,
+        lambda **kw: url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id, **kw),
+        "Cartella lavoro",
+    )
 
     return render_template(
         "lavoro_cartella.html",
         lavoro=lavoro,
         entries=entries,
         folder_active=folder_active,
+        subdir=subdir,
+        breadcrumb=breadcrumb,
     )
 
 
@@ -431,4 +463,5 @@ def lavoro_cartella_download(lavoro_id, filename):
     if not abs_path or not os.path.isfile(abs_path):
         return jsonify({"error": "File non trovato."}), 404
 
-    return send_file(abs_path, as_attachment=False)
+    download_name = os.path.basename(filename)
+    return send_file(abs_path, as_attachment=True, download_name=download_name)

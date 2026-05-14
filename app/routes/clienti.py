@@ -1,4 +1,5 @@
 import os
+import shutil
 from datetime import date
 
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, send_file, url_for
@@ -208,6 +209,14 @@ def cliente_delete(cliente_id):
         {Task.cliente_id: None}
     )
 
+    if cliente.folder_path:
+        abs_path = safe_path(cliente.folder_path)
+        if abs_path and os.path.exists(abs_path):
+            try:
+                shutil.rmtree(abs_path)
+            except OSError as e:
+                return jsonify({"error": f"Impossibile eliminare la cartella: {str(e)}"}), 500
+
     db.session.delete(cliente)
     db.session.commit()
     return jsonify({"message": "Cliente eliminato con successo"})
@@ -216,6 +225,8 @@ def cliente_delete(cliente_id):
 @bp.route("/clienti/edit/<int:cliente_id>", methods=["GET", "PUT"])
 @role_required("admin", "operatore")
 def cliente_edit(cliente_id):
+    # NOTA: folder_path NON viene aggiornato al rename del cliente.
+    # Il path su disco resta stabile per evitare rottura percorsi esterni/sync.
     cliente = Cliente.query.get_or_404(cliente_id)
     if request.method == "GET":
         return render_template("cliente_edit.html", cliente=cliente)

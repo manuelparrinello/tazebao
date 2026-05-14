@@ -2,9 +2,10 @@ import locale
 import os
 from datetime import date as date_cls, datetime as datetime_cls
 
-from flask import Flask
+from flask import Flask, flash, redirect, request, url_for
 from dotenv import load_dotenv
 from markupsafe import Markup, escape
+from werkzeug.exceptions import RequestEntityTooLarge
 
 from .auth import register_auth_guards
 from .cli import register_cli
@@ -57,6 +58,14 @@ def create_app():
         storage_root = os.path.join(basedir, "storage")
         os.makedirs(storage_root, exist_ok=True)
     app.config["ERP_STORAGE_ROOT"] = os.path.abspath(storage_root)
+
+    upload_max_mb = int(os.environ.get("ERP_MAX_UPLOAD_MB", "512"))
+    app.config["MAX_CONTENT_LENGTH"] = upload_max_mb * 1024 * 1024
+
+    @app.errorhandler(RequestEntityTooLarge)
+    def handle_file_too_large(e):
+        flash(f"File troppo grande. Il limite è di {upload_max_mb} MB.", "danger")
+        return redirect(request.referrer or url_for("main.index"))
 
     configure_environment(app)
 

@@ -95,11 +95,17 @@ def list_entries(abs_path):
         return entries
     for name in os.listdir(abs_path):
         full = os.path.join(abs_path, name)
+        try:
+            is_dir = os.path.isdir(full)
+            size = os.path.getsize(full) if os.path.isfile(full) else None
+            mtime = os.path.getmtime(full)
+        except (OSError, PermissionError):
+            continue
         entries.append({
             "name": name,
-            "is_dir": os.path.isdir(full),
-            "size": os.path.getsize(full) if os.path.isfile(full) else None,
-            "mtime": os.path.getmtime(full),
+            "is_dir": is_dir,
+            "size": size,
+            "mtime": mtime,
         })
     entries.sort(key=lambda e: (not e["is_dir"], e["name"].lower()))
     return entries

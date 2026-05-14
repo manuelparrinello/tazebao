@@ -1,4 +1,5 @@
 import os
+import shutil
 from datetime import datetime
 
 from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, send_file, url_for
@@ -248,6 +249,8 @@ def lavoro_page(lavoro_id):
 @bp.route("/lavori/<int:lavoro_id>/edit", methods=["GET", "POST"])
 @role_required("admin", "operatore")
 def lavoro_edit(lavoro_id):
+    # NOTA: folder_path NON viene aggiornato al cambio descrizione.
+    # Il path su disco resta stabile per evitare rottura percorsi esterni/sync.
     lavoro = Lavoro.query.get_or_404(lavoro_id)
     clienti_list = Cliente.query.order_by(Cliente.name.asc()).all()
     error = None
@@ -347,6 +350,15 @@ def lavoro_delete(lavoro_id):
         pdf_path = os.path.join(current_app.static_folder, lavoro.preventivo_pdf_path)
         if os.path.exists(pdf_path):
             os.remove(pdf_path)
+
+    if lavoro.folder_path:
+        abs_path = safe_path(lavoro.folder_path)
+        if abs_path and os.path.exists(abs_path):
+            try:
+                shutil.rmtree(abs_path)
+            except OSError as e:
+                flash(f"Impossibile eliminare la cartella: {str(e)}", "danger")
+                return redirect(url_for("lavori.lavoro_page", lavoro_id=lavoro.id))
 
     db.session.delete(lavoro)
     db.session.commit()

@@ -4460,7 +4460,7 @@ table td {
 
 /* Column widths */
 .file-browser-table .fb-size-col {
-  width: 85px;
+  width: auto;
 }
 
 .file-browser-table .fb-date-col {

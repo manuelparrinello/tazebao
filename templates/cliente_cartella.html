@@ -141,37 +141,39 @@
     <table class="table table-hover align-middle file-browser-table">
         <thead class="table-light">
             <tr>
-                <th>Nome</th>
-                <th class="text-end" style="width:100px">Dimensione</th>
-                <th class="text-end d-none d-sm-table-cell" style="width:180px">Modificato</th>
-                <th style="width:100px"></th>
+                <th class="fb-name-cell">Nome</th>
+                <th class="fb-size-col text-end">Dimensione</th>
+                <th class="fb-date-col text-end d-none d-sm-table-cell">Modificato</th>
+                <th class="fb-actions-col text-center"></th>
             </tr>
         </thead>
         <tbody>
             {% for entry in entries %}
             <tr class="file-browser-row">
-                <td class="text-break">
+                <td class="fb-name-cell">
                     {% if entry.is_dir %}
-                    <a href="{{ url_for('clienti.cliente_cartella', cliente_id=cliente.id, subdir=(subdir + '/' + entry.name) if subdir else entry.name) }}" class="text-decoration-none text-reset stretched-link-dir">
+                    <a href="{{ url_for('clienti.cliente_cartella', cliente_id=cliente.id, subdir=(subdir + '/' + entry.name) if subdir else entry.name) }}" class="text-decoration-none text-reset stretched-link-dir" title="{{ entry.name }}">
                         <i class="bi bi-folder-fill text-warning me-2"></i><span class="fw-semibold">{{ entry.name }}</span>
                     </a>
                     {% else %}
-                    {{ file_icon(entry.name) }}<span>{{ entry.name }}</span>
+                    {{ file_icon(entry.name) }}<span title="{{ entry.name }}">{{ entry.name }}</span>
                     {% endif %}
                 </td>
-                <td class="text-end text-secondary small">{{ format_size(entry.size) }}</td>
-                <td class="text-end text-secondary small d-none d-sm-table-cell">{{ format_date(entry.mtime) }}</td>
-                <td class="text-center text-nowrap">
-                    {% if not entry.is_dir %}
-                    <a href="{{ url_for('clienti.cliente_cartella_download', cliente_id=cliente.id, filename=(subdir + '/' + entry.name) if subdir else entry.name) }}" class="btn btn-sm btn-outline-primary" title="Scarica {{ entry.name }}">
-                        <i class="bi bi-download"></i>
-                    </a>
-                    {% endif %}
-                    {% if current_user.role != "readonly" %}
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#renameModal" data-old-name="{{ entry.name }}" title="Rinomina {{ entry.name }}">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    {% endif %}
+                <td class="fb-size-col text-end text-secondary small">{{ format_size(entry.size) }}</td>
+                <td class="fb-date-col text-end text-secondary small d-none d-sm-table-cell">{{ format_date(entry.mtime) }}</td>
+                <td class="fb-actions-col text-center">
+                    <div class="erp-actions justify-content-center">
+                        {% if not entry.is_dir %}
+                        <a href="{{ url_for('clienti.cliente_cartella_download', cliente_id=cliente.id, filename=(subdir + '/' + entry.name) if subdir else entry.name) }}" class="btn btn-sm btn-outline-primary erp-icon-btn" title="Scarica {{ entry.name }}">
+                            <i class="bi bi-download"></i>
+                        </a>
+                        {% endif %}
+                        {% if current_user.role != "readonly" %}
+                        <button type="button" class="btn btn-sm btn-outline-secondary erp-icon-btn" data-bs-toggle="modal" data-bs-target="#renameModal" data-old-name="{{ entry.name }}" title="Rinomina {{ entry.name }}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        {% endif %}
+                    </div>
                 </td>
             </tr>
             {% endfor %}

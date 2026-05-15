@@ -978,6 +978,39 @@ body {
   flex-shrink: 0;
 }
 
+/* =========================
+   ERP ICON BUTTON — compatto icon-only
+   ========================= */
+
+.erp-icon-btn {
+  min-height: 28px;
+  min-width: 28px;
+  width: 28px;
+  height: 28px;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px !important;
+}
+
+.erp-icon-btn i.bi {
+  font-size: 0.8rem;
+}
+
+@media (max-width: 575.98px) {
+  .erp-icon-btn {
+    min-height: 26px;
+    min-width: 26px;
+    width: 26px;
+    height: 26px;
+  }
+
+  .erp-icon-btn i.bi {
+    font-size: 0.75rem;
+  }
+}
+
 .col-id {
   width: 64px !important;
 }
@@ -4399,6 +4432,10 @@ table td {
    FILE BROWSER
 ========================= */
 
+.file-browser-table {
+  width: 100%;
+}
+
 .file-browser-table td:first-child i.bi {
   font-size: 1.1rem;
 }
@@ -4419,6 +4456,55 @@ table td {
   display: inline-flex;
   align-items: center;
   width: 100%;
+}
+
+/* Column widths */
+.file-browser-table .fb-size-col {
+  width: 85px;
+}
+
+.file-browser-table .fb-date-col {
+  width: 155px;
+}
+
+.file-browser-table .fb-actions-col {
+  width: 150px;
+}
+
+/* Name cell — truncate long names */
+.file-browser-table .fb-name-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 0;
+}
+
+.file-browser-table .fb-name-cell a,
+.file-browser-table .fb-name-cell > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+}
+
+.file-browser-table .fb-name-cell a.stretched-link-dir span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+@media (max-width: 575.98px) {
+  .file-browser-table .fb-size-col,
+  .file-browser-table .fb-date-col {
+    display: none;
+  }
+
+  .file-browser-table .fb-actions-col {
+    width: 75px;
+  }
 }
 
 

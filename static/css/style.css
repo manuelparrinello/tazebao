@@ -204,7 +204,7 @@
   font-size: 0.6rem !important;
   min-width: 16px;
   height: 16px;
-  display: inline-flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 0 4px !important;
@@ -213,6 +213,7 @@
 }
 .notif-dropdown {
   width: 360px;
+  max-width: calc(100vw - 2rem);
   max-height: 420px;
   overflow-y: auto;
   padding: 0;
@@ -239,11 +240,17 @@
   font-size: 0.82rem;
   font-weight: 600;
   line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .notif-desc {
   font-size: 0.75rem;
   color: #6c757d;
   margin-top: 0.1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 575.98px) {
@@ -284,7 +291,7 @@
 .app-content {
   /* min-height: 100vh; */
   transition: margin-left 0.2s ease;
-  padding: 80px !important;
+  padding: 120px 80px 80px !important;
 }
 
 @media (max-width: 991.98px) {

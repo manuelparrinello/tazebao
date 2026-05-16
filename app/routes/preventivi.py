@@ -1,6 +1,7 @@
+from datetime import date as date_type
 from decimal import Decimal
 
-from flask import Blueprint, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
@@ -10,7 +11,7 @@ from ..models import Cliente, Lavoro, Preventivo, RigaPreventivo
 bp = Blueprint("preventivi", __name__)
 
 IVA = Decimal("1.22")
-PREVENTIVO_STATUSES = ("bozza", "inviato", "accettato", "rifiutato")
+PREVENTIVO_STATUSES = ("bozza", "inviato", "in_attesa", "accettato", "rifiutato", "scaduto")
 
 
 def decimal_from_form(value, default="0"):
@@ -175,6 +176,15 @@ def preventivo_edit(id):
             request.form.get("descrizione") or preventivo.descrizione or ""
         ).strip()
 
+        raw_data_invio = request.form.get("data_invio")
+        preventivo.data_invio = (
+            date_type.fromisoformat(raw_data_invio) if raw_data_invio else None
+        )
+        raw_data_followup = request.form.get("data_followup")
+        preventivo.data_followup = (
+            date_type.fromisoformat(raw_data_followup) if raw_data_followup else None
+        )
+
         righe_data = []
         qty_values = request.form.getlist("qty[]")
         descrizioni = request.form.getlist("riga_descrizione[]")
@@ -203,3 +213,37 @@ def preventivo_edit(id):
         totale_iva=totale_iva,
         totale_finale=totale_finale,
     )
+
+
+@bp.post("/preventivi/<int:id>/converti-in-lavoro")
+@role_required("admin", "operatore")
+def converti_preventivo_in_lavoro(id):
+    preventivo = Preventivo.query.filter_by(id=id).first_or_404()
+
+    if preventivo.stato not in ("accettato", "accettata", "approvato", "approvata"):
+        flash("Il preventivo deve essere accettato prima di essere convertito.", "danger")
+        return redirect(url_for("preventivi.visualizza_preventivo", id=preventivo.id))
+
+    if preventivo.convertito_in_lavoro_id:
+        flash("Questo preventivo e gia stato convertito in un lavoro.", "warning")
+        return redirect(
+            url_for(
+                "lavori.lavoro_page",
+                lavoro_id=preventivo.convertito_in_lavoro_id,
+            )
+        )
+
+    nuovo_lavoro = Lavoro(
+        descrizione=preventivo.descrizione,
+        cliente_id=preventivo.cliente_id,
+        stato="Da iniziare",
+        preventivato=preventivo.totale_preventivo,
+    )
+    db.session.add(nuovo_lavoro)
+    db.session.flush()
+
+    preventivo.convertito_in_lavoro_id = nuovo_lavoro.id
+    db.session.commit()
+
+    flash("Preventivo convertito in lavoro con successo.", "success")
+    return redirect(url_for("lavori.lavoro_page", lavoro_id=nuovo_lavoro.id))

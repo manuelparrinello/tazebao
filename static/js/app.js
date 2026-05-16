@@ -345,6 +345,11 @@ if (document.getElementById("app")) {
           const response = await fetch("/api/dashboard/summary", {
             headers: { Accept: "application/json" },
           });
+          const contentType = response.headers.get("content-type") || "";
+          if (!contentType.includes("application/json")) {
+            const text = await response.text();
+            throw new Error("Il server ha risposto con HTML (possibile errore DB o migration mancante).");
+          }
           const payload = await response.json();
 
           if (!response.ok || payload.success === false) {

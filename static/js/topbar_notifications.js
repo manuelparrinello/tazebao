@@ -7,9 +7,15 @@
       headers: { Accept: "application/json" },
     })
       .then(function (r) {
+        var ct = r.headers.get("content-type") || "";
+        if (!ct.includes("application/json")) {
+          renderNotifications([]);
+          return null;
+        }
         return r.json();
       })
       .then(function (payload) {
+        if (!payload) return;
         if (!payload.success) return;
         renderNotifications(payload.data.notifications || []);
       })

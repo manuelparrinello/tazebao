@@ -63,13 +63,16 @@ const preventivi = Vue.createApp({
       if (!stato) return '<span class="erp-badge badge text-bg-secondary">-</span>';
       if (stato === "pdf_esterno") return '<span class="erp-badge badge text-bg-warning"><i class="bi bi-filetype-pdf me-1"></i>PDF esterno</span>';
       const map = {
-        bozza: "secondary",
+        bozza: "warning",
         inviato: "primary",
+        in_attesa: "info",
         accettato: "success",
         rifiutato: "danger",
+        scaduto: "secondary",
       };
       const cls = map[stato] || "secondary";
-      return `<span class="erp-badge badge text-bg-${cls}">${stato}</span>`;
+      const label = stato.replace(/_/g, " ").replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+      return `<span class="erp-badge badge text-bg-${cls}">${label}</span>`;
     },
   },
   delimiters: ["[[", "]]"],

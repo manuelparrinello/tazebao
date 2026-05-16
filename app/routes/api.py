@@ -385,86 +385,89 @@ def get_notifications():
 @bp.get("/api/dashboard/summary")
 @login_required
 def get_dashboard_summary():
-    today = date.today()
-    due_soon_limit = today + timedelta(days=7)
-    now = datetime.combine(today, time.min)
-    upcoming_limit = now + timedelta(days=7)
-    closed_task_statuses = ("completata", "annullata")
-    closed_job_statuses = ("completato", "completata", "chiuso", "chiusa")
-    draft_quote_statuses = ("bozza", "draft")
-    accepted_quote_statuses = ("accettato", "accettata", "approvato", "approvata")
-    finance_data = finance_summary(today.year, today.month)
+    try:
+        today = date.today()
+        due_soon_limit = today + timedelta(days=7)
+        now = datetime.combine(today, time.min)
+        upcoming_limit = now + timedelta(days=7)
+        closed_task_statuses = ("completata", "annullata")
+        closed_job_statuses = ("completato", "completata", "chiuso", "chiusa")
+        draft_quote_statuses = ("bozza", "draft")
+        accepted_quote_statuses = ("accettato", "accettata", "approvato", "approvata")
+        finance_data = finance_summary(today.year, today.month)
 
-    open_tasks = Task.query.filter(~Task.status.in_(closed_task_statuses))
-    task_open_count = open_tasks.count()
-    task_due_soon_count = (
-        open_tasks.filter(Task.due_date >= today)
-        .filter(Task.due_date <= due_soon_limit)
-        .count()
-    )
-    overdue_task_count = open_tasks.filter(Task.due_date < today).count()
+        open_tasks = Task.query.filter(~Task.status.in_(closed_task_statuses))
+        task_open_count = open_tasks.count()
+        task_due_soon_count = (
+            open_tasks.filter(Task.due_date >= today)
+            .filter(Task.due_date <= due_soon_limit)
+            .count()
+        )
+        overdue_task_count = open_tasks.filter(Task.due_date < today).count()
 
-    upcoming_events = (
-        CalendarEvent.query.filter(CalendarEvent.start_datetime >= now)
-        .filter(CalendarEvent.start_datetime <= upcoming_limit)
-        .order_by(CalendarEvent.start_datetime.asc())
-        .limit(5)
-        .all()
-    )
-
-    recent_tasks = (
-        Task.query.order_by(Task.updated_at.desc(), Task.created_at.desc()).limit(5).all()
-    )
-    recent_quotes = (
-        Preventivo.query.order_by(Preventivo.data_creazione.desc()).limit(5).all()
-    )
-    unread_mail_count = EmailMessage.query.filter(
-        EmailMessage.direction == "inbound",
-        EmailMessage.is_read.is_(False),
-    ).count()
-
-    notifications = get_notifications()
-
-    data = {
-        "notifications": notifications,
-        "task_open_count": task_open_count,
-        "task_due_soon_count": task_due_soon_count,
-        "overdue_task_count": overdue_task_count,
-        "upcoming_events_count": (
+        upcoming_events = (
             CalendarEvent.query.filter(CalendarEvent.start_datetime >= now)
             .filter(CalendarEvent.start_datetime <= upcoming_limit)
-            .count()
-        ),
-        "active_clients_count": Cliente.query.count(),
-        "active_jobs_count": Lavoro.query.filter(
-            db.or_(
-                Lavoro.stato.is_(None),
-                ~db.func.lower(Lavoro.stato).in_(closed_job_statuses),
-            )
-        ).count(),
-        "draft_quotes_count": Preventivo.query.filter(
-            db.func.lower(Preventivo.stato).in_(draft_quote_statuses)
-        ).count(),
-        "accepted_quotes_count": Preventivo.query.filter(
-            db.func.lower(Preventivo.stato).in_(accepted_quote_statuses)
-        ).count(),
-        "recent_tasks": [serialize_dashboard_task(task) for task in recent_tasks],
-        "upcoming_events": [
-            serialize_dashboard_event(event) for event in upcoming_events
-        ],
-        "recent_quotes": [
-            serialize_dashboard_quote(preventivo) for preventivo in recent_quotes
-        ],
-        "unread_mail_count": unread_mail_count,
-        "current_balance": finance_data["current_balance"],
-        "month_income_effective": finance_data["month_income_effective"],
-        "month_income_expected": finance_data["month_income_expected"],
-        "month_expenses_fixed": finance_data["month_expenses_fixed"],
-        "month_expenses_variable": finance_data["month_expenses_variable"],
-        "month_expenses_total": finance_data["month_expenses_total"],
-        "month_balance": finance_data["month_balance"],
-    }
-    return api_response(data=data)
+            .order_by(CalendarEvent.start_datetime.asc())
+            .limit(5)
+            .all()
+        )
+
+        recent_tasks = (
+            Task.query.order_by(Task.updated_at.desc(), Task.created_at.desc()).limit(5).all()
+        )
+        recent_quotes = (
+            Preventivo.query.order_by(Preventivo.data_creazione.desc()).limit(5).all()
+        )
+        unread_mail_count = EmailMessage.query.filter(
+            EmailMessage.direction == "inbound",
+            EmailMessage.is_read.is_(False),
+        ).count()
+
+        notifications = get_notifications()
+
+        data = {
+            "notifications": notifications,
+            "task_open_count": task_open_count,
+            "task_due_soon_count": task_due_soon_count,
+            "overdue_task_count": overdue_task_count,
+            "upcoming_events_count": (
+                CalendarEvent.query.filter(CalendarEvent.start_datetime >= now)
+                .filter(CalendarEvent.start_datetime <= upcoming_limit)
+                .count()
+            ),
+            "active_clients_count": Cliente.query.count(),
+            "active_jobs_count": Lavoro.query.filter(
+                db.or_(
+                    Lavoro.stato.is_(None),
+                    ~db.func.lower(Lavoro.stato).in_(closed_job_statuses),
+                )
+            ).count(),
+            "draft_quotes_count": Preventivo.query.filter(
+                db.func.lower(Preventivo.stato).in_(draft_quote_statuses)
+            ).count(),
+            "accepted_quotes_count": Preventivo.query.filter(
+                db.func.lower(Preventivo.stato).in_(accepted_quote_statuses)
+            ).count(),
+            "recent_tasks": [serialize_dashboard_task(task) for task in recent_tasks],
+            "upcoming_events": [
+                serialize_dashboard_event(event) for event in upcoming_events
+            ],
+            "recent_quotes": [
+                serialize_dashboard_quote(preventivo) for preventivo in recent_quotes
+            ],
+            "unread_mail_count": unread_mail_count,
+            "current_balance": finance_data["current_balance"],
+            "month_income_effective": finance_data["month_income_effective"],
+            "month_income_expected": finance_data["month_income_expected"],
+            "month_expenses_fixed": finance_data["month_expenses_fixed"],
+            "month_expenses_variable": finance_data["month_expenses_variable"],
+            "month_expenses_total": finance_data["month_expenses_total"],
+            "month_balance": finance_data["month_balance"],
+        }
+        return api_response(data=data)
+    except Exception as e:
+        return api_response(False, None, str(e), 500)
 
 
 @bp.get("/api/finance")

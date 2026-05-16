@@ -64,6 +64,14 @@
                         <label for="descrizione" class="form-label fw-bold">Titolo</label>
                         <input type="text" class="form-control" id="descrizione" name="descrizione" value="{{ preventivo.descrizione or '' }}" required>
                     </div>
+                    <div class="mt-3">
+                        <label for="data_invio" class="form-label fw-bold">Data invio</label>
+                        <input type="date" class="form-control" id="data_invio" name="data_invio" value="{{ preventivo.data_invio.isoformat() if preventivo.data_invio else '' }}">
+                    </div>
+                    <div class="mt-3">
+                        <label for="data_followup" class="form-label fw-bold">Data follow-up</label>
+                        <input type="date" class="form-control" id="data_followup" name="data_followup" value="{{ preventivo.data_followup.isoformat() if preventivo.data_followup else '' }}">
+                    </div>
                 </div>
             </div>
         </div>

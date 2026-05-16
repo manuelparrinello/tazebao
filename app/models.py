@@ -152,6 +152,7 @@ class Lavoro(db.Model):
         backref="lavoro",
         lazy=True,
         cascade="all, delete, delete-orphan",
+        foreign_keys="Preventivo.lavoro_id",
     )
     folder_path = db.Column(db.String(255), nullable=True, unique=True)
     cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False)
@@ -664,11 +665,21 @@ class Preventivo(db.Model):
     stato = db.Column(db.String(20), default="bozza", nullable=False)
     totale_preventivo = db.Column(db.Float, nullable=True)
     lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=True)
+    data_invio = db.Column(db.Date, nullable=True)
+    data_followup = db.Column(db.Date, nullable=True)
+    convertito_in_lavoro_id = db.Column(
+        db.Integer, db.ForeignKey("lavori.id"), nullable=True
+    )
     righe = db.relationship(
         "RigaPreventivo",
         back_populates="preventivo",
         cascade="all, delete-orphan",
         lazy="selectin",
+    )
+    lavoro_convertito = db.relationship(
+        "Lavoro",
+        backref="preventivo_di_origine",
+        foreign_keys=[convertito_in_lavoro_id],
     )
 
 

@@ -213,7 +213,7 @@
                             </span>
                             <div class="lav-badges">
                                 {{ erp_badge("work_status", lavoro.stato) }}
-                                {{ erp_badge("work_priority", lavoro.priorita) }}
+                                {% if lavoro.priorita %}<span class="priority-indicator priority-{{ lavoro.priorita|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ labelize(lavoro.priorita) }}</span></span>{% endif %}
                             </div>
                         </div>
                         <div class="lav-card-body">
@@ -271,7 +271,7 @@
                             </span>
                             <div class="task-badges">
                                 {{ erp_badge("task_status", task.status) }}
-                                {{ erp_badge("task_priority", task.priority) }}
+                                {% if task.priority %}<span class="priority-indicator priority-{{ task.priority|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ labelize(task.priority) }}</span></span>{% endif %}
                             </div>
                         </div>
                         <div class="task-card-body">

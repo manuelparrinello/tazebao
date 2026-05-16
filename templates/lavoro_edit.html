@@ -29,7 +29,7 @@
         </div>
         <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
             {{ erp_badge("work_status", lavoro.stato) }}
-            {{ erp_badge("work_priority", lavoro.priorita) }}
+            {% if lavoro.priorita %}<span class="priority-indicator priority-{{ lavoro.priorita|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ lavoro.priorita|title }}</span></span>{% else %}<span class="text-secondary small">-</span>{% endif %}
             <span class="text-secondary">
                 Cliente:
                 {% if lavoro.cliente %}

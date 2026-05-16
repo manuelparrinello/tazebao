@@ -38,13 +38,12 @@
                     <thead>
                         <tr>
                             <th class="fw-bold col-title">Task</th>
-                            <th class="fw-bold col-pills">Categoria</th>
+                            <th class="fw-bold col-pills-cat">Categoria</th>
                             <th class="fw-bold col-pills">Stato</th>
-                            <th class="fw-bold col-pills">Priorit&agrave;</th>
+                            <th class="fw-bold col-prio">Priorit&agrave;</th>
                             <th class="fw-bold col-date">Scadenza</th>
                             <th class="fw-bold col-refs mobile-hide">Cliente</th>
                             <th class="fw-bold col-refs mobile-hide">Lavoro</th>
-                            <th class="fw-bold col-refs mobile-hide">Assegnata a</th>
                             <th class="fw-bold col-actions">Azioni</th>
                         </tr>
                     </thead>
@@ -56,11 +55,10 @@
                             </td>
                             <td>{{ erp_badge("task_category", task.category) }}</td>
                             <td>{{ erp_badge("task_status", task.status) }}</td>
-                            <td>{{ erp_badge("task_priority", task.priority) }}</td>
+                            <td>{% if task.priority %}<span class="priority-indicator priority-{{ task.priority }}"><span class="priority-dot"></span><span class="priority-label">{{ labelize(task.priority) }}</span></span>{% else %}-{% endif %}</td>
                             <td>{{ task.due_date|date_it if task.due_date else "-" }}</td>
                             <td class="mobile-hide"><span class="text-truncate d-block">{{ task.cliente.name if task.cliente else "-" }}</span></td>
                             <td class="mobile-hide"><span class="text-truncate d-block">{{ task.lavoro.descrizione if task.lavoro else "-" }}</span></td>
-                            <td class="mobile-hide"><span class="text-truncate d-block">{{ task.assignee.name or task.assignee.email if task.assignee else "-" }}</span></td>
                             <td>
                                 <div class="erp-actions">
                                     {% if can_mutate %}
@@ -108,7 +106,7 @@
                     <div class="d-flex flex-wrap gap-1 mb-2">
                         {{ erp_badge("task_category", task.category) }}
                         {{ erp_badge("task_status", task.status) }}
-                        {{ erp_badge("task_priority", task.priority) }}
+                        {% if task.priority %}<span class="priority-indicator priority-{{ task.priority }}"><span class="priority-dot"></span><span class="priority-label">{{ labelize(task.priority) }}</span></span>{% endif %}
                     </div>
                     <div class="small text-secondary">
                         {% if task.due_date %}
@@ -116,9 +114,6 @@
                         {% endif %}
                         {% if task.cliente %}
                         <span class="ms-2"><i class="bi bi-person me-1"></i>{{ task.cliente.name }}</span>
-                        {% endif %}
-                        {% if task.assignee %}
-                        <span class="ms-2"><i class="bi bi-person-fill me-1"></i>{{ task.assignee.name }}</span>
                         {% endif %}
                     </div>
                 </div>

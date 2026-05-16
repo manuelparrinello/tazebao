@@ -1556,14 +1556,14 @@ body.loaded {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
+  gap: 0.25rem;
   max-width: 100%;
-  min-height: 24px;
-  padding: 0.32rem 0.58rem;
+  min-height: 22px;
+  padding: 0.22rem 0.42rem;
   border-radius: 999px;
   border: 1px solid transparent;
-  font-size: 0.72rem;
-  font-weight: 800;
+  font-size: 0.66rem;
+  font-weight: 700;
   line-height: 1;
   white-space: nowrap;
 }
@@ -2984,12 +2984,12 @@ body.loaded {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
-  font-size: 0.72rem;
-  font-weight: 700;
+  gap: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 600;
   line-height: 1;
-  padding: 0.38rem 0.62rem;
-  letter-spacing: 0.01em;
+  padding: 0.28rem 0.48rem;
+  letter-spacing: 0.005em;
   white-space: nowrap;
 }
 
@@ -3948,7 +3948,7 @@ table td {
 ========================= */
 
 .tasks-table {
-  min-width: 1100px;
+  min-width: 1050px;
   table-layout: fixed;
 }
 
@@ -3958,11 +3958,19 @@ table td {
 }
 
 .tasks-table .col-title {
-  width: 24%;
+  width: 26%;
+}
+
+.tasks-table .col-pills-cat {
+  width: 130px;
 }
 
 .tasks-table .col-pills {
   width: 100px;
+}
+
+.tasks-table .col-prio {
+  width: 80px;
 }
 
 .tasks-table .col-date {
@@ -3970,12 +3978,49 @@ table td {
 }
 
 .tasks-table .col-refs {
-  width: 12%;
+  width: 14%;
 }
 
 .tasks-table .col-actions {
   width: 96px;
 }
+
+.tasks-table .erp-badge {
+  font-size: 0.65rem;
+  padding: 0.22rem 0.38rem;
+}
+
+.priority-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.priority-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.priority-urgente .priority-dot,
+.priority-alta .priority-dot { background-color: #dc3545; }
+
+.priority-media .priority-dot { background-color: #ffc107; }
+
+.priority-bassa .priority-dot { background-color: #198754; }
+
+.priority-urgente,
+.priority-alta { color: #842029; }
+
+.priority-media { color: #664d03; }
+
+.priority-bassa { color: #0f5132; }
 
 /* =========================
    LAVORI ERP - TABELLA

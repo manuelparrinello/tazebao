@@ -23,7 +23,7 @@ const TabellaLavori = {
         <template v-if="lavori_data.length > 0">
           <tr v-for="lavoro in lavori_data">
             <td :sorttable_customkey="prioIndex(lavoro.priorita)" class="text-center col-prio">
-              <span v-html="badgeHtml('work_priority', lavoro.priorita)"></span>
+                <span v-html="priorityHtml(lavoro.priorita)"></span>
             </td>
             <td>
               <a class="fw-bold text-decoration-underline" :href="'/lavori/' + lavoro.id">[[ lavoro.descrizione ]]</a>
@@ -62,7 +62,7 @@ const TabellaLavori = {
               <div class="fw-bold mobile-row-title mb-1" :title="lavoro.descrizione">[[ lavoro.descrizione ]]</div>
               <div class="d-flex flex-wrap gap-1 mb-1">
                 <span v-html="badgeHtml('work_status', lavoro.stato)"></span>
-                <span v-html="badgeHtml('work_priority', lavoro.priorita)"></span>
+              <span v-html="priorityHtml(lavoro.priorita)"></span>
               </div>
               <div class="mobile-row-muted">
                 <template v-if="lavoro.cliente">
@@ -91,6 +91,11 @@ const TabellaLavori = {
     },
     badgeHtml(kind, value, text = null) {
       return window.erpBadge?.html ? window.erpBadge.html(kind, value, text) : `<span class="badge rounded-pill">${value || "-"}</span>`;
+    },
+    priorityHtml(prio) {
+      if (!prio) return '-';
+      const label = String(prio).replace(/\b\w/g, c => c.toUpperCase());
+      return `<span class="priority-indicator priority-${prio.toLowerCase()}"><span class="priority-dot"></span><span class="priority-label">${label}</span></span>`;
     },
     formatDate(value) {
       const formatter = window.erpDateFormatter?.formatDate;

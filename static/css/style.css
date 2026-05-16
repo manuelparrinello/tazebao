@@ -189,6 +189,63 @@
   object-fit: cover;
 }
 
+.topbar-notif-btn {
+  text-decoration: none !important;
+  color: #111;
+  padding: 0.15rem 0.25rem !important;
+  display: flex;
+  align-items: center;
+  min-height: 36px !important;
+}
+.topbar-notif-btn:hover {
+  color: var(--app-primary);
+}
+.notif-badge {
+  font-size: 0.6rem !important;
+  min-width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px !important;
+  top: 2px !important;
+  right: -4px !important;
+}
+.notif-dropdown {
+  width: 360px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 0;
+}
+.notif-item {
+  border-bottom: 1px solid var(--sidebar-border);
+  padding: 0.6rem 0.85rem;
+  white-space: normal;
+  word-wrap: break-word;
+}
+.notif-item:last-child {
+  border-bottom: none;
+}
+.notif-item:hover {
+  background-color: var(--sidebar-hover);
+}
+.notif-icon {
+  font-size: 1rem;
+  color: var(--app-primary);
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+.notif-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.notif-desc {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.1rem;
+}
+
 @media (max-width: 575.98px) {
   .app-topbar {
     height: 56px;

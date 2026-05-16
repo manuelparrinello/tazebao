@@ -9,7 +9,16 @@ from ..finance_service import (
     delete_financial_movement,
     finance_summary,
 )
-from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Preventivo
+from ..models import (
+    CalendarEvent,
+    Cliente,
+    EditorialPublication,
+    EmailLog,
+    EmailMessage,
+    FinancialMovement,
+    Lavoro,
+    Preventivo,
+)
 from ..models import (
     CALENDAR_EVENT_TYPES,
     EMAIL_DIRECTIONS,
@@ -265,6 +274,114 @@ def get_clienti():
     )
 
 
+def get_notifications():
+    today = date.today()
+    three_days = today + timedelta(days=3)
+    closed_statuses = ("completata", "annullata")
+    notifs = []
+
+    overdue = (
+        Task.query.filter(Task.due_date < today)
+        .filter(~Task.status.in_(closed_statuses))
+        .order_by(Task.due_date.asc())
+        .limit(10)
+        .all()
+    )
+    for t in overdue:
+        notifs.append(
+            {
+                "type": "overdue_task",
+                "icon": "bi-exclamation-triangle",
+                "title": f"Task scaduta: {t.name}",
+                "description": f"Scaduta il {t.due_date.strftime('%d/%m/%Y')}",
+                "url": url_for("tasks.task_edit", task_id=t.id),
+            }
+        )
+
+    due_soon = (
+        Task.query.filter(Task.due_date >= today)
+        .filter(Task.due_date <= three_days)
+        .filter(~Task.status.in_(closed_statuses))
+        .order_by(Task.due_date.asc())
+        .limit(10)
+        .all()
+    )
+    for t in due_soon:
+        notifs.append(
+            {
+                "type": "task_due_soon",
+                "icon": "bi-alarm",
+                "title": f"Task in scadenza: {t.name}",
+                "description": f"Scade il {t.due_date.strftime('%d/%m/%Y')}",
+                "url": url_for("tasks.task_edit", task_id=t.id),
+            }
+        )
+
+    upcoming_pub = (
+        EditorialPublication.query.filter(
+            EditorialPublication.publication_date >= today,
+            EditorialPublication.publication_date <= three_days,
+            EditorialPublication.status.in_(["programmato", "approvato"]),
+        )
+        .order_by(EditorialPublication.publication_date.asc())
+        .limit(10)
+        .all()
+    )
+    for p in upcoming_pub:
+        cliente_name = p.cliente.name if p.cliente else ""
+        notifs.append(
+            {
+                "type": "upcoming_publication",
+                "icon": "bi-calendar2-week",
+                "title": f"Pubblicazione: {p.title}",
+                "description": f"{cliente_name} - {p.publication_date.strftime('%d/%m/%Y')}",
+                "url": url_for(
+                    "editorial_calendar.editorial_edit", id=p.id
+                ),
+            }
+        )
+
+    draft_statuses = ("bozza", "draft")
+    pending_quotes = (
+        Preventivo.query.filter(
+            db.func.lower(Preventivo.stato).in_(draft_statuses)
+        )
+        .order_by(Preventivo.data_creazione.desc())
+        .limit(10)
+        .all()
+    )
+    for q in pending_quotes:
+        notifs.append(
+            {
+                "type": "pending_quote",
+                "icon": "bi-file-earmark-text",
+                "title": f"Preventivo da completare: {q.descrizione}",
+                "description": q.cliente.name if q.cliente else "",
+                "url": url_for("preventivi.visualizza_preventivo", id=q.id),
+            }
+        )
+
+    pending_finance = (
+        FinancialMovement.query.filter_by(movement_status="prevista")
+        .order_by(FinancialMovement.movement_date.asc())
+        .limit(10)
+        .all()
+    )
+    for m in pending_finance:
+        segno = "entrata" if m.movement_type == "entrata" else "uscita"
+        notifs.append(
+            {
+                "type": "pending_finance",
+                "icon": "bi-cash-coin",
+                "title": f"{m.title} ({segno})",
+                "description": f"Previsto il {m.movement_date.strftime('%d/%m/%Y')} - \u20ac{float(m.amount):.2f}",
+                "url": url_for("finance.finance_index"),
+            }
+        )
+
+    return notifs[:30]
+
+
 @bp.get("/api/dashboard/summary")
 @login_required
 def get_dashboard_summary():
@@ -306,7 +423,10 @@ def get_dashboard_summary():
         EmailMessage.is_read.is_(False),
     ).count()
 
+    notifications = get_notifications()
+
     data = {
+        "notifications": notifications,
         "task_open_count": task_open_count,
         "task_due_soon_count": task_due_soon_count,
         "overdue_task_count": overdue_task_count,

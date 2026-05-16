@@ -39,7 +39,7 @@
                     <tbody>
                         <tr v-for="preventivo in preventivi" class="pointer" @click="openPreventivo(preventivo)">
                             <td class="col-descrizione-cell">
-                                <a :href="preventivo.source === 'pdf_esterno' ? preventivo.pdf_url : '/preventivi/visualizza/' + preventivo.id" class="fw-bold text-decoration-none a-no-color d-block text-truncate" @click.stop="openPreventivo(preventivo)" :target="preventivo.source === 'pdf_esterno' ? '_blank' : '_self'">
+                                <a :href="preventivo.source === 'pdf_esterno' ? preventivo.pdf_url : '/preventivi/visualizza/' + preventivo.id" class="fw-bold text-decoration-none a-no-color d-block text-truncate" @click.stop.prevent="openPreventivo(preventivo)" :target="preventivo.source === 'pdf_esterno' ? '_blank' : '_self'">
                                     <i v-if="preventivo.source === 'pdf_esterno'" class="bi bi-filetype-pdf me-1 text-danger"></i>
                                     [[ preventivo.descrizione ]]
                                 </a>
@@ -52,7 +52,7 @@
                     </tbody>
                 </table>
                 <div class="d-md-none mobile-list">
-                    <a v-for="preventivo in preventivi" :key="preventivo.id" class="mobile-list-item mobile-row-link" :href="preventivo.source === 'pdf_esterno' ? preventivo.pdf_url : '/preventivi/visualizza/' + preventivo.id" :target="preventivo.source === 'pdf_esterno' ? '_blank' : '_self'" @click.stop>
+                    <a v-for="preventivo in preventivi" :key="preventivo.id" class="mobile-list-item mobile-row-link" :href="preventivo.source === 'pdf_esterno' ? preventivo.pdf_url : '/preventivi/visualizza/' + preventivo.id" :target="preventivo.source === 'pdf_esterno' ? '_blank' : '_self'">
                         <div class="d-flex align-items-start justify-content-between gap-3">
                             <div class="min-w-0 flex-grow-1">
                                 <div class="fw-bold mobile-row-title mb-1" :title="preventivo.descrizione">

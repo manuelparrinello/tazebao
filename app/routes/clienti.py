@@ -7,7 +7,7 @@ from flask import Blueprint, flash, jsonify, redirect, render_template, request,
 from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import CalendarEvent, Cliente, EditorialPublication, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
-from ..storage_utils import build_breadcrumb, create_subfolder, get_cliente_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
+from ..storage_utils import build_breadcrumb, create_subfolder, delete_empty_storage_folder, delete_storage_file, get_cliente_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
 
 
 bp = Blueprint("clienti", __name__)
@@ -420,6 +420,59 @@ def cliente_cartella_rename(cliente_id):
         flash(str(e), "danger")
 
     return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id, subdir=subdir or None))
+
+
+@bp.route("/clienti/<int:cliente_id>/cartella/elimina/<path:filename>", methods=["POST"])
+@role_required("admin", "operatore")
+def cliente_cartella_delete_file(cliente_id, filename):
+    cliente = Cliente.query.get_or_404(cliente_id)
+    if not cliente.folder_path:
+        flash("Nessuna cartella creata per questo cliente.", "warning")
+        return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
+
+    rel_path = os.path.join(cliente.folder_path, filename).replace("\\", "/")
+    abs_path = safe_path(rel_path)
+    if not abs_path:
+        flash("File non trovato.", "danger")
+        return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
+
+    try:
+        delete_storage_file(abs_path)
+        flash("File eliminato correttamente.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+
+    parent_subdir = os.path.dirname(filename)
+    return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id, subdir=parent_subdir or None))
+
+
+@bp.route("/clienti/<int:cliente_id>/cartella/elimina-cartella/<path:dirname>", methods=["POST"])
+@role_required("admin", "operatore")
+def cliente_cartella_delete_folder(cliente_id, dirname):
+    cliente = Cliente.query.get_or_404(cliente_id)
+    if not cliente.folder_path:
+        flash("Nessuna cartella creata per questo cliente.", "warning")
+        return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
+
+    rel_path = os.path.join(cliente.folder_path, dirname).replace("\\", "/")
+    abs_path = safe_path(rel_path)
+    if not abs_path:
+        flash("Percorso non valido.", "danger")
+        return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
+
+    home_abs = safe_path(cliente.folder_path)
+    if abs_path == home_abs:
+        flash("Impossibile eliminare la cartella principale.", "danger")
+        return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
+
+    try:
+        delete_empty_storage_folder(abs_path)
+        flash("Cartella eliminata correttamente.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+
+    parent_subdir = os.path.dirname(dirname)
+    return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id, subdir=parent_subdir or None))
 
 
 @bp.route("/clienti/<int:cliente_id>/cartella/download/<path:filename>")

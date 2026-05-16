@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
-from ..storage_utils import build_breadcrumb, create_subfolder, get_lavoro_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
+from ..storage_utils import build_breadcrumb, create_subfolder, delete_empty_storage_folder, delete_storage_file, get_lavoro_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
 
 
 bp = Blueprint("lavori", __name__)
@@ -555,6 +555,59 @@ def lavoro_cartella_rename(lavoro_id):
         flash(str(e), "danger")
 
     return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id, subdir=subdir or None))
+
+
+@bp.route("/lavori/<int:lavoro_id>/cartella/elimina/<path:filename>", methods=["POST"])
+@role_required("admin", "operatore")
+def lavoro_cartella_delete_file(lavoro_id, filename):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    if not lavoro.folder_path:
+        flash("Nessuna cartella creata per questo lavoro.", "warning")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    rel_path = os.path.join(lavoro.folder_path, filename).replace("\\", "/")
+    abs_path = safe_path(rel_path)
+    if not abs_path:
+        flash("File non trovato.", "danger")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    try:
+        delete_storage_file(abs_path)
+        flash("File eliminato correttamente.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+
+    parent_subdir = os.path.dirname(filename)
+    return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id, subdir=parent_subdir or None))
+
+
+@bp.route("/lavori/<int:lavoro_id>/cartella/elimina-cartella/<path:dirname>", methods=["POST"])
+@role_required("admin", "operatore")
+def lavoro_cartella_delete_folder(lavoro_id, dirname):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    if not lavoro.folder_path:
+        flash("Nessuna cartella creata per questo lavoro.", "warning")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    rel_path = os.path.join(lavoro.folder_path, dirname).replace("\\", "/")
+    abs_path = safe_path(rel_path)
+    if not abs_path:
+        flash("Percorso non valido.", "danger")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    home_abs = safe_path(lavoro.folder_path)
+    if abs_path == home_abs:
+        flash("Impossibile eliminare la cartella principale.", "danger")
+        return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
+
+    try:
+        delete_empty_storage_folder(abs_path)
+        flash("Cartella eliminata correttamente.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+
+    parent_subdir = os.path.dirname(dirname)
+    return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id, subdir=parent_subdir or None))
 
 
 @bp.route("/lavori/<int:lavoro_id>/cartella/download/<path:filename>")

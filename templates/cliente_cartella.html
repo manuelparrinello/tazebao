@@ -188,6 +188,21 @@
                                 <button type="button" class="btn btn-sm btn-outline-secondary erp-icon-btn" data-bs-toggle="modal" data-bs-target="#renameModal" data-old-name="{{ entry.name }}" title="Rinomina {{ entry.name }}">
                                     <i class="bi bi-pencil"></i>
                                 </button>
+                                {% if not entry.is_dir %}
+                                <form action="{{ url_for('clienti.cliente_cartella_delete_file', cliente_id=cliente.id, filename=(subdir + '/' + entry.name) if subdir else entry.name) }}" method="post" class="d-inline" onsubmit="return confirm('Confermi l\'eliminazione?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger erp-icon-btn" title="Elimina {{ entry.name }}">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <form action="{{ url_for('clienti.cliente_cartella_delete_folder', cliente_id=cliente.id, dirname=(subdir + '/' + entry.name) if subdir else entry.name) }}" method="post" class="d-inline" onsubmit="return confirm('Confermi l\'eliminazione?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger erp-icon-btn" title="Elimina cartella {{ entry.name }}">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
                                 {% endif %}
                             </div>
                         </td>
@@ -226,6 +241,21 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary erp-icon-btn" data-bs-toggle="modal" data-bs-target="#renameModal" data-old-name="{{ entry.name }}" title="Rinomina {{ entry.name }}">
                             <i class="bi bi-pencil"></i>
                         </button>
+                        {% if not entry.is_dir %}
+                        <form action="{{ url_for('clienti.cliente_cartella_delete_file', cliente_id=cliente.id, filename=(subdir + '/' + entry.name) if subdir else entry.name) }}" method="post" class="d-inline" onsubmit="return confirm('Confermi l\'eliminazione?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger erp-icon-btn" title="Elimina {{ entry.name }}">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </form>
+                        {% else %}
+                        <form action="{{ url_for('clienti.cliente_cartella_delete_folder', cliente_id=cliente.id, dirname=(subdir + '/' + entry.name) if subdir else entry.name) }}" method="post" class="d-inline" onsubmit="return confirm('Confermi l\'eliminazione?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger erp-icon-btn" title="Elimina cartella {{ entry.name }}">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </form>
+                        {% endif %}
                         {% endif %}
                     </div>
                 </div>

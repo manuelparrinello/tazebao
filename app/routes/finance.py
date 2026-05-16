@@ -9,6 +9,7 @@ from ..finance_service import (
     apply_financial_payload,
     delete_financial_movement,
     finance_summary,
+    marginality_ranking,
 )
 from ..models import (
     FINANCE_CATEGORIES,
@@ -63,6 +64,7 @@ def finance_index():
         current_year=year,
         current_month=month,
         months=enumerate(MONTH_NAMES),
+        marg_ranking=marginality_ranking(),
     )
 
 

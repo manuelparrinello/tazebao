@@ -6,6 +6,7 @@ from flask import Blueprint, flash, jsonify, redirect, render_template, request,
 
 from ..auth import login_required, role_required
 from ..extensions import db
+from ..finance_service import cliente_marginality
 from ..models import CalendarEvent, Cliente, EditorialPublication, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
 from ..storage_utils import build_breadcrumb, create_subfolder, delete_empty_storage_folder, delete_storage_file, get_cliente_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
 
@@ -175,6 +176,7 @@ def cliente_page(cliente_id):
         email_logs=email_logs,
         mail_messages=mail_messages,
         quick_actions=quick_actions,
+        marg=cliente_marginality(cliente_id),
     )
 
 

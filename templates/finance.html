@@ -225,7 +225,100 @@
     </div>
 </div>
 
-<div class="row g-3 mt-3">
+<div class="row g-3 mt-4">
+    <div class="col-12">
+        <div class="card rounded-3 border border-light-subtle">
+            <div class="card-body p-3 p-md-4">
+                <h5 class="fw-bolder mb-3"><i class="bi bi-graph-up me-2 text-primary"></i>Marginalità</h5>
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <h6 class="text-secondary small fw-bold mb-2">Top 5 clienti</h6>
+                        {% if marg_ranking.top_clients %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-borderless mb-0">
+                                <thead>
+                                    <tr class="small text-secondary">
+                                        <th>Cliente</th>
+                                        <th class="text-end">Entrate</th>
+                                        <th class="text-end">Uscite</th>
+                                        <th class="text-end">Utile</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for c in marg_ranking.top_clients %}
+                                    <tr>
+                                        <td><a href="{{ url_for('cliente_page', cliente_id=c.id) }}" class="text-decoration-none">{{ c.name }}</a></td>
+                                        <td class="text-end text-success small">{{ euro(c.income) }}</td>
+                                        <td class="text-end text-danger small">{{ euro(c.expenses) }}</td>
+                                        <td class="text-end fw-bold {% if c.net > 0 %}text-success{% elif c.net < 0 %}text-danger{% endif %}">{{ euro(c.net) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-secondary small mb-0">Nessun dato sufficiente.</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <h6 class="text-secondary small fw-bold mb-2">Top 5 lavori</h6>
+                        {% if marg_ranking.top_jobs %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-borderless mb-0">
+                                <thead>
+                                    <tr class="small text-secondary">
+                                        <th>Lavoro</th>
+                                        <th class="text-end">Prev.</th>
+                                        <th class="text-end">Utile</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for j in marg_ranking.top_jobs %}
+                                    <tr>
+                                        <td><a href="{{ url_for('lavori.lavoro_page', lavoro_id=j.id) }}" class="text-decoration-none">{{ j.descrizione|truncate(30) }}</a></td>
+                                        <td class="text-end small">{{ euro(j.preventivato) }}</td>
+                                        <td class="text-end fw-bold {% if j.net > 0 %}text-success{% elif j.net < 0 %}text-danger{% endif %}">{{ euro(j.net) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-secondary small mb-0">Nessun lavoro con preventivo.</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <h6 class="text-secondary small fw-bold mb-2">Lavori in perdita</h6>
+                        {% if marg_ranking.losing_jobs %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-borderless mb-0">
+                                <thead>
+                                    <tr class="small text-secondary">
+                                        <th>Lavoro</th>
+                                        <th class="text-end">Utile</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for j in marg_ranking.losing_jobs %}
+                                    <tr>
+                                        <td><a href="{{ url_for('lavori.lavoro_page', lavoro_id=j.id) }}" class="text-decoration-none">{{ j.descrizione|truncate(30) }}</a></td>
+                                        <td class="text-end fw-bold text-danger">{{ euro(j.net) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-secondary small mb-0">Nessun lavoro in perdita.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-4">
     <div class="col-12 col-xl-6">
         <div class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-3 p-md-4">

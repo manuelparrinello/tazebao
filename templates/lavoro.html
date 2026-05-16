@@ -163,7 +163,46 @@
             </div>
         </section>
     </div>
+</div>
 
+<section class="mt-4">
+    <div class="row g-3">
+        <div class="col-6 col-md-3">
+            <div class="card h-100 rounded-3 border border-light-subtle">
+                <div class="card-body p-3">
+                    <p class="text-secondary small mb-1">Preventivato</p>
+                    <div class="h4 fw-bold mb-0">{{ euro(lavoro.preventivato|default(0)) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card h-100 rounded-3 border border-light-subtle">
+                <div class="card-body p-3">
+                    <p class="text-secondary small mb-1">Entrate collegate</p>
+                    <div class="h4 fw-bold mb-0 text-success">{{ euro(marg.total_income) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card h-100 rounded-3 border border-light-subtle">
+                <div class="card-body p-3">
+                    <p class="text-secondary small mb-1">Uscite collegate</p>
+                    <div class="h4 fw-bold mb-0 text-danger">{{ euro(marg.total_expenses) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card h-100 rounded-3 border border-light-subtle">
+                <div class="card-body p-3">
+                    <p class="text-secondary small mb-1">Margine stimato</p>
+                    <div class="h4 fw-bold mb-0 {% if marg.net > 0 %}text-success{% elif marg.net < 0 %}text-danger{% else %}text-secondary{% endif %}">{{ euro(marg.net) }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="row g-4 mt-1">
     <div class="col-12">
         <section class="card rounded-3 border border-light-subtle">
             <div class="card-body p-3 p-md-4">

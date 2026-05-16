@@ -1,13 +1,17 @@
 from datetime import date, datetime
 from decimal import Decimal
 
+from sqlalchemy import func
+
 from .extensions import db
 from .models import (
     FINANCE_CATEGORIES,
     FINANCE_EXPENSE_TYPES,
     FINANCE_MOVEMENT_STATUSES,
     FINANCE_MOVEMENT_TYPES,
+    Cliente,
     FinancialMovement,
+    Lavoro,
 )
 
 
@@ -167,3 +171,211 @@ def finance_summary(year=None, month=None):
 
 def delete_financial_movement(movement):
     db.session.delete(movement)
+
+
+def cliente_marginality(cliente_id):
+    income = (
+        db.session.query(func.coalesce(func.sum(FinancialMovement.amount), 0))
+        .filter(
+            FinancialMovement.cliente_id == cliente_id,
+            FinancialMovement.movement_type == "entrata",
+            FinancialMovement.movement_status == "effettiva",
+        )
+        .scalar()
+    )
+    expenses = (
+        db.session.query(func.coalesce(func.sum(FinancialMovement.amount), 0))
+        .filter(
+            FinancialMovement.cliente_id == cliente_id,
+            FinancialMovement.movement_type == "uscita",
+        )
+        .scalar()
+    )
+    count = (
+        db.session.query(func.count(FinancialMovement.id))
+        .filter(FinancialMovement.cliente_id == cliente_id)
+        .scalar()
+    )
+    last = (
+        db.session.query(func.max(FinancialMovement.movement_date))
+        .filter(FinancialMovement.cliente_id == cliente_id)
+        .scalar()
+    )
+    return {
+        "total_income": float(income),
+        "total_expenses": float(expenses),
+        "net": float(income - expenses),
+        "movement_count": count,
+        "last_movement_date": last.isoformat() if last else None,
+    }
+
+
+def lavoro_marginality(lavoro_id):
+    income = (
+        db.session.query(func.coalesce(func.sum(FinancialMovement.amount), 0))
+        .filter(
+            FinancialMovement.lavoro_id == lavoro_id,
+            FinancialMovement.movement_type == "entrata",
+            FinancialMovement.movement_status == "effettiva",
+        )
+        .scalar()
+    )
+    expenses = (
+        db.session.query(func.coalesce(func.sum(FinancialMovement.amount), 0))
+        .filter(
+            FinancialMovement.lavoro_id == lavoro_id,
+            FinancialMovement.movement_type == "uscita",
+        )
+        .scalar()
+    )
+    return {
+        "total_income": float(income),
+        "total_expenses": float(expenses),
+        "net": float(income - expenses),
+    }
+
+
+def _client_margin_rows(limit=5):
+    rows = (
+        db.session.query(
+            Cliente.id,
+            Cliente.name,
+            func.coalesce(func.sum(FinancialMovement.amount), 0).label("income"),
+        )
+        .join(FinancialMovement, FinancialMovement.cliente_id == Cliente.id)
+        .filter(
+            FinancialMovement.movement_type == "entrata",
+            FinancialMovement.movement_status == "effettiva",
+        )
+        .group_by(Cliente.id, Cliente.name)
+        .order_by(func.sum(FinancialMovement.amount).desc())
+        .limit(limit)
+        .all()
+    )
+    result = []
+    for r in rows:
+        expenses = (
+            db.session.query(func.coalesce(func.sum(FinancialMovement.amount), 0))
+            .filter(
+                FinancialMovement.cliente_id == r.id,
+                FinancialMovement.movement_type == "uscita",
+            )
+            .scalar()
+        )
+        result.append(
+            {
+                "id": r.id,
+                "name": r.name,
+                "income": float(r.income),
+                "expenses": float(expenses),
+                "net": float(r.income - expenses),
+            }
+        )
+    return result
+
+
+def _job_margin_rows(limit=5):
+    rows = (
+        db.session.query(
+            Lavoro.id,
+            Lavoro.descrizione,
+            Lavoro.cliente_id,
+            func.coalesce(Lavoro.preventivato, 0).label("preventivato"),
+        )
+        .filter(Lavoro.preventivato.isnot(None), Lavoro.preventivato > 0)
+        .limit(limit)
+        .all()
+    )
+    result = []
+    for r in rows:
+        income = (
+            db.session.query(func.coalesce(func.sum(FinancialMovement.amount), 0))
+            .filter(
+                FinancialMovement.lavoro_id == r.id,
+                FinancialMovement.movement_type == "entrata",
+                FinancialMovement.movement_status == "effettiva",
+            )
+            .scalar()
+        )
+        expenses = (
+            db.session.query(func.coalesce(func.sum(FinancialMovement.amount), 0))
+            .filter(
+                FinancialMovement.lavoro_id == r.id,
+                FinancialMovement.movement_type == "uscita",
+            )
+            .scalar()
+        )
+        cliente_name = ""
+        if r.cliente_id:
+            c = db.session.get(Cliente, r.cliente_id)
+            if c:
+                cliente_name = c.name
+        result.append(
+            {
+                "id": r.id,
+                "descrizione": r.descrizione,
+                "cliente_name": cliente_name,
+                "preventivato": float(r.preventivato),
+                "income": float(income),
+                "expenses": float(expenses),
+                "net": float(income - expenses),
+            }
+        )
+    return result
+
+
+def _losing_jobs(limit=5):
+    rows = (
+        db.session.query(
+            Lavoro.id,
+            Lavoro.descrizione,
+            Lavoro.cliente_id,
+        )
+        .all()
+    )
+    result = []
+    for r in rows:
+        income = (
+            db.session.query(func.coalesce(func.sum(FinancialMovement.amount), 0))
+            .filter(
+                FinancialMovement.lavoro_id == r.id,
+                FinancialMovement.movement_type == "entrata",
+                FinancialMovement.movement_status == "effettiva",
+            )
+            .scalar()
+        )
+        expenses = (
+            db.session.query(func.coalesce(func.sum(FinancialMovement.amount), 0))
+            .filter(
+                FinancialMovement.lavoro_id == r.id,
+                FinancialMovement.movement_type == "uscita",
+            )
+            .scalar()
+        )
+        net = income - expenses
+        if net < 0:
+            cliente_name = ""
+            if r.cliente_id:
+                c = db.session.get(Cliente, r.cliente_id)
+                if c:
+                    cliente_name = c.name
+            result.append(
+                {
+                    "id": r.id,
+                    "descrizione": r.descrizione,
+                    "cliente_name": cliente_name,
+                    "income": float(income),
+                    "expenses": float(expenses),
+                    "net": float(net),
+                }
+            )
+    result.sort(key=lambda x: x["net"])
+    return result[:limit]
+
+
+def marginality_ranking():
+    return {
+        "top_clients": _client_margin_rows(5),
+        "top_jobs": _job_margin_rows(5),
+        "losing_jobs": _losing_jobs(5),
+    }

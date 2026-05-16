@@ -21,19 +21,21 @@
     <!-- Navbar -->
     {% include '_navbar.html' %}
 
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="app-content p-5 pb-0">
+    <!-- Flash messages as floating toasts -->
+    <div class="erp-toast-container" aria-live="polite" aria-atomic="true">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
         {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="toast align-items-center text-bg-{{ category }} border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="4500">
+            <div class="d-flex">
+                <div class="toast-body">{{ message }}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Chiudi"></button>
+            </div>
         </div>
         {% endfor %}
+        {% endif %}
+        {% endwith %}
     </div>
-    {% endif %}
-    {% endwith %}
 
     <!-- Contenuto dinamico -->
     <main class="app-content p-5">
@@ -48,6 +50,14 @@
     <script src="{{ url_for('static', filename='js/sorttable.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
     <script src="{{ url_for('static', filename='js/topbar_notifications.js') }}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.erp-toast-container .toast').forEach(function(el) {
+            var toast = new bootstrap.Toast(el, { autohide: true, delay: 4500 });
+            toast.show();
+        });
+    });
+    </script>
     {% block scripts %}
     {% endblock %}
 </body>

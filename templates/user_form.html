@@ -17,16 +17,6 @@
         </a>
     </div>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div>
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} mb-2">{{ message }}</div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% endwith %}
-
     <form action="{{ action_url }}" method="post" class="erp-boxed-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="erp-form-card">

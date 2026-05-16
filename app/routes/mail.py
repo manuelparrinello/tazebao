@@ -186,7 +186,7 @@ def mail_index():
 @login_required
 def mail_detail(message_id):
     message = EmailMessage.query.get_or_404(message_id)
-    if message.direction == "inbound" and not message.is_read:
+    if message.direction == "inbound" and not message.is_read and g.current_user.role != "readonly":
         message.is_read = True
         db.session.commit()
     return render_template("mail_detail.html", message=message, **mail_choices())

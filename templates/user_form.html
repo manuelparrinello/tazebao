@@ -7,10 +7,10 @@
 
 {% block content %}
 <div class="erp-form-page">
-    <div class="erp-form-header">
+    <div class="erp-form-header d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2">
         <div>
-            <h1 class="erp-form-title">{{ "Modifica utente" if is_edit else "Nuovo utente" }}</h1>
-            <p class="erp-form-subtitle">Gestisci anagrafica, ruolo e stato accesso.</p>
+            <h3 class="fw-bolder erp-form-title mb-1">{{ "Modifica utente" if is_edit else "Nuovo utente" }}</h3>
+            <p class="erp-form-subtitle mb-0">Gestisci anagrafica, ruolo e stato accesso.</p>
         </div>
         <a href="{{ url_for('users.users_index') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i>&nbsp;Torna agli utenti
@@ -19,7 +19,8 @@
 
     <form action="{{ action_url }}" method="post" class="erp-boxed-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="erp-form-card">
+        <div class="card erp-form-card">
+            <div class="card-body p-3 p-md-4">
             <div class="erp-form-section">
                 <div class="erp-form-section-heading">
                     <h5>Utente</h5>
@@ -91,7 +92,8 @@
                     <i class="bi bi-person-x"></i>&nbsp;Disattiva
                 </button>
                 {% endif %}
-                <a href="{{ url_for('users.users_index') }}" class="btn btn-outline-secondary">Annulla</a>
+                <a href="{{ url_for('users.users_index') }}" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i>&nbsp;Annulla</a>
+            </div>
             </div>
         </div>
     </form>

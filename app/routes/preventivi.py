@@ -131,7 +131,7 @@ def preventivi():
 
 @bp.post("/presentivi/addrow")
 @bp.post("/preventivi/addrow")
-@login_required
+@role_required("admin", "operatore")
 def render_row():
     data = request.get_json(silent=True) or {}
     id_riga = data.get("idRiga")

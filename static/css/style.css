@@ -3492,6 +3492,37 @@ table td {
   font-size: 0.7rem;
 }
 
+.dashboard-kpi-value {
+  font-size: 2rem;
+}
+
+.dashboard-kpi-danger { color: #dc3545; }
+.dashboard-kpi-warning { color: #b8860b; }
+.dashboard-kpi-success { color: #198754; }
+
+.dashboard-icon-box-danger { background-color: #f8d7da !important; }
+.dashboard-icon-box-warning { background-color: #fff3cd !important; }
+.dashboard-icon-box-success { background-color: #d1e7dd !important; }
+.dashboard-icon-box-info { background-color: #dbeafe !important; }
+.dashboard-icon-box-primary { background-color: var(--sidebar-active) !important; }
+
+.dashboard-list-priority {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.dashboard-list-priority .priority-dot {
+  width: 6px;
+  height: 6px;
+}
+
+.dashboard-empty-icon {
+  font-size: 2rem;
+  color: #dee2e6;
+  margin-bottom: 0.5rem;
+}
+
 /* =========================
    CALENDARIO EDITORIALE - HEADER
 ========================= */

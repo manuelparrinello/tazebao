@@ -311,28 +311,25 @@ if (document.getElementById("app")) {
     computed: {
       kpiCards() {
         if (!this.summary) return [];
+        const overdue = this.summary.overdue_task_count || 0;
+        const dueSoon = this.summary.task_due_soon_count || 0;
+        const drafts = this.summary.draft_quotes_count || 0;
+        const unread = this.summary.unread_mail_count || 0;
         return [
-          { title: "Task aperte", value: this.summary.task_open_count, icon: "bi-list-check" },
-          { title: "Scadenze prossime", value: this.summary.task_due_soon_count, icon: "bi-alarm" },
-          { title: "Task scadute", value: this.summary.overdue_task_count, icon: "bi-exclamation-triangle" },
-          { title: "Email non lette", value: this.summary.unread_mail_count, icon: "bi-envelope-exclamation" },
-          { title: "Eventi prossimi", value: this.summary.upcoming_events_count, icon: "bi-calendar-event" },
-          { title: "Clienti", value: this.summary.active_clients_count, icon: "bi-people" },
-          { title: "Lavori attivi", value: this.summary.active_jobs_count, icon: "bi-briefcase" },
-          { title: "Preventivi bozza", value: this.summary.draft_quotes_count, icon: "bi-file-earmark-text" },
-          { title: "Preventivi accettati", value: this.summary.accepted_quotes_count, icon: "bi-check2-circle" },
+          { title: "Task scadute", value: overdue, icon: "bi-exclamation-triangle", valueClass: overdue > 0 ? "dashboard-kpi-danger" : "", boxClass: overdue > 0 ? "dashboard-icon-box-danger" : "dashboard-icon-box-primary" },
+          { title: "In scadenza (7g)", value: dueSoon, icon: "bi-alarm", valueClass: dueSoon > 0 ? "dashboard-kpi-warning" : "", boxClass: dueSoon > 0 ? "dashboard-icon-box-warning" : "dashboard-icon-box-primary" },
+          { title: "Preventivi bozza", value: drafts, icon: "bi-file-earmark-text", valueClass: drafts > 0 ? "dashboard-kpi-warning" : "", boxClass: drafts > 0 ? "dashboard-icon-box-warning" : "dashboard-icon-box-primary" },
+          { title: "Email non lette", value: unread, icon: "bi-envelope-exclamation", valueClass: unread > 0 ? "dashboard-kpi-warning" : "", boxClass: unread > 0 ? "dashboard-icon-box-info" : "dashboard-icon-box-primary" },
         ];
       },
       financeCards() {
         if (!this.summary) return [];
+        const bal = this.summary.month_balance || 0;
         return [
-          { title: "In cassa", value: this.formatCurrency(this.summary.current_balance), icon: "bi-cash-coin" },
-          { title: "Entrate effettive mese", value: this.formatCurrency(this.summary.month_income_effective), icon: "bi-arrow-down-circle" },
-          { title: "Entrate previste mese", value: this.formatCurrency(this.summary.month_income_expected), icon: "bi-clock-history" },
-          { title: "Uscite mese", value: this.formatCurrency(this.summary.month_expenses_total), icon: "bi-arrow-up-circle" },
-          { title: "Spese fisse", value: this.formatCurrency(this.summary.month_expenses_fixed), icon: "bi-pin-angle" },
-          { title: "Spese variabili", value: this.formatCurrency(this.summary.month_expenses_variable), icon: "bi-shuffle" },
-          { title: "Bilancio mese", value: this.formatCurrency(this.summary.month_balance), icon: "bi-graph-up" },
+          { title: "Bilancio mese", value: this.formatCurrency(bal), icon: "bi-graph-up", valueClass: bal >= 0 ? "text-success" : "text-danger", boxClass: bal >= 0 ? "dashboard-icon-box-success" : "dashboard-icon-box-danger" },
+          { title: "Entrate effettive", value: this.formatCurrency(this.summary.month_income_effective || 0), icon: "bi-arrow-down-circle", valueClass: "text-success", boxClass: "dashboard-icon-box-success" },
+          { title: "Uscite mese", value: this.formatCurrency(this.summary.month_expenses_total || 0), icon: "bi-arrow-up-circle", valueClass: "text-danger", boxClass: "dashboard-icon-box-danger" },
+          { title: "Lavori attivi", value: this.summary.active_jobs_count || 0, icon: "bi-briefcase", valueClass: "", boxClass: "dashboard-icon-box-primary" },
         ];
       },
     },
@@ -382,6 +379,19 @@ if (document.getElementById("app")) {
         const html = window.erpBadge?.html(kind, value, text);
         return html || `<span class="badge rounded-pill erp-badge text-bg-light border">${window.erpBadge?.label(kind, value, text) || value || '-'}</span>`;
       },
+      priorityHtml(prio) {
+        if (!prio) return '<span class="text-secondary">-</span>';
+        const label = String(prio).replace(/\b\w/g, c => c.toUpperCase());
+        return `<span class="dashboard-list-priority priority-${prio.toLowerCase()}"><span class="priority-dot"></span><span class="priority-label">${label}</span></span>`;
+      },
+      isOverdue(dateStr) {
+        if (!dateStr) return false;
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return d < today;
+      },
     },
     template: `
       <section class="container-fluid px-0">
@@ -407,15 +417,15 @@ if (document.getElementById("app")) {
 
         <div v-else>
           <div class="row g-3">
-            <div class="col-12 col-md-6 col-xl-3" v-for="card in kpiCards" :key="card.title">
+            <div class="col-12 col-sm-6 col-xl-3" v-for="card in kpiCards" :key="card.title">
               <article class="card h-100 rounded-3 border border-light-subtle">
                 <div class="card-body p-4">
                   <div class="d-flex align-items-start justify-content-between gap-3">
                     <div class="min-w-0">
                       <p class="text-secondary small mb-2">[[ card.title ]]</p>
-                      <div class="display-6 fw-bold text-truncate">[[ card.value ]]</div>
+                      <div class="fw-bold text-truncate dashboard-kpi-value" :class="card.valueClass">[[ card.value ]]</div>
                     </div>
-                    <div class="dashboard-icon-box rounded-3 bg-primary d-inline-flex align-items-center justify-content-center flex-shrink-0">
+                    <div class="dashboard-icon-box rounded-3 d-inline-flex align-items-center justify-content-center flex-shrink-0" :class="card.boxClass">
                       <i class="bi" :class="card.icon"></i>
                     </div>
                   </div>
@@ -430,15 +440,15 @@ if (document.getElementById("app")) {
               <a class="btn btn-sm btn-outline-primary" href="/finance">Apri finanze</a>
             </div>
             <div class="row g-3">
-              <div class="col-12 col-md-6 col-xl-3" v-for="card in financeCards" :key="card.title">
+              <div class="col-12 col-sm-6 col-xl-3" v-for="card in financeCards" :key="card.title">
                 <article class="card h-100 rounded-3 border border-light-subtle">
                   <div class="card-body p-4">
                     <div class="d-flex align-items-start justify-content-between gap-3">
                       <div class="min-w-0">
                         <p class="text-secondary small mb-2">[[ card.title ]]</p>
-                        <div class="h3 fw-bold mb-0 text-truncate">[[ card.value ]]</div>
+                        <div class="fw-bold text-truncate dashboard-kpi-value" :class="card.valueClass">[[ card.value ]]</div>
                       </div>
-                      <div class="dashboard-icon-box rounded-3 bg-primary d-inline-flex align-items-center justify-content-center flex-shrink-0">
+                      <div class="dashboard-icon-box rounded-3 d-inline-flex align-items-center justify-content-center flex-shrink-0" :class="card.boxClass">
                         <i class="bi" :class="card.icon"></i>
                       </div>
                     </div>
@@ -453,9 +463,9 @@ if (document.getElementById("app")) {
               <article class="card h-100 rounded-3 border border-light-subtle">
                 <div class="card-body p-4">
                   <h2 class="h5 mb-3">Prossimi eventi</h2>
-                  <div v-if="summary.upcoming_events.length === 0" class="text-secondary py-3 text-center">
-                    <i class="bi bi-calendar2-week d-block fs-2 text-secondary mb-2"></i>
-                    <span>Nessun evento nei prossimi 7 giorni.</span>
+                  <div v-if="summary.upcoming_events.length === 0" class="text-secondary py-4 text-center">
+                    <div class="dashboard-empty-icon"><i class="bi bi-calendar2-week"></i></div>
+                    <div class="small">Nessun evento nei prossimi 7 giorni.</div>
                   </div>
                   <a v-for="event in summary.upcoming_events" :key="event.id" :href="event.url" class="dashboard-list-item">
                     <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
@@ -465,6 +475,7 @@ if (document.getElementById("app")) {
                     <div class="small text-secondary d-flex flex-wrap gap-2">
                       <span><i class="bi bi-calendar3 me-1"></i>[[ formatDateTime(event.start_datetime) ]]</span>
                       <span v-if="event.cliente"><i class="bi bi-person me-1"></i>[[ event.cliente.name ]]</span>
+                      <span v-if="event.lavoro"><i class="bi bi-briefcase me-1"></i>[[ event.lavoro.descrizione ]]</span>
                     </div>
                   </a>
                 </div>
@@ -475,18 +486,21 @@ if (document.getElementById("app")) {
               <article class="card h-100 rounded-3 border border-light-subtle">
                 <div class="card-body p-4">
                   <h2 class="h5 mb-3">Task recenti</h2>
-                  <div v-if="summary.recent_tasks.length === 0" class="text-secondary py-3 text-center">
-                    <i class="bi bi-list-check d-block fs-2 text-secondary mb-2"></i>
-                    <span>Nessuna task presente.</span>
+                  <div v-if="summary.recent_tasks.length === 0" class="text-secondary py-4 text-center">
+                    <div class="dashboard-empty-icon"><i class="bi bi-list-check"></i></div>
+                    <div class="small">Nessuna task recente.</div>
                   </div>
                   <a v-for="task in summary.recent_tasks" :key="task.id" :href="task.url" class="dashboard-list-item">
                     <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
                       <div class="fw-bold text-truncate min-w-0">[[ task.name ]]</div>
                       <span v-html="badgeHtml('task_status', task.status)" class="flex-shrink-0"></span>
                     </div>
-                    <div class="small text-secondary d-flex flex-wrap gap-2">
-                      <span v-if="task.due_date"><i class="bi bi-calendar3 me-1"></i>Scadenza: [[ formatDate(task.due_date) ]]</span>
-                      <span><i class="bi bi-flag me-1"></i>[[ labelize(task.priority) ]]</span>
+                    <div class="small d-flex flex-wrap gap-2">
+                      <span v-html="priorityHtml(task.priority)"></span>
+                      <span v-if="task.due_date" :class="isOverdue(task.due_date) ? 'text-danger fw-bold' : 'text-secondary'">
+                        <i class="bi bi-calendar3 me-1"></i>[[ formatDate(task.due_date) ]]
+                      </span>
+                      <span v-if="task.cliente" class="text-secondary"><i class="bi bi-person me-1"></i>[[ task.cliente.name ]]</span>
                     </div>
                   </a>
                 </div>
@@ -497,9 +511,9 @@ if (document.getElementById("app")) {
               <article class="card h-100 rounded-3 border border-light-subtle">
                 <div class="card-body p-4">
                   <h2 class="h5 mb-3">Preventivi recenti</h2>
-                  <div v-if="summary.recent_quotes.length === 0" class="text-secondary py-3 text-center">
-                    <i class="bi bi-file-earmark-text d-block fs-2 text-secondary mb-2"></i>
-                    <span>Nessun preventivo presente.</span>
+                  <div v-if="summary.recent_quotes.length === 0" class="text-secondary py-4 text-center">
+                    <div class="dashboard-empty-icon"><i class="bi bi-file-earmark-text"></i></div>
+                    <div class="small">Nessun preventivo recente.</div>
                   </div>
                   <a v-for="quote in summary.recent_quotes" :key="quote.id" :href="quote.url" class="dashboard-list-item">
                     <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
@@ -507,9 +521,9 @@ if (document.getElementById("app")) {
                       <span v-html="badgeHtml('quote_status', quote.stato)" class="flex-shrink-0"></span>
                     </div>
                     <div class="small text-secondary d-flex flex-wrap gap-2">
-                      <span v-if="quote.cliente"><i class="bi bi-person me-1"></i>[[ quote.cliente.name ]]</span>
+                      <span v-if="quote.importo_totale" class="fw-semibold"><i class="bi bi-currency-euro me-1"></i>[[ formatCurrency(quote.importo_totale) ]]</span>
                       <span><i class="bi bi-calendar3 me-1"></i>[[ formatDate(quote.data_creazione) ]]</span>
-                      <span class="fw-bold">[[ formatCurrency(quote.totale_preventivo) ]]</span>
+                      <span v-if="quote.cliente"><i class="bi bi-person me-1"></i>[[ quote.cliente.name ]]</span>
                     </div>
                   </a>
                 </div>

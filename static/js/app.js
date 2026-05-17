@@ -240,9 +240,7 @@ function deleteCliente(id) {
 
 async function clickForDeleteCliente(event, idCliente) {
   event.preventDefault();
-  const utenteConferma = confirm("Sei sicuro di voler cancellare il cliente?");
-
-  if (utenteConferma === false) {
+  if (!await erpConfirm("Sei sicuro di voler cancellare il cliente?")) {
     return;
   }
 
@@ -278,8 +276,7 @@ function deleteLavoro(id) {
 
 async function clickForDeleteLavoro(event, idLavoro) {
   event.preventDefault();
-  const conferma = confirm("Vuoi cancellare questo lavoro?");
-  if (!conferma) return;
+  if (!await erpConfirm("Vuoi cancellare questo lavoro?")) return;
 
   try {
     const response = await deleteLavoro(idLavoro);

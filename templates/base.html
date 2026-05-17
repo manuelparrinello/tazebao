@@ -58,6 +58,29 @@
         });
     });
     </script>
+    <!-- Modale conferma distruttiva globale (DEVE stare prima di erp-confirm.js) -->
+    <div class="erp-confirm-overlay" id="erpConfirmOverlay" role="dialog" aria-modal="true">
+      <div class="erp-confirm-modal">
+        <div class="erp-confirm-header">
+          <h5 class="erp-confirm-title" id="erpConfirmTitle">Conferma azione</h5>
+          <button type="button" class="erp-confirm-close" data-erp-confirm-dismiss aria-label="Chiudi">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="erp-confirm-body">
+          <p id="erpConfirmMessage">Sei sicuro?</p>
+        </div>
+        <div class="erp-confirm-footer">
+          <button type="button" class="btn btn-outline-secondary" data-erp-confirm-dismiss>
+            <i class="bi bi-x-lg"></i>&nbsp;Annulla
+          </button>
+          <button type="button" class="btn btn-danger" id="erpConfirmButton">
+            <i class="bi bi-trash3"></i>&nbsp;Conferma eliminazione
+          </button>
+        </div>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/erp-confirm.js') }}"></script>
     {% block scripts %}
     {% endblock %}
 </body>

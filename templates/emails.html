@@ -92,7 +92,7 @@
                             <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) }}" class="btn btn-sm btn-outline-primary" aria-label="Modifica">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <form action="{{ url_for('emails.emails_delete', email_id=email_log.id) }}" method="post" onsubmit="return confirm('Eliminare questa comunicazione?')" class="d-inline">
+                            <form action="{{ url_for('emails.emails_delete', email_id=email_log.id) }}" method="post" class="d-inline" data-confirm-message="Eliminare questa comunicazione?">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Elimina">
                                     <i class="bi bi-trash"></i>

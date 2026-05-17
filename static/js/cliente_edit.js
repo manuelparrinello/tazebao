@@ -32,11 +32,7 @@ const getSingleCliente = Vue.createApp({
     
     async clickForDeleteCliente(event, idCliente) {
       event.preventDefault();
-      const utenteConferma = confirm(
-        "Sei sicuro di voler cancellare il cliente?"
-      );
-
-      if (utenteConferma === false) {
+      if (!await erpConfirm("Sei sicuro di voler cancellare il cliente?")) {
         return;
       }
 

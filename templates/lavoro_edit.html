@@ -148,7 +148,7 @@
                             <a href="{{ url_for('static', filename=lavoro.preventivo_pdf_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-file-earmark-pdf-fill me-1"></i>Apri PDF preventivo
                             </a>
-                            <button type="submit" name="remove_pdf" value="1" class="btn btn-sm btn-outline-danger" onclick="return confirm('Rimuovere definitivamente il PDF allegato?')">
+                            <button type="submit" name="remove_pdf" value="1" class="btn btn-sm btn-outline-danger" data-confirm-message="Rimuovere definitivamente il PDF allegato?">
                                 <i class="bi bi-trash me-1"></i>Rimuovi PDF
                             </button>
                             {% else %}
@@ -177,7 +177,7 @@
                     <h6 class="fw-bolder mb-1 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Zona pericolo</h6>
                     <p class="text-secondary mb-0 small">Elimina definitivamente questo lavoro con task, moodboard ed eventi calendario associati. L'operazione viene bloccata se esistono preventivi, movimenti finanziari o email collegate.</p>
                 </div>
-                <form action="{{ url_for('lavori.lavoro_delete', lavoro_id=lavoro.id) }}" method="post" onsubmit="return confirm('Sei sicuro di voler eliminare definitivamente il lavoro \"{{ lavoro.descrizione }}\"?')">
+                <form action="{{ url_for('lavori.lavoro_delete', lavoro_id=lavoro.id) }}" method="post" data-confirm-title="Elimina lavoro" data-confirm-message="Sei sicuro di voler eliminare definitivamente il lavoro &quot;{{ lavoro.descrizione }}&quot;?">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-outline-danger">
                         <i class="bi bi-trash3"></i>&nbsp;Elimina lavoro

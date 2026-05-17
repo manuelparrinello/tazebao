@@ -88,7 +88,7 @@
                 <a class="btn btn-outline-secondary" href="{{ url_for('users.users_password', user_id=user.id) }}">
                     <i class="bi bi-key"></i>&nbsp;Reset password
                 </a>
-                <button type="submit" formaction="{{ url_for('users.users_delete', user_id=user.id) }}" formmethod="post" class="btn btn-outline-danger" {% if current_user and current_user.id == user.id %}disabled title="Non puoi disattivare il tuo account"{% else %}onclick="return confirm('Disattivare questo utente? L\'account verrà disattivato, non eliminato dal database.')"{% endif %}>
+                <button type="submit" formaction="{{ url_for('users.users_delete', user_id=user.id) }}" formmethod="post" class="btn btn-outline-danger" {% if current_user and current_user.id == user.id %}disabled title="Non puoi disattivare il tuo account"{% else %}data-confirm-message="Disattivare questo utente? L'account verrà disattivato, non eliminato dal database."{% endif %}>
                     <i class="bi bi-person-x"></i>&nbsp;Disattiva
                 </button>
                 {% endif %}

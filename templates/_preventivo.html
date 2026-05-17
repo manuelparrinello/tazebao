@@ -47,7 +47,7 @@
         {% if current_user and current_user.role != "readonly" %}
         <a class="btn btn-primary" href="{{ url_for('preventivi.preventivo_edit', id=preventivo.id) }}">Modifica</a>
         {% if preventivo.stato in ('accettato', 'accettata', 'approvato', 'approvata') and not preventivo.convertito_in_lavoro_id %}
-        <form method="post" action="{{ url_for('preventivi.converti_preventivo_in_lavoro', id=preventivo.id) }}" onsubmit="return confirm('Convertire questo preventivo in un nuovo lavoro?')">
+        <form method="post" action="{{ url_for('preventivi.converti_preventivo_in_lavoro', id=preventivo.id) }}" data-confirm-message="Convertire questo preventivo in un nuovo lavoro?">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-success w-100"><i class="bi bi-briefcase"></i>&nbsp;Converti in lavoro</button>
         </form>

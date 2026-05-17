@@ -41,7 +41,7 @@
             <a class="btn btn-outline-secondary erp-action-secondary" href="{{ url_for('moodboards.moodboard_edit', id=moodboard.id) }}">
                 <i class="bi bi-pencil"></i>&nbsp;Modifica
             </a>
-            <form action="{{ url_for('moodboards.moodboard_delete', id=moodboard.id) }}" method="post" class="d-inline" onsubmit="return confirm('Eliminare questa moodboard e tutte le sue immagini?');">
+            <form action="{{ url_for('moodboards.moodboard_delete', id=moodboard.id) }}" method="post" class="d-inline" data-confirm-message="Eliminare questa moodboard e tutte le sue immagini?">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-outline-danger erp-action-secondary">
                     <i class="bi bi-trash3"></i>&nbsp;Elimina
@@ -72,7 +72,7 @@
         </div>
         {% if can_mutate %}
         <div class="moodboard-card-delete">
-            <form action="{{ url_for('moodboards.moodboard_delete_image', id=moodboard.id, image_id=image.id) }}" method="post" onsubmit="return confirm('Rimuovere questa immagine?');">
+            <form action="{{ url_for('moodboards.moodboard_delete_image', id=moodboard.id, image_id=image.id) }}" method="post" data-confirm-message="Rimuovere questa immagine?">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-danger" aria-label="Rimuovi">
                     <i class="bi bi-trash3"></i>

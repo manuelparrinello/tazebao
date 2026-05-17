@@ -9,9 +9,9 @@ const getAllClienti = Vue.createApp({
     };
   },
   methods: {
-    clickForDeleteCliente(cliente_id) {
+    async clickForDeleteCliente(cliente_id) {
       const url = `/clienti/${cliente_id}`;
-      if (window.confirm('Vuoi davvero cancellare il cliente?')) {
+      if (await erpConfirm('Vuoi davvero cancellare il cliente?')) {
         fetch(url, {
           method: 'delete',
           headers: csrfHeaders(),

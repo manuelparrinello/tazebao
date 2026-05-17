@@ -160,7 +160,7 @@
                                         {% if loop.first %}<div class="editorial-image-badge">Anteprima</div>{% endif %}
                                     </div>
                                     {% if publication.id %}
-                                    <form action="{{ url_for('editorial_calendar.editorial_image_delete', publication_id=publication.id, image_id=img.id) }}" method="post" class="mt-1" onsubmit="return confirm('Rimuovere questa immagine? L\'operazione non puo essere annullata.')">
+                                    <form action="{{ url_for('editorial_calendar.editorial_image_delete', publication_id=publication.id, image_id=img.id) }}" method="post" class="mt-1" data-confirm-message="Rimuovere questa immagine? L'operazione non puo essere annullata.">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <button type="submit" class="btn btn-sm btn-outline-danger w-100 editorial-image-remove-btn">
                                             <i class="bi bi-trash3"></i>&nbsp;Rimuovi immagine
@@ -266,13 +266,13 @@
 </div>
 
 {% if can_delete %}
-<form action="{{ url_for('editorial_calendar.editorial_delete', publication_id=publication.id) }}" method="post" class="editorial-form-danger-action" onsubmit="return confirm('Annullare questa pubblicazione? Lo stato verra impostato su \"annullato\".')">
+<form action="{{ url_for('editorial_calendar.editorial_delete', publication_id=publication.id) }}" method="post" class="editorial-form-danger-action" data-confirm-title="Annulla pubblicazione" data-confirm-message="Annullare questa pubblicazione? Lo stato verra impostato su &quot;annullato&quot;.">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button type="submit" class="btn btn-outline-danger">
         <i class="bi bi-slash-circle"></i>&nbsp;Annulla pubblicazione
     </button>
 </form>
-<form action="{{ url_for('editorial_calendar.editorial_purge', publication_id=publication.id) }}" method="post" class="editorial-form-danger-action mt-2" onsubmit="return confirm('Eliminare definitivamente questa pubblicazione? Le immagini associate verranno rimosse dal server.')">
+<form action="{{ url_for('editorial_calendar.editorial_purge', publication_id=publication.id) }}" method="post" class="editorial-form-danger-action mt-2" data-confirm-title="Elimina pubblicazione" data-confirm-danger-label="Elimina definitivamente" data-confirm-message="Eliminare definitivamente questa pubblicazione? Le immagini associate verranno rimosse dal server.">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button type="submit" class="btn btn-outline-danger">
         <i class="bi bi-trash3"></i>&nbsp;Elimina definitivamente

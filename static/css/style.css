@@ -3153,9 +3153,9 @@ body.loaded {
 }
 
 .btn-primary:hover {
-  background-color: #0d6efd !important;
-  border-color: #0d6efd !important;
-  color: #fff!important;
+  background-color: #1acf72 !important;
+  border-color: #1acf72 !important;
+  color: #111!important;
   transition: 0.3s ease-in-out;
 }
 
@@ -3489,10 +3489,14 @@ body.loaded {
   width: 220px;
 }
 
-table td {
-  vertical-align: baseline !important;
-  font-weight: 500 !important;
-  padding: 13px 3px!important;
+.table td {
+  vertical-align: baseline;
+  font-weight: 500;
+  padding: 13px 3px;
+}
+
+.file-browser-table td {
+  padding: 13px 3px;
 }
 
 .loader {

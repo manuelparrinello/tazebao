@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 from uuid import uuid4
 
 from flask import Blueprint, current_app, flash, g, redirect, render_template, request, url_for
@@ -15,18 +14,13 @@ from ..models import (
     Task,
     User,
 )
+from ..utils.parsing import parse_optional_id
 
 
 bp = Blueprint("moodboards", __name__)
 
 ALLOWED_IMAGE_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
 UPLOAD_FOLDER = "uploads/moodboards"
-
-
-def parse_optional_id(value):
-    if not value:
-        return None
-    return int(value)
 
 
 def validate_extension(filename):

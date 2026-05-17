@@ -15,21 +15,7 @@ from .models import (
 )
 
 
-MONTH_NAMES = (
-    "",
-    "Gennaio",
-    "Febbraio",
-    "Marzo",
-    "Aprile",
-    "Maggio",
-    "Giugno",
-    "Luglio",
-    "Agosto",
-    "Settembre",
-    "Ottobre",
-    "Novembre",
-    "Dicembre",
-)
+from .utils.calendar_helpers import MONTH_NAMES
 
 
 def parse_finance_date(value):
@@ -46,10 +32,7 @@ def parse_finance_amount(value):
     return Decimal(str(value).replace(",", "."))
 
 
-def parse_optional_id(value):
-    if value in (None, ""):
-        return None
-    return int(value)
+from .utils.parsing import parse_optional_id
 
 
 def normalize_financial_movement(movement):

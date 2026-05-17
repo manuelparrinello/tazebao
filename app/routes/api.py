@@ -27,6 +27,7 @@ from ..models import (
     TASK_STATUSES,
     Task,
 )
+from ..utils.parsing import parse_optional_date, parse_optional_datetime, parse_optional_id
 
 
 bp = Blueprint("api", __name__)
@@ -34,26 +35,6 @@ bp = Blueprint("api", __name__)
 
 def api_response(success=True, data=None, error=None, status=200):
     return jsonify({"success": success, "data": data, "error": error}), status
-
-
-def parse_optional_date(value):
-    if not value:
-        return None
-    return datetime.strptime(value, "%Y-%m-%d").date()
-
-
-def parse_optional_datetime(value):
-    if not value:
-        return None
-    if value.endswith("Z"):
-        value = value[:-1] + "+00:00"
-    return datetime.fromisoformat(value)
-
-
-def parse_optional_id(value):
-    if value in (None, ""):
-        return None
-    return int(value)
 
 
 def apply_calendar_payload(event, data, partial=False):

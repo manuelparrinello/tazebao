@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from ..auth import login_required, role_required
@@ -15,21 +13,10 @@ from ..models import (
     Task,
     User,
 )
+from ..utils.parsing import parse_optional_date, parse_optional_id
 
 
 bp = Blueprint("tasks", __name__)
-
-
-def parse_optional_date(value):
-    if not value:
-        return None
-    return datetime.strptime(value, "%Y-%m-%d").date()
-
-
-def parse_optional_id(value):
-    if not value:
-        return None
-    return int(value)
 
 
 def task_form_choices():

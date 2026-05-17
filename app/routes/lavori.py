@@ -10,6 +10,7 @@ from ..extensions import db
 from ..finance_service import lavoro_marginality
 from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
 from ..storage_utils import build_breadcrumb, create_subfolder, delete_empty_storage_folder, delete_storage_file, get_lavoro_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
+from ..utils.parsing import parse_optional_date, parse_optional_float, parse_optional_id
 
 
 bp = Blueprint("lavori", __name__)
@@ -42,24 +43,6 @@ def save_preventivo_pdf(lavoro_id):
     return rel_path.replace("\\", "/")
 
 status_lavori = ["Completato", "In corso", "In attesa", "Da iniziare"]
-
-
-def parse_optional_float(value):
-    if value in (None, ""):
-        return 0
-    return float(str(value).replace(",", "."))
-
-
-def parse_optional_date(value):
-    if not value:
-        return None
-    return datetime.strptime(value, "%Y-%m-%d").date()
-
-
-def parse_optional_id(value):
-    if value in (None, ""):
-        return None
-    return int(value)
 
 
 def apply_lavoro_form(lavoro):

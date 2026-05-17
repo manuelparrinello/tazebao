@@ -1,4 +1,3 @@
-from calendar import monthrange
 from datetime import date, datetime, time, timedelta
 
 from flask import Blueprint, redirect, render_template, request, url_for
@@ -13,37 +12,11 @@ from ..models import (
     Task,
     User,
 )
+from ..utils.calendar_helpers import MONTH_NAMES, month_bounds, month_navigation
+from ..utils.parsing import parse_optional_datetime, parse_optional_id
 
 
 bp = Blueprint("calendar", __name__)
-
-MONTH_NAMES = (
-    "",
-    "Gennaio",
-    "Febbraio",
-    "Marzo",
-    "Aprile",
-    "Maggio",
-    "Giugno",
-    "Luglio",
-    "Agosto",
-    "Settembre",
-    "Ottobre",
-    "Novembre",
-    "Dicembre",
-)
-
-
-def parse_optional_datetime(value):
-    if not value:
-        return None
-    return datetime.strptime(value, "%Y-%m-%dT%H:%M")
-
-
-def parse_optional_id(value):
-    if not value:
-        return None
-    return int(value)
 
 
 def calendar_form_choices():
@@ -77,20 +50,11 @@ def apply_calendar_form(event):
         raise ValueError("La data fine non puo precedere la data inizio.")
 
 
-def month_bounds(year, month):
-    first_day = date(year, month, 1)
-    last_day = date(year, month, monthrange(year, month)[1])
-    next_month = last_day + timedelta(days=1)
-    return first_day, last_day, next_month
-
-
 def adjacent_month_urls(year, month):
-    first_day = date(year, month, 1)
-    prev_day = first_day - timedelta(days=1)
-    next_day = month_bounds(year, month)[2]
+    prev_year, prev_month, next_year, next_month = month_navigation(year, month)
     return (
-        url_for("calendar.calendar_index", year=prev_day.year, month=prev_day.month),
-        url_for("calendar.calendar_index", year=next_day.year, month=next_day.month),
+        url_for("calendar.calendar_index", year=prev_year, month=prev_month),
+        url_for("calendar.calendar_index", year=next_year, month=next_month),
     )
 
 

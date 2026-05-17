@@ -13,15 +13,10 @@ from ..mail_service import (
     sync_inbox,
 )
 from ..models import Cliente, EmailAccount, EmailMessage, Lavoro
+from ..utils.parsing import parse_optional_id
 
 
 bp = Blueprint("mail", __name__)
-
-
-def parse_optional_id(value):
-    if not value:
-        return None
-    return int(value)
 
 
 def bool_from_form(name, default=False):

@@ -5,21 +5,10 @@ from flask import Blueprint, flash, g, redirect, render_template, request, url_f
 from ..auth import login_required, role_required
 from ..extensions import db
 from ..models import EMAIL_DIRECTIONS, Cliente, EmailLog, Lavoro, Task
+from ..utils.parsing import parse_optional_datetime, parse_optional_id
 
 
 bp = Blueprint("emails", __name__)
-
-
-def parse_optional_datetime(value):
-    if not value:
-        return None
-    return datetime.strptime(value, "%Y-%m-%dT%H:%M")
-
-
-def parse_optional_id(value):
-    if not value:
-        return None
-    return int(value)
 
 
 def email_form_choices():

@@ -1,4 +1,4 @@
-export function inizialiNome() {
+function inizialiNome() {
   if (this.cliente.nome.length) {
     return this.nomeCliente.charAt(0).toUpperCase();
   } else {
@@ -6,7 +6,7 @@ export function inizialiNome() {
   }
 }
 
-export function submitFormNewCliente(e) {
+function submitFormNewCliente(e) {
   e.preventDefault();
   // Creazione di un oggetto FormData per inviare i dati del modulo
   const form = document.querySelector("#nuovoCliente");

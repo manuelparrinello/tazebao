@@ -280,7 +280,7 @@ async function clickForDeleteLavoro(event, idLavoro) {
 
   try {
     const response = await deleteLavoro(idLavoro);
-    if (!response) {
+    if (!response.ok) {
       const corpoRispostaTesto = await response.text();
       console.error("Errore response:", corpoRispostaTesto);
       throw new Error(

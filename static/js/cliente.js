@@ -111,8 +111,8 @@ const getSingleCliente = Vue.createApp({
                         Accept: "application/json",
                     },
                 });
-                if (!response) {
-                    throw new error();
+                if (!response.ok) {
+                    throw new Error("Errore caricamento lavori");
                 }
                 this.lavori = await response.json();
             } catch (errore) {

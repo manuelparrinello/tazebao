@@ -24,7 +24,7 @@ const TabellaLavori = {
                 <template v-if="lavori_data.length > 0">
                     <tr v-for="lavoro in lavori_data">
                         <td><span class=""><a class="" :href="'/lavori/' + lavoro.id ">[[ lavoro.descrizione ]]</a></span></td>
-                        <td :sorttable_customkey="[[ lavoro.preventivato ]]" class="text-center">[[ lavoro.preventivato
+                        <td :sorttable_customkey="lavoro.preventivato" class="text-center">[[ lavoro.preventivato
                             ]]€</td>
                         <td :sorttable_customkey="prioIndex(lavoro.priorita)" class="text-center">
                             <span class="prio-pill" :class="prioClass(lavoro.priorita)">
@@ -34,7 +34,7 @@ const TabellaLavori = {
                         <td class="text-center">
                         <select :class="statusColor(lavoro.stato)" @change="update_status($event, lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
                             <option :value="lavoro.stato" selected>[[ lavoro.stato ]]</option>
-                            <option v-for="stato in filtro_stati(lavoro.stato)" :value="[[ stato ]]">[[stato]]</option>
+                            <option v-for="stato in filtro_stati(lavoro.stato)" :value="stato">[[stato]]</option>
                         </select>
                         </td>
                         <td class="text-center">[[ formatDate(lavoro.data_inizio) ]]</td>

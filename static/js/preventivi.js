@@ -20,11 +20,44 @@ function formatPreventivoEuro(value) {
   return "&euro; " + num.toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+const CLOSED_QUOTE_STATES = ["accettato", "accettata", "approvato", "approvata", "rifiutato", "rifiutata", "scaduto", "annullato", "annullata", "convertito"];
+
+function getActiveFilter() {
+  const el = document.getElementById("preventivi");
+  return el ? (el.getAttribute("data-active-filter") || "") : "";
+}
+
+function matchFilter(preventivo, filter) {
+  if (!filter) return true;
+  const s = (preventivo.stato || "").toLowerCase();
+  switch (filter) {
+    case "aperti":
+      return !CLOSED_QUOTE_STATES.includes(s) && s !== "pdf_esterno";
+    case "accettati":
+      return ["accettato", "accettata", "approvato", "approvata"].includes(s);
+    case "rifiutati":
+      return ["rifiutato", "rifiutata"].includes(s);
+    case "scaduti":
+      return s === "scaduto";
+    case "followup":
+      return !CLOSED_QUOTE_STATES.includes(s) && s !== "pdf_esterno" && s !== "bozza";
+    default:
+      return true;
+  }
+}
+
 const preventivi = Vue.createApp({
   data() {
     return {
       preventivi: [],
+      activeFilter: getActiveFilter(),
     };
+  },
+  computed: {
+    filteredPreventivi() {
+      if (!this.activeFilter) return this.preventivi;
+      return this.preventivi.filter(function(p) { return matchFilter(p, this.activeFilter); }, this);
+    },
   },
   methods: {
     async fetchAllPreventivi() {

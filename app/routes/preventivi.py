@@ -1,4 +1,4 @@
-from datetime import date as date_type
+from datetime import date as date_type, datetime, timedelta
 from decimal import Decimal
 
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
@@ -12,6 +12,8 @@ bp = Blueprint("preventivi", __name__)
 
 IVA = Decimal("1.22")
 PREVENTIVO_STATUSES = ("bozza", "inviato", "in_attesa", "accettato", "rifiutato", "scaduto")
+PREVENTIVO_FILTERS = {"aperti", "accettati", "rifiutati", "scaduti", "followup"}
+PREVENTIVO_CLOSED_STATES = ("accettato", "accettata", "approvato", "approvata", "rifiutato", "rifiutata", "scaduto", "annullato", "annullata", "convertito")
 
 
 def decimal_from_form(value, default="0"):
@@ -126,7 +128,10 @@ def nuovo_preventivo():
 @bp.get("/preventivi")
 @login_required
 def preventivi():
-    return render_template("preventivi.html")
+    filter_name = request.args.get("filter", "").strip().lower()
+    if filter_name not in PREVENTIVO_FILTERS:
+        filter_name = None
+    return render_template("preventivi.html", active_filter=filter_name)
 
 
 @bp.post("/presentivi/addrow")

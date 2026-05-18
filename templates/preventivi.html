@@ -6,7 +6,7 @@
     <div class="col-12 col-xl-7 px-0">
         <div class="editorial-page-header">
             <h3 class="fw-bolder mb-1">
-                <i class="bi bi-file-text me-2 text-primary"></i>Tutti i preventivi
+                <i class="bi bi-file-text me-2 text-primary"></i>Preventivi
             </h3>
             <p class="text-secondary mb-0">Elenco di tutti i preventivi presenti nel sistema.</p>
         </div>
@@ -22,8 +22,24 @@
     </div>
 </div>
 <hr>
-<div class="mt-5" id="preventivi" v-cloak>
-    <div v-if="preventivi.length > 0">
+{% if active_filter %}
+<div class="d-flex align-items-center gap-2 mb-3">
+    <span class="badge rounded-pill text-bg-primary erp-badge d-inline-flex align-items-center gap-1">
+        <i class="bi bi-funnel"></i>
+        {% if active_filter == "aperti" %}Preventivi aperti
+        {% elif active_filter == "accettati" %}Preventivi accettati
+        {% elif active_filter == "rifiutati" %}Preventivi rifiutati
+        {% elif active_filter == "scaduti" %}Preventivi scaduti
+        {% elif active_filter == "followup" %}Followup preventivi
+        {% else %}Filtrato{% endif %}
+    </span>
+    <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('preventivi.preventivi') }}">
+        <i class="bi bi-x-lg"></i>&nbsp;Rimuovi filtro
+    </a>
+</div>
+{% endif %}
+<div class="mt-4" id="preventivi" v-cloak data-active-filter="{{ active_filter or '' }}">
+    <div v-if="filteredPreventivi.length > 0">
         <div class="card rounded-3 border border-light-subtle" data-mobile-list-clean>
             <div class="card-body p-0 p-md-4">
                 <table class="table my-0 sortable table-hover rounded-3 no-last-border preventivi-table d-none d-md-table">
@@ -38,7 +54,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="preventivo in preventivi" class="pointer" @click="openPreventivo(preventivo)">
+                        <tr v-for="preventivo in filteredPreventivi" class="pointer" @click="openPreventivo(preventivo)">
                             <td class="col-descrizione-cell">
                                 <a :href="preventivo.source === 'pdf_esterno' ? preventivo.pdf_url : '/preventivi/visualizza/' + preventivo.id" class="fw-bold text-decoration-none a-no-color d-block text-truncate" @click.stop.prevent="openPreventivo(preventivo)" :target="preventivo.source === 'pdf_esterno' ? '_blank' : '_self'">
                                     <i v-if="preventivo.source === 'pdf_esterno'" class="bi bi-filetype-pdf me-1 text-danger"></i>
@@ -63,7 +79,7 @@
                     </tbody>
                 </table>
                 <div class="d-md-none mobile-list">
-                    <a v-for="preventivo in preventivi" :key="preventivo.id" class="mobile-list-item mobile-row-link" :href="preventivo.source === 'pdf_esterno' ? preventivo.pdf_url : '/preventivi/visualizza/' + preventivo.id" :target="preventivo.source === 'pdf_esterno' ? '_blank' : '_self'">
+                    <a v-for="preventivo in filteredPreventivi" :key="preventivo.id" class="mobile-list-item mobile-row-link" :href="preventivo.source === 'pdf_esterno' ? preventivo.pdf_url : '/preventivi/visualizza/' + preventivo.id" :target="preventivo.source === 'pdf_esterno' ? '_blank' : '_self'">
                         <div class="d-flex align-items-start justify-content-between gap-3">
                             <div class="min-w-0 flex-grow-1">
                                 <div class="fw-bold mobile-row-title mb-1" :title="preventivo.descrizione">

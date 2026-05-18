@@ -31,7 +31,7 @@
 
 {% if tasks %}
 <div class="mt-5">
-    <div class="card rounded-3 border border-light-subtle">
+    <div class="card rounded-3 border border-light-subtle" data-mobile-list-clean>
         <div class="card-body p-0 p-md-4">
             <div class="table-responsive d-none d-md-block">
                 <table class="table table-hover my-0 tasks-table">
@@ -85,9 +85,9 @@
                 </table>
             </div>
 
-            <div class="d-md-none mobile-list p-3">
+            <div class="d-md-none mobile-list">
                 {% for task in tasks %}
-                <div class="border rounded-3 bg-white p-3">
+                <div class="mobile-list-item">
                     <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                         <div class="min-w-0">
                             <a class="fw-bold a-no-color d-block text-truncate" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}">{{ task.name }}</a>

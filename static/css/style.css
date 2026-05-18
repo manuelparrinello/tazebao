@@ -83,7 +83,7 @@
 
 .topbar-center {
   flex: 1 1 auto;
-  max-width: 420px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -127,6 +127,10 @@
   align-items: center;
   gap: 0.35rem;
   flex-shrink: 0;
+}
+
+.topbar-notif + .topbar-user {
+  margin-left: 0.5rem;
 }
 
 .topbar-actions {
@@ -364,6 +368,49 @@
 }
 
 @media (max-width: 575.98px) {
+  [data-mobile-list-clean] {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    margin-top: 0 !important;
+  }
+
+  [data-mobile-list-clean] > .card-body {
+    padding: 0 !important;
+  }
+
+  [data-mobile-list-clean] .mobile-list {
+    padding: 0 !important;
+  }
+
+  [data-mobile-list-clean] .mobile-list > * {
+    width: 100%;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    padding: 0.7rem 0 !important;
+    box-shadow: none !important;
+  }
+
+  [data-mobile-list-clean] .mobile-list > * + * {
+    border-top: 1px solid var(--sidebar-border) !important;
+  }
+
+  [data-mobile-list-clean] .admin-export-mobile-card {
+    width: 100%;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    padding: 0.5rem 0 !important;
+    box-shadow: none !important;
+  }
+
+  [data-mobile-list-clean] .admin-export-mobile-card + .admin-export-mobile-card {
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--sidebar-border) !important;
+    padding-top: 1rem !important;
+  }
+
   .app-topbar {
     height: 56px;
   }
@@ -1372,6 +1419,10 @@ body {
   border: 1px solid var(--sidebar-border);
   border-radius: 12px;
   background: #fff;
+}
+
+.admin-export-mobile-card + .admin-export-mobile-card {
+  margin-top: 0.75rem;
 }
 
 .finance-table {

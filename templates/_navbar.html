@@ -31,7 +31,7 @@
         <i class="bi bi-list fs-3"></i>
       </button>
       <a href="{{ url_for('main.app_shell') }}" class="topbar-brand">
-        <span class="topbar-brand-text">Cosebelle ERP</span>
+        <span class="topbar-brand-text d-none d-md-inline">Cosebelle ERP</span>
       </a>
     </div>
 
@@ -97,7 +97,8 @@
         <button class="btn btn-link topbar-user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           <span class="topbar-user-name d-none d-lg-inline">{{ current_user.name or current_user.email }}</span>
           <span class="topbar-user-avatar-wrapper">
-            <img src="{{ url_for('static', filename='img/Logo_Purple.png') }}" class="topbar-user-avatar rounded-circle" alt="">
+            <img src="{{ url_for('static', filename='img/Logo_Purple.png') }}" class="topbar-user-avatar rounded-circle d-none d-md-inline" alt="">
+            <i class="bi bi-person fs-5 d-md-none"></i>
           </span>
         </button>
         <ul class="dropdown-menu dropdown-menu-end">

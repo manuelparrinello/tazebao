@@ -317,7 +317,7 @@ def get_notifications():
                 "title": f"Pubblicazione: {p.title}",
                 "description": f"{cliente_name} - {p.publication_date.strftime('%d/%m/%Y')}",
                 "url": url_for(
-                    "editorial_calendar.editorial_edit", id=p.id
+                    "editorial_calendar.editorial_edit", publication_id=p.id
                 ),
             }
         )

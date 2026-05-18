@@ -172,16 +172,17 @@ const ERP_BADGE_MAP = {
   },
   editorial_status: {
     idea: ["text-bg-light border", "Idea"],
-    programmato: ["primary", "Programmato"],
+    da_produrre: ["secondary", "Da produrre"],
+    in_revisione: ["warning", "In revisione"],
     approvato: ["success", "Approvato"],
-    in_produzione: ["warning", "In produzione"],
-    completato: ["primary", "Completato"],
+    programmato: ["primary", "Programmato"],
+    pubblicato: ["primary", "Pubblicato"],
     annullato: ["secondary", "Annullato"],
   },
   editorial_client_approval: {
     da_approvare: ["warning", "Da approvare"],
     approvato: ["success", "Approvato"],
-    respinto: ["danger", "Respinto"],
+    modifiche_richieste: ["danger", "Modifiche richieste"],
   },
   finance_movement_type: {
     entrata: ["success", "Entrata"],

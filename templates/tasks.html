@@ -28,6 +28,21 @@
     </div>
 </div>
 <hr>
+{% if active_filter %}
+<div class="d-flex align-items-center gap-2 mb-3">
+    <span class="badge rounded-pill text-bg-primary erp-badge d-inline-flex align-items-center gap-1">
+        <i class="bi bi-funnel"></i>
+        {% if active_filter == "aperte" %}Task aperte
+        {% elif active_filter == "scadute" %}Task scadute
+        {% elif active_filter == "in_scadenza" %}Task in scadenza
+        {% elif active_filter == "urgenti" %}Task urgenti
+        {% else %}Filtrato{% endif %}
+    </span>
+    <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('tasks.tasks') }}">
+        <i class="bi bi-x-lg"></i>&nbsp;Rimuovi filtro
+    </a>
+</div>
+{% endif %}
 
 {% if tasks %}
 <div class="mt-5">

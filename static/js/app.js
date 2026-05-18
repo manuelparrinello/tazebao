@@ -330,8 +330,8 @@ if (document.getElementById("app")) {
         const expectedIncomeCount = this.summary.expected_income_count || 0;
         const expectedIncomeSum = this.summary.expected_income_sum || 0;
         return [
-          { title: "Task aperte", value: open, icon: "bi-list-check", valueClass: "", boxClass: "dashboard-icon-box-primary", url: "/tasks" },
-          { title: "Task urgenti", value: overdue, icon: "bi-exclamation-triangle", valueClass: overdue > 0 ? "dashboard-kpi-danger" : "", boxClass: overdue > 0 ? "dashboard-icon-box-danger" : "dashboard-icon-box-primary", url: "/tasks" },
+          { title: "Task aperte", value: open, icon: "bi-list-check", valueClass: "", boxClass: "dashboard-icon-box-primary", url: "/tasks?filter=aperte" },
+          { title: "Task urgenti", value: overdue, icon: "bi-exclamation-triangle", valueClass: overdue > 0 ? "dashboard-kpi-danger" : "", boxClass: overdue > 0 ? "dashboard-icon-box-danger" : "dashboard-icon-box-primary", url: "/tasks?filter=urgenti" },
           { title: "Lavori attivi", value: activeJobs, icon: "bi-briefcase", valueClass: "", boxClass: "dashboard-icon-box-primary", url: "/lavori" },
           { title: "Preventivi in attesa", value: pendingQuotes, icon: "bi-file-earmark-text", valueClass: pendingQuotes > 0 ? "dashboard-kpi-warning" : "", boxClass: pendingQuotes > 0 ? "dashboard-icon-box-warning" : "dashboard-icon-box-primary", url: "/preventivi" },
           { title: "Pubblicazioni imminenti", value: upcomingPubs, icon: "bi-calendar2-week", valueClass: upcomingPubs > 0 ? "dashboard-kpi-success" : "", boxClass: upcomingPubs > 0 ? "dashboard-icon-box-success" : "dashboard-icon-box-primary", url: "/editorial-calendar" },

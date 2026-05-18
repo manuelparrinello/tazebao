@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
 from ..auth import login_required, role_required
@@ -58,16 +60,47 @@ def apply_task_form(task):
         raise ValueError("Priorita task non valida.")
 
 
+TASK_FILTERS = {"aperte", "scadute", "in_scadenza", "urgenti"}
+CLOSED_STATUSES = ("completata", "annullata")
+
+
 @bp.get("/tasks")
 @login_required
 def tasks():
-    tasks_list = Task.query.order_by(Task.created_at.desc()).all()
+    filter_name = request.args.get("filter", "").strip().lower()
+    if filter_name not in TASK_FILTERS:
+        filter_name = None
+
+    query = Task.query
+    today = date.today()
+
+    if filter_name == "aperte":
+        query = query.filter(~Task.status.in_(CLOSED_STATUSES))
+    elif filter_name == "scadute":
+        query = query.filter(
+            Task.due_date < today,
+            ~Task.status.in_(CLOSED_STATUSES),
+        )
+    elif filter_name == "in_scadenza":
+        query = query.filter(
+            Task.due_date >= today,
+            Task.due_date <= today + timedelta(days=3),
+            ~Task.status.in_(CLOSED_STATUSES),
+        )
+    elif filter_name == "urgenti":
+        query = query.filter(
+            Task.priority.in_(("alta", "urgente")),
+            ~Task.status.in_(CLOSED_STATUSES),
+        )
+
+    tasks_list = query.order_by(Task.created_at.desc()).all()
     return render_template(
         "tasks.html",
         tasks=tasks_list,
         categories=TASK_CATEGORIES,
         statuses=TASK_STATUSES,
         priorities=TASK_PRIORITIES,
+        active_filter=filter_name,
     )
 
 

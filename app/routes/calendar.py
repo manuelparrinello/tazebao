@@ -206,6 +206,15 @@ def calendar_new():
     )
 
 
+@bp.post("/calendar/<int:event_id>/delete")
+@role_required("admin", "operatore")
+def calendar_delete(event_id):
+    event = CalendarEvent.query.get_or_404(event_id)
+    db.session.delete(event)
+    db.session.commit()
+    return redirect(url_for("calendar.calendar_index"))
+
+
 @bp.route("/calendar/<int:event_id>/edit", methods=["GET", "POST"])
 @role_required("admin", "operatore")
 def calendar_edit(event_id):

@@ -34,6 +34,7 @@
                             <th class="fw-bold pointer col-data" scope="col">Data</th>
                             <th class="fw-bold pointer col-stato" scope="col">Stato</th>
                             <th class="fw-bold pointer col-totale text-end" scope="col">Totale</th>
+                            {% if can_mutate %}<th class="fw-bold col-actions text-end" scope="col">Azioni</th>{% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -48,6 +49,16 @@
                             <td class="col-data-cell">[[ formatDate(preventivo.data_creazione) ]]</td>
                             <td class="col-stato-cell" v-html="statoBadgeHtml(preventivo.stato)"></td>
                             <td class="col-totale-cell text-end fw-bold preventivo-importo" v-html="formatEuro(preventivo.totale_preventivo)"></td>
+                            {% if can_mutate %}
+                            <td class="col-actions text-end" @click.stop>
+                                <form :action="'/preventivi/' + preventivo.id + '/delete'" method="post" class="d-inline" data-confirm-message="Eliminare definitivamente questo preventivo?">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger erp-icon-btn" aria-label="Elimina" v-if="preventivo.source !== 'pdf_esterno'">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            {% endif %}
                         </tr>
                     </tbody>
                 </table>
@@ -70,6 +81,14 @@
                             <div class="text-end flex-shrink-0">
                                 <div class="fw-bold preventivo-importo" v-html="formatEuro(preventivo.totale_preventivo)"></div>
                                 <i class="bi bi-chevron-right text-secondary mt-1"></i>
+                                {% if can_mutate %}
+                                <form :action="'/preventivi/' + preventivo.id + '/delete'" method="post" class="d-inline" data-confirm-message="Eliminare definitivamente questo preventivo?" @click.stop>
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger erp-icon-btn mt-1" aria-label="Elimina" v-if="preventivo.source !== 'pdf_esterno'">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
                             </div>
                         </div>
                     </a>

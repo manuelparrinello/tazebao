@@ -215,6 +215,21 @@ def preventivo_edit(id):
     )
 
 
+@bp.post("/preventivi/<int:id>/delete")
+@role_required("admin", "operatore")
+def preventivo_delete(id):
+    preventivo = Preventivo.query.filter_by(id=id).first_or_404()
+
+    if preventivo.convertito_in_lavoro_id:
+        flash("Non puoi eliminare un preventivo gia convertito in lavoro.", "danger")
+        return redirect(url_for("preventivi.visualizza_preventivo", id=preventivo.id))
+
+    db.session.delete(preventivo)
+    db.session.commit()
+    flash("Preventivo eliminato.", "success")
+    return redirect(url_for("preventivi.preventivi"))
+
+
 @bp.post("/preventivi/<int:id>/converti-in-lavoro")
 @role_required("admin", "operatore")
 def converti_preventivo_in_lavoro(id):

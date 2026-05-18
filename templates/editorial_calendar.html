@@ -172,11 +172,11 @@
             <div class="editorial-calendar-grid">
                 {% for week in weeks %}
                     {% for day in week %}
-                    <div class="editorial-day-cell {% if not day.in_month %}editorial-day-cell-inactive{% endif %}">
+                    <div class="editorial-day-cell {% if day.is_today %}editorial-day-today{% endif %} {% if not day.in_month %}editorial-day-cell-inactive{% endif %}">
                         <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="fw-bold {% if day.is_today %}text-primary{% endif %}">{{ day.day }}</span>
+                            <span class="fw-bold">{{ day.day }}</span>
                             {% if can_mutate and day.in_month %}
-                            <a class="btn btn-sm btn-outline-secondary editorial-day-add" href="{{ url_for('editorial_calendar.editorial_new', cliente_id=cliente.id, date=day.date.isoformat()) }}" aria-label="Nuova pubblicazione">
+                            <a class="editorial-day-add" href="{{ url_for('editorial_calendar.editorial_new', cliente_id=cliente.id, date=day.date.isoformat()) }}" aria-label="Nuova pubblicazione">
                                 <i class="bi bi-plus-lg"></i>
                             </a>
                             {% endif %}

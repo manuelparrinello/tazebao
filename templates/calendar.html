@@ -112,7 +112,7 @@
                     </thead>
                     <tbody>
                         {% for event in events %}
-                        <tr>
+                        <tr class="pointer" onclick="window.location='{{ event.edit_url if can_mutate else '#' }}'">
                             <td>
                                 <div class="fw-bold">{{ event.date|date_it }}</div>
                                 {% if event.time %}
@@ -120,7 +120,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a class="fw-bold a-no-color" href="{{ event.edit_url if can_mutate else '#' }}">{{ event.title }}</a>
+                                <a class="fw-bold a-no-color" href="{{ event.edit_url if can_mutate else '#' }}" onclick="event.stopPropagation();">{{ event.title }}</a>
                                 {% if event.description %}
                                 <div class="small text-secondary text-truncate">{{ event.description }}</div>
                                 {% endif %}

@@ -52,6 +52,9 @@
                         <tr>
                             <td>
                                 <a class="fw-bold a-no-color d-block text-truncate" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}">{{ task.name }}</a>
+                                {% if task.note %}
+                                <span class="small text-secondary text-truncate d-block" title="{{ task.note }}">{{ task.note|truncate(80) }}</span>
+                                {% endif %}
                             </td>
                             <td>{{ erp_badge("task_category", task.category) }}</td>
                             <td>{{ erp_badge("task_status", task.status) }}</td>
@@ -88,6 +91,9 @@
                     <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                         <div class="min-w-0">
                             <a class="fw-bold a-no-color d-block text-truncate" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}">{{ task.name }}</a>
+                            {% if task.note %}
+                            <span class="small text-secondary text-truncate d-block" title="{{ task.note }}">{{ task.note|truncate(60) }}</span>
+                            {% endif %}
                         </div>
                         <div class="erp-actions">
                             {% if can_mutate %}

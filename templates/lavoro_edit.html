@@ -126,11 +126,12 @@
 
                 <section class="erp-form-section">
                     <div class="erp-form-section-heading">
-                        <h5>Note</h5>
-                        <p>Dettagli interni utili alla gestione del lavoro.</p>
+                        <h5>Appunti operativi</h5>
+                        <p>Annotazioni, dettagli operativi e informazioni utili alla gestione del lavoro.</p>
                     </div>
-                    <label for="note" class="form-label fw-bold">Note</label>
-                    <textarea class="form-control" id="note" name="note" rows="5">{{ lavoro.note or '' }}</textarea>
+                    <label for="note" class="form-label fw-bold">Appunti operativi</label>
+                    <textarea class="form-control" id="note" name="note" rows="6" placeholder="Scrivi qui note, promemoria e dettagli operativi sul lavoro...">{{ lavoro.note or '' }}</textarea>
+                    <div class="form-text">I caratteri a capo vengono preservati nella visualizzazione.</div>
                 </section>
 
                 <section class="erp-form-section">

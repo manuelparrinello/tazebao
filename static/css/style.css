@@ -4847,4 +4847,35 @@ body.loaded {
   }
 }
 
+/* =========================
+   APPUNTI OPERATIVI
+   ========================= */
+
+.erp-notes-card {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.75rem;
+  background: #fafbfc;
+}
+
+.erp-notes-content {
+  font-size: 0.925rem;
+  line-height: 1.65;
+  color: #212529;
+}
+
+.erp-notes-content p:last-child {
+  margin-bottom: 0;
+}
+
+.erp-notes-icon {
+  font-size: 1.1rem;
+  color: #6c757d;
+}
+
+.erp-notes-empty {
+  color: #adb5bd;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
 

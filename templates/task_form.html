@@ -50,10 +50,18 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col-12">
-                            <label for="note" class="form-label fw-bold">Descrizione / note</label>
-                            <textarea class="form-control" id="note" name="note" rows="4">{{ task.note or '' }}</textarea>
-                        </div>
+                    </div>
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Appunti operativi</h5>
+                        <p>Annotazioni, dettagli operativi e descrizione della task.</p>
+                    </div>
+                    <div class="col-12 px-0">
+                        <label for="note" class="form-label fw-bold">Appunti operativi</label>
+                        <textarea class="form-control" id="note" name="note" rows="6" placeholder="Scrivi qui note, promemoria e dettagli operativi sulla task...">{{ task.note or '' }}</textarea>
+                        <div class="form-text">I caratteri a capo vengono preservati nella visualizzazione.</div>
                     </div>
                 </section>
 

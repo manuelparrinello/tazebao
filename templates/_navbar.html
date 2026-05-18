@@ -36,10 +36,14 @@
     </div>
 
     <div class="topbar-center">
-      <form class="topbar-search" action="{{ url_for('main.search') }}" method="get" role="search">
+      <form class="topbar-search" action="{{ url_for('main.search') }}" method="get" role="search" id="global-search">
         <div class="topbar-search-wrap">
           <i class="bi bi-search"></i>
-          <input type="search" name="q" class="form-control form-control-sm" placeholder="Cerca..." aria-label="Cerca">
+          <input type="search" name="q" class="form-control form-control-sm" placeholder="Cerca..." aria-label="Cerca" id="global-search-input" autocomplete="off">
+        </div>
+        <div class="search-dropdown" id="search-dropdown" style="display:none;">
+          <div class="search-dropdown-results" id="search-results"></div>
+          <a class="search-dropdown-footer" id="search-full-link" href="{{ url_for('main.search') }}" style="display:none;">Vedi tutti i risultati &rarr;</a>
         </div>
       </form>
     </div>

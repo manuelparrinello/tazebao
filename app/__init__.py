@@ -62,6 +62,9 @@ def create_app():
     upload_max_mb = int(os.environ.get("ERP_MAX_UPLOAD_MB", "512"))
     app.config["MAX_CONTENT_LENGTH"] = upload_max_mb * 1024 * 1024
 
+    form_memory_mb = int(os.environ.get("ERP_MAX_FORM_MEMORY_MB", "5"))
+    app.config["MAX_FORM_MEMORY_SIZE"] = form_memory_mb * 1024 * 1024
+
     @app.errorhandler(RequestEntityTooLarge)
     def handle_file_too_large(e):
         flash(f"File troppo grande. Il limite è di {upload_max_mb} MB.", "danger")

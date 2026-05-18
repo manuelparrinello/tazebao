@@ -22,7 +22,7 @@
     <div class="alert alert-danger">{{ error }}</div>
     {% endif %}
 
-    <form action="{{ form_action }}" method="post" class="erp-boxed-form">
+    <form action="{{ form_action }}" method="post" class="erp-boxed-form" data-submit-guard="true">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="erp-form-card">
             <div class="erp-form-section">

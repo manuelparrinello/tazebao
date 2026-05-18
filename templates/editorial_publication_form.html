@@ -46,7 +46,7 @@
 <div class="alert alert-danger mt-4">{{ error }}</div>
 {% endif %}
 
-<form action="{{ form_action }}" method="post" enctype="multipart/form-data" class="editorial-publication-form mt-4">
+<form action="{{ form_action }}" method="post" enctype="multipart/form-data" class="editorial-publication-form mt-4" data-submit-guard="true">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
     <div class="card rounded-3 border border-light-subtle">

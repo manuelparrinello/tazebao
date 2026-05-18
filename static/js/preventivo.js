@@ -29,10 +29,6 @@ const preventivo = Vue.createApp({
     };
   },
   methods: {
-    dbg(e) {
-      console.log("RAW:", JSON.stringify(e.target.value));
-      console.log("MODEL:", JSON.stringify(this.descrizione));
-    },
     autoResize(e) {
       e.target.style.height = "auto";
       e.target.style.height = e.target.scrollHeight + "px";
@@ -72,7 +68,6 @@ const preventivo = Vue.createApp({
         const data = await response.json();
         this.clienteData = data;
       } catch (error) {
-        console.log(error.message);
       } finally {
         this.loading = false;
       }
@@ -113,11 +108,8 @@ const preventivo = Vue.createApp({
         prezzo: Number(this.prezzo) || 0,
         totaleRiga: Number(this.qty) * Number(this.prezzo),
       };
-      console.log(this.titoloPreventivo);
       this.righe.push(riga);
       this.calcSubtotale();
-      console.log(this.subtotale);
-      console.log(this.descrizione);
       this.idRiga++;
       this.indiceRiga++;
       this.qty = 1;
@@ -165,7 +157,6 @@ const preventivo = Vue.createApp({
       const data = await response.json();
       var preventivo_id = data.preventivo_id;
       this.preventivoId = preventivo_id;
-      console.log(preventivo_id);
       var conferma = window.confirm("Preventivo salvato. Vuoi visualizzarlo?");
       if (!conferma) {
         window.location.href = "/clienti";
@@ -181,5 +172,4 @@ const preventivo = Vue.createApp({
     });
   },
   delimiters: ["[[", "]]"],
-  computed() {},
 }).mount("#nuovoPreventivo");

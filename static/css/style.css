@@ -1468,28 +1468,6 @@ i.bi {
   font-size: 0.95rem;
 }
 
-.action-icon.edit-icon {
-  /* border: solid 1px #ddd; */
-  color: #2e2a2a !important;
-  /* background-color: #ffffff; */
-}
-
-.action-icon.delete-icon {
-  /* border: solid 1px #ddd; */
-  color: #e6412b !important;
-  /* background-color: #ffffff; */
-}
-
-.action-icon.delete-icon:hover {
-  /* color: #fff !important; */
-  /* background: #b71c1c; */
-}
-
-.action-icon.edit-icon:hover {
-  /* color: white !important; */
-  /* background: #ffa545; */
-}
-
 .desktop-nav-logo,
 .mobile-nav-logo {
   padding: 1rem 0rem 0.5rem 0rem !important;
@@ -3279,11 +3257,6 @@ body.loaded {
   table-layout: fixed;
   width: 100%;
 }
-
-/* .no-last-border tbody tr:last-child td,
-.no-last-border tbody tr:last-child th {
-  border-bottom: none;
-} */
 
 .btn {
   border-radius: 12px !important;

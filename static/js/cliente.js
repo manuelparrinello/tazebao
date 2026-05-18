@@ -92,10 +92,8 @@ const getSingleCliente = Vue.createApp({
                     }),
                 });
                 if (!response.ok) {
-                    console.log("Errore nella richiesta! HTTP" + response.status);
                     throw new Error("Errore nella richiesta! HTTP" + response.status);
                 }
-                console.log(await response.json());
             } catch (error) {
                 this.error = error.message || "Errore imprevisto";
             }

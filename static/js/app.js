@@ -327,14 +327,15 @@ if (document.getElementById("app")) {
         const activeJobs = this.summary.active_jobs_count || 0;
         const pendingQuotes = this.summary.pending_quotes_count || 0;
         const upcomingPubs = this.summary.upcoming_publications_count || 0;
-        const expectedIncome = this.summary.expected_income_count || 0;
+        const expectedIncomeCount = this.summary.expected_income_count || 0;
+        const expectedIncomeSum = this.summary.expected_income_sum || 0;
         return [
           { title: "Task aperte", value: open, icon: "bi-list-check", valueClass: "", boxClass: "dashboard-icon-box-primary", url: "/tasks" },
           { title: "Task urgenti", value: overdue, icon: "bi-exclamation-triangle", valueClass: overdue > 0 ? "dashboard-kpi-danger" : "", boxClass: overdue > 0 ? "dashboard-icon-box-danger" : "dashboard-icon-box-primary", url: "/tasks" },
           { title: "Lavori attivi", value: activeJobs, icon: "bi-briefcase", valueClass: "", boxClass: "dashboard-icon-box-primary", url: "/lavori" },
           { title: "Preventivi in attesa", value: pendingQuotes, icon: "bi-file-earmark-text", valueClass: pendingQuotes > 0 ? "dashboard-kpi-warning" : "", boxClass: pendingQuotes > 0 ? "dashboard-icon-box-warning" : "dashboard-icon-box-primary", url: "/preventivi" },
           { title: "Pubblicazioni imminenti", value: upcomingPubs, icon: "bi-calendar2-week", valueClass: upcomingPubs > 0 ? "dashboard-kpi-success" : "", boxClass: upcomingPubs > 0 ? "dashboard-icon-box-success" : "dashboard-icon-box-primary", url: "/editorial-calendar" },
-          { title: "Entrate previste", value: expectedIncome, icon: "bi-currency-euro", valueClass: expectedIncome > 0 ? "dashboard-kpi-success" : "", boxClass: expectedIncome > 0 ? "dashboard-icon-box-success" : "dashboard-icon-box-primary", url: "/finance" },
+          { title: "Entrate previste", value: this.formatCurrency(expectedIncomeSum), icon: "bi-currency-euro", valueClass: expectedIncomeSum > 0 ? "dashboard-kpi-success" : "", boxClass: expectedIncomeSum > 0 ? "dashboard-icon-box-success" : "dashboard-icon-box-primary", url: "/finance" },
         ];
       },
       financeCards() {
@@ -467,7 +468,7 @@ if (document.getElementById("app")) {
                     <a :href="item.url" class="dashboard-today-item">
                       <div class="d-flex align-items-start gap-3">
                         <div class="dashboard-today-icon flex-shrink-0" :class="'dashboard-today-' + item.type">
-                          <i class="bi" :class="item.type === 'task_scaduta' ? 'bi-check2-square' : item.type === 'evento' ? 'bi-calendar3' : item.type === 'da_approvare' ? 'bi-check2-circle' : 'bi-chat-dots'"></i>
+                          <i class="bi" :class="item.type === 'task_in_scadenza' ? 'bi-clock' : item.type === 'task_scaduta' ? 'bi-exclamation-circle' : item.type === 'evento' ? 'bi-calendar3' : item.type === 'da_approvare' ? 'bi-check2-circle' : 'bi-chat-dots'"></i>
                         </div>
                         <div class="min-w-0 flex-grow-1">
                           <div class="fw-semibold text-truncate">[[ item.label ]]</div>

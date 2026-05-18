@@ -381,7 +381,7 @@ def build_today_items(today_tasks, today_events, today_followups, pending_approv
 
     for task in today_tasks:
         items.append({
-            "type": "task_scaduta",
+            "type": "task_in_scadenza",
             "label": f"Task in scadenza: {task.name}",
             "priority": task.priority,
             "due_date": task.due_date.isoformat() if task.due_date else None,
@@ -518,6 +518,14 @@ def get_dashboard_summary():
             FinancialMovement.movement_type == "entrata",
             FinancialMovement.movement_status == "prevista",
         ).count()
+        expected_income_sum = (
+            db.session.query(db.func.coalesce(db.func.sum(FinancialMovement.amount), 0))
+            .filter(
+                FinancialMovement.movement_type == "entrata",
+                FinancialMovement.movement_status == "prevista",
+            )
+            .scalar()
+        )
 
         today_events = (
             CalendarEvent.query.filter(CalendarEvent.start_datetime >= now)
@@ -571,6 +579,7 @@ def get_dashboard_summary():
             ).count(),
             "upcoming_publications_count": len(upcoming_publications),
             "expected_income_count": expected_income_count,
+            "expected_income_sum": float(expected_income_sum),
             "recent_tasks": [serialize_dashboard_task(task) for task in recent_tasks],
             "upcoming_events": [
                 serialize_dashboard_event(event) for event in upcoming_events

@@ -3848,6 +3848,11 @@ body.loaded {
   color: #dc3545;
 }
 
+.dashboard-today-task_in_scadenza {
+  background: #fff3cd;
+  color: #b8860b;
+}
+
 .dashboard-today-evento {
   background: #dbeafe;
   color: #0d6efd;

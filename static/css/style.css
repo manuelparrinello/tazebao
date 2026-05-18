@@ -424,6 +424,10 @@
   .app-content {
     padding: 4rem 0.75rem 1rem 0.75rem !important;
   }
+
+  .display-6 {
+    font-size: 1.35rem;
+  }
 }
 
 /* =========================
@@ -4768,6 +4772,10 @@ body.loaded {
   .file-browser-table .fb-actions-col {
     width: 75px;
   }
+}
+
+.folder-path-code {
+  word-break: break-all;
 }
 
 /* =========================

@@ -217,11 +217,11 @@
                 <div class="d-flex align-items-start justify-content-between gap-2">
                     <div class="min-w-0 flex-grow-1">
                         {% if entry.is_dir %}
-                        <a href="{{ url_for('lavori.lavoro_cartella', lavoro_id=lavoro.id, subdir=(subdir + '/' + entry.name) if subdir else entry.name) }}" class="text-decoration-none text-reset fw-semibold" title="{{ entry.name }}">
+                        <a href="{{ url_for('lavori.lavoro_cartella', lavoro_id=lavoro.id, subdir=(subdir + '/' + entry.name) if subdir else entry.name) }}" class="text-decoration-none text-reset fw-semibold text-truncate d-inline-block w-100" title="{{ entry.name }}">
                             <i class="bi bi-folder-fill text-warning me-2"></i><span>{{ entry.name }}</span>
                         </a>
                         {% else %}
-                        <span class="fw-semibold" title="{{ entry.name }}">
+                        <span class="fw-semibold text-truncate d-inline-block w-100" title="{{ entry.name }}">
                             {{ file_icon(entry.name) }}<span>{{ entry.name }}</span>
                         </span>
                         {% endif %}

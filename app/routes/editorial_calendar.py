@@ -494,7 +494,10 @@ def delete_image_file(image_path):
         return
     full_path = os.path.join(current_app.static_folder, image_path)
     if os.path.isfile(full_path):
-        os.remove(full_path)
+        try:
+            os.remove(full_path)
+        except OSError:
+            current_app.logger.exception("Errore rimozione file immagine editoriale: %s", full_path)
 
 
 @bp.post("/editorial-calendar/<int:publication_id>/images/<int:image_id>/delete")
@@ -504,10 +507,15 @@ def editorial_image_delete(publication_id, image_id):
     img = EditorialPublicationImage.query.get_or_404(image_id)
     if img.publication_id != publication.id:
         return redirect(request.referrer or url_for("editorial_calendar.editorial_index"))
-    delete_image_file(img.image_path)
-    db.session.delete(img)
-    db.session.commit()
-    flash("Immagine rimossa dalla pubblicazione.", "success")
+    try:
+        delete_image_file(img.image_path)
+        db.session.delete(img)
+        db.session.commit()
+        flash("Immagine rimossa dalla pubblicazione.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore eliminazione immagine editoriale %d", image_id)
+        flash("Impossibile rimuovere l'immagine. Operazione annullata.", "danger")
     return redirect(request.referrer or url_for("editorial_calendar.editorial_index"))
 
 
@@ -515,9 +523,14 @@ def editorial_image_delete(publication_id, image_id):
 @role_required("admin", "operatore")
 def editorial_delete(publication_id):
     publication = EditorialPublication.query.get_or_404(publication_id)
-    publication.status = "annullato"
-    db.session.commit()
-    flash("Pubblicazione annullata.", "success")
+    try:
+        publication.status = "annullato"
+        db.session.commit()
+        flash("Pubblicazione annullata.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore annullamento pubblicazione %d", publication_id)
+        flash("Impossibile annullare la pubblicazione. Operazione annullata.", "danger")
     return redirect(
         url_for(
             "editorial_calendar.client_calendar",
@@ -534,17 +547,21 @@ def editorial_purge(publication_id):
     publication = EditorialPublication.query.get_or_404(publication_id)
     cliente_id = publication.cliente_id
     pub_date = publication.publication_date
+    try:
+        for img in list(publication.images or []):
+            delete_image_file(img.image_path)
+            db.session.delete(img)
 
-    for img in list(publication.images or []):
-        delete_image_file(img.image_path)
-        db.session.delete(img)
+        if publication.preview_image_path:
+            delete_image_file(publication.preview_image_path)
 
-    if publication.preview_image_path:
-        delete_image_file(publication.preview_image_path)
-
-    db.session.delete(publication)
-    db.session.commit()
-    flash("Pubblicazione eliminata definitivamente.", "success")
+        db.session.delete(publication)
+        db.session.commit()
+        flash("Pubblicazione eliminata definitivamente.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore purge pubblicazione %d", publication_id)
+        flash("Impossibile eliminare definitivamente la pubblicazione. Operazione annullata.", "danger")
     return redirect(
         url_for(
             "editorial_calendar.client_calendar",

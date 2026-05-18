@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, g, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, g, redirect, render_template, request, url_for
 
 from ..auth import role_required
 from ..extensions import db
@@ -212,9 +212,14 @@ def users_deactivate(user_id):
         flash("Non puoi disattivare l'ultimo admin attivo.", "danger")
         return redirect(url_for("users.users_index"))
 
-    user.is_active = False
-    db.session.commit()
-    flash("Utente disattivato.", "success")
+    try:
+        user.is_active = False
+        db.session.commit()
+        flash("Utente disattivato.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore disattivazione utente %d", user_id)
+        flash("Impossibile disattivare l'utente. Operazione annullata.", "danger")
     return redirect(url_for("users.users_index"))
 
 
@@ -229,9 +234,14 @@ def users_delete(user_id):
     if not can_soft_delete_user(user):
         return redirect(url_for("users.users_index"))
 
-    user.is_active = False
-    db.session.commit()
-    flash("Utente eliminato dalla lista attiva. L'account è stato disattivato.", "success")
+    try:
+        user.is_active = False
+        db.session.commit()
+        flash("Utente eliminato dalla lista attiva. L'account è stato disattivato.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore soft-delete utente %d", user_id)
+        flash("Impossibile eliminare l'utente. Operazione annullata.", "danger")
     return redirect(url_for("users.users_index"))
 
 
@@ -246,9 +256,14 @@ def users_destroy(user_id):
     if not can_destroy_user(user):
         return redirect(url_for("users.users_index"))
 
-    db.session.delete(user)
-    db.session.commit()
-    flash("Utente eliminato definitivamente.", "success")
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        flash("Utente eliminato definitivamente.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore eliminazione definitiva utente %d", user_id)
+        flash("Impossibile eliminare definitivamente l'utente. Operazione annullata.", "danger")
     return redirect(url_for("users.users_index"))
 
 

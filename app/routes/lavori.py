@@ -282,13 +282,18 @@ def lavoro_edit(lavoro_id):
 @role_required("admin", "operatore")
 def lavoro_remove_pdf(lavoro_id):
     lavoro = Lavoro.query.get_or_404(lavoro_id)
-    if lavoro.preventivo_pdf_path:
-        old_path = os.path.join(current_app.static_folder, lavoro.preventivo_pdf_path)
-        if os.path.exists(old_path):
-            os.remove(old_path)
+    try:
+        if lavoro.preventivo_pdf_path:
+            old_path = os.path.join(current_app.static_folder, lavoro.preventivo_pdf_path)
+            if os.path.exists(old_path):
+                os.remove(old_path)
         lavoro.preventivo_pdf_path = None
         db.session.commit()
         flash("PDF preventivo rimosso.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore rimozione PDF lavoro %d", lavoro_id)
+        flash("Errore durante la rimozione del PDF.", "danger")
     return redirect(url_for("lavori.lavoro_edit", lavoro_id=lavoro.id))
 
 
@@ -316,38 +321,39 @@ def lavoro_delete(lavoro_id):
         flash("Impossibile eliminare il lavoro: presenti " + ", ".join(blocco) + " collegati.", "danger")
         return redirect(url_for("lavori.lavoro_page", lavoro_id=lavoro_id))
 
-    for evt in CalendarEvent.query.filter_by(lavoro_id=lavoro_id).all():
-        db.session.delete(evt)
-    for mb in Moodboard.query.filter_by(lavoro_id=lavoro_id).all():
-        db.session.delete(mb)
-    task_ids = [t.id for t in Task.query.filter_by(lavoro_id=lavoro_id).all()]
-    if task_ids:
-        CalendarEvent.query.filter(CalendarEvent.task_id.in_(task_ids)).update(
-            {CalendarEvent.task_id: None}, synchronize_session=False
-        )
-        EmailLog.query.filter(EmailLog.task_id.in_(task_ids)).update(
-            {EmailLog.task_id: None}, synchronize_session=False
-        )
-    for task in Task.query.filter_by(lavoro_id=lavoro_id).all():
-        db.session.delete(task)
+    try:
+        for evt in CalendarEvent.query.filter_by(lavoro_id=lavoro_id).all():
+            db.session.delete(evt)
+        for mb in Moodboard.query.filter_by(lavoro_id=lavoro_id).all():
+            db.session.delete(mb)
+        task_ids = [t.id for t in Task.query.filter_by(lavoro_id=lavoro_id).all()]
+        if task_ids:
+            CalendarEvent.query.filter(CalendarEvent.task_id.in_(task_ids)).update(
+                {CalendarEvent.task_id: None}, synchronize_session=False
+            )
+            EmailLog.query.filter(EmailLog.task_id.in_(task_ids)).update(
+                {EmailLog.task_id: None}, synchronize_session=False
+            )
+        for task in Task.query.filter_by(lavoro_id=lavoro_id).all():
+            db.session.delete(task)
 
-    if lavoro.preventivo_pdf_path:
-        pdf_path = os.path.join(current_app.static_folder, lavoro.preventivo_pdf_path)
-        if os.path.exists(pdf_path):
-            os.remove(pdf_path)
+        if lavoro.preventivo_pdf_path:
+            pdf_path = os.path.join(current_app.static_folder, lavoro.preventivo_pdf_path)
+            if os.path.exists(pdf_path):
+                os.remove(pdf_path)
 
-    if lavoro.folder_path:
-        abs_path = safe_path(lavoro.folder_path)
-        if abs_path and os.path.exists(abs_path):
-            try:
+        if lavoro.folder_path:
+            abs_path = safe_path(lavoro.folder_path)
+            if abs_path and os.path.exists(abs_path):
                 shutil.rmtree(abs_path)
-            except OSError as e:
-                flash(f"Impossibile eliminare la cartella: {str(e)}", "danger")
-                return redirect(url_for("lavori.lavoro_page", lavoro_id=lavoro.id))
 
-    db.session.delete(lavoro)
-    db.session.commit()
-    flash(f"Lavoro '{lavoro_descrizione}' eliminato con successo.", "success")
+        db.session.delete(lavoro)
+        db.session.commit()
+        flash(f"Lavoro '{lavoro_descrizione}' eliminato con successo.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore eliminazione lavoro %d", lavoro_id)
+        flash("Impossibile eliminare il lavoro. Operazione annullata.", "danger")
     return redirect(url_for("lavori.lavori"))
 
 

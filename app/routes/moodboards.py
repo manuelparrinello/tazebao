@@ -181,12 +181,17 @@ def moodboard_edit(id):
 @role_required("admin", "operatore")
 def moodboard_delete(id):
     moodboard = Moodboard.query.get_or_404(id)
-    for image in moodboard.images:
-        if image.image_path:
-            delete_image_file(image.image_path)
-    db.session.delete(moodboard)
-    db.session.commit()
-    flash("Moodboard eliminata con successo.", "success")
+    try:
+        for image in moodboard.images:
+            if image.image_path:
+                delete_image_file(image.image_path)
+        db.session.delete(moodboard)
+        db.session.commit()
+        flash("Moodboard eliminata con successo.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore eliminazione moodboard %d", id)
+        flash("Impossibile eliminare la moodboard. Operazione annullata.", "danger")
     return redirect(url_for("moodboards.moodboard_index"))
 
 
@@ -257,11 +262,16 @@ def moodboard_delete_image(id, image_id):
     image = MoodboardImage.query.get_or_404(image_id)
     if image.moodboard_id != moodboard.id:
         return redirect(url_for("moodboards.moodboard_detail", id=moodboard.id))
-    if image.image_path:
-        delete_image_file(image.image_path)
-    db.session.delete(image)
-    db.session.commit()
-    flash("Immagine rimossa dalla moodboard.", "success")
+    try:
+        if image.image_path:
+            delete_image_file(image.image_path)
+        db.session.delete(image)
+        db.session.commit()
+        flash("Immagine rimossa dalla moodboard.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore eliminazione immagine moodboard %d", image_id)
+        flash("Impossibile rimuovere l'immagine. Operazione annullata.", "danger")
     return redirect(url_for("moodboards.moodboard_detail", id=moodboard.id))
 
 
@@ -283,4 +293,7 @@ def delete_image_file(image_path):
         return
     full_path = os.path.join(current_app.static_folder, image_path)
     if os.path.isfile(full_path):
-        os.remove(full_path)
+        try:
+            os.remove(full_path)
+        except OSError:
+            current_app.logger.exception("Errore rimozione file immagine moodboard: %s", full_path)

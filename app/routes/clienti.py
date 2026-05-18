@@ -2,7 +2,7 @@ import os
 import shutil
 from datetime import date
 
-from flask import Blueprint, flash, jsonify, redirect, render_template, request, send_file, url_for
+from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, send_file, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
@@ -223,9 +223,14 @@ def cliente_delete(cliente_id):
             except OSError as e:
                 return jsonify({"error": f"Impossibile eliminare la cartella: {str(e)}"}), 500
 
-    db.session.delete(cliente)
-    db.session.commit()
-    return jsonify({"message": "Cliente eliminato con successo"})
+    try:
+        db.session.delete(cliente)
+        db.session.commit()
+        return jsonify({"message": "Cliente eliminato con successo"})
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore eliminazione cliente %d", cliente_id)
+        return jsonify({"error": "Impossibile completare l'eliminazione del cliente."}), 500
 
 
 @bp.route("/clienti/edit/<int:cliente_id>", methods=["GET", "PUT"])

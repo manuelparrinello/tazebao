@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Blueprint, flash, g, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, g, redirect, render_template, request, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
@@ -123,7 +123,12 @@ def emails_edit(email_id):
 @role_required("admin", "operatore")
 def emails_delete(email_id):
     email_log = EmailLog.query.get_or_404(email_id)
-    db.session.delete(email_log)
-    db.session.commit()
-    flash("Comunicazione eliminata con successo.", "success")
+    try:
+        db.session.delete(email_log)
+        db.session.commit()
+        flash("Comunicazione eliminata con successo.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore eliminazione email log %d", email_id)
+        flash("Impossibile eliminare la comunicazione. Operazione annullata.", "danger")
     return redirect(url_for("emails.emails_index"))

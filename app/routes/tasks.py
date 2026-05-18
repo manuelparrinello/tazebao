@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
@@ -135,11 +135,16 @@ def task_edit(task_id):
 @role_required("admin", "operatore")
 def task_delete(task_id):
     task = Task.query.get_or_404(task_id)
-    for moodboard in task.moodboards:
-        moodboard.task_id = None
-    CalendarEvent.query.filter_by(task_id=task_id).update({CalendarEvent.task_id: None})
-    EmailLog.query.filter_by(task_id=task_id).update({EmailLog.task_id: None})
-    db.session.delete(task)
-    db.session.commit()
-    flash("Task eliminata con successo.", "success")
+    try:
+        for moodboard in task.moodboards:
+            moodboard.task_id = None
+        CalendarEvent.query.filter_by(task_id=task_id).update({CalendarEvent.task_id: None})
+        EmailLog.query.filter_by(task_id=task_id).update({EmailLog.task_id: None})
+        db.session.delete(task)
+        db.session.commit()
+        flash("Task eliminata con successo.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore eliminazione task %d", task_id)
+        flash("Impossibile eliminare il task. Operazione annullata.", "danger")
     return redirect(url_for("tasks.tasks"))

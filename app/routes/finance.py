@@ -1,6 +1,6 @@
 from datetime import date
 
-from flask import Blueprint, flash, g, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, g, redirect, render_template, request, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
@@ -143,7 +143,12 @@ def finance_delete(movement_id):
     movement = FinancialMovement.query.get_or_404(movement_id)
     year = movement.year
     month = movement.month
-    delete_financial_movement(movement)
-    db.session.commit()
-    flash("Movimento eliminato con successo.", "success")
+    try:
+        delete_financial_movement(movement)
+        db.session.commit()
+        flash("Movimento eliminato con successo.", "success")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Errore eliminazione movimento finanziario %d", movement_id)
+        flash("Impossibile eliminare il movimento. Operazione annullata.", "danger")
     return redirect(url_for("finance.finance_index", year=year, month=month))

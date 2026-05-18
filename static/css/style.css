@@ -3794,6 +3794,98 @@ body.loaded {
   margin-bottom: 0.5rem;
 }
 
+.dashboard-kpi-card {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.dashboard-kpi-card:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+
+.dashboard-kpi-label {
+  font-size: 0.72rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.dashboard-kpi-finance {
+  font-size: 1.3rem;
+}
+
+.dashboard-today-item {
+  display: block;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 10px;
+  background: #fff;
+  color: #111;
+  transition: background 0.12s ease, border-color 0.12s ease;
+  text-decoration: none !important;
+}
+
+.dashboard-today-item:hover {
+  background: var(--sidebar-hover);
+  border-color: var(--app-primary);
+  color: #111;
+}
+
+.dashboard-today-icon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.dashboard-today-task_scaduta {
+  background: #f8d7da;
+  color: #dc3545;
+}
+
+.dashboard-today-evento {
+  background: #dbeafe;
+  color: #0d6efd;
+}
+
+.dashboard-today-da_approvare {
+  background: #fff3cd;
+  color: #b8860b;
+}
+
+.dashboard-today-followup {
+  background: #d1e7dd;
+  color: #198754;
+}
+
+@media (max-width: 575.98px) {
+  .dashboard-kpi-value {
+    font-size: 1.4rem;
+  }
+
+  .dashboard-kpi-label {
+    font-size: 0.65rem;
+  }
+
+  .dashboard-icon-box {
+    width: 34px;
+    height: 34px;
+  }
+
+  .dashboard-icon-box i {
+    font-size: 0.8rem;
+  }
+
+  .dashboard-today-item {
+    padding: 0.55rem 0.6rem;
+  }
+}
+
 /* =========================
    CALENDARIO EDITORIALE - HEADER
 ========================= */

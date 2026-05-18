@@ -170,6 +170,19 @@ const ERP_BADGE_MAP = {
     costituzione_societa: ["text-bg-light border", "Costituzione società"],
     generale: ["text-bg-light border", "Generale"],
   },
+  editorial_status: {
+    idea: ["text-bg-light border", "Idea"],
+    programmato: ["primary", "Programmato"],
+    approvato: ["success", "Approvato"],
+    in_produzione: ["warning", "In produzione"],
+    completato: ["primary", "Completato"],
+    annullato: ["secondary", "Annullato"],
+  },
+  editorial_client_approval: {
+    da_approvare: ["warning", "Da approvare"],
+    approvato: ["success", "Approvato"],
+    respinto: ["danger", "Respinto"],
+  },
   finance_movement_type: {
     entrata: ["success", "Entrata"],
     uscita: ["danger", "Uscita"],
@@ -308,15 +321,19 @@ if (document.getElementById("app")) {
     computed: {
       kpiCards() {
         if (!this.summary) return [];
+        const open = this.summary.open_task_count || 0;
         const overdue = this.summary.overdue_task_count || 0;
-        const dueSoon = this.summary.task_due_soon_count || 0;
-        const drafts = this.summary.draft_quotes_count || 0;
-        const unread = this.summary.unread_mail_count || 0;
+        const activeJobs = this.summary.active_jobs_count || 0;
+        const pendingQuotes = this.summary.pending_quotes_count || 0;
+        const upcomingPubs = this.summary.upcoming_publications_count || 0;
+        const expectedIncome = this.summary.expected_income_count || 0;
         return [
-          { title: "Task scadute", value: overdue, icon: "bi-exclamation-triangle", valueClass: overdue > 0 ? "dashboard-kpi-danger" : "", boxClass: overdue > 0 ? "dashboard-icon-box-danger" : "dashboard-icon-box-primary" },
-          { title: "In scadenza (7g)", value: dueSoon, icon: "bi-alarm", valueClass: dueSoon > 0 ? "dashboard-kpi-warning" : "", boxClass: dueSoon > 0 ? "dashboard-icon-box-warning" : "dashboard-icon-box-primary" },
-          { title: "Preventivi bozza", value: drafts, icon: "bi-file-earmark-text", valueClass: drafts > 0 ? "dashboard-kpi-warning" : "", boxClass: drafts > 0 ? "dashboard-icon-box-warning" : "dashboard-icon-box-primary" },
-          { title: "Email non lette", value: unread, icon: "bi-envelope-exclamation", valueClass: unread > 0 ? "dashboard-kpi-warning" : "", boxClass: unread > 0 ? "dashboard-icon-box-info" : "dashboard-icon-box-primary" },
+          { title: "Task aperte", value: open, icon: "bi-list-check", valueClass: "", boxClass: "dashboard-icon-box-primary", url: "/tasks" },
+          { title: "Task urgenti", value: overdue, icon: "bi-exclamation-triangle", valueClass: overdue > 0 ? "dashboard-kpi-danger" : "", boxClass: overdue > 0 ? "dashboard-icon-box-danger" : "dashboard-icon-box-primary", url: "/tasks" },
+          { title: "Lavori attivi", value: activeJobs, icon: "bi-briefcase", valueClass: "", boxClass: "dashboard-icon-box-primary", url: "/lavori" },
+          { title: "Preventivi in attesa", value: pendingQuotes, icon: "bi-file-earmark-text", valueClass: pendingQuotes > 0 ? "dashboard-kpi-warning" : "", boxClass: pendingQuotes > 0 ? "dashboard-icon-box-warning" : "dashboard-icon-box-primary", url: "/preventivi" },
+          { title: "Pubblicazioni imminenti", value: upcomingPubs, icon: "bi-calendar2-week", valueClass: upcomingPubs > 0 ? "dashboard-kpi-success" : "", boxClass: upcomingPubs > 0 ? "dashboard-icon-box-success" : "dashboard-icon-box-primary", url: "/editorial-calendar" },
+          { title: "Entrate previste", value: expectedIncome, icon: "bi-currency-euro", valueClass: expectedIncome > 0 ? "dashboard-kpi-success" : "", boxClass: expectedIncome > 0 ? "dashboard-icon-box-success" : "dashboard-icon-box-primary", url: "/finance" },
         ];
       },
       financeCards() {
@@ -378,7 +395,7 @@ if (document.getElementById("app")) {
         return value.replaceAll("_", " ");
       },
       badgeHtml(kind, value, text) {
-        return `<span class="badge rounded-pill erp-badge text-bg-light border">${text || value || '-'}</span>`;
+        return erpBadgeHtml(kind, value, text);
       },
       priorityHtml(prio) {
         if (!prio) return '<span class="text-secondary">-</span>';
@@ -400,7 +417,7 @@ if (document.getElementById("app")) {
           <div>
             <p class="text-primary text-uppercase small fw-bold mb-2">Dashboard ERP</p>
             <h1 class="h3 mb-2">Panoramica operativa</h1>
-            <p class="text-secondary mb-0">KPI aggiornati da task, calendario, clienti, lavori e preventivi.</p>
+            <p class="text-secondary mb-0">Panoramica operativa di oggi.</p>
           </div>
           <button class="btn btn-outline-primary" type="button" @click="loadDashboard" :disabled="loading">
             <i class="bi bi-arrow-clockwise"></i>&nbsp;Aggiorna
@@ -418,36 +435,14 @@ if (document.getElementById("app")) {
 
         <div v-else>
           <div class="row g-3">
-            <div class="col-12 col-sm-6 col-xl-3" v-for="card in kpiCards" :key="card.title">
-              <article class="card h-100 rounded-3 border border-light-subtle">
-                <div class="card-body p-4">
-                  <div class="d-flex align-items-start justify-content-between gap-3">
-                    <div class="min-w-0">
-                      <p class="text-secondary small mb-2">[[ card.title ]]</p>
-                      <div class="fw-bold text-truncate dashboard-kpi-value" :class="card.valueClass">[[ card.value ]]</div>
-                    </div>
-                    <div class="dashboard-icon-box rounded-3 d-inline-flex align-items-center justify-content-center flex-shrink-0" :class="card.boxClass">
-                      <i class="bi" :class="card.icon"></i>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </div>
-
-          <div class="mt-4">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-              <h2 class="h5 mb-0">Finanze</h2>
-              <a class="btn btn-sm btn-outline-primary" href="/finance">Apri finanze</a>
-            </div>
-            <div class="row g-3">
-              <div class="col-12 col-sm-6 col-xl-3" v-for="card in financeCards" :key="card.title">
-                <article class="card h-100 rounded-3 border border-light-subtle">
-                  <div class="card-body p-4">
-                    <div class="d-flex align-items-start justify-content-between gap-3">
+            <div class="col-6 col-md-4 col-xl-2" v-for="card in kpiCards" :key="card.title">
+              <a :href="card.url" class="text-decoration-none">
+                <article class="card h-100 rounded-3 border border-light-subtle dashboard-kpi-card">
+                  <div class="card-body p-3 p-xl-4">
+                    <div class="d-flex align-items-center justify-content-between gap-2">
                       <div class="min-w-0">
-                        <p class="text-secondary small mb-2">[[ card.title ]]</p>
-                        <div class="fw-bold text-truncate dashboard-kpi-value" :class="card.valueClass">[[ card.value ]]</div>
+                        <p class="text-secondary small mb-1 dashboard-kpi-label">[[ card.title ]]</p>
+                        <div class="fw-bold dashboard-kpi-value" :class="card.valueClass">[[ card.value ]]</div>
                       </div>
                       <div class="dashboard-icon-box rounded-3 d-inline-flex align-items-center justify-content-center flex-shrink-0" :class="card.boxClass">
                         <i class="bi" :class="card.icon"></i>
@@ -455,6 +450,37 @@ if (document.getElementById("app")) {
                     </div>
                   </div>
                 </article>
+              </a>
+            </div>
+          </div>
+
+          <div v-if="summary.today_items && summary.today_items.length > 0" class="mt-4">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <h2 class="h5 mb-0">Da fare oggi</h2>
+              <span class="badge rounded-pill text-bg-primary erp-badge" v-if="summary.today_items.length">[[ summary.today_items.length ]]</span>
+            </div>
+            <div class="card rounded-3 border border-light-subtle">
+              <div class="card-body p-3 p-md-4">
+                <div class="row g-2">
+                  <div class="col-12 col-md-6" v-for="item in summary.today_items" :key="item.url + item.label">
+                    <a :href="item.url" class="dashboard-today-item">
+                      <div class="d-flex align-items-start gap-3">
+                        <div class="dashboard-today-icon flex-shrink-0" :class="'dashboard-today-' + item.type">
+                          <i class="bi" :class="item.type === 'task_scaduta' ? 'bi-check2-square' : item.type === 'evento' ? 'bi-calendar3' : item.type === 'da_approvare' ? 'bi-check2-circle' : 'bi-chat-dots'"></i>
+                        </div>
+                        <div class="min-w-0 flex-grow-1">
+                          <div class="fw-semibold text-truncate">[[ item.label ]]</div>
+                          <div class="small text-secondary d-flex flex-wrap gap-2 mt-1">
+                            <span v-if="item.time"><i class="bi bi-clock me-1"></i>[[ item.time ]]</span>
+                            <span v-if="item.priority" v-html="priorityHtml(item.priority)"></span>
+                            <span v-if="item.cliente"><i class="bi bi-person me-1"></i>[[ item.cliente ]]</span>
+                          </div>
+                        </div>
+                        <i class="bi bi-chevron-right text-secondary flex-shrink-0 mt-1"></i>
+                      </div>
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -462,9 +488,9 @@ if (document.getElementById("app")) {
           <div class="row g-3 mt-3">
             <div class="col-12 col-xl-4">
               <article class="card h-100 rounded-3 border border-light-subtle">
-                <div class="card-body p-4">
+                <div class="card-body p-3 p-md-4">
                   <h2 class="h5 mb-3">Prossimi eventi</h2>
-                  <div v-if="summary.upcoming_events.length === 0" class="text-secondary py-4 text-center">
+                  <div v-if="!summary.upcoming_events || summary.upcoming_events.length === 0" class="text-secondary py-3 text-center">
                     <div class="dashboard-empty-icon"><i class="bi bi-calendar2-week"></i></div>
                     <div class="small">Nessun evento nei prossimi 7 giorni.</div>
                   </div>
@@ -476,7 +502,6 @@ if (document.getElementById("app")) {
                     <div class="small text-secondary d-flex flex-wrap gap-2">
                       <span><i class="bi bi-calendar3 me-1"></i>[[ formatDateTime(event.start_datetime) ]]</span>
                       <span v-if="event.cliente"><i class="bi bi-person me-1"></i>[[ event.cliente.name ]]</span>
-                      <span v-if="event.lavoro"><i class="bi bi-briefcase me-1"></i>[[ event.lavoro.descrizione ]]</span>
                     </div>
                   </a>
                 </div>
@@ -485,50 +510,64 @@ if (document.getElementById("app")) {
 
             <div class="col-12 col-xl-4">
               <article class="card h-100 rounded-3 border border-light-subtle">
-                <div class="card-body p-4">
-                  <h2 class="h5 mb-3">Task recenti</h2>
-                  <div v-if="summary.recent_tasks.length === 0" class="text-secondary py-4 text-center">
-                    <div class="dashboard-empty-icon"><i class="bi bi-list-check"></i></div>
-                    <div class="small">Nessuna task recente.</div>
+                <div class="card-body p-3 p-md-4">
+                  <h2 class="h5 mb-3">Prossime pubblicazioni</h2>
+                  <div v-if="!summary.upcoming_publications || summary.upcoming_publications.length === 0" class="text-secondary py-3 text-center">
+                    <div class="dashboard-empty-icon"><i class="bi bi-calendar2-week"></i></div>
+                    <div class="small">Nessuna pubblicazione nei prossimi 7 giorni.</div>
                   </div>
-                  <a v-for="task in summary.recent_tasks" :key="task.id" :href="task.url" class="dashboard-list-item">
+                  <a v-for="pub in summary.upcoming_publications" :key="pub.id" :href="pub.url" class="dashboard-list-item">
                     <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
-                      <div class="fw-bold text-truncate min-w-0">[[ task.name ]]</div>
-                      <span v-html="badgeHtml('task_status', task.status)" class="flex-shrink-0"></span>
-                    </div>
-                    <div class="small d-flex flex-wrap gap-2">
-                      <span v-html="priorityHtml(task.priority)"></span>
-                      <span v-if="task.due_date" :class="isOverdue(task.due_date) ? 'text-danger fw-bold' : 'text-secondary'">
-                        <i class="bi bi-calendar3 me-1"></i>[[ formatDate(task.due_date) ]]
-                      </span>
-                      <span v-if="task.cliente" class="text-secondary"><i class="bi bi-person me-1"></i>[[ task.cliente.name ]]</span>
-                    </div>
-                  </a>
-                </div>
-              </article>
-            </div>
-
-            <div class="col-12 col-xl-4">
-              <article class="card h-100 rounded-3 border border-light-subtle">
-                <div class="card-body p-4">
-                  <h2 class="h5 mb-3">Preventivi recenti</h2>
-                  <div v-if="summary.recent_quotes.length === 0" class="text-secondary py-4 text-center">
-                    <div class="dashboard-empty-icon"><i class="bi bi-file-earmark-text"></i></div>
-                    <div class="small">Nessun preventivo recente.</div>
-                  </div>
-                  <a v-for="quote in summary.recent_quotes" :key="quote.id" :href="quote.url" class="dashboard-list-item">
-                    <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
-                      <div class="fw-bold text-truncate min-w-0">[[ quote.descrizione ]]</div>
-                      <span v-html="badgeHtml('quote_status', quote.stato)" class="flex-shrink-0"></span>
+                      <div class="fw-bold text-truncate min-w-0">[[ pub.title ]]</div>
+                      <span v-html="badgeHtml('editorial_status', pub.status)" class="flex-shrink-0"></span>
                     </div>
                     <div class="small text-secondary d-flex flex-wrap gap-2">
-                      <span v-if="quote.importo_totale" class="fw-semibold"><i class="bi bi-currency-euro me-1"></i>[[ formatCurrency(quote.importo_totale) ]]</span>
-                      <span><i class="bi bi-calendar3 me-1"></i>[[ formatDate(quote.data_creazione) ]]</span>
-                      <span v-if="quote.cliente"><i class="bi bi-person me-1"></i>[[ quote.cliente.name ]]</span>
+                      <span><i class="bi bi-calendar3 me-1"></i>[[ formatDate(pub.date) ]]</span>
+                      <span v-if="pub.cliente"><i class="bi bi-person me-1"></i>[[ pub.cliente.name ]]</span>
                     </div>
                   </a>
                 </div>
               </article>
+            </div>
+
+            <div class="col-12 col-xl-4">
+              <article class="card h-100 rounded-3 border border-light-subtle">
+                <div class="card-body p-3 p-md-4">
+                  <h2 class="h5 mb-3">Ultimi aggiornamenti</h2>
+                  <div v-if="!summary.recent_updates || summary.recent_updates.length === 0" class="text-secondary py-3 text-center">
+                    <div class="dashboard-empty-icon"><i class="bi bi-arrow-repeat"></i></div>
+                    <div class="small">Nessun aggiornamento recente.</div>
+                  </div>
+                  <a v-for="upd in summary.recent_updates" :key="upd.url" :href="upd.url" class="dashboard-list-item">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
+                      <div class="fw-bold text-truncate min-w-0">[[ upd.label ]]</div>
+                      <span v-html="badgeHtml(upd.type === 'task' ? 'task_status' : upd.type === 'preventivo' ? 'quote_status' : 'work_status', upd.status)" class="flex-shrink-0"></span>
+                    </div>
+                    <div class="small text-secondary">
+                      <span v-if="upd.ts"><i class="bi bi-clock me-1"></i>[[ formatDateTime(upd.ts) ]]</span>
+                    </div>
+                  </a>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h2 class="h5 mb-0">Finanze mese</h2>
+              <a class="btn btn-sm btn-outline-primary" href="/finance">Apri finanze</a>
+            </div>
+            <div class="row g-3">
+              <div class="col-6 col-md-3" v-for="card in financeCards" :key="card.title">
+                <article class="card h-100 rounded-3 border border-light-subtle dashboard-kpi-card">
+                  <div class="card-body p-3 p-md-4">
+                    <div class="min-w-0">
+                      <p class="text-secondary small mb-1 dashboard-kpi-label">[[ card.title ]]</p>
+                      <div class="fw-bold text-truncate dashboard-kpi-value dashboard-kpi-finance" :class="card.valueClass">[[ card.value ]]</div>
+                    </div>
+                  </div>
+                </article>
+              </div>
             </div>
           </div>
         </div>

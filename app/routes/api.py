@@ -363,6 +363,87 @@ def get_notifications():
     return notifs[:30]
 
 
+def serialize_dashboard_publication(p):
+    return {
+        "id": p.id,
+        "url": url_for("editorial_calendar.editorial_edit", publication_id=p.id),
+        "title": p.title,
+        "date": p.publication_date.isoformat() if p.publication_date else None,
+        "status": p.status,
+        "client_approval_status": p.client_approval_status,
+        "cliente": {"id": p.cliente.id, "name": p.cliente.name} if p.cliente else None,
+        "platforms": p.get_platforms(),
+    }
+
+
+def build_today_items(today_tasks, today_events, today_followups, pending_approvals, overdue_count):
+    items = []
+
+    for task in today_tasks:
+        items.append({
+            "type": "task_scaduta",
+            "label": f"Task in scadenza: {task.name}",
+            "priority": task.priority,
+            "due_date": task.due_date.isoformat() if task.due_date else None,
+            "url": url_for("tasks.task_edit", task_id=task.id),
+        })
+
+    for event in today_events:
+        items.append({
+            "type": "evento",
+            "label": f"Evento: {event.title}",
+            "time": event.start_datetime.strftime("%H:%M") if event.start_datetime else None,
+            "url": url_for("calendar.calendar_edit", event_id=event.id),
+        })
+
+    for p in pending_approvals[:3]:
+        items.append({
+            "type": "da_approvare",
+            "label": f"Approvazione: {p.title}",
+            "cliente": p.cliente.name if p.cliente else None,
+            "url": url_for("editorial_calendar.editorial_edit", publication_id=p.id),
+        })
+
+    for p in today_followups[:2]:
+        items.append({
+            "type": "followup",
+            "label": f"Follow-up preventivo: {p.descrizione}",
+            "url": url_for("preventivi.visualizza_preventivo", id=p.id),
+        })
+
+    return items[:8]
+
+
+def build_recent_updates(tasks, quotes, jobs):
+    updates = []
+    for t in tasks:
+        updates.append({
+            "type": "task",
+            "label": f"Task: {t.name}",
+            "status": t.status,
+            "url": url_for("tasks.task_edit", task_id=t.id),
+            "ts": (t.updated_at or t.created_at).isoformat() if (t.updated_at or t.created_at) else None,
+        })
+    for q in quotes:
+        updates.append({
+            "type": "preventivo",
+            "label": f"Preventivo: {q.descrizione}",
+            "status": q.stato,
+            "url": url_for("preventivi.visualizza_preventivo", id=q.id),
+            "ts": q.data_creazione.isoformat() if q.data_creazione else None,
+        })
+    for j in jobs:
+        updates.append({
+            "type": "lavoro",
+            "label": f"Lavoro: {j.descrizione}",
+            "status": j.stato,
+            "url": url_for("lavori.lavoro_page", lavoro_id=j.id),
+            "ts": None,
+        })
+    updates.sort(key=lambda x: x["ts"] or "", reverse=True)
+    return updates[:5]
+
+
 @bp.get("/api/dashboard/summary")
 @login_required
 def get_dashboard_summary():
@@ -407,9 +488,66 @@ def get_dashboard_summary():
 
         notifications = get_notifications()
 
+        tomorrow = today + timedelta(days=1)
+        upcoming_publications = (
+            EditorialPublication.query
+            .filter(EditorialPublication.publication_date >= today)
+            .filter(EditorialPublication.publication_date <= upcoming_limit)
+            .order_by(EditorialPublication.publication_date.asc())
+            .limit(8)
+            .all()
+        )
+
+        pending_approval_publications = (
+            EditorialPublication.query
+            .filter(EditorialPublication.client_approval_status == "da_approvare")
+            .filter(EditorialPublication.status != "annullato")
+            .order_by(EditorialPublication.publication_date.asc())
+            .limit(5)
+            .all()
+        )
+
+        pending_quotes = (
+            Preventivo.query
+            .filter(db.func.lower(Preventivo.stato).in_(("inviato", "inviata", "in_attesa")))
+            .order_by(Preventivo.data_creazione.desc())
+            .all()
+        )
+
+        expected_income_count = FinancialMovement.query.filter(
+            FinancialMovement.movement_type == "entrata",
+            FinancialMovement.movement_status == "prevista",
+        ).count()
+
+        today_events = (
+            CalendarEvent.query.filter(CalendarEvent.start_datetime >= now)
+            .filter(CalendarEvent.start_datetime < now + timedelta(days=1))
+            .order_by(CalendarEvent.start_datetime.asc())
+            .limit(3)
+            .all()
+        )
+
+        today_tasks = (
+            open_tasks.filter(Task.due_date == today)
+            .order_by(Task.priority.asc(), Task.due_date.asc())
+            .limit(3)
+            .all()
+        )
+
+        today_followups = (
+            Preventivo.query
+            .filter(Preventivo.data_followup == today)
+            .order_by(Preventivo.data_creazione.desc())
+            .all()
+        )
+
+        recent_jobs = (
+            Lavoro.query.order_by(Lavoro.id.desc()).limit(3).all()
+        )
+
         data = {
             "notifications": notifications,
-            "task_open_count": task_open_count,
+            "open_task_count": task_open_count,
             "task_due_soon_count": task_due_soon_count,
             "overdue_task_count": overdue_task_count,
             "upcoming_events_count": (
@@ -424,19 +562,27 @@ def get_dashboard_summary():
                     ~db.func.lower(Lavoro.stato).in_(closed_job_statuses),
                 )
             ).count(),
+            "pending_quotes_count": len(pending_quotes),
             "draft_quotes_count": Preventivo.query.filter(
                 db.func.lower(Preventivo.stato).in_(draft_quote_statuses)
             ).count(),
             "accepted_quotes_count": Preventivo.query.filter(
                 db.func.lower(Preventivo.stato).in_(accepted_quote_statuses)
             ).count(),
+            "upcoming_publications_count": len(upcoming_publications),
+            "expected_income_count": expected_income_count,
             "recent_tasks": [serialize_dashboard_task(task) for task in recent_tasks],
             "upcoming_events": [
                 serialize_dashboard_event(event) for event in upcoming_events
             ],
+            "upcoming_publications": [
+                serialize_dashboard_publication(p) for p in upcoming_publications
+            ],
             "recent_quotes": [
                 serialize_dashboard_quote(preventivo) for preventivo in recent_quotes
             ],
+            "today_items": build_today_items(today_tasks, today_events, today_followups, pending_approval_publications, overdue_task_count),
+            "recent_updates": build_recent_updates(recent_tasks[:2], recent_quotes[:2], recent_jobs[:2]),
             "unread_mail_count": unread_mail_count,
             "current_balance": finance_data["current_balance"],
             "month_income_effective": finance_data["month_income_effective"],

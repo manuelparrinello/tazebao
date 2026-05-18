@@ -9,13 +9,7 @@ bp = Blueprint("main", __name__)
 
 @bp.route("/")
 def index():
-    return render_template(
-        "index.html",
-        title="Home",
-        description="Welcome to the Home Page",
-        path=current_app.config["DB_PATH"],
-    )
-
+    return render_template("app_shell.html")
 
 @bp.route("/app")
 @login_required

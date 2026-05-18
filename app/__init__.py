@@ -70,6 +70,20 @@ def create_app():
         flash(f"File troppo grande. Il limite è di {upload_max_mb} MB.", "danger")
         return redirect(request.referrer or url_for("main.index"))
 
+    @app.errorhandler(404)
+    def handle_not_found(e):
+        if request.path.startswith("/api/") or request.accept_mimetypes.best == "application/json":
+            return {"error": "Risorsa non trovata"}, 404
+        flash("Pagina non trovata.", "warning")
+        return redirect(url_for("main.index"))
+
+    @app.errorhandler(500)
+    def handle_server_error(e):
+        if request.path.startswith("/api/") or request.accept_mimetypes.best == "application/json":
+            return {"error": "Errore interno del server"}, 500
+        flash("Errore interno del server. Riprova più tardi.", "danger")
+        return redirect(url_for("main.index"))
+
     configure_environment(app)
 
     db.init_app(app)

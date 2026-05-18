@@ -1,3 +1,1 @@
-document.getElementById("btnSidebarCollapse")?.addEventListener("click", () => {
-  document.body.classList.toggle("sidebar-collapsed");
-});
+// Sidebar collapse — non implementato, rimosso.

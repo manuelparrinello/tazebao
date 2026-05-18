@@ -57,7 +57,7 @@ def nuovo_preventivo():
         lavoro_id = data.get("lavoro_id")
         descrizione = data["titolo_preventivo"]
         cliente = Cliente.query.filter_by(id=cliente_id).first()
-        print("Cliente: " + cliente.name + ", ID: " + str(cliente.id))
+
         righe_data = [
             {
                 "qty": riga["qty"],

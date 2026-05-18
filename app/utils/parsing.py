@@ -13,9 +13,12 @@ def parse_optional_date(value):
 def parse_optional_datetime(value):
     if not value:
         return None
-    if value.endswith("Z"):
-        value = value[:-1] + "+00:00"
-    return datetime.fromisoformat(value)
+    try:
+        if value.endswith("Z"):
+            value = value[:-1] + "+00:00"
+        return datetime.fromisoformat(value)
+    except (ValueError, TypeError):
+        return None
 
 
 def parse_optional_id(value):

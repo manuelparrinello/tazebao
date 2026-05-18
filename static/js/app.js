@@ -378,8 +378,7 @@ if (document.getElementById("app")) {
         return value.replaceAll("_", " ");
       },
       badgeHtml(kind, value, text) {
-        const html = window.erpBadge?.html(kind, value, text);
-        return html || `<span class="badge rounded-pill erp-badge text-bg-light border">${window.erpBadge?.label(kind, value, text) || value || '-'}</span>`;
+        return `<span class="badge rounded-pill erp-badge text-bg-light border">${text || value || '-'}</span>`;
       },
       priorityHtml(prio) {
         if (!prio) return '<span class="text-secondary">-</span>';

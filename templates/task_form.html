@@ -1,10 +1,7 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m %}
 
 {% block title %}{{ page_title }}{% endblock %}
-
-{% macro selected(current, value) -%}
-{% if current == value %}selected{% endif %}
-{%- endmacro %}
 
 {% block content %}
 <div class="erp-form-page">
@@ -42,7 +39,7 @@
                             <label for="category" class="form-label fw-bold">Categoria</label>
                             <select class="form-control form-select" id="category" name="category">
                                 {% for category in categories %}
-                                <option value="{{ category }}" {{ selected(task.category or 'generale', category) }}>{{ category|labelize }}</option>
+                                <option value="{{ category }}" {{ m.selected(task.category or 'generale', category) }}>{{ category|labelize }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -71,7 +68,7 @@
                             <label for="status" class="form-label fw-bold">Stato</label>
                             <select class="form-control form-select" id="status" name="status">
                                 {% for status in statuses %}
-                                <option value="{{ status }}" {{ selected(task.status or 'da_fare', status) }}>{{ status|labelize }}</option>
+                                <option value="{{ status }}" {{ m.selected(task.status or 'da_fare', status) }}>{{ status|labelize }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -79,7 +76,7 @@
                             <label for="priority" class="form-label fw-bold">Priorita</label>
                             <select class="form-control form-select" id="priority" name="priority">
                                 {% for priority in priorities %}
-                                <option value="{{ priority }}" {{ selected(task.priority or 'media', priority) }}>{{ priority|labelize }}</option>
+                                <option value="{{ priority }}" {{ m.selected(task.priority or 'media', priority) }}>{{ priority|labelize }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -101,7 +98,7 @@
                             <select class="form-control form-select" id="cliente_id" name="cliente_id">
                                 <option value="">Nessun cliente</option>
                                 {% for cliente in clienti %}
-                                <option value="{{ cliente.id }}" {{ selected(task.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
+                                <option value="{{ cliente.id }}" {{ m.selected(task.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -110,7 +107,7 @@
                             <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
                                 <option value="">Nessun lavoro</option>
                                 {% for lavoro in lavori %}
-                                <option value="{{ lavoro.id }}" {{ selected(task.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
+                                <option value="{{ lavoro.id }}" {{ m.selected(task.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -119,7 +116,7 @@
                             <select class="form-control form-select" id="assignee_id" name="assignee_id">
                                 <option value="">Nessun assegnatario</option>
                                 {% for user in users %}
-                                <option value="{{ user.id }}" {{ selected(task.assignee_id, user.id) }}>{{ user.name or user.email }}</option>
+                                <option value="{{ user.id }}" {{ m.selected(task.assignee_id, user.id) }}>{{ user.name or user.email }}</option>
                                 {% endfor %}
                             </select>
                         </div>

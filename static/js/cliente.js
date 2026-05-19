@@ -1,7 +1,4 @@
 const getSingleCliente = Vue.createApp({
-    components: {
-        'tabella-lavori': TabellaLavori
-    },
     data() {
         return {
             cliente: {},

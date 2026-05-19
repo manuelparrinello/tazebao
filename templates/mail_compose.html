@@ -1,10 +1,7 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m %}
 
 {% block title %}{{ page_title }}{% endblock %}
-
-{% macro selected(current, value) -%}
-{% if current|string == value|string %}selected{% endif %}
-{%- endmacro %}
 
 {% block content %}
 <div class="erp-form-page">
@@ -42,7 +39,7 @@
                         <label for="account_id" class="form-label fw-bold">Account mittente</label>
                         <select class="form-control form-select" id="account_id" name="account_id" required>
                             {% for account in accounts %}
-                            <option value="{{ account.id }}" {{ selected(form_data.get('account_id'), account.id) }}>{{ account.label }} &middot; {{ account.email_address }}</option>
+                            <option value="{{ account.id }}" {{ m.selected(form_data.get('account_id'), account.id) }}>{{ account.label }} &middot; {{ account.email_address }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -72,7 +69,7 @@
                         <select class="form-control form-select" id="cliente_id" name="cliente_id">
                             <option value="">Nessun cliente</option>
                             {% for cliente in clienti %}
-                            <option value="{{ cliente.id }}" {{ selected(form_data.get('cliente_id'), cliente.id) }}>{{ cliente.name }}</option>
+                            <option value="{{ cliente.id }}" {{ m.selected(form_data.get('cliente_id'), cliente.id) }}>{{ cliente.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -81,7 +78,7 @@
                         <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
                             <option value="">Nessun lavoro</option>
                             {% for lavoro in lavori %}
-                            <option value="{{ lavoro.id }}" {{ selected(form_data.get('lavoro_id'), lavoro.id) }}>{{ lavoro.descrizione }}</option>
+                            <option value="{{ lavoro.id }}" {{ m.selected(form_data.get('lavoro_id'), lavoro.id) }}>{{ lavoro.descrizione }}</option>
                             {% endfor %}
                         </select>
                     </div>

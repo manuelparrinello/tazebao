@@ -1,10 +1,7 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m %}
 
 {% block title %}{{ page_title }}{% endblock %}
-
-{% macro selected(current, value) -%}
-{% if current == value %}selected{% endif %}
-{%- endmacro %}
 
 {% macro date_value(value) -%}
 {{ value.isoformat() if value else "" }}
@@ -63,7 +60,7 @@
                             <label for="cliente_id" class="form-label fw-bold">Cliente</label>
                             <select class="form-select" id="cliente_id" name="cliente_id" required>
                                 {% for cliente in clienti %}
-                                <option value="{{ cliente.id }}" {{ selected(lavoro.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
+                                <option value="{{ cliente.id }}" {{ m.selected(lavoro.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -80,7 +77,7 @@
                             <label for="stato" class="form-label fw-bold">Stato</label>
                             <select class="form-select" id="stato" name="stato" required>
                                 {% for stato in status_lavori %}
-                                <option value="{{ stato }}" {{ selected(lavoro.stato, stato) }}>{{ stato }}</option>
+                                <option value="{{ stato }}" {{ m.selected(lavoro.stato, stato) }}>{{ stato }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -88,9 +85,9 @@
                             <label for="priorita" class="form-label fw-bold">Priorita</label>
                             <select class="form-select" id="priorita" name="priorita">
                                 <option value="" {% if not lavoro.priorita %}selected{% endif %}>Nessuna priorita</option>
-                                <option value="Bassa" {{ selected(lavoro.priorita, "Bassa") }}>Bassa</option>
-                                <option value="Media" {{ selected(lavoro.priorita, "Media") }}>Media</option>
-                                <option value="Alta" {{ selected(lavoro.priorita, "Alta") }}>Alta</option>
+                                <option value="Bassa" {{ m.selected(lavoro.priorita, "Bassa") }}>Bassa</option>
+                                <option value="Media" {{ m.selected(lavoro.priorita, "Media") }}>Media</option>
+                                <option value="Alta" {{ m.selected(lavoro.priorita, "Alta") }}>Alta</option>
                             </select>
                         </div>
                         <div class="col-12 col-md-6 col-lg-3">

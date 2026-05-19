@@ -1,10 +1,7 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m %}
 
 {% block title %}{{ page_title }}{% endblock %}
-
-{% macro selected(current, value) -%}
-{% if current == value %}selected{% endif %}
-{%- endmacro %}
 
 {% block content %}
 <div class="erp-form-page">
@@ -56,7 +53,7 @@
                             <select class="form-control form-select" id="task_id" name="task_id">
                                 <option value="">Nessun task</option>
                                 {% for task in tasks %}
-                                <option value="{{ task.id }}" {{ selected(moodboard.task_id, task.id) }}>{{ task.name }}</option>
+                                <option value="{{ task.id }}" {{ m.selected(moodboard.task_id, task.id) }}>{{ task.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -65,7 +62,7 @@
                             <select class="form-control form-select" id="cliente_id" name="cliente_id">
                                 <option value="">Nessun cliente</option>
                                 {% for cliente in clienti %}
-                                <option value="{{ cliente.id }}" {{ selected(moodboard.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
+                                <option value="{{ cliente.id }}" {{ m.selected(moodboard.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -74,7 +71,7 @@
                             <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
                                 <option value="">Nessun lavoro</option>
                                 {% for lavoro in lavori %}
-                                <option value="{{ lavoro.id }}" {{ selected(moodboard.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
+                                <option value="{{ lavoro.id }}" {{ m.selected(moodboard.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
                                 {% endfor %}
                             </select>
                         </div>

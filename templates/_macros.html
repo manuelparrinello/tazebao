@@ -1,3 +1,7 @@
+{% macro selected(current, value) -%}
+{{ 'selected' if current|string == value|string else '' }}
+{%- endmacro %}
+
 {% macro euro(value) -%}
 {{ "%.2f"|format(value or 0)|replace(".", ",") }} &euro;
 {%- endmacro %}

@@ -1,10 +1,7 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m %}
 
 {% block title %}{{ page_title }}{% endblock %}
-
-{% macro selected(current, value) -%}
-{% if current == value %}selected{% endif %}
-{%- endmacro %}
 
 {% macro datetime_value(value) -%}
 {{ value.strftime("%Y-%m-%dT%H:%M") if value else "" }}
@@ -41,8 +38,8 @@
                         <div class="col-12 col-md-6 col-lg-3">
                             <label for="direction" class="form-label fw-bold">Direzione</label>
                             <select class="form-control form-select" id="direction" name="direction">
-                                <option value="outbound" {{ selected(email_log.direction or 'outbound', 'outbound') }}>Inviata</option>
-                                <option value="inbound" {{ selected(email_log.direction, 'inbound') }}>Ricevuta</option>
+                                <option value="outbound" {{ m.selected(email_log.direction or 'outbound', 'outbound') }}>Inviata</option>
+                                <option value="inbound" {{ m.selected(email_log.direction, 'inbound') }}>Ricevuta</option>
                             </select>
                         </div>
                         <div class="col-12 col-md-6 col-lg-3">
@@ -76,7 +73,7 @@
                             <select class="form-control form-select" id="cliente_id" name="cliente_id">
                                 <option value="">Nessun cliente</option>
                                 {% for cliente in clienti %}
-                                <option value="{{ cliente.id }}" {{ selected(email_log.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
+                                <option value="{{ cliente.id }}" {{ m.selected(email_log.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -85,7 +82,7 @@
                             <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
                                 <option value="">Nessun lavoro</option>
                                 {% for lavoro in lavori %}
-                                <option value="{{ lavoro.id }}" {{ selected(email_log.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
+                                <option value="{{ lavoro.id }}" {{ m.selected(email_log.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -94,7 +91,7 @@
                             <select class="form-control form-select" id="task_id" name="task_id">
                                 <option value="">Nessuna task</option>
                                 {% for task in tasks %}
-                                <option value="{{ task.id }}" {{ selected(email_log.task_id, task.id) }}>{{ task.name }}</option>
+                                <option value="{{ task.id }}" {{ m.selected(email_log.task_id, task.id) }}>{{ task.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>

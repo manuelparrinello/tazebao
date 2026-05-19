@@ -1,10 +1,7 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m %}
 
 {% block title %}{{ page_title }}{% endblock %}
-
-{% macro selected(current, value) -%}
-{% if current == value %}selected{% endif %}
-{%- endmacro %}
 
 {% macro date_value(value) -%}
 {{ value.strftime("%Y-%m-%d") if value else "" }}
@@ -60,7 +57,7 @@
                             <option value="">Seleziona cliente</option>
                             {% for cliente in clienti %}
                             {% set sel_cliente_id = form_data.get('cliente_id', publication.cliente_id) %}
-                            <option value="{{ cliente.id }}" {{ selected(sel_cliente_id|string, cliente.id|string) }}>{{ cliente.name }}</option>
+                            <option value="{{ cliente.id }}" {{ m.selected(sel_cliente_id|string, cliente.id|string) }}>{{ cliente.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -88,7 +85,7 @@
                         <select class="form-control form-select" id="content_type" name="content_type">
                             {% for content_type in content_types %}
                             {% set sel_content_type = form_data.get('content_type', publication.content_type or 'post_grafico') %}
-                            <option value="{{ content_type }}" {{ selected(sel_content_type, content_type) }}>{{ content_type|labelize }}</option>
+                            <option value="{{ content_type }}" {{ m.selected(sel_content_type, content_type) }}>{{ content_type|labelize }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -209,7 +206,7 @@
                         <select class="form-control form-select" id="status" name="status">
                             {% for status in statuses %}
                             {% set sel_status = form_data.get('status', publication.status or 'idea') %}
-                            <option value="{{ status }}" {{ selected(sel_status, status) }}>{{ status|labelize }}</option>
+                            <option value="{{ status }}" {{ m.selected(sel_status, status) }}>{{ status|labelize }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -218,7 +215,7 @@
                         <select class="form-control form-select" id="client_approval_status" name="client_approval_status">
                             {% for approval_status in client_approval_statuses %}
                             {% set sel_approval = form_data.get('client_approval_status', publication.client_approval_status or 'da_approvare') %}
-                            <option value="{{ approval_status }}" {{ selected(sel_approval, approval_status) }}>{{ approval_status|labelize }}</option>
+                            <option value="{{ approval_status }}" {{ m.selected(sel_approval, approval_status) }}>{{ approval_status|labelize }}</option>
                             {% endfor %}
                         </select>
                     </div>

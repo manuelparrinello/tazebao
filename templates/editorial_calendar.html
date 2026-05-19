@@ -1,10 +1,7 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m %}
 
 {% block title %}Calendario Editoriale{% endblock %}
-
-{% macro selected(current, value) -%}
-{% if current == value %}selected{% endif %}
-{%- endmacro %}
 
 {% macro publication_thumb(publication, size="sm") -%}
 {% set paths = publication.get_image_paths() %}
@@ -276,7 +273,7 @@
                     <select class="form-control form-select" id="cliente_id" name="cliente_id">
                         <option value="">Tutti i clienti</option>
                         {% for option_cliente in clienti %}
-                        <option value="{{ option_cliente.id }}" {{ selected(active_cliente_id, option_cliente.id) }}>{{ option_cliente.name }}</option>
+                        <option value="{{ option_cliente.id }}" {{ m.selected(active_cliente_id, option_cliente.id) }}>{{ option_cliente.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -285,7 +282,7 @@
                     <select class="form-control form-select" id="month" name="month">
                         {% for month_number, month_label in months %}
                         {% if month_number %}
-                        <option value="{{ month_number }}" {{ selected(current_month, month_number) }}>{{ month_label }}</option>
+                        <option value="{{ month_number }}" {{ m.selected(current_month, month_number) }}>{{ month_label }}</option>
                         {% endif %}
                         {% endfor %}
                     </select>
@@ -299,7 +296,7 @@
                     <select class="form-control form-select" id="platform" name="platform">
                         <option value="">Tutte</option>
                         {% for platform in platforms %}
-                        <option value="{{ platform }}" {{ selected(active_platform, platform) }}>{{ platform|labelize }}</option>
+                        <option value="{{ platform }}" {{ m.selected(active_platform, platform) }}>{{ platform|labelize }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -308,7 +305,7 @@
                     <select class="form-control form-select" id="content_type" name="content_type">
                         <option value="">Tutti</option>
                         {% for content_type in content_types %}
-                        <option value="{{ content_type }}" {{ selected(active_content_type, content_type) }}>{{ content_type|labelize }}</option>
+                        <option value="{{ content_type }}" {{ m.selected(active_content_type, content_type) }}>{{ content_type|labelize }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -317,7 +314,7 @@
                     <select class="form-control form-select" id="status" name="status">
                         <option value="">Tutti</option>
                         {% for status in statuses %}
-                        <option value="{{ status }}" {{ selected(active_status, status) }}>{{ status|labelize }}</option>
+                        <option value="{{ status }}" {{ m.selected(active_status, status) }}>{{ status|labelize }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -326,7 +323,7 @@
                     <select class="form-control form-select" id="client_approval_status" name="client_approval_status">
                         <option value="">Tutte</option>
                         {% for approval_status in client_approval_statuses %}
-                        <option value="{{ approval_status }}" {{ selected(active_client_approval_status, approval_status) }}>{{ approval_status|labelize }}</option>
+                        <option value="{{ approval_status }}" {{ m.selected(active_client_approval_status, approval_status) }}>{{ approval_status|labelize }}</option>
                         {% endfor %}
                     </select>
                 </div>

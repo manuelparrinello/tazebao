@@ -3,7 +3,7 @@
 
 {% block title %}Finanze{% endblock %}
 
-{% macro signed_m.euro(value) -%}
+{% macro signed_euro(value) -%}
 {% set amount = value or 0 %}
 {% if amount > 0 %}+{{ "%.2f"|format(amount)|replace(".", ",") }} &euro;{% elif amount < 0 %}-{{ "%.2f"|format(amount|abs)|replace(".", ",") }} &euro;{% else %}{{ "%.2f"|format(0)|replace(".", ",") }} &euro;{% endif %}
 {%- endmacro %}
@@ -190,7 +190,7 @@
         <div class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-4">
                 <p class="text-secondary small mb-2">In cassa</p>
-                <div class="display-6 fw-bold {{ balance_class(summary.current_balance) }}">{{ signed_m.euro(summary.current_balance) }}</div>
+                <div class="display-6 fw-bold {{ balance_class(summary.current_balance) }}">{{ signed_euro(summary.current_balance) }}</div>
             </div>
         </div>
     </div>

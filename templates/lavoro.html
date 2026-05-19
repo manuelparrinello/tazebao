@@ -1,10 +1,7 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m %}
 
 {% block title %}{{ lavoro.descrizione }}{% endblock %}
-
-{% macro euro(value) -%}
-{{ "%.2f"|format(value or 0)|replace(".", ",") }} &euro;
-{%- endmacro %}
 
 {% macro date_value(value) -%}
 {{ value|date_it if value else "-" }}
@@ -12,15 +9,6 @@
 
 {% macro datetime_value(value) -%}
 {{ value|datetime_it if value else "-" }}
-{%- endmacro %}
-
-{% macro empty_state(text, action_url=None, action_label=None) -%}
-<div class="border rounded-3 bg-light px-3 py-4 text-secondary">
-    <div>{{ text }}</div>
-    {% if current_user and current_user.role != "readonly" and action_url and action_label %}
-    <a class="btn btn-sm btn-outline-primary mt-3" href="{{ action_url }}">{{ action_label }}</a>
-    {% endif %}
-</div>
 {%- endmacro %}
 
 {% set can_mutate = current_user and current_user.role != "readonly" %}
@@ -118,7 +106,7 @@
                     </div>
                     <div class="col-12 col-md-4">
                         <div class="text-secondary small">Preventivato</div>
-                        <div class="fw-bold">{{ euro(lavoro.preventivato|default(0)) }}</div>
+                        <div class="fw-bold">{{ m.euro(lavoro.preventivato|default(0)) }}</div>
                     </div>
                     {% if lavoro.preventivo_pdf_path %}
                     <div class="col-12">
@@ -150,7 +138,7 @@
                     <a href="{{ url_for('cliente_page', cliente_id=lavoro.cliente.id) }}" class="btn btn-sm btn-outline-primary">Apri</a>
                 </div>
                 {% else %}
-                {{ empty_state("Nessun cliente collegato a questo lavoro.") }}
+                {{ m.empty_state("Nessun cliente collegato a questo lavoro.") }}
                 {% endif %}
             </div>
         </section>
@@ -190,7 +178,7 @@
             <div class="card h-100 rounded-3 border border-light-subtle">
                 <div class="card-body p-3">
                     <p class="text-secondary small mb-1">Preventivato</p>
-                    <div class="h4 fw-bold mb-0">{{ euro(lavoro.preventivato|default(0)) }}</div>
+                    <div class="h4 fw-bold mb-0">{{ m.euro(lavoro.preventivato|default(0)) }}</div>
                 </div>
             </div>
         </div>
@@ -198,7 +186,7 @@
             <div class="card h-100 rounded-3 border border-light-subtle">
                 <div class="card-body p-3">
                     <p class="text-secondary small mb-1">Entrate collegate</p>
-                    <div class="h4 fw-bold mb-0 text-success">{{ euro(marg.total_income) }}</div>
+                    <div class="h4 fw-bold mb-0 text-success">{{ m.euro(marg.total_income) }}</div>
                 </div>
             </div>
         </div>
@@ -206,7 +194,7 @@
             <div class="card h-100 rounded-3 border border-light-subtle">
                 <div class="card-body p-3">
                     <p class="text-secondary small mb-1">Uscite collegate</p>
-                    <div class="h4 fw-bold mb-0 text-danger">{{ euro(marg.total_expenses) }}</div>
+                    <div class="h4 fw-bold mb-0 text-danger">{{ m.euro(marg.total_expenses) }}</div>
                 </div>
             </div>
         </div>
@@ -214,7 +202,7 @@
             <div class="card h-100 rounded-3 border border-light-subtle">
                 <div class="card-body p-3">
                     <p class="text-secondary small mb-1">Margine stimato</p>
-                    <div class="h4 fw-bold mb-0 {% if marg.net > 0 %}text-success{% elif marg.net < 0 %}text-danger{% else %}text-secondary{% endif %}">{{ euro(marg.net) }}</div>
+                    <div class="h4 fw-bold mb-0 {% if marg.net > 0 %}text-success{% elif marg.net < 0 %}text-danger{% else %}text-secondary{% endif %}">{{ m.euro(marg.net) }}</div>
                 </div>
             </div>
         </div>
@@ -312,7 +300,7 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                {{ empty_state("Nessuna task ERP collegata a questo lavoro.", quick_actions.nuovo_task, "Crea task") }}
+                {{ m.empty_state("Nessuna task ERP collegata a questo lavoro.", quick_actions.nuovo_task, "Crea task") }}
                 {% endif %}
             </div>
         </section>
@@ -337,13 +325,13 @@
                             <div class="prev-badges">
                                 {{ erp_badge("quote_status", preventivo.stato) }}
                             </div>
-                            <div class="prev-total">{{ euro(preventivo.totale_preventivo) }}</div>
+                            <div class="prev-total">{{ m.euro(preventivo.totale_preventivo) }}</div>
                         </div>
                     </a>
                     {% endfor %}
                 </div>
                 {% else %}
-                {{ empty_state("Nessun preventivo collegato a questo lavoro.", quick_actions.nuovo_preventivo, "Crea preventivo") }}
+                {{ m.empty_state("Nessun preventivo collegato a questo lavoro.", quick_actions.nuovo_preventivo, "Crea preventivo") }}
                 {% endif %}
             </div>
         </section>
@@ -371,7 +359,7 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                {{ empty_state("Nessun evento calendario collegato a questo lavoro.", quick_actions.nuovo_evento, "Crea evento") }}
+                {{ m.empty_state("Nessun evento calendario collegato a questo lavoro.", quick_actions.nuovo_evento, "Crea evento") }}
                 {% endif %}
             </div>
         </section>
@@ -388,7 +376,7 @@
                         <div class="fin-card-header">
                             <span class="fin-ref"><i class="bi bi-hash me-1"></i>#{{ movimento.id }}</span>
                             <span class="fin-amount {% if movimento.movement_type == 'entrata' %}fin-amount-entrata{% else %}fin-amount-uscita{% endif %}">
-                                {% if movimento.movement_type == 'entrata' %}+{% else %}−{% endif %}{{ euro(movimento.amount|float) }}
+                                {% if movimento.movement_type == 'entrata' %}+{% else %}−{% endif %}{{ m.euro(movimento.amount|float) }}
                             </span>
                         </div>
                         <div class="fin-card-body">

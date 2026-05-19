@@ -1,12 +1,9 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m %}
 
 {% block title %}Finanze{% endblock %}
 
-{% macro euro(value) -%}
-{{ "%.2f"|format(value or 0)|replace(".", ",") }} &euro;
-{%- endmacro %}
-
-{% macro signed_euro(value) -%}
+{% macro signed_m.euro(value) -%}
 {% set amount = value or 0 %}
 {% if amount > 0 %}+{{ "%.2f"|format(amount)|replace(".", ",") }} &euro;{% elif amount < 0 %}-{{ "%.2f"|format(amount|abs)|replace(".", ",") }} &euro;{% else %}{{ "%.2f"|format(0)|replace(".", ",") }} &euro;{% endif %}
 {%- endmacro %}
@@ -64,7 +61,7 @@
                     </div>
                 </td>
                 <td class="text-end fw-bold fs-6 {% if kind == 'entrata' %}text-success{% else %}text-danger{% endif %}">
-                    {{ euro(movement.amount|float) }}
+                    {{ m.euro(movement.amount|float) }}
                 </td>
                 <td class="text-end">
                     {% if _can_mutate %}
@@ -109,7 +106,7 @@
             </div>
         </div>
         <div class="fw-bold fs-5 mb-2 {% if kind == 'entrata' %}text-success{% else %}text-danger{% endif %}">
-            {{ euro(movement.amount|float) }}
+            {{ m.euro(movement.amount|float) }}
         </div>
         <div class="d-flex align-items-center gap-2 mb-2">
             {% if kind == "entrata" %}
@@ -193,7 +190,7 @@
         <div class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-4">
                 <p class="text-secondary small mb-2">In cassa</p>
-                <div class="display-6 fw-bold {{ balance_class(summary.current_balance) }}">{{ signed_euro(summary.current_balance) }}</div>
+                <div class="display-6 fw-bold {{ balance_class(summary.current_balance) }}">{{ signed_m.euro(summary.current_balance) }}</div>
             </div>
         </div>
     </div>
@@ -201,7 +198,7 @@
         <div class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-4">
                 <p class="text-secondary small mb-2">Bilancio mese</p>
-                <div class="display-6 fw-bold">{{ euro(summary.month_balance) }}</div>
+                <div class="display-6 fw-bold">{{ m.euro(summary.month_balance) }}</div>
             </div>
         </div>
     </div>
@@ -209,8 +206,8 @@
         <div class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-4">
                 <p class="text-secondary small mb-2">Entrate effettive</p>
-                <div class="h2 fw-bold mb-0 text-success">{{ euro(summary.month_income_effective) }}</div>
-                <div class="text-secondary small mt-1">Previste: {{ euro(summary.month_income_expected) }}</div>
+                <div class="h2 fw-bold mb-0 text-success">{{ m.euro(summary.month_income_effective) }}</div>
+                <div class="text-secondary small mt-1">Previste: {{ m.euro(summary.month_income_expected) }}</div>
             </div>
         </div>
     </div>
@@ -218,8 +215,8 @@
         <div class="card h-100 rounded-3 border border-light-subtle">
             <div class="card-body p-4">
                 <p class="text-secondary small mb-2">Uscite mese</p>
-                <div class="h2 fw-bold mb-0 text-danger">{{ euro(summary.month_expenses_total) }}</div>
-                <div class="text-secondary small mt-1">Fisse {{ euro(summary.month_expenses_fixed) }} &middot; Variabili {{ euro(summary.month_expenses_variable) }}</div>
+                <div class="h2 fw-bold mb-0 text-danger">{{ m.euro(summary.month_expenses_total) }}</div>
+                <div class="text-secondary small mt-1">Fisse {{ m.euro(summary.month_expenses_fixed) }} &middot; Variabili {{ m.euro(summary.month_expenses_variable) }}</div>
             </div>
         </div>
     </div>
@@ -248,9 +245,9 @@
                                     {% for c in marg_ranking.top_clients %}
                                     <tr>
                                         <td><a href="{{ url_for('cliente_page', cliente_id=c.id) }}" class="text-decoration-none">{{ c.name }}</a></td>
-                                        <td class="text-end text-success small">{{ euro(c.income) }}</td>
-                                        <td class="text-end text-danger small">{{ euro(c.expenses) }}</td>
-                                        <td class="text-end fw-bold {% if c.net > 0 %}text-success{% elif c.net < 0 %}text-danger{% endif %}">{{ euro(c.net) }}</td>
+                                        <td class="text-end text-success small">{{ m.euro(c.income) }}</td>
+                                        <td class="text-end text-danger small">{{ m.euro(c.expenses) }}</td>
+                                        <td class="text-end fw-bold {% if c.net > 0 %}text-success{% elif c.net < 0 %}text-danger{% endif %}">{{ m.euro(c.net) }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -276,8 +273,8 @@
                                     {% for j in marg_ranking.top_jobs %}
                                     <tr>
                                         <td><a href="{{ url_for('lavori.lavoro_page', lavoro_id=j.id) }}" class="text-decoration-none">{{ j.descrizione|truncate(30) }}</a></td>
-                                        <td class="text-end small">{{ euro(j.preventivato) }}</td>
-                                        <td class="text-end fw-bold {% if j.net > 0 %}text-success{% elif j.net < 0 %}text-danger{% endif %}">{{ euro(j.net) }}</td>
+                                        <td class="text-end small">{{ m.euro(j.preventivato) }}</td>
+                                        <td class="text-end fw-bold {% if j.net > 0 %}text-success{% elif j.net < 0 %}text-danger{% endif %}">{{ m.euro(j.net) }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -302,7 +299,7 @@
                                     {% for j in marg_ranking.losing_jobs %}
                                     <tr>
                                         <td><a href="{{ url_for('lavori.lavoro_page', lavoro_id=j.id) }}" class="text-decoration-none">{{ j.descrizione|truncate(30) }}</a></td>
-                                        <td class="text-end fw-bold text-danger">{{ euro(j.net) }}</td>
+                                        <td class="text-end fw-bold text-danger">{{ m.euro(j.net) }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

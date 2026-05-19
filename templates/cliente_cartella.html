@@ -1,63 +1,6 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m %}
 {% block title %}Cartella cliente — {{ cliente.name }}{% endblock %}
-
-{% macro file_icon(filename) %}
-{%- set ext = filename.split('.')[-1]|lower if '.' in filename else '' -%}
-{%- set icon_map = {
-  'pdf':  ('bi-file-earmark-pdf-fill', 'text-danger'),
-  'jpg':  ('bi-file-earmark-image', 'text-info'),
-  'jpeg': ('bi-file-earmark-image', 'text-info'),
-  'png':  ('bi-file-earmark-image', 'text-info'),
-  'webp': ('bi-file-earmark-image', 'text-info'),
-  'gif':  ('bi-file-earmark-image', 'text-info'),
-  'svg':  ('bi-file-earmark-image', 'text-info'),
-  'tiff': ('bi-file-earmark-image', 'text-info'),
-  'tif':  ('bi-file-earmark-image', 'text-info'),
-  'doc':  ('bi-file-earmark-word', 'text-primary'),
-  'docx': ('bi-file-earmark-word', 'text-primary'),
-  'odt':  ('bi-file-earmark-word', 'text-primary'),
-  'xls':  ('bi-file-earmark-spreadsheet', 'text-success'),
-  'xlsx': ('bi-file-earmark-spreadsheet', 'text-success'),
-  'csv':  ('bi-file-earmark-spreadsheet', 'text-success'),
-  'ppt':  ('bi-file-earmark-slides', 'text-warning'),
-  'pptx': ('bi-file-earmark-slides', 'text-warning'),
-  'zip':  ('bi-file-earmark-zip', 'text-warning'),
-  'rar':  ('bi-file-earmark-zip', 'text-warning'),
-  '7z':   ('bi-file-earmark-zip', 'text-warning'),
-  'txt':  ('bi-file-earmark-text', 'text-secondary'),
-  'md':   ('bi-file-earmark-text', 'text-secondary'),
-  'ai':   ('bi-file-earmark-code', 'text-danger'),
-  'psd':  ('bi-file-earmark-image', 'text-primary'),
-  'eps':  ('bi-file-earmark-image', 'text-secondary'),
-  'indd': ('bi-file-earmark-richtext', 'text-danger'),
-  'idml': ('bi-file-earmark-richtext', 'text-danger'),
-  'blend':('bi-file-earmark-code', 'text-success'),
-  'aep':  ('bi-file-earmark-play', 'text-primary'),
-  'prproj':('bi-file-earmark-play', 'text-primary'),
-  'mp4':  ('bi-file-earmark-play', 'text-info'),
-  'mov':  ('bi-file-earmark-play', 'text-info'),
-  'avi':  ('bi-file-earmark-play', 'text-info'),
-  'mkv':  ('bi-file-earmark-play', 'text-info'),
-  'webm': ('bi-file-earmark-play', 'text-info'),
-  'mp3':  ('bi-file-earmark-music', 'text-success'),
-  'wav':  ('bi-file-earmark-music', 'text-success'),
-  'aiff': ('bi-file-earmark-music', 'text-success'),
-  'flac': ('bi-file-earmark-music', 'text-success'),
-} -%}
-{%- set icon_data = icon_map.get(ext, ('bi-file-earmark', 'text-secondary')) -%}
-<i class="bi {{ icon_data[0] }} {{ icon_data[1] }} me-2"></i>
-{%- endmacro %}
-
-{% macro format_size(size) %}
-{%- if size is not none and size >= 1048576 %}{{ "%.1f"|format(size / 1048576) }} MB
-{%- elif size is not none and size >= 1024 %}{{ "%.1f"|format(size / 1024) }} KB
-{%- elif size is not none %}{{ size }} B
-{%- else %}-{% endif %}
-{%- endmacro %}
-
-{% macro format_date(timestamp) %}
-{%- if timestamp %}{{ timestamp|datetime_it }}{% else %}-{% endif %}
-{%- endmacro %}
 
 {% block content %}
 <nav aria-label="breadcrumb" class="mb-3">
@@ -172,11 +115,11 @@
                                 <i class="bi bi-folder-fill text-warning me-2"></i><span class="fw-semibold">{{ entry.name }}</span>
                             </a>
                             {% else %}
-                            {{ file_icon(entry.name) }}<span title="{{ entry.name }}">{{ entry.name }}</span>
+                            {{ m.file_icon(entry.name) }}<span title="{{ entry.name }}">{{ entry.name }}</span>
                             {% endif %}
                         </td>
-                        <td class="fb-size-col text-end text-secondary small">{{ format_size(entry.size) }}</td>
-                        <td class="fb-date-col text-end text-secondary small d-none d-sm-table-cell">{{ format_date(entry.mtime) }}</td>
+                        <td class="fb-size-col text-end text-secondary small">{{ m.format_size(entry.size) }}</td>
+                        <td class="fb-date-col text-end text-secondary small d-none d-sm-table-cell">{{ m.format_date(entry.mtime) }}</td>
                         <td class="fb-actions-col text-center">
                             <div class="erp-actions justify-content-center">
                                 {% if not entry.is_dir %}
@@ -222,13 +165,13 @@
                         </a>
                         {% else %}
                         <span class="fw-semibold text-truncate d-inline-block w-100" title="{{ entry.name }}">
-                            {{ file_icon(entry.name) }}<span>{{ entry.name }}</span>
+                            {{ m.file_icon(entry.name) }}<span>{{ entry.name }}</span>
                         </span>
                         {% endif %}
                         <div class="small text-secondary mt-1">
-                            {{ format_size(entry.size) }}
+                            {{ m.format_size(entry.size) }}
                             {% if entry.size is not none %}&middot;{% endif %}
-                            {{ format_date(entry.mtime) }}
+                            {{ m.format_date(entry.mtime) }}
                         </div>
                     </div>
                     <div class="erp-actions flex-shrink-0">

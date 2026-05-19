@@ -182,6 +182,9 @@ def create_subfolder(base_dir, folder_name):
 def delete_storage_file(abs_path):
     if not abs_path:
         raise ValueError("Percorso non valido.")
+    root = resolve_storage_root()
+    if not os.path.realpath(abs_path).startswith(os.path.realpath(root)):
+        raise ValueError("Percorso non consentito.")
     if os.path.islink(abs_path):
         raise ValueError("Impossibile eliminare il file: symlink non consentito.")
     if not os.path.isfile(abs_path):
@@ -195,6 +198,9 @@ def delete_storage_file(abs_path):
 def delete_empty_storage_folder(abs_path):
     if not abs_path:
         raise ValueError("Percorso non valido.")
+    root = resolve_storage_root()
+    if not os.path.realpath(abs_path).startswith(os.path.realpath(root)):
+        raise ValueError("Percorso non consentito.")
     if os.path.islink(abs_path):
         raise ValueError("Impossibile eliminare la cartella: symlink non consentito.")
     if not os.path.isdir(abs_path):
@@ -213,6 +219,12 @@ def delete_empty_storage_folder(abs_path):
 
 def rename_storage_entry(base_dir, old_name, new_name):
     if not old_name or not new_name:
+        raise ValueError("Nome non valido.")
+    if "/" in old_name or "\\" in old_name:
+        raise ValueError("Nome non valido.")
+    if ".." in old_name:
+        raise ValueError("Nome non valido.")
+    if os.path.isabs(old_name):
         raise ValueError("Nome non valido.")
     safe_new = safe_folder_name(new_name)
     if not safe_new:

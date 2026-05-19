@@ -6,10 +6,6 @@
 {% if current == value %}selected{% endif %}
 {%- endmacro %}
 
-{% macro labelize(value) -%}
-{{ value.replace("_", " ").title() }}
-{%- endmacro %}
-
 {% block content %}
 <div class="erp-form-page">
     <div class="erp-form-header">

@@ -2,10 +2,6 @@
 
 {% block title %}Modifica preventivo {{ preventivo.id }}{% endblock %}
 
-{% macro labelize(value) -%}
-{{ value.replace("_", " ").title() if value else "-" }}
-{%- endmacro %}
-
 {% macro euro_value(value) -%}
 {{ "%.2f"|format(value|default(0)|float)|replace(".", ",") }}
 {%- endmacro %}

@@ -2,10 +2,6 @@
 
 {% block title %}Task{% endblock %}
 
-{% macro labelize(value) -%}
-{{ value.replace("_", " ").title() }}
-{%- endmacro %}
-
 {% block content %}
 {% set can_mutate = current_user is defined and current_user is not none and current_user.role in ("admin", "operatore") %}
 <div class="row mx-auto w-100 align-items-start g-3">
@@ -73,7 +69,7 @@
                             </td>
                             <td>{{ erp_badge("task_category", task.category) }}</td>
                             <td>{{ erp_badge("task_status", task.status) }}</td>
-                            <td>{% if task.priority %}<span class="priority-indicator priority-{{ task.priority }}"><span class="priority-dot"></span><span class="priority-label">{{ labelize(task.priority) }}</span></span>{% else %}-{% endif %}</td>
+                            <td>{% if task.priority %}<span class="priority-indicator priority-{{ task.priority }}"><span class="priority-dot"></span><span class="priority-label">{{ task.priority|labelize }}</span></span>{% else %}-{% endif %}</td>
                             <td>{{ task.due_date|date_it if task.due_date else "-" }}</td>
                             <td class="mobile-hide"><span class="text-truncate d-block">{{ task.cliente.name if task.cliente else "-" }}</span></td>
                             <td class="mobile-hide"><span class="text-truncate d-block">{{ task.lavoro.descrizione if task.lavoro else "-" }}</span></td>
@@ -127,7 +123,7 @@
                     <div class="d-flex flex-wrap gap-1 mb-2">
                         {{ erp_badge("task_category", task.category) }}
                         {{ erp_badge("task_status", task.status) }}
-                        {% if task.priority %}<span class="priority-indicator priority-{{ task.priority }}"><span class="priority-dot"></span><span class="priority-label">{{ labelize(task.priority) }}</span></span>{% endif %}
+                        {% if task.priority %}<span class="priority-indicator priority-{{ task.priority }}"><span class="priority-dot"></span><span class="priority-label">{{ task.priority|labelize }}</span></span>{% endif %}
                     </div>
                     <div class="small text-secondary">
                         {% if task.due_date %}

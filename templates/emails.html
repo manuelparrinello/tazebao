@@ -2,10 +2,6 @@
 
 {% block title %}Registro comunicazioni{% endblock %}
 
-{% macro labelize(value) -%}
-{{ value.replace("_", " ").title() if value else "-" }}
-{%- endmacro %}
-
 {% block content %}
 {% set can_mutate = current_user and current_user.role != "readonly" %}
 <div class="row mx-auto w-100 align-items-start g-3">

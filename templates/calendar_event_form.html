@@ -10,10 +10,6 @@
 {{ value.strftime("%Y-%m-%dT%H:%M") if value else "" }}
 {%- endmacro %}
 
-{% macro labelize(value) -%}
-{{ value.replace("_", " ").title() }}
-{%- endmacro %}
-
 {% block content %}
 <div class="erp-form-page">
     <div class="erp-form-header">
@@ -50,7 +46,7 @@
                             <label for="event_type" class="form-label fw-bold">Tipo</label>
                             <select class="form-control form-select" id="event_type" name="event_type">
                                 {% for event_type in event_types %}
-                                <option value="{{ event_type }}" {{ selected(event.event_type or 'generale', event_type) }}>{{ labelize(event_type) }}</option>
+                                <option value="{{ event_type }}" {{ selected(event.event_type or 'generale', event_type) }}>{{ event_type|labelize }}</option>
                                 {% endfor %}
                             </select>
                         </div>

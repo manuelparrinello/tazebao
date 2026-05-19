@@ -2,10 +2,6 @@
 
 {% block title %}{{ lavoro.descrizione }}{% endblock %}
 
-{% macro labelize(value) -%}
-{{ value.replace("_", " ").title() if value else "-" }}
-{%- endmacro %}
-
 {% macro euro(value) -%}
 {{ "%.2f"|format(value or 0)|replace(".", ",") }} &euro;
 {%- endmacro %}
@@ -53,7 +49,7 @@
             </p>
             <div class="d-flex flex-wrap gap-2 mt-2">
                 {{ erp_badge("work_status", lavoro.stato) }}
-                {% if lavoro.priorita %}<span class="priority-indicator priority-{{ lavoro.priorita|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ labelize(lavoro.priorita) }}</span></span>{% else %}<span class="text-secondary small">-</span>{% endif %}
+                {% if lavoro.priorita %}<span class="priority-indicator priority-{{ lavoro.priorita|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ lavoro.priorita|labelize }}</span></span>{% else %}<span class="text-secondary small">-</span>{% endif %}
             </div>
         </div>
     </div>
@@ -118,7 +114,7 @@
                     </div>
                     <div class="col-12 col-md-4">
                         <div class="text-secondary small">Priorita</div>
-                        <div>{% if lavoro.priorita %}<span class="priority-indicator priority-{{ lavoro.priorita|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ labelize(lavoro.priorita) }}</span></span>{% else %}<span class="text-secondary small">-</span>{% endif %}</div>
+                        <div>{% if lavoro.priorita %}<span class="priority-indicator priority-{{ lavoro.priorita|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ lavoro.priorita|labelize }}</span></span>{% else %}<span class="text-secondary small">-</span>{% endif %}</div>
                     </div>
                     <div class="col-12 col-md-4">
                         <div class="text-secondary small">Preventivato</div>
@@ -298,7 +294,7 @@
                             <span class="task-ref"><i class="bi bi-hash me-1"></i>#{{ task.id }}</span>
                             <div class="task-badges">
                                 {{ erp_badge("task_status", task.status) }}
-                                {% if task.priority %}<span class="priority-indicator priority-{{ task.priority|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ labelize(task.priority) }}</span></span>{% endif %}
+                                {% if task.priority %}<span class="priority-indicator priority-{{ task.priority|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ task.priority|labelize }}</span></span>{% endif %}
                             </div>
                         </div>
                         <div class="task-card-body">

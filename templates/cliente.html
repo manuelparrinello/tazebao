@@ -13,10 +13,6 @@
 
 {% set can_mutate = current_user and current_user.role != "readonly" %}
 
-{% macro labelize(value) -%}
-{{ value.replace("_", " ").title() if value else "-" }}
-{%- endmacro %}
-
 {% macro euro(value) -%}
 {{ "%.2f"|format(value or 0)|replace(".", ",") }} &euro;
 {%- endmacro %}
@@ -251,7 +247,7 @@
                             </span>
                             <div class="lav-badges">
                                 {{ erp_badge("work_status", lavoro.stato) }}
-                                {% if lavoro.priorita %}<span class="priority-indicator priority-{{ lavoro.priorita|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ labelize(lavoro.priorita) }}</span></span>{% endif %}
+                                {% if lavoro.priorita %}<span class="priority-indicator priority-{{ lavoro.priorita|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ lavoro.priorita|labelize }}</span></span>{% endif %}
                             </div>
                         </div>
                         <div class="lav-card-body">
@@ -309,7 +305,7 @@
                             </span>
                             <div class="task-badges">
                                 {{ erp_badge("task_status", task.status) }}
-                                {% if task.priority %}<span class="priority-indicator priority-{{ task.priority|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ labelize(task.priority) }}</span></span>{% endif %}
+                                {% if task.priority %}<span class="priority-indicator priority-{{ task.priority|lower }}"><span class="priority-dot"></span><span class="priority-label">{{ task.priority|labelize }}</span></span>{% endif %}
                             </div>
                         </div>
                         <div class="task-card-body">
@@ -462,7 +458,7 @@
 {% elif platform == "facebook" %}
 <span class="pub-pill pub-pill-fb"><i class="bi bi-facebook"></i>FB</span>
 {% else %}
-<span class="pub-pill pub-pill-generic">{{ labelize(platform) }}</span>
+<span class="pub-pill pub-pill-generic">{{ platform|labelize }}</span>
 {% endif %}
 {%- endmacro %}
 

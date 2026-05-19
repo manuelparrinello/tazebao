@@ -10,10 +10,6 @@
 {{ value.strftime("%Y-%m-%d") if value else "" }}
 {%- endmacro %}
 
-{% macro labelize(value) -%}
-{{ value.replace("_", " ").title() if value else "-" }}
-{%- endmacro %}
-
 {% macro checked_platform(publication, value) -%}
 {% if form_platforms is not none %}
 {%- if value in form_platforms %}checked{% endif %}
@@ -80,7 +76,7 @@
                                 <input class="form-check-input" type="checkbox" id="platform_{{ platform }}" name="platforms" value="{{ platform }}" {{ checked_platform(publication, platform) }}>
                                 <span class="editorial-platform-check-label">
                                     {% if platform == "instagram" %}<i class="bi bi-instagram"></i>{% elif platform == "facebook" %}<i class="bi bi-facebook"></i>{% endif %}
-                                    <span>{{ labelize(platform) }}</span>
+                                    <span>{{ platform|labelize }}</span>
                                 </span>
                             </label>
                             {% endfor %}
@@ -92,7 +88,7 @@
                         <select class="form-control form-select" id="content_type" name="content_type">
                             {% for content_type in content_types %}
                             {% set sel_content_type = form_data.get('content_type', publication.content_type or 'post_grafico') %}
-                            <option value="{{ content_type }}" {{ selected(sel_content_type, content_type) }}>{{ labelize(content_type) }}</option>
+                            <option value="{{ content_type }}" {{ selected(sel_content_type, content_type) }}>{{ content_type|labelize }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -213,7 +209,7 @@
                         <select class="form-control form-select" id="status" name="status">
                             {% for status in statuses %}
                             {% set sel_status = form_data.get('status', publication.status or 'idea') %}
-                            <option value="{{ status }}" {{ selected(sel_status, status) }}>{{ labelize(status) }}</option>
+                            <option value="{{ status }}" {{ selected(sel_status, status) }}>{{ status|labelize }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -222,7 +218,7 @@
                         <select class="form-control form-select" id="client_approval_status" name="client_approval_status">
                             {% for approval_status in client_approval_statuses %}
                             {% set sel_approval = form_data.get('client_approval_status', publication.client_approval_status or 'da_approvare') %}
-                            <option value="{{ approval_status }}" {{ selected(sel_approval, approval_status) }}>{{ labelize(approval_status) }}</option>
+                            <option value="{{ approval_status }}" {{ selected(sel_approval, approval_status) }}>{{ approval_status|labelize }}</option>
                             {% endfor %}
                         </select>
                     </div>

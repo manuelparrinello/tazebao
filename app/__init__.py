@@ -197,6 +197,10 @@ def register_template_filters(app):
             return "-"
         return str(value).replace("_", " ").replace("-", " ").title()
 
+    @app.template_filter("labelize")
+    def labelize_filter(value):
+        return _titleize(value)
+
     def _badge_payload(kind, value):
         key = _normalize_badge_key(value)
         mapping = {

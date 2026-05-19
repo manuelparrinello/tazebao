@@ -3652,18 +3652,32 @@ body.loaded {
   box-shadow: 0 0 0 0.25rem #d2d2d2;
 }
 
-.prio-pill {
-  text-align: center !important;
-  width: 100%;
+@media (min-width: 768px) {
+  .prio-pill {
+    text-align: left !important;
+    width: auto;
+    display: inline-block;
+  }
 }
 
 #note_td {
   word-wrap: break-word;
-  width: 220px;
+  width: auto;
+}
+
+@media (min-width: 768px) {
+  .table td {
+    vertical-align: middle;
+  }
+
+  /* Desktop table default: left-aligned */
+  .table th:not(.text-end):not(.text-center),
+  .table td:not(.text-end):not(.text-center) {
+    text-align: left;
+  }
 }
 
 .table td {
-  vertical-align: baseline;
   font-weight: 500;
   padding: 13px 3px;
 }
@@ -4357,7 +4371,7 @@ body.loaded {
 }
 
 .tasks-table .col-title {
-  width: 26%;
+  width: 30%;
 }
 
 .tasks-table .col-pills-cat {
@@ -4436,12 +4450,15 @@ body.loaded {
 }
 
 .lavori-table .col-title {
-  width: 28%;
+  width: 32%;
 }
 
 .lavori-table .col-prio {
-  width: 60px;
-  text-align: center;
+  width: 64px;
+}
+
+.lavori-table .col-cliente {
+  width: 16%;
 }
 
 .lavori-table .col-money {
@@ -4457,17 +4474,20 @@ body.loaded {
 }
 
 .lavori-table .col-note {
-  width: 80px;
-  text-align: center;
+  width: 72px;
 }
 
 .lavori-table .col-pdf {
-  width: 60px;
-  text-align: center;
+  width: 52px;
 }
 
 .lavori-table .col-status {
   width: 130px;
+}
+
+/* Col-prio for cliente lavori table */
+.col-prio-cliente {
+  width: 72px;
 }
 
 .lavoro-note-icon {
@@ -4511,8 +4531,7 @@ body.loaded {
 }
 
 .clienti-table .col-note {
-  width: 80px;
-  text-align: center;
+  width: 64px;
 }
 
 .clienti-table .col-nominativo-cell a {
@@ -4904,23 +4923,24 @@ body.loaded {
 
 /* Column widths */
 .file-browser-table .fb-size-col {
-  width: auto;
+  width: 90px;
 }
 
 .file-browser-table .fb-date-col {
-  width: 155px;
+  width: 140px;
 }
 
 .file-browser-table .fb-actions-col {
-  width: 150px;
+  width: 132px;
 }
 
-/* Name cell — truncate long names */
+/* Name cell — dominant column, truncate long names */
 .file-browser-table .fb-name-cell {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 0;
+  width: auto;
+  max-width: none;
 }
 
 .file-browser-table .fb-name-cell a,

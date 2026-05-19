@@ -10,37 +10,36 @@ const TabellaLavori = {
             <thead>
                 <tr>
                     <th class="fw-bold pointer col-desc" scope="col">Descrizione</th>
-                    <th class="fw-bold pointer text-center" scope="col">Preventivato</th>
-                    <th class="fw-bold pointer text-center" scope="col">Prio</th>
-                    <th class="fw-bold pointer text-center" scope="col">Stato</th>
-                    <th class="fw-bold pointer text-center" scope="col">Inizio</th>
-                    <th class="fw-bold pointer text-center" scope="col">Fine</th>
-                    <th class="fw-bold pointer text-center" scope="col">Pagamento</th>
-                    <th class="fw-bold pointer text-center col-note" scope="col">Note</th>
+                    <th class="fw-bold pointer" scope="col">Preventivato</th>
+                    <th class="fw-bold pointer col-prio-cliente" scope="col">Prio</th>
+                    <th class="fw-bold pointer" scope="col">Stato</th>
+                    <th class="fw-bold pointer" scope="col">Inizio</th>
+                    <th class="fw-bold pointer" scope="col">Fine</th>
+                    <th class="fw-bold pointer" scope="col">Pagamento</th>
+                    <th class="fw-bold pointer col-note" scope="col">Note</th>
 
                 </tr>
             </thead>
             <tbody>
                 <template v-if="lavori_data.length > 0">
                     <tr v-for="lavoro in lavori_data">
-                        <td><span class=""><a class="" :href="'/lavori/' + lavoro.id ">[[ lavoro.descrizione ]]</a></span></td>
-                        <td :sorttable_customkey="lavoro.preventivato" class="text-center">[[ lavoro.preventivato
-                            ]]€</td>
-                        <td :sorttable_customkey="prioIndex(lavoro.priorita)" class="text-center">
+                        <td><a :href="'/lavori/' + lavoro.id">[[ lavoro.descrizione ]]</a></td>
+                        <td :sorttable_customkey="lavoro.preventivato">[[ lavoro.preventivato ]]€</td>
+                        <td :sorttable_customkey="prioIndex(lavoro.priorita)" class="col-prio-cliente">
                             <span class="prio-pill" :class="prioClass(lavoro.priorita)">
                                 [[ lavoro.priorita ]]
                              </span>
                         </td>
-                        <td class="text-center">
+                        <td>
                         <select :class="statusColor(lavoro.stato)" @change="update_status($event, lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
                             <option :value="lavoro.stato" selected>[[ lavoro.stato ]]</option>
                             <option v-for="stato in filtro_stati(lavoro.stato)" :value="stato">[[stato]]</option>
                         </select>
                         </td>
-                        <td class="text-center">[[ formatDate(lavoro.data_inizio) ]]</td>
-                        <td class="text-center">[[ formatDate(lavoro.data_fine) ]]</td>  
-                        <td class="text-center">[[ formatDate(lavoro.data_pagamento) ]]</td>
-                        <td class="text-center" id="note_td" v-html="renderNoteIcon(lavoro.note)"></td>
+                        <td>[[ formatDate(lavoro.data_inizio) ]]</td>
+                        <td>[[ formatDate(lavoro.data_fine) ]]</td>  
+                        <td>[[ formatDate(lavoro.data_pagamento) ]]</td>
+                        <td class="col-note text-nowrap" v-html="renderNoteIcon(lavoro.note)"></td>
                     </tr>
                 </template>
                 <tr v-else>

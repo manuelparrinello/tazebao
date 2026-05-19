@@ -30,8 +30,8 @@
                 <tr>
                     <th class="fw-bold pointer col-user" scope="col">Utente</th>
                     <th class="fw-bold pointer col-email mobile-hide" scope="col">Email</th>
-                    <th class="fw-bold pointer col-status text-center" scope="col">Ruolo</th>
-                    <th class="fw-bold pointer col-status text-center" scope="col">Stato</th>
+                    <th class="fw-bold pointer col-status" scope="col">Ruolo</th>
+                    <th class="fw-bold pointer col-status" scope="col">Stato</th>
                     <th class="fw-bold text-end col-actions" scope="col">Azioni</th>
                 </tr>
             </thead>
@@ -45,8 +45,8 @@
                     <td class="col-email mobile-hide">
                         <div class="text-truncate" title="{{ user.email }}">{{ user.email }}</div>
                     </td>
-                    <td class="col-status text-center">{{ erp_badge("user_role", user.role) }}</td>
-                    <td class="col-status text-center">{{ erp_badge("user_state", "active" if user.is_active else "inactive") }}</td>
+                    <td class="col-status">{{ erp_badge("user_role", user.role) }}</td>
+                    <td class="col-status">{{ erp_badge("user_state", "active" if user.is_active else "inactive") }}</td>
                     <td class="col-actions text-end">
                         <div class="erp-actions">
                             <a class="btn btn-sm btn-outline-primary" href="{{ url_for('users.users_edit', user_id=user.id) }}" aria-label="Modifica">

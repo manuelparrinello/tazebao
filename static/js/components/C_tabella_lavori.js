@@ -9,20 +9,20 @@ const TabellaLavori = {
     <table class="table sortable my-0 table-hover rounded-3 no-last-border lavori-table d-none d-md-table" id="tabellaLavori">
       <thead>
         <tr>
-          <th class="fw-bold pointer text-center col-prio" scope="col">Prio</th>
+          <th class="fw-bold pointer col-prio" scope="col">Prio</th>
           <th class="fw-bold pointer col-title" scope="col">Descrizione</th>
           <th class="fw-bold pointer col-cliente mobile-hide" scope="col">Cliente</th>
           <th class="fw-bold pointer col-money text-end" scope="col">Prezzo</th>
-          <th class="fw-bold pointer text-center col-payment mobile-hide" scope="col">Pagamento</th>
-          <th class="fw-bold pointer text-center col-note mobile-hide" scope="col">Note</th>
-          <th class="fw-bold pointer text-center col-pdf" scope="col">PDF</th>
-          <th class="fw-bold pointer text-center col-status" scope="col">Stato</th>
+          <th class="fw-bold pointer col-payment mobile-hide" scope="col">Pagamento</th>
+          <th class="fw-bold pointer col-note mobile-hide" scope="col">Note</th>
+          <th class="fw-bold pointer col-pdf" scope="col">PDF</th>
+          <th class="fw-bold pointer col-status" scope="col">Stato</th>
         </tr>
       </thead>
       <tbody>
         <template v-if="lavori_data.length > 0">
           <tr v-for="lavoro in lavori_data">
-            <td :sorttable_customkey="prioIndex(lavoro.priorita)" class="text-center col-prio">
+            <td :sorttable_customkey="prioIndex(lavoro.priorita)" class="col-prio">
                 <span v-html="priorityHtml(lavoro.priorita)"></span>
             </td>
             <td>
@@ -33,10 +33,10 @@ const TabellaLavori = {
               <a :href="'/clienti/' + lavoro.cliente.id" class="text-decoration-none a-no-color">[[ lavoro.cliente.name ]]</a>
             </td>
             <td :sorttable_customkey="lavoro.preventivato" class="text-end">[[ lavoro.preventivato ]] &euro;</td>
-            <td class="text-center mobile-hide">[[ formatDate(lavoro.data_pagamento) ]]</td>
-            <td class="text-center mobile-hide note-td" v-html="renderNoteIcon(lavoro.note)"></td>
-            <td class="text-center col-pdf" v-html="pdfIcon(lavoro.preventivo_pdf_path)"></td>
-            <td class="text-center">
+            <td class="mobile-hide">[[ formatDate(lavoro.data_pagamento) ]]</td>
+            <td class="mobile-hide" v-html="renderNoteIcon(lavoro.note)"></td>
+            <td class="col-pdf" v-html="pdfIcon(lavoro.preventivo_pdf_path)"></td>
+            <td>
               <template v-if="canMutate()">
                 <select :class="statusColor(lavoro.stato)" @change="update_status($event, lavoro.id)" :id="'status_select_' + lavoro.id" name="status_select" class="form-control form-select form-select-sm status-select">
                   <option :value="lavoro.stato" selected>[[ lavoro.stato ]]</option>

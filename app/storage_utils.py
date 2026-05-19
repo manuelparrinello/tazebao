@@ -150,6 +150,29 @@ def save_uploaded_storage_file(file, target_dir):
     return safe_name
 
 
+def save_uploaded_storage_files(files, target_dir):
+    results = {"ok": [], "errors": [], "renamed": 0}
+    for file in files:
+        if not file or not file.filename:
+            continue
+        try:
+            original_name = secure_filename(file.filename or "file")
+            if not original_name:
+                continue
+            if not allowed_storage_file(original_name):
+                results["errors"].append(f"{file.filename}: Estensione non consentita.")
+                continue
+            safe_name = unique_filename(target_dir, original_name)
+            if safe_name != original_name:
+                results["renamed"] += 1
+            abs_path = os.path.join(target_dir, safe_name)
+            file.save(abs_path)
+            results["ok"].append(safe_name)
+        except (ValueError, OSError, IOError) as e:
+            results["errors"].append(f"{file.filename}: {str(e)}")
+    return results
+
+
 def safe_folder_name(name):
     name = name.strip()
     if not name:

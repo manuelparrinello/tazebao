@@ -4795,4 +4795,83 @@ body.loaded {
   font-size: 0.9rem;
 }
 
+.editoriale-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.editoriale-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+@media (max-width: 575.98px) {
+  .editoriale-header {
+    flex-direction: column;
+  }
+  .editoriale-actions {
+    width: 100%;
+  }
+  .editoriale-actions .btn {
+    width: 100%;
+  }
+}
+
+/* =========================
+   PREVENTIVO PDF ESTERNO (Scheda Lavoro)
+   Single-row layout: info left, actions right
+========================= */
+.prev-card-pdf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.prev-card-pdf-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  flex: 1;
+}
+.prev-card-pdf-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #dc3545;
+  flex-shrink: 0;
+}
+.prev-card-pdf-title {
+  font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.prev-card-pdf-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.15rem;
+}
+.prev-card-pdf-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+@media (max-width: 575.98px) {
+  .prev-card-pdf {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .prev-card-pdf-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 0.35rem;
+  }
+}
+
 

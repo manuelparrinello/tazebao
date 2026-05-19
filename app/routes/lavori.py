@@ -9,7 +9,7 @@ from ..auth import login_required, role_required
 from ..extensions import db
 from ..finance_service import lavoro_marginality
 from ..models import CalendarEvent, Cliente, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
-from ..storage_utils import build_breadcrumb, create_subfolder, delete_empty_storage_folder, delete_storage_file, get_lavoro_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
+from ..storage_utils import build_breadcrumb, create_subfolder, delete_empty_storage_folder, delete_storage_file, get_lavoro_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, save_uploaded_storage_files, slugify, ensure_storage_dir
 from ..utils.parsing import parse_optional_date, parse_optional_float, parse_optional_id
 
 
@@ -112,6 +112,9 @@ def nuovo_lavoro():
             pdf_path = save_preventivo_pdf(nuovo_lavoro.id)
             if pdf_path:
                 nuovo_lavoro.preventivo_pdf_path = pdf_path
+                title = (request.form.get("external_quote_title") or "").strip()
+                nuovo_lavoro.external_quote_title = title if title else None
+                nuovo_lavoro.preventivo_pdf_uploaded_at = datetime.utcnow()
                 db.session.commit()
         except ValueError as e:
             return jsonify({"success": False, "error": str(e)}), 400
@@ -186,7 +189,6 @@ def lavoro_page(lavoro_id):
     preventivi = (
         Preventivo.query.filter_by(lavoro_id=lavoro_id)
         .order_by(Preventivo.data_creazione.desc())
-        .limit(10)
         .all()
     )
     eventi = (
@@ -231,6 +233,61 @@ def lavoro_page(lavoro_id):
     )
 
 
+@bp.post("/lavori/<int:lavoro_id>/upload-pdf")
+@role_required("admin", "operatore")
+def lavoro_upload_pdf(lavoro_id):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+
+    if request.form.get("delete_pdf"):
+        if lavoro.preventivo_pdf_path:
+            abs_path = os.path.join(current_app.static_folder, lavoro.preventivo_pdf_path)
+            if os.path.exists(abs_path):
+                os.remove(abs_path)
+            lavoro.preventivo_pdf_path = None
+            lavoro.external_quote_title = None
+            lavoro.preventivo_pdf_uploaded_at = None
+            db.session.commit()
+            flash("PDF preventivo eliminato.", "success")
+        return redirect(url_for("lavori.lavoro_page", lavoro_id=lavoro.id))
+
+    try:
+        pdf_path = save_preventivo_pdf(lavoro.id)
+        if not pdf_path:
+            flash("Nessun file selezionato.", "warning")
+            return redirect(url_for("lavori.lavoro_page", lavoro_id=lavoro.id))
+        if lavoro.preventivo_pdf_path:
+            old_path = os.path.join(current_app.static_folder, lavoro.preventivo_pdf_path)
+            if os.path.exists(old_path):
+                os.remove(old_path)
+        lavoro.preventivo_pdf_path = pdf_path
+        title = (request.form.get("external_quote_title") or "").strip()
+        lavoro.external_quote_title = title if title else None
+        lavoro.preventivo_pdf_uploaded_at = datetime.utcnow()
+        db.session.commit()
+        flash("PDF preventivo caricato correttamente.", "success")
+    except ValueError as e:
+        db.session.rollback()
+        flash(str(e), "danger")
+    except Exception:
+        db.session.rollback()
+        flash("Errore durante il caricamento del PDF.", "danger")
+    return redirect(url_for("lavori.lavoro_page", lavoro_id=lavoro.id))
+
+
+@bp.route("/lavori/<int:lavoro_id>/download-pdf")
+@login_required
+def lavoro_download_pdf(lavoro_id):
+    lavoro = Lavoro.query.get_or_404(lavoro_id)
+    if not lavoro.preventivo_pdf_path:
+        flash("Nessun PDF associato a questo lavoro.", "warning")
+        return redirect(url_for("lavori.lavoro_page", lavoro_id=lavoro.id))
+    abs_path = os.path.join(current_app.static_folder, lavoro.preventivo_pdf_path)
+    if not os.path.isfile(abs_path):
+        flash("File PDF non trovato.", "danger")
+        return redirect(url_for("lavori.lavoro_page", lavoro_id=lavoro.id))
+    return send_file(abs_path, as_attachment=True, download_name="preventivo.pdf")
+
+
 @bp.route("/lavori/<int:lavoro_id>/edit", methods=["GET", "POST"])
 @role_required("admin", "operatore")
 def lavoro_edit(lavoro_id):
@@ -249,6 +306,8 @@ def lavoro_edit(lavoro_id):
                 if os.path.exists(old_path):
                     os.remove(old_path)
                 lavoro.preventivo_pdf_path = None
+                lavoro.external_quote_title = None
+                lavoro.preventivo_pdf_uploaded_at = None
 
             db.session.commit()
 
@@ -259,6 +318,9 @@ def lavoro_edit(lavoro_id):
                     if os.path.exists(old_path):
                         os.remove(old_path)
                 lavoro.preventivo_pdf_path = pdf_path
+                title = (request.form.get("external_quote_title") or "").strip()
+                lavoro.external_quote_title = title if title else None
+                lavoro.preventivo_pdf_uploaded_at = datetime.utcnow()
                 db.session.commit()
 
             return redirect(url_for("lavori.lavoro_page", lavoro_id=lavoro.id))
@@ -288,6 +350,8 @@ def lavoro_remove_pdf(lavoro_id):
             if os.path.exists(old_path):
                 os.remove(old_path)
         lavoro.preventivo_pdf_path = None
+        lavoro.external_quote_title = None
+        lavoro.preventivo_pdf_uploaded_at = None
         db.session.commit()
         flash("PDF preventivo rimosso.", "success")
     except Exception:
@@ -473,16 +537,23 @@ def lavoro_cartella_upload(lavoro_id):
         flash("Cartella non trovata.", "warning")
         return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id))
 
-    file = request.files.get("file")
-    if not file or not file.filename:
+    files = request.files.getlist("file")
+    if not files or all(not f or not f.filename for f in files):
         flash("Nessun file selezionato.", "warning")
         return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id, subdir=subdir or None))
 
-    try:
-        save_uploaded_storage_file(file, abs_path)
-        flash("File caricato correttamente.", "success")
-    except ValueError as e:
-        flash(str(e), "danger")
+    results = save_uploaded_storage_files(files, abs_path)
+
+    n_ok = len(results["ok"])
+    n_renamed = results["renamed"]
+    if n_ok > 0:
+        msg = f"{n_ok} file caricati correttamente."
+        if n_renamed > 0:
+            msg += f" {n_renamed} rinominato{'i' if n_renamed > 1 else ''} per evitare sovrascrittura."
+        flash(msg, "success")
+
+    for err in results["errors"]:
+        flash(err, "danger")
 
     return redirect(url_for("lavori.lavoro_cartella", lavoro_id=lavoro.id, subdir=subdir or None))
 

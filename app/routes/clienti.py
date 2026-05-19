@@ -8,7 +8,7 @@ from ..auth import login_required, role_required
 from ..extensions import db
 from ..finance_service import cliente_marginality
 from ..models import CalendarEvent, Cliente, EditorialPublication, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
-from ..storage_utils import build_breadcrumb, create_subfolder, delete_empty_storage_folder, delete_storage_file, get_cliente_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, slugify, ensure_storage_dir
+from ..storage_utils import build_breadcrumb, create_subfolder, delete_empty_storage_folder, delete_storage_file, get_cliente_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, save_uploaded_storage_files, slugify, ensure_storage_dir
 
 
 bp = Blueprint("clienti", __name__)
@@ -358,16 +358,23 @@ def cliente_cartella_upload(cliente_id):
         flash("Cartella non trovata.", "warning")
         return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id))
 
-    file = request.files.get("file")
-    if not file or not file.filename:
+    files = request.files.getlist("file")
+    if not files or all(not f or not f.filename for f in files):
         flash("Nessun file selezionato.", "warning")
         return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id, subdir=subdir or None))
 
-    try:
-        save_uploaded_storage_file(file, abs_path)
-        flash("File caricato correttamente.", "success")
-    except ValueError as e:
-        flash(str(e), "danger")
+    results = save_uploaded_storage_files(files, abs_path)
+
+    n_ok = len(results["ok"])
+    n_renamed = results["renamed"]
+    if n_ok > 0:
+        msg = f"{n_ok} file caricati correttamente."
+        if n_renamed > 0:
+            msg += f" {n_renamed} rinominato{'i' if n_renamed > 1 else ''} per evitare sovrascrittura."
+        flash(msg, "success")
+
+    for err in results["errors"]:
+        flash(err, "danger")
 
     return redirect(url_for("clienti.cliente_cartella", cliente_id=cliente.id, subdir=subdir or None))
 

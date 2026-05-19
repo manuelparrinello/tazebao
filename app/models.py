@@ -147,6 +147,8 @@ class Lavoro(db.Model):
     note = db.Column(db.Text, nullable=True)
     preventivato = db.Column(db.Float, nullable=True, default=0)
     preventivo_pdf_path = db.Column(db.String(255), nullable=True)
+    external_quote_title = db.Column(db.String(200), nullable=True)
+    preventivo_pdf_uploaded_at = db.Column(db.DateTime, nullable=True)
     preventivi = db.relationship(
         "Preventivo",
         backref="lavoro",

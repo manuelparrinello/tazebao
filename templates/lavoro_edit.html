@@ -138,8 +138,8 @@
                     </div>
                     <div class="row g-3 align-items-end">
                         <div class="col-12 col-md-6 col-lg-5">
-                            <label for="preventivo_pdf" class="form-label fw-bold">Carica PDF</label>
-                            <input type="file" class="form-control" id="preventivo_pdf" name="preventivo_pdf" accept=".pdf,application/pdf">
+                            <label for="external_quote_title" class="form-label fw-bold">Nome preventivo</label>
+                            <input type="text" class="form-control" id="external_quote_title" name="external_quote_title" placeholder="Es. Preventivo grafica coordinata" maxlength="200" value="{{ lavoro.external_quote_title or '' }}">
                         </div>
                         <div class="col-12 col-md-6 col-lg-7 d-flex flex-wrap gap-2 align-items-center">
                             {% if lavoro.preventivo_pdf_path %}
@@ -152,6 +152,10 @@
                             {% else %}
                             <span class="text-secondary small">Nessun PDF caricato.</span>
                             {% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label for="preventivo_pdf" class="form-label fw-bold">Carica PDF</label>
+                            <input type="file" class="form-control" id="preventivo_pdf" name="preventivo_pdf" accept=".pdf,application/pdf">
                         </div>
                     </div>
                 </section>

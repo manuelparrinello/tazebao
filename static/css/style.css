@@ -1258,10 +1258,11 @@ body {
   width: 180px !important;
 }
 
-.col-status,
-.col-prio {
+.col-status{
   width: 120px !important;
 }
+
+
 
 .col-actions {
   width: 104px !important;
@@ -1546,14 +1547,6 @@ body.loaded {
 }
 
 /* CSS */
-
-#menu-mobile-btn {
-  position: absolute;
-  right: 15px;
-  top: 15px;
-  background: var(--app-primary);
-  border: var(--app-primary);
-}
 
 .button-61 {
   background-color: #20e37f;
@@ -4483,6 +4476,11 @@ body.loaded {
 
 .lavori-table .col-status {
   width: 130px;
+}
+
+
+.col-prio {
+  width: 50px!Important;
 }
 
 /* Col-prio for cliente lavori table */

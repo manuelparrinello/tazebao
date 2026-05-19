@@ -2155,16 +2155,31 @@ body.loaded {
 }
 
 /* =========================
-   PUBBLICAZIONI SCHEDA CLIENTE
+   CARD/LIST COMUNI
+   Pattern condivisi tra card/list di pubblicazioni, task, lavori,
+   preventivi, email, eventi e movimenti finanziari.
+   Override specifici nelle rispettive sezioni.
 ========================= */
 
-.pub-list {
+.pub-list,
+.task-list,
+.lav-list,
+.prev-list,
+.mail-list,
+.evt-list,
+.fin-list {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
 }
 
-.pub-card {
+.pub-card,
+.task-card,
+.lav-card,
+.prev-card,
+.mail-card,
+.evt-card,
+.fin-card {
   display: block;
   border: 1px solid var(--sidebar-border);
   border-radius: 12px;
@@ -2174,17 +2189,70 @@ body.loaded {
   transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 
-.pub-card:hover {
+.pub-card:hover,
+.task-card:hover,
+.lav-card:hover,
+.prev-card:hover,
+.mail-card:hover,
+.evt-card:hover,
+.fin-card:hover {
   background: var(--sidebar-hover);
   text-decoration: none !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.pub-card-header {
+.pub-card-header,
+.task-card-header,
+.lav-card-header,
+.prev-card-header,
+.mail-card-header,
+.evt-card-header,
+.fin-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.pub-card-body,
+.task-card-body,
+.lav-card-body,
+.prev-card-body,
+.mail-card-body,
+.fin-card-body {
+  margin-bottom: 0.5rem;
+}
+
+.pub-card-footer,
+.task-card-footer,
+.lav-card-footer,
+.prev-card-footer,
+.mail-card-footer,
+.fin-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+@media (max-width: 575.98px) {
+  .pub-card,
+  .task-card,
+  .lav-card,
+  .prev-card,
+  .mail-card,
+  .evt-card,
+  .fin-card {
+    padding: 0.75rem 0.85rem;
+  }
+}
+
+/* =========================
+   PUBBLICAZIONI SCHEDA CLIENTE
+========================= */
+
+.pub-card-header {
   margin-bottom: 0.5rem;
 }
 
@@ -2198,10 +2266,6 @@ body.loaded {
 
 .pub-date i {
   font-size: 0.82rem;
-}
-
-.pub-card-body {
-  margin-bottom: 0.5rem;
 }
 
 .pub-title {
@@ -2263,19 +2327,7 @@ body.loaded {
   border-color: rgba(17, 17, 17, 0.12);
 }
 
-.pub-card-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-
 @media (max-width: 575.98px) {
-  .pub-card {
-    padding: 0.75rem 0.85rem;
-  }
-
   .pub-title {
     font-size: 0.88rem;
   }
@@ -2298,36 +2350,6 @@ body.loaded {
    TASK ERP SCHEDA CLIENTE
 ========================= */
 
-.task-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.task-card {
-  display: block;
-  border: 1px solid var(--sidebar-border);
-  border-radius: 12px;
-  background: #fff;
-  padding: 0.85rem 1rem;
-  color: inherit;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
-}
-
-.task-card:hover {
-  background: var(--sidebar-hover);
-  text-decoration: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.task-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.45rem;
-}
-
 .task-ref {
   font-size: 0.76rem;
   font-weight: 700;
@@ -2346,10 +2368,6 @@ body.loaded {
   gap: 0.3rem;
 }
 
-.task-card-body {
-  margin-bottom: 0.5rem;
-}
-
 .task-title {
   font-weight: 700;
   font-size: 0.95rem;
@@ -2357,13 +2375,6 @@ body.loaded {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.task-card-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
 }
 
 .task-meta {
@@ -2386,10 +2397,6 @@ body.loaded {
 }
 
 @media (max-width: 575.98px) {
-  .task-card {
-    padding: 0.75rem 0.85rem;
-  }
-
   .task-title {
     font-size: 0.88rem;
   }
@@ -2406,36 +2413,6 @@ body.loaded {
 /* =========================
    EVENTI CALENDARIO SCHEDA CLIENTE
 ========================= */
-
-.evt-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.evt-card {
-  display: block;
-  border: 1px solid var(--sidebar-border);
-  border-radius: 12px;
-  background: #fff;
-  padding: 0.85rem 1rem;
-  color: inherit;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
-}
-
-.evt-card:hover {
-  background: var(--sidebar-hover);
-  text-decoration: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.evt-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.45rem;
-}
 
 .evt-datetime {
   font-size: 0.76rem;
@@ -2471,10 +2448,6 @@ body.loaded {
 }
 
 @media (max-width: 575.98px) {
-  .evt-card {
-    padding: 0.75rem 0.85rem;
-  }
-
   .evt-title {
     font-size: 0.88rem;
   }
@@ -2491,36 +2464,6 @@ body.loaded {
 /* =========================
    MOVIMENTI ECONOMICI SCHEDA CLIENTE
 ========================= */
-
-.fin-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.fin-card {
-  display: block;
-  border: 1px solid var(--sidebar-border);
-  border-radius: 12px;
-  background: #fff;
-  padding: 0.85rem 1rem;
-  color: inherit;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
-}
-
-.fin-card:hover {
-  background: var(--sidebar-hover);
-  text-decoration: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.fin-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.45rem;
-}
 
 .fin-ref {
   font-size: 0.76rem;
@@ -2548,10 +2491,6 @@ body.loaded {
   color: #842029;
 }
 
-.fin-card-body {
-  margin-bottom: 0.5rem;
-}
-
 .fin-title {
   font-weight: 700;
   font-size: 0.95rem;
@@ -2569,11 +2508,7 @@ body.loaded {
 }
 
 .fin-card-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   justify-content: space-between;
-  gap: 0.4rem;
 }
 
 .fin-badges {
@@ -2629,10 +2564,6 @@ body.loaded {
 }
 
 @media (max-width: 575.98px) {
-  .fin-card {
-    padding: 0.75rem 0.85rem;
-  }
-
   .fin-card-header {
     flex-direction: column;
     align-items: flex-start;
@@ -2664,36 +2595,6 @@ body.loaded {
    LAVORI SCHEDA CLIENTE
 ========================= */
 
-.lav-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.lav-card {
-  display: block;
-  border: 1px solid var(--sidebar-border);
-  border-radius: 12px;
-  background: #fff;
-  padding: 0.85rem 1rem;
-  color: inherit;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
-}
-
-.lav-card:hover {
-  background: var(--sidebar-hover);
-  text-decoration: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.lav-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.45rem;
-}
-
 .lav-ref {
   font-size: 0.76rem;
   font-weight: 700;
@@ -2712,10 +2613,6 @@ body.loaded {
   gap: 0.3rem;
 }
 
-.lav-card-body {
-  margin-bottom: 0.5rem;
-}
-
 .lav-title {
   font-weight: 700;
   font-size: 0.95rem;
@@ -2726,11 +2623,7 @@ body.loaded {
 }
 
 .lav-card-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   justify-content: space-between;
-  gap: 0.4rem;
 }
 
 .lav-meta {
@@ -2760,10 +2653,6 @@ body.loaded {
 }
 
 @media (max-width: 575.98px) {
-  .lav-card {
-    padding: 0.75rem 0.85rem;
-  }
-
   .lav-title {
     font-size: 0.88rem;
   }
@@ -2784,36 +2673,6 @@ body.loaded {
 /* =========================
    PREVENTIVI SCHEDA CLIENTE
 ========================= */
-
-.prev-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.prev-card {
-  display: block;
-  border: 1px solid var(--sidebar-border);
-  border-radius: 12px;
-  background: #fff;
-  padding: 0.85rem 1rem;
-  color: inherit;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
-}
-
-.prev-card:hover {
-  background: var(--sidebar-hover);
-  text-decoration: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.prev-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.45rem;
-}
 
 .prev-ref {
   font-size: 0.76rem;
@@ -2839,10 +2698,6 @@ body.loaded {
   font-size: 0.8rem;
 }
 
-.prev-card-body {
-  margin-bottom: 0.5rem;
-}
-
 .prev-title {
   font-weight: 700;
   font-size: 0.95rem;
@@ -2853,11 +2708,7 @@ body.loaded {
 }
 
 .prev-card-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   justify-content: space-between;
-  gap: 0.4rem;
 }
 
 .prev-badges {
@@ -2874,10 +2725,6 @@ body.loaded {
 }
 
 @media (max-width: 575.98px) {
-  .prev-card {
-    padding: 0.75rem 0.85rem;
-  }
-
   .prev-title {
     font-size: 0.88rem;
   }
@@ -2896,28 +2743,6 @@ body.loaded {
    EMAIL REALI SCHEDA CLIENTE
 ========================= */
 
-.mail-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.mail-card {
-  display: block;
-  border: 1px solid var(--sidebar-border);
-  border-radius: 12px;
-  background: #fff;
-  padding: 0.85rem 1rem;
-  color: inherit;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
-}
-
-.mail-card:hover {
-  background: var(--sidebar-hover);
-  text-decoration: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
 .mail-card-unread {
   border-left: 3px solid var(--app-primary);
   background: rgba(32, 227, 127, 0.04);
@@ -2925,14 +2750,6 @@ body.loaded {
 
 .mail-card-unread .mail-subject {
   font-weight: 800;
-}
-
-.mail-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.45rem;
 }
 
 .mail-card-contact {
@@ -2965,10 +2782,6 @@ body.loaded {
   flex-shrink: 0;
 }
 
-.mail-card-body {
-  margin-bottom: 0.5rem;
-}
-
 .mail-subject {
   font-weight: 700;
   font-size: 0.95rem;
@@ -2976,13 +2789,6 @@ body.loaded {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.mail-card-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
 }
 
 .mail-date {
@@ -3035,10 +2841,6 @@ body.loaded {
 }
 
 @media (max-width: 575.98px) {
-  .mail-card {
-    padding: 0.75rem 0.85rem;
-  }
-
   .mail-subject {
     font-size: 0.88rem;
   }

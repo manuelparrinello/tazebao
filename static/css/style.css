@@ -1489,9 +1489,7 @@ i.bi {
   line-height: 1;
 }
 
-.btn:not(.btn-close),
-.button-61,
-.button-61-p0 {
+.btn:not(.btn-close) {
   border-radius: 8px;
   font-weight: 500;
   line-height: 1.1;
@@ -1518,9 +1516,7 @@ i.bi {
 }
 
 .erp-actions i.bi,
-.btn i.bi,
-.button-61 i.bi,
-.button-61-p0 i.bi {
+.btn i.bi {
   font-size: 0.95rem;
 }
 
@@ -1547,82 +1543,6 @@ body.loaded {
 }
 
 /* CSS */
-
-.button-61 {
-  background-color: #20e37f;
-  align-items: center;
-  appearance: none;
-  border-radius: 8px;
-  border-style: none;
-  /* box-shadow: rgba(0, 0, 0, .2) 0 3px 1px -2px, rgba(0, 0, 0, .14) 0 2px 2px 0, rgba(0, 0, 0, .12) 0 1px 5px 0; */
-  box-sizing: border-box;
-  color: #111;
-  cursor: pointer;
-  display: inline-flex;
-  font-weight: 500;
-  height: 36px;
-  justify-content: center;
-  line-height: normal;
-  min-width: 64px;
-  outline: none;
-  overflow: visible;
-  padding: 0 16px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  vertical-align: middle;
-  will-change: transform, opacity;
-}
-
-.button-61-p0 {
-  background-color: #20e37f;
-  align-items: center;
-  appearance: none;
-  border-radius: 20px;
-  border-style: none;
-  /* box-shadow: rgba(0, 0, 0, .2) 0 3px 1px -2px, rgba(0, 0, 0, .14) 0 2px 2px 0, rgba(0, 0, 0, .12) 0 1px 5px 0; */
-  box-sizing: border-box;
-  color: #111;
-  cursor: pointer;
-  display: inline-flex;
-  font-weight: 500;
-  height: 36px;
-  justify-content: center;
-  line-height: normal;
-  min-width: 40px;
-  outline: none;
-  overflow: visible;
-  padding: 0 5px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  vertical-align: middle;
-  will-change: transform, opacity;
-}
-
-.button-61:disabled {
-  background-color: rgba(0, 0, 0, 0.12);
-  cursor: default;
-  pointer-events: none;
-}
-
-.button-61-warning {
-  background-color: #ffbe0b;
-  color: #161616;
-}
-
-.button-61-danger {
-  background-color: #ff006e;
-  color: #ffffff;
-}
 
 .icon-trash-righe:hover {
   color: #20e37f !important;

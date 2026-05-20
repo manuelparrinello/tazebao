@@ -120,10 +120,8 @@ const TabellaLavori = {
     },
 
     prioIndex(prio) {
-      if (prio === "Bassa") return 1;
-      if (prio === "Media") return 2;
-      if (prio === "Alta") return 3;
-      return "";
+      var map = { "bassa": 1, "media": 2, "alta": 3, "urgente": 4 };
+      return map[String(prio).toLowerCase().trim()] ?? "";
     },
 
     pdfIcon(path) {

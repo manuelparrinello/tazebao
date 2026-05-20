@@ -17,13 +17,13 @@
 {% set _can_mutate = current_user and current_user.role != "readonly" %}
 {% if movements %}
 <div class="d-none d-md-block">
-    <table class="table table-hover my-0 finance-table">
+    <table class="table table-hover my-0 sortable finance-table">
         <thead>
             <tr>
                 <th class="fw-bold text-start">Titolo</th>
                 <th class="fw-bold text-center finance-col-type">Tipo</th>
                 <th class="fw-bold text-center finance-col-amount">Importo</th>
-                <th class="fw-bold text-end finance-col-actions">Azioni</th>
+                <th class="fw-bold text-end finance-col-actions sorttable_nosort">Azioni</th>
             </tr>
         </thead>
         <tbody>

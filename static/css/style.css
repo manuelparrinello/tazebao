@@ -458,7 +458,7 @@
 .app-content {
   /* min-height: 100vh; */
   transition: margin-left 0.2s ease;
-  padding: 120px 80px 80px !important;
+  padding: 60px 80px 80px !important;
 }
 
 @media (max-width: 991.98px) {

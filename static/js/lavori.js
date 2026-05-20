@@ -91,7 +91,8 @@ const getAllLavori = Vue.createApp({
                 if (!response.ok) {
                     throw new Error("Errore caricamento lavori");
                 }
-                this.lavori = await response.json();
+                const payload = await response.json();
+                this.lavori = Array.isArray(payload) ? payload : (payload.data || []);
             } catch (errore) {
                 this.error = errore.message || "Errore imprevisto";
             } finally {

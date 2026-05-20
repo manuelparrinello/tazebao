@@ -72,8 +72,8 @@ const preventivi = Vue.createApp({
         if (!response.ok) {
           throw new Error("Errore HTTP:" + response.status);
         }
-        const data = await response.json();
-        this.preventivi = data;
+        const payload = await response.json();
+        this.preventivi = Array.isArray(payload) ? payload : (payload.data || []);
       } catch (err) {
         console.log(err);
       }

@@ -86,7 +86,6 @@ def task_row(task):
             "due_date": task.due_date,
             "lavoro_id": task.lavoro_id,
             "cliente_id": task.cliente_id,
-            "assignee_id": task.assignee_id,
             "created_at": task.created_at,
             "updated_at": task.updated_at,
         }
@@ -119,7 +118,6 @@ def calendar_row(event):
             "cliente_id": event.cliente_id,
             "lavoro_id": event.lavoro_id,
             "task_id": event.task_id,
-            "assigned_user_id": event.assigned_user_id,
             "created_at": event.created_at,
             "updated_at": event.updated_at,
         }

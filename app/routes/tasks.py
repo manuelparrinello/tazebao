@@ -13,7 +13,6 @@ from ..models import (
     EmailLog,
     Lavoro,
     Task,
-    User,
 )
 from ..utils.parsing import parse_optional_date, parse_optional_id
 
@@ -28,7 +27,6 @@ def task_form_choices():
         "priorities": TASK_PRIORITIES,
         "clienti": Cliente.query.order_by(Cliente.name.asc()).all(),
         "lavori": Lavoro.query.order_by(Lavoro.descrizione.asc()).all(),
-        "users": User.query.order_by(User.name.asc(), User.email.asc()).all(),
     }
 
 
@@ -48,8 +46,6 @@ def apply_task_form(task):
     task.due_date = parse_optional_date(request.form.get("due_date"))
     task.cliente_id = validate_fk_id(Cliente, parse_optional_id(request.form.get("cliente_id")), "Cliente")
     task.lavoro_id = validate_fk_id(Lavoro, parse_optional_id(request.form.get("lavoro_id")), "Lavoro")
-    task.assignee_id = validate_fk_id(User, parse_optional_id(request.form.get("assignee_id")), "Utente")
-
     if not task.name:
         raise ValueError("Il titolo task e obbligatorio.")
     if task.category not in TASK_CATEGORIES:

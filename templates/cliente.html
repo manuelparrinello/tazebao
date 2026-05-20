@@ -305,9 +305,7 @@
                                 {% if task.due_date %}
                                 <span class="task-meta-item"><i class="bi bi-calendar-event me-1"></i>{{ task.due_date|date_it }}</span>
                                 {% endif %}
-                                {% if task.assignee %}
-                                <span class="task-meta-item"><i class="bi bi-person-fill me-1"></i>{{ task.assignee.name }}</span>
-                                {% endif %}
+
                             </div>
                         </div>
                     </a>
@@ -569,6 +567,73 @@
                 </div>
                 {% else %}
                 {{ m.empty_state("Nessun movimento economico collegato a questo cliente.", quick_actions.nuovo_movimento, "Crea movimento") }}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <div class="col-12">
+        <section class="card rounded-3 border border-light-subtle">
+            <div class="card-body p-3 p-md-4">
+                <div class="d-flex align-items-start justify-content-between gap-3 mb-1">
+                    <div>
+                        <h5 class="fw-bolder mb-1"><i class="bi bi-receipt-cutoff me-2 text-primary"></i>Fatture</h5>
+                        <div class="small text-secondary">Fatture collegate a questo cliente.</div>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% if can_mutate %}
+                    <a href="{{ url_for('invoices.invoice_new', cliente_id=cliente.id) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus-lg me-1"></i>Nuova fattura
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('invoices.invoices_index', cliente_id=cliente.id) }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-eye me-1"></i>Vedi tutte
+                    </a>
+                </div>
+                {% if fatture %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover my-0">
+                        <thead>
+                            <tr>
+                                <th class="fw-bold text-start">Numero</th>
+                                <th class="fw-bold text-center">Data</th>
+                                <th class="fw-bold text-center">Importo</th>
+                                <th class="fw-bold text-center">IVA</th>
+                                <th class="fw-bold text-center">Stato</th>
+                                <th class="fw-bold text-end">PDF</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fattura in fatture[:10] %}
+                            <tr>
+                                <td class="fw-bold text-start"><a class="a-no-color" href="{{ url_for('invoices.invoice_edit', invoice_id=fattura.id) if can_mutate else '#' }}">{{ fattura.numero }}</a></td>
+                                <td class="text-center">{{ fattura.data_emissione|date_it }}</td>
+                                <td class="text-center fw-semibold {% if fattura.pagato %}text-success{% else %}text-danger{% endif %}">{{ m.euro(fattura.importo|float) }}</td>
+                                <td class="text-center text-secondary">{{ fattura.aliquota_iva or 22 }}%</td>
+                                <td class="text-center">
+                                    {% if fattura.pagato %}
+                                    <span class="badge rounded-pill text-bg-success erp-badge">Pagata</span>
+                                    {% else %}
+                                    <span class="badge rounded-pill text-bg-warning erp-badge">Da pagare</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    {% if fattura.pdf_path %}
+                                    <a href="{{ url_for('invoices.invoice_pdf', invoice_id=fattura.id) }}" class="btn btn-sm btn-outline-secondary erp-icon-btn" target="_blank" aria-label="PDF">
+                                        <i class="bi bi-file-earmark-pdf"></i>
+                                    </a>
+                                    {% else %}
+                                    <span class="text-secondary">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                {{ m.empty_state("Nessuna fattura collegata a questo cliente.", url_for('invoices.invoice_new', cliente_id=cliente.id) if can_mutate else none, "Crea fattura") }}
                 {% endif %}
             </div>
         </section>

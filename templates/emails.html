@@ -46,25 +46,25 @@
         <table class="table table-hover my-0 emails-table">
             <thead>
             <tr>
-                <th class="fw-bold pointer col-data">Data</th>
-                <th class="fw-bold pointer col-comunicazione">Comunicazione</th>
-                <th class="fw-bold pointer col-direzione">Direzione</th>
-                <th class="fw-bold pointer col-collegamenti mobile-hide">Collegamenti</th>
+                <th class="fw-bold pointer col-data text-start">Data</th>
+                <th class="fw-bold pointer col-comunicazione text-start">Comunicazione</th>
+                <th class="fw-bold pointer col-direzione text-center">Direzione</th>
+                <th class="fw-bold pointer col-collegamenti text-center mobile-hide">Collegamenti</th>
                 <th class="fw-bold text-end col-azioni">Azioni</th>
             </tr>
             </thead>
             <tbody>
                 {% for email_log in email_logs %}
                 <tr>
-                    <td class="col-data">
+                    <td class="col-data text-start">
                         <span class="text-nowrap small">{{ email_log.sent_at|datetime_it if email_log.sent_at else "-" }}</span>
                     </td>
-                    <td class="col-comunicazione">
+                    <td class="col-comunicazione text-start">
                         <a href="{{ url_for('emails.emails_edit', email_id=email_log.id) if can_mutate else '#' }}" class="fw-bold text-decoration-none d-block text-truncate">{{ email_log.subject }}</a>
                         <span class="d-block text-truncate small text-secondary" title="{{ email_log.email_address }}">{{ email_log.email_address }}</span>
                     </td>
-                    <td class="col-direzione">{{ erp_badge("mail_direction", email_log.direction) }}</td>
-                    <td class="col-collegamenti mobile-hide">
+                    <td class="col-direzione text-center">{{ erp_badge("mail_direction", email_log.direction) }}</td>
+                    <td class="col-collegamenti text-center mobile-hide">
                         <div class="small text-truncate">
                             {% if email_log.cliente %}
                             <a href="{{ url_for('cliente_page', cliente_id=email_log.cliente.id) }}" class="fw-semibold">{{ email_log.cliente.name }}</a>

@@ -342,21 +342,21 @@
                 <table class="table table-hover my-0 editorial-table">
                     <thead>
                         <tr>
-                            <th class="fw-bold col-date">Data</th>
-                            <th class="fw-bold editorial-col-publication">Pubblicazione</th>
-                            <th class="fw-bold col-pills">Piattaforma</th>
-                            <th class="fw-bold col-pills">Tipo</th>
-                            <th class="fw-bold col-pills">Stato</th>
-                            <th class="fw-bold col-pills">Approvazione</th>
-                            <th class="fw-bold col-cliente">Cliente</th>
-                            <th class="fw-bold col-actions">Azioni</th>
+                            <th class="fw-bold col-date text-start">Data</th>
+                            <th class="fw-bold editorial-col-publication text-start">Pubblicazione</th>
+                            <th class="fw-bold col-pills text-center">Piattaforma</th>
+                            <th class="fw-bold col-pills text-center">Tipo</th>
+                            <th class="fw-bold col-pills text-center">Stato</th>
+                            <th class="fw-bold col-pills text-center">Approvazione</th>
+                            <th class="fw-bold col-cliente text-center">Cliente</th>
+                            <th class="fw-bold col-actions text-end">Azioni</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for publication in publications %}
                         <tr>
-                            <td class="editorial-td-date">{{ publication.publication_date|date_it }}</td>
-                            <td class="editorial-publication-cell">
+                            <td class="editorial-td-date text-start">{{ publication.publication_date|date_it }}</td>
+                            <td class="editorial-publication-cell text-start">
                                 <div class="d-flex align-items-center gap-2 min-w-0">
                                     {{ publication_thumb(publication) }}
                                     <div class="min-w-0">
@@ -367,12 +367,12 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ platform_pills(publication) }}</td>
-                            <td>{{ erp_badge("editorial_content_type", publication.content_type) }}</td>
-                            <td>{{ erp_badge("editorial_status", publication.status) }}</td>
-                            <td>{{ erp_badge("editorial_client_approval", publication.client_approval_status) }}</td>
-                            <td class="editorial-td-cliente">{{ publication.cliente.name if publication.cliente else "-" }}</td>
-                            <td>
+                            <td class="text-center">{{ platform_pills(publication) }}</td>
+                            <td class="text-center">{{ erp_badge("editorial_content_type", publication.content_type) }}</td>
+                            <td class="text-center">{{ erp_badge("editorial_status", publication.status) }}</td>
+                            <td class="text-center">{{ erp_badge("editorial_client_approval", publication.client_approval_status) }}</td>
+                            <td class="editorial-td-cliente text-center">{{ publication.cliente.name if publication.cliente else "-" }}</td>
+                            <td class="text-end">
                                 <div class="erp-actions">
                                     <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('editorial_calendar.editorial_edit', publication_id=publication.id) if can_mutate else '#' }}" aria-label="Modifica">
                                         <i class="bi bi-pencil"></i>

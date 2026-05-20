@@ -201,7 +201,6 @@ class Task(db.Model):
     due_date = db.Column(db.Date, nullable=True)
     lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=True)
     cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=True)
-    assignee_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(
         db.DateTime,
@@ -212,7 +211,6 @@ class Task(db.Model):
 
     lavoro = db.relationship("Lavoro", backref="erp_tasks")
     cliente = db.relationship("Cliente", backref="erp_tasks")
-    assignee = db.relationship("User", backref="assigned_tasks")
 
     def to_dict(self):
         return {
@@ -235,12 +233,6 @@ class Task(db.Model):
                 if self.cliente
                 else None
             ),
-            "assignee_id": self.assignee_id,
-            "assignee": (
-                {"id": self.assignee.id, "name": self.assignee.name, "email": self.assignee.email}
-                if self.assignee
-                else None
-            ),
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
@@ -258,7 +250,6 @@ class CalendarEvent(db.Model):
     cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=True)
     lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=True)
     task_id = db.Column(db.Integer, db.ForeignKey("erp_tasks.id"), nullable=True)
-    assigned_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(
         db.DateTime,
@@ -270,7 +261,6 @@ class CalendarEvent(db.Model):
     cliente = db.relationship("Cliente", backref="calendar_events")
     lavoro = db.relationship("Lavoro", backref="calendar_events")
     task = db.relationship("Task", backref="calendar_events")
-    assigned_user = db.relationship("User", backref="calendar_events")
 
     def to_dict(self):
         return {
@@ -297,16 +287,6 @@ class CalendarEvent(db.Model):
             ),
             "task_id": self.task_id,
             "task": self.task.to_dict() if self.task else None,
-            "assigned_user_id": self.assigned_user_id,
-            "assigned_user": (
-                {
-                    "id": self.assigned_user.id,
-                    "name": self.assigned_user.name,
-                    "email": self.assigned_user.email,
-                }
-                if self.assigned_user
-                else None
-            ),
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
@@ -325,7 +305,6 @@ class EditorialPublication(db.Model):
     caption = db.Column(db.Text, nullable=True)
     preview_image_path = db.Column(db.String(500), nullable=True)
     status = db.Column(db.String(40), nullable=False, default="idea", index=True)
-    assigned_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True, index=True)
     client_approval_status = db.Column(
         db.String(40),
         nullable=False,
@@ -342,7 +321,6 @@ class EditorialPublication(db.Model):
     )
 
     cliente = db.relationship("Cliente", backref="editorial_publications")
-    assigned_user = db.relationship("User", backref="assigned_editorial_publications")
 
     def get_platforms(self):
         source = self.platforms or self.platform or ""
@@ -395,16 +373,6 @@ class EditorialPublication(db.Model):
             "caption": self.caption,
             "preview_image_path": self.preview_image_path,
             "status": self.status,
-            "assigned_user_id": self.assigned_user_id,
-            "assigned_user": (
-                {
-                    "id": self.assigned_user.id,
-                    "name": self.assigned_user.name,
-                    "email": self.assigned_user.email,
-                }
-                if self.assigned_user
-                else None
-            ),
             "client_approval_status": self.client_approval_status,
             "internal_notes": self.internal_notes,
             "asset_url": self.asset_url,
@@ -728,6 +696,33 @@ class Moodboard(db.Model):
         cascade="all, delete-orphan",
         order_by="MoodboardImage.sort_order",
     )
+
+
+class Fattura(db.Model):
+    __tablename__ = "erp_fatture"
+
+    id = db.Column(db.Integer, primary_key=True)
+    numero = db.Column(db.String(50), nullable=False)
+    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False, index=True)
+    lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=True)
+    data_emissione = db.Column(db.Date, nullable=False)
+    data_scadenza = db.Column(db.Date, nullable=True)
+    importo = db.Column(db.Numeric(12, 2), nullable=False)
+    aliquota_iva = db.Column(db.Integer, nullable=False, default=22)
+    pagato = db.Column(db.Boolean, nullable=False, default=False)
+    data_pagamento = db.Column(db.Date, nullable=True)
+    pdf_path = db.Column(db.String(500), nullable=True)
+    note = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+    cliente = db.relationship("Cliente", backref="fatture")
+    lavoro = db.relationship("Lavoro", backref="fatture")
 
 
 class MoodboardImage(db.Model):

@@ -26,7 +26,7 @@ ALLOWED_PREVIEW_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
 PREVIEW_UPLOAD_FOLDER = "uploads/editorial_previews"
 
 from ..utils.calendar_helpers import MONTH_NAMES, month_bounds, month_navigation
-from ..utils.parsing import parse_optional_date as parse_date
+from ..utils.parsing import parse_optional_date as parse_date, parse_optional_id
 
 
 def adjacent_month_urls(cliente_id, year, month):

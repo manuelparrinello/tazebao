@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="erp-form-page">
+    <div class="erp-form-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2">
+            <div>
+                <h3 class="fw-bolder erp-form-title">{{ page_title }}</h3>
+                <p class="erp-form-subtitle">Registra una fattura cliente con eventuale allegato PDF.</p>
+            </div>
+            <a href="{{ url_for('invoices.invoices_index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i>&nbsp;Torna alle fatture
+            </a>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger mt-4">{{ error }}</div>
+    {% endif %}
+
+    <form action="{{ form_action }}" method="post" class="erp-boxed-form" data-submit-guard="true" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="card erp-form-card">
+            <div class="card-body p-3 p-md-4">
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Dati fattura</h5>
+                        <p>Numero, date e importo della fattura.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label for="numero" class="form-label fw-bold">Numero fattura</label>
+                            <input type="text" class="form-control" id="numero" name="numero" value="{{ fattura.numero or '' }}" required>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="data_emissione" class="form-label fw-bold">Data emissione</label>
+                            <input type="date" class="form-control" id="data_emissione" name="data_emissione" value="{{ fattura.data_emissione.isoformat() if fattura.data_emissione else '' }}" required>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="data_scadenza" class="form-label fw-bold">Data scadenza</label>
+                            <input type="date" class="form-control" id="data_scadenza" name="data_scadenza" value="{{ fattura.data_scadenza.isoformat() if fattura.data_scadenza else '' }}">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="importo" class="form-label fw-bold">Importo</label>
+                            <div class="input-group">
+                                <input type="number" min="0.01" step="0.01" class="form-control" id="importo" name="importo" value="{{ fattura.importo or '' }}" required>
+                                <span class="input-group-text">&euro;</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-2">
+                            <label for="aliquota_iva" class="form-label fw-bold">Aliquota IVA</label>
+                            <div class="input-group">
+                                <input type="number" min="0" max="100" class="form-control" id="aliquota_iva" name="aliquota_iva" value="{{ fattura.aliquota_iva or 22 }}">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-2">
+                            <div class="form-check mt-39">
+                                <input class="form-check-input" type="checkbox" id="pagato" name="pagato" {% if fattura.pagato %}checked{% endif %}>
+                                <label class="form-check-label fw-bold" for="pagato">Pagata</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="data_pagamento" class="form-label fw-bold">Data pagamento</label>
+                            <input type="date" class="form-control" id="data_pagamento" name="data_pagamento" value="{{ fattura.data_pagamento.isoformat() if fattura.data_pagamento else '' }}">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Collegamenti</h5>
+                        <p>Associa la fattura a un cliente e opzionalmente a un lavoro.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label for="cliente_id" class="form-label fw-bold">Cliente</label>
+                            <select class="form-control form-select" id="cliente_id" name="cliente_id" required>
+                                <option value="">Seleziona cliente</option>
+                                {% for cliente in clienti %}
+                                <option value="{{ cliente.id }}" {{ m.selected(fattura.cliente_id, cliente.id) }}>{{ cliente.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="lavoro_id" class="form-label fw-bold">Lavoro (opzionale)</label>
+                            <select class="form-control form-select" id="lavoro_id" name="lavoro_id">
+                                <option value="">Nessun lavoro</option>
+                                {% for lavoro in lavori %}
+                                <option value="{{ lavoro.id }}" data-cliente-id="{{ lavoro.cliente_id or '' }}" {{ m.selected(fattura.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Allegato PDF</h5>
+                        <p>Carica il file PDF della fattura ricevuta.</p>
+                    </div>
+                    <div class="col-12 px-0">
+                        <label for="pdf" class="form-label fw-bold">File PDF</label>
+                        <input type="file" class="form-control" id="pdf" name="pdf" accept=".pdf,application/pdf">
+                        <div class="form-text">Solo PDF. Se non selezioni un file, l'allegato esistente (se presente) viene mantenuto.</div>
+                        {% if fattura.pdf_path %}
+                        <div class="mt-2">
+                            <a href="{{ url_for('invoices.invoice_pdf', invoice_id=fattura.id) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="bi bi-file-earmark-pdf me-1"></i>PDF attuale
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Note</h5>
+                        <p>Informazioni aggiuntive sulla fattura.</p>
+                    </div>
+                    <label for="note" class="form-label fw-bold">Note</label>
+                    <textarea class="form-control" id="note" name="note" rows="4">{{ fattura.note or '' }}</textarea>
+                </section>
+
+                <div class="erp-form-footer-actions">
+                    <a href="{{ url_for('invoices.invoices_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg"></i>&nbsp;Annulla
+                    </a>
+                    <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var clienteSelect = document.getElementById('cliente_id');
+    var lavoroSelect = document.getElementById('lavoro_id');
+    if (!clienteSelect || !lavoroSelect) return;
+
+    var lavoroOptions = Array.from(lavoroSelect.options).slice(1);
+
+    function filterLavori() {
+        var clienteId = clienteSelect.value;
+        var currentValue = lavoroSelect.value;
+        var hasVisibleOption = false;
+
+        lavoroOptions.forEach(function (opt) {
+            var match = !clienteId || opt.getAttribute('data-cliente-id') === clienteId;
+            opt.style.display = match ? '' : 'none';
+            if (match && opt.value === currentValue) hasVisibleOption = true;
+        });
+
+        if (currentValue && !hasVisibleOption) {
+            lavoroSelect.value = '';
+        }
+    }
+
+    clienteSelect.addEventListener('change', filterLavori);
+    filterLavori();
+});
+</script>
+{% endblock %}

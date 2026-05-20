@@ -7,7 +7,7 @@ from flask import Blueprint, current_app, flash, jsonify, redirect, render_templ
 from ..auth import login_required, role_required
 from ..extensions import db
 from ..finance_service import cliente_marginality
-from ..models import CalendarEvent, Cliente, EditorialPublication, EmailLog, EmailMessage, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
+from ..models import CalendarEvent, Cliente, EditorialPublication, EmailLog, EmailMessage, Fattura, FinancialMovement, Lavoro, Moodboard, Preventivo, Task
 from ..storage_utils import build_breadcrumb, create_subfolder, delete_empty_storage_folder, delete_storage_file, get_cliente_relative_path, list_entries, normalize_subdir, rename_storage_entry, resolve_collision, safe_path, save_uploaded_storage_file, save_uploaded_storage_files, slugify, ensure_storage_dir
 
 
@@ -136,6 +136,11 @@ def cliente_page(cliente_id):
         .limit(10)
         .all()
     )
+    fatture = (
+        Fattura.query.filter_by(cliente_id=cliente_id)
+        .order_by(Fattura.data_emissione.desc(), Fattura.id.desc())
+        .all()
+    )
     email_logs = (
         EmailLog.query.filter_by(cliente_id=cliente_id)
         .order_by(EmailLog.sent_at.desc(), EmailLog.id.desc())
@@ -177,6 +182,7 @@ def cliente_page(cliente_id):
         preventivi=preventivi,
         preventivi_esterni=preventivi_esterni,
         movimenti=movimenti,
+        fatture=fatture,
         email_logs=email_logs,
         mail_messages=mail_messages,
         quick_actions=quick_actions,

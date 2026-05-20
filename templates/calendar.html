@@ -97,35 +97,33 @@
                 <table class="table table-hover my-0 calendar-table">
                     <thead>
                         <tr>
-                            <th class="fw-bold col-date">Data</th>
-                            <th class="fw-bold col-title">Evento</th>
-                            <th class="fw-bold col-status">Tipo</th>
-                            <th class="fw-bold col-refs">Cliente</th>
-                            <th class="fw-bold col-refs">Lavoro</th>
-                            <th class="fw-bold col-refs">Task</th>
-                            <th class="fw-bold col-refs">Assegnato a</th>
+                            <th class="fw-bold col-date text-start">Data</th>
+                            <th class="fw-bold col-title text-start">Evento</th>
+                            <th class="fw-bold col-status text-center">Tipo</th>
+                            <th class="fw-bold col-refs text-center">Cliente</th>
+                            <th class="fw-bold col-refs text-center">Lavoro</th>
+                            <th class="fw-bold col-refs text-end">Task</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for event in events %}
                         <tr class="pointer" onclick="window.location='{{ event.edit_url if can_mutate else '#' }}'">
-                            <td>
+                            <td class="text-start">
                                 <div class="fw-bold">{{ event.date|date_it }}</div>
                                 {% if event.time %}
                                 <div class="small text-secondary">{{ event.time }}</div>
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="text-start">
                                 <a class="fw-bold a-no-color" href="{{ event.edit_url if can_mutate else '#' }}" onclick="event.stopPropagation();">{{ event.title }}</a>
                                 {% if event.description %}
                                 <div class="small text-secondary text-truncate">{{ event.description }}</div>
                                 {% endif %}
                             </td>
-                            <td>{{ erp_badge("event_type", event.event_type) if event.source == "calendar_event" else erp_badge("event_type", "task_due_date", "Task") }}</td>
-                            <td><span class="text-truncate d-block">{{ event.cliente.name if event.cliente else "-" }}</span></td>
-                            <td><span class="text-truncate d-block">{{ event.lavoro.descrizione if event.lavoro else "-" }}</span></td>
-                            <td><span class="text-truncate d-block">{{ event.task.name if event.task else "-" }}</span></td>
-                            <td><span class="text-truncate d-block">{{ event.assigned_user.name or event.assigned_user.email if event.assigned_user else "-" }}</span></td>
+                            <td class="text-center">{{ erp_badge("event_type", event.event_type) if event.source == "calendar_event" else erp_badge("event_type", "task_due_date", "Task") }}</td>
+                            <td class="text-center"><span class="text-truncate d-block">{{ event.cliente.name if event.cliente else "-" }}</span></td>
+                            <td class="text-center"><span class="text-truncate d-block">{{ event.lavoro.descrizione if event.lavoro else "-" }}</span></td>
+                            <td class="text-end"><span class="text-truncate d-block">{{ event.task.name if event.task else "-" }}</span></td>
                         </tr>
                         {% endfor %}
                     </tbody>

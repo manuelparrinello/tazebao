@@ -20,9 +20,9 @@
     <table class="table table-hover my-0 finance-table">
         <thead>
             <tr>
-                <th class="fw-bold">Titolo</th>
-                <th class="fw-bold finance-col-type">Tipo</th>
-                <th class="fw-bold text-end finance-col-amount">Importo</th>
+                <th class="fw-bold text-start">Titolo</th>
+                <th class="fw-bold text-center finance-col-type">Tipo</th>
+                <th class="fw-bold text-center finance-col-amount">Importo</th>
                 <th class="fw-bold text-end finance-col-actions">Azioni</th>
             </tr>
         </thead>
@@ -60,7 +60,7 @@
                         {% endif %}
                     </div>
                 </td>
-                <td class="text-end fw-bold fs-6 {% if kind == 'entrata' %}text-success{% else %}text-danger{% endif %}">
+                <td class="text-center fw-bold fs-6 {% if kind == 'entrata' %}text-success{% else %}text-danger{% endif %}">
                     {{ m.euro(movement.amount|float) }}
                 </td>
                 <td class="text-end">
@@ -235,18 +235,18 @@
                             <table class="table table-sm table-borderless mb-0">
                                 <thead>
                                     <tr class="small text-secondary">
-                                        <th>Cliente</th>
-                                        <th class="text-end">Entrate</th>
-                                        <th class="text-end">Uscite</th>
+                                        <th class="text-start">Cliente</th>
+                                        <th class="text-center">Entrate</th>
+                                        <th class="text-center">Uscite</th>
                                         <th class="text-end">Utile</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for c in marg_ranking.top_clients %}
                                     <tr>
-                                        <td><a href="{{ url_for('cliente_page', cliente_id=c.id) }}" class="text-decoration-none">{{ c.name }}</a></td>
-                                        <td class="text-end text-success small">{{ m.euro(c.income) }}</td>
-                                        <td class="text-end text-danger small">{{ m.euro(c.expenses) }}</td>
+                                        <td class="text-start"><a href="{{ url_for('cliente_page', cliente_id=c.id) }}" class="text-decoration-none">{{ c.name }}</a></td>
+                                        <td class="text-center text-success small">{{ m.euro(c.income) }}</td>
+                                        <td class="text-center text-danger small">{{ m.euro(c.expenses) }}</td>
                                         <td class="text-end fw-bold {% if c.net > 0 %}text-success{% elif c.net < 0 %}text-danger{% endif %}">{{ m.euro(c.net) }}</td>
                                     </tr>
                                     {% endfor %}
@@ -264,16 +264,16 @@
                             <table class="table table-sm table-borderless mb-0">
                                 <thead>
                                     <tr class="small text-secondary">
-                                        <th>Lavoro</th>
-                                        <th class="text-end">Prev.</th>
+                                        <th class="text-start">Lavoro</th>
+                                        <th class="text-center">Prev.</th>
                                         <th class="text-end">Utile</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for j in marg_ranking.top_jobs %}
                                     <tr>
-                                        <td><a href="{{ url_for('lavori.lavoro_page', lavoro_id=j.id) }}" class="text-decoration-none">{{ j.descrizione|truncate(30) }}</a></td>
-                                        <td class="text-end small">{{ m.euro(j.preventivato) }}</td>
+                                        <td class="text-start"><a href="{{ url_for('lavori.lavoro_page', lavoro_id=j.id) }}" class="text-decoration-none">{{ j.descrizione|truncate(30) }}</a></td>
+                                        <td class="text-center small">{{ m.euro(j.preventivato) }}</td>
                                         <td class="text-end fw-bold {% if j.net > 0 %}text-success{% elif j.net < 0 %}text-danger{% endif %}">{{ m.euro(j.net) }}</td>
                                     </tr>
                                     {% endfor %}
@@ -291,7 +291,7 @@
                             <table class="table table-sm table-borderless mb-0">
                                 <thead>
                                     <tr class="small text-secondary">
-                                        <th>Lavoro</th>
+                                        <th class="text-start">Lavoro</th>
                                         <th class="text-end">Utile</th>
                                     </tr>
                                 </thead>

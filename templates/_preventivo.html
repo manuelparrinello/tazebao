@@ -127,20 +127,20 @@
                 <table class="table">
                     <thead>
                         <tr class="tr-thickborder">
-                            <th style="width: 40px;" scope="col">QTY</th>
-                            <th style="width: auto" scope="col">Descrizione</th>
-                            <th class="text-end" style="width: 90px;" scope="col">Prezzo imponibile</th>
-                            <th class="text-end" style="width: 90px;" scope="col">Prezzo ivato</th>
+                            <th class="text-start" style="width: 40px;" scope="col">QTY</th>
+                            <th class="text-start" style="width: auto" scope="col">Descrizione</th>
+                            <th class="text-center" style="width: 90px;" scope="col">Prezzo imponibile</th>
+                            <th class="text-center" style="width: 90px;" scope="col">Prezzo ivato</th>
                             <th class="text-end" style="width: 120px;" scope="col">Totale imponibile</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="riga in preventivoData.righe">
-                            <th scope="row">[[ riga?.qty ]]</th>
-                            <td style="white-space: pre-wrap; word-wrap: break-word;">[[ riga?.descrizione ]]
+                            <th class="text-start" scope="row">[[ riga?.qty ]]</th>
+                            <td class="text-start" style="white-space: pre-wrap; word-wrap: break-word;">[[ riga?.descrizione ]]
                             </td>
-                            <td class="text-end">[[ euroFormat(riga?.prezzo_ie) ]]&euro;</td>
-                            <td class="text-end">[[ euroFormat(riga?.prezzo_ii) ]]&euro;</td>
+                            <td class="text-center">[[ euroFormat(riga?.prezzo_ie) ]]&euro;</td>
+                            <td class="text-center">[[ euroFormat(riga?.prezzo_ii) ]]&euro;</td>
                             <td class="text-end">[[ euroFormat(riga?.totale_riga) ]]&euro;</td>
                         </tr>
                     </tbody>

@@ -90,7 +90,7 @@
                 <section class="erp-form-section">
                     <div class="erp-form-section-heading">
                         <h5>Collegamenti</h5>
-                        <p>Cliente, lavoro e assegnatario collegati alla task.</p>
+                        <p>Cliente e lavoro collegati alla task.</p>
                     </div>
                     <div class="row g-3">
                         <div class="col-12 col-md-6 col-lg-4">
@@ -108,15 +108,6 @@
                                 <option value="">Nessun lavoro</option>
                                 {% for lavoro in lavori %}
                                 <option value="{{ lavoro.id }}" {{ m.selected(task.lavoro_id, lavoro.id) }}>{{ lavoro.descrizione }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-12 col-lg-4">
-                            <label for="assignee_id" class="form-label fw-bold">Assegnatario</label>
-                            <select class="form-control form-select" id="assignee_id" name="assignee_id">
-                                <option value="">Nessun assegnatario</option>
-                                {% for user in users %}
-                                <option value="{{ user.id }}" {{ m.selected(task.assignee_id, user.id) }}>{{ user.name or user.email }}</option>
                                 {% endfor %}
                             </select>
                         </div>

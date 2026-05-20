@@ -29,8 +29,8 @@
             <table class="table table-hover my-0 admin-export-table">
                 <thead>
                     <tr>
-                        <th class="fw-bold admin-export-resource-col">Risorsa</th>
-                        <th class="fw-bold admin-export-description-col">Descrizione</th>
+                        <th class="fw-bold admin-export-resource-col text-start">Risorsa</th>
+                        <th class="fw-bold admin-export-description-col text-center">Descrizione</th>
                         <th class="fw-bold text-end admin-export-actions-col">Export</th>
                     </tr>
                 </thead>
@@ -41,7 +41,7 @@
                             <div class="fw-bold">{{ config.label }}</div>
                             <div class="small text-secondary">{{ resource }}</div>
                         </td>
-                        <td>{{ config.description }}</td>
+                        <td class="text-center">{{ config.description }}</td>
                         <td class="text-end">
                             <div class="admin-export-actions">
                                 <a class="btn btn-sm btn-outline-primary admin-export-btn" href="{{ url_for('admin_export.export_csv', resource=resource) }}" title="Scarica CSV">

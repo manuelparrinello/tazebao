@@ -3,12 +3,9 @@ from flask import Blueprint, current_app, flash, g, redirect, render_template, r
 from ..auth import role_required
 from ..extensions import db
 from ..models import (
-    CalendarEvent,
-    EditorialPublication,
     EmailAccount,
     EmailLog,
     FinancialMovement,
-    Task,
     User,
     VALID_USER_ROLES,
 )
@@ -63,12 +60,9 @@ def can_soft_delete_user(user):
 
 def user_has_erp_links(user):
     checks = (
-        Task.query.filter_by(assignee_id=user.id).first(),
-        CalendarEvent.query.filter_by(assigned_user_id=user.id).first(),
         FinancialMovement.query.filter_by(created_by=user.id).first(),
         EmailAccount.query.filter_by(created_by=user.id).first(),
         EmailLog.query.filter_by(created_by=user.id).first(),
-        EditorialPublication.query.filter_by(assigned_user_id=user.id).first(),
     )
     return any(checks)
 

@@ -10,7 +10,6 @@ from ..models import (
     Cliente,
     Lavoro,
     Task,
-    User,
 )
 from ..utils.calendar_helpers import MONTH_NAMES, month_bounds, month_navigation
 from ..utils.parsing import parse_optional_datetime, parse_optional_id
@@ -25,7 +24,6 @@ def calendar_form_choices():
         "clienti": Cliente.query.order_by(Cliente.name.asc()).all(),
         "lavori": Lavoro.query.order_by(Lavoro.descrizione.asc()).all(),
         "tasks": Task.query.order_by(Task.created_at.desc()).all(),
-        "users": User.query.order_by(User.name.asc(), User.email.asc()).all(),
     }
 
 
@@ -38,7 +36,6 @@ def apply_calendar_form(event):
     event.cliente_id = parse_optional_id(request.form.get("cliente_id"))
     event.lavoro_id = parse_optional_id(request.form.get("lavoro_id"))
     event.task_id = parse_optional_id(request.form.get("task_id"))
-    event.assigned_user_id = parse_optional_id(request.form.get("assigned_user_id"))
 
     if not event.title:
         raise ValueError("Il titolo evento e obbligatorio.")
@@ -70,7 +67,6 @@ def calendar_event_item(event):
         "cliente": event.cliente,
         "lavoro": event.lavoro,
         "task": event.task,
-        "assigned_user": event.assigned_user,
         "edit_url": url_for("calendar.calendar_edit", event_id=event.id),
     }
 
@@ -87,7 +83,6 @@ def task_due_date_item(task):
         "cliente": task.cliente,
         "lavoro": task.lavoro,
         "task": task,
-        "assigned_user": task.assignee,
         "edit_url": url_for("tasks.task_edit", task_id=task.id),
     }
 

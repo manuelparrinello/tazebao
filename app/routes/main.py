@@ -2,6 +2,7 @@ from flask import Blueprint, current_app, jsonify, render_template, request, url
 
 from ..auth import login_required
 from ..extensions import db
+from ..utils.api import api_response
 
 
 bp = Blueprint("main", __name__)
@@ -344,4 +345,4 @@ def api_search():
                 }
             )
 
-    return jsonify({"results": results})
+    return api_response(data={"results": results})

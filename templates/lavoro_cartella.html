@@ -101,16 +101,16 @@
             <table class="table table-hover align-middle my-0 file-browser-table">
                 <thead>
                     <tr>
-                        <th class="fw-bold fb-name-cell">Nome</th>
-                        <th class="fw-bold fb-size-col text-end">Dimensione</th>
-                        <th class="fw-bold fb-date-col text-end d-none d-sm-table-cell">Modificato</th>
-                        <th class="fb-actions-col text-center"></th>
+                        <th class="fw-bold fb-name-cell text-start">Nome</th>
+                        <th class="fw-bold fb-size-col text-center">Dimensione</th>
+                        <th class="fw-bold fb-date-col text-center d-none d-sm-table-cell">Modificato</th>
+                        <th class="fb-actions-col text-end"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for entry in entries %}
                     <tr class="file-browser-row">
-                        <td class="fb-name-cell">
+                        <td class="fb-name-cell text-start">
                             {% if entry.is_dir %}
                             <a href="{{ url_for('lavori.lavoro_cartella', lavoro_id=lavoro.id, subdir=(subdir + '/' + entry.name) if subdir else entry.name) }}" class="text-decoration-none text-reset stretched-link-dir" title="{{ entry.name }}">
                                 <i class="bi bi-folder-fill text-warning me-2"></i><span class="fw-semibold">{{ entry.name }}</span>
@@ -119,10 +119,10 @@
                             {{ m.file_icon(entry.name) }}<span title="{{ entry.name }}">{{ entry.name }}</span>
                             {% endif %}
                         </td>
-                        <td class="fb-size-col text-end text-secondary small">{{ m.format_size(entry.size) }}</td>
-                        <td class="fb-date-col text-end text-secondary small d-none d-sm-table-cell">{{ m.format_date(entry.mtime) }}</td>
-                        <td class="fb-actions-col text-center">
-                            <div class="erp-actions justify-content-center">
+                        <td class="fb-size-col text-center text-secondary small">{{ m.format_size(entry.size) }}</td>
+                        <td class="fb-date-col text-center text-secondary small d-none d-sm-table-cell">{{ m.format_date(entry.mtime) }}</td>
+                        <td class="fb-actions-col text-end">
+                            <div class="erp-actions justify-content-end">
                                 {% if not entry.is_dir %}
                                 <a href="{{ url_for('lavori.lavoro_cartella_download', lavoro_id=lavoro.id, filename=(subdir + '/' + entry.name) if subdir else entry.name) }}" class="btn btn-sm btn-outline-primary erp-icon-btn" title="Scarica {{ entry.name }}">
                                     <i class="bi bi-download"></i>

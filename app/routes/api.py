@@ -1,6 +1,6 @@
 from datetime import date, datetime, time, timedelta
 
-from flask import Blueprint, g, jsonify, request, url_for
+from flask import Blueprint, g, request, url_for
 
 from ..auth import login_required, role_required
 from ..extensions import db
@@ -27,14 +27,11 @@ from ..models import (
     TASK_STATUSES,
     Task,
 )
+from ..utils.api import api_response
 from ..utils.parsing import parse_optional_date, parse_optional_datetime, parse_optional_id
 
 
 bp = Blueprint("api", __name__)
-
-
-def api_response(success=True, data=None, error=None, status=200):
-    return jsonify({"success": success, "data": data, "error": error}), status
 
 
 def apply_calendar_payload(event, data, partial=False):
@@ -54,8 +51,6 @@ def apply_calendar_payload(event, data, partial=False):
         event.lavoro_id = parse_optional_id(data.get("lavoro_id"))
     if not partial or "task_id" in data:
         event.task_id = parse_optional_id(data.get("task_id"))
-    if not partial or "assigned_user_id" in data:
-        event.assigned_user_id = parse_optional_id(data.get("assigned_user_id"))
 
     if not event.title:
         raise ValueError("Il titolo evento e obbligatorio.")
@@ -127,16 +122,6 @@ def task_due_date_to_calendar_event(task):
         ),
         "task_id": task.id,
         "task": task.to_dict(),
-        "assigned_user_id": task.assignee_id,
-        "assigned_user": (
-            {
-                "id": task.assignee.id,
-                "name": task.assignee.name,
-                "email": task.assignee.email,
-            }
-            if task.assignee
-            else None
-        ),
         "created_at": task.created_at.isoformat() if task.created_at else None,
         "updated_at": task.updated_at.isoformat() if task.updated_at else None,
     }
@@ -222,8 +207,6 @@ def apply_task_payload(task, data, partial=False):
         task.lavoro_id = parse_optional_id(data.get("lavoro_id"))
     if not partial or "cliente_id" in data:
         task.cliente_id = parse_optional_id(data.get("cliente_id"))
-    if not partial or "assignee_id" in data:
-        task.assignee_id = parse_optional_id(data.get("assignee_id"))
 
     if not task.name:
         raise ValueError("Il titolo task e obbligatorio.")
@@ -239,8 +222,8 @@ def apply_task_payload(task, data, partial=False):
 @login_required
 def get_clienti():
     clienti = Cliente.query.all()
-    return jsonify(
-        [
+    return api_response(
+        data=[
             {
                 "id": c.id,
                 "nome": c.name,
@@ -885,8 +868,8 @@ def delete_calendar_event(event_id):
 @login_required
 def get_lavori():
     lavori = Lavoro.query.all()
-    return jsonify(
-        [
+    return api_response(
+        data=[
             {
                 "id": l.id,
                 "descrizione": l.descrizione,
@@ -912,9 +895,11 @@ def get_lavori():
 @bp.get("/api/lavori/get/<int:id>")
 @login_required
 def get_lavoro_byID(id):
-    lavoro = Lavoro.query.get_or_404(id)
-    return jsonify(
-        {
+    lavoro = db.session.get(Lavoro, id)
+    if lavoro is None:
+        return api_response(False, None, "Lavoro non trovato.", 404)
+    return api_response(
+        data={
             "id": lavoro.id,
             "descrizione": lavoro.descrizione,
             "data_inizio": lavoro.data_inizio,
@@ -936,12 +921,14 @@ def get_lavoro_byID(id):
 @bp.get("/api/clienti/get/<int:cliente_id>")
 @login_required
 def get_cliente_byID(cliente_id):
-    c = Cliente.query.get_or_404(cliente_id)
+    c = db.session.get(Cliente, cliente_id)
+    if c is None:
+        return api_response(False, None, "Cliente non trovato.", 404)
     lavori = Lavoro.query.filter_by(cliente_id=cliente_id)
     countLavori = lavori.count()
 
-    return jsonify(
-        {
+    return api_response(
+        data={
             "id": c.id,
             "nome": c.name,
             "ragsoc": c.ragsoc,
@@ -979,9 +966,9 @@ def get_cliente_byID(cliente_id):
 @login_required
 def get_ID_by_name(nome):
     cliente = Cliente.query.filter_by(name=nome).first()
-    id = cliente.id
-    print(id)
-    return jsonify({"id": id})
+    if cliente is None:
+        return api_response(False, None, "Cliente non trovato.", 404)
+    return api_response(data={"id": cliente.id})
 
 
 @bp.get("/api/preventivi/getall")
@@ -999,10 +986,10 @@ def get_preventivi():
             "id": p.id,
             "descrizione": p.descrizione,
             "data": p.data_creazione,
-            "cliente": Cliente.query.filter_by(id=p.cliente_id).first_or_404().name,
+            "cliente": p.cliente.name if p.cliente else None,
             "stato": p.stato,
             "totale_preventivo": p.totale_preventivo,
-            "data_creazione": p.data_creazione.isoformat(),
+            "data_creazione": p.data_creazione.isoformat() if p.data_creazione else None,
             "lavoro": {"id": p.lavoro.id, "descrizione": p.lavoro.descrizione} if p.lavoro else None,
             "source": "erp",
             "pdf_url": None,
@@ -1042,15 +1029,17 @@ def get_preventivi():
             "righe": [],
         })
 
-    return jsonify(result)
+    return api_response(data=result)
 
 
 @bp.get("/api/preventivi/get/<int:id>")
 @login_required
 def get_preventivo_byID(id):
-    preventivo = Preventivo.query.filter_by(id=id).first_or_404()
-    return jsonify(
-        {
+    preventivo = Preventivo.query.filter_by(id=id).first()
+    if preventivo is None:
+        return api_response(False, None, "Preventivo non trovato.", 404)
+    return api_response(
+        data={
             "id": preventivo.id,
             "data": preventivo.data_creazione,
             "stato": preventivo.stato,

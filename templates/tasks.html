@@ -48,33 +48,28 @@
                 <table class="table table-hover my-0 tasks-table">
                     <thead>
                         <tr>
+                            <th class="fw-bold col-prio" style="max-width:150px">Prio</th>
                             <th class="fw-bold col-title">Task</th>
-                            <th class="fw-bold col-pills-cat">Categoria</th>
-                            <th class="fw-bold col-pills">Stato</th>
-                            <th class="fw-bold col-prio">Priorit&agrave;</th>
-                            <th class="fw-bold col-date">Scadenza</th>
                             <th class="fw-bold col-refs mobile-hide">Cliente</th>
                             <th class="fw-bold col-refs mobile-hide">Lavoro</th>
-                            <th class="fw-bold col-actions">Azioni</th>
+                            <th class="fw-bold col-pills">Stato</th>
+                            <th class="fw-bold col-date">Scadenza</th>
+                            <th class="fw-bold col-actions text-end">Azioni</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for task in tasks %}
                         <tr>
+                            <td style="max-width:150px">{% if task.priority %}<span class="priority-indicator priority-{{ task.priority }}"><span class="priority-dot"></span><span class="priority-label">{{ task.priority|labelize }}</span></span>{% else %}-{% endif %}</td>
                             <td>
                                 <a class="fw-bold a-no-color d-block text-truncate" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}">{{ task.name }}</a>
-                                {% if task.note %}
-                                <span class="small text-secondary text-truncate d-block" title="{{ task.note }}">{{ task.note|truncate(80) }}</span>
-                                {% endif %}
                             </td>
-                            <td>{{ erp_badge("task_category", task.category) }}</td>
-                            <td>{{ erp_badge("task_status", task.status) }}</td>
-                            <td>{% if task.priority %}<span class="priority-indicator priority-{{ task.priority }}"><span class="priority-dot"></span><span class="priority-label">{{ task.priority|labelize }}</span></span>{% else %}-{% endif %}</td>
-                            <td>{{ task.due_date|date_it if task.due_date else "-" }}</td>
                             <td class="mobile-hide"><span class="text-truncate d-block">{{ task.cliente.name if task.cliente else "-" }}</span></td>
                             <td class="mobile-hide"><span class="text-truncate d-block">{{ task.lavoro.descrizione if task.lavoro else "-" }}</span></td>
-                            <td>
-                                <div class="erp-actions">
+                            <td>{{ erp_badge("task_status", task.status) }}</td>
+                            <td>{{ task.due_date|date_it if task.due_date else "-" }}</td>
+                            <td class="text-end">
+                                <div class="erp-actions justify-content-end">
                                     {% if can_mutate %}
                                     <a class="btn btn-sm btn-outline-secondary erp-icon-btn" href="{{ url_for('tasks.task_edit', task_id=task.id) }}" aria-label="Modifica">
                                         <i class="bi bi-pencil"></i>
@@ -102,9 +97,6 @@
                     <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                         <div class="min-w-0">
                             <a class="fw-bold a-no-color d-block text-truncate" href="{{ url_for('tasks.task_edit', task_id=task.id) if can_mutate else '#' }}">{{ task.name }}</a>
-                            {% if task.note %}
-                            <span class="small text-secondary text-truncate d-block" title="{{ task.note }}">{{ task.note|truncate(60) }}</span>
-                            {% endif %}
                         </div>
                         <div class="erp-actions">
                             {% if can_mutate %}

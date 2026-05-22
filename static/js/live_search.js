@@ -26,8 +26,9 @@
     dropdown.style.display = "block";
   }
 
-  function render(data) {
-    if (!data.results || data.results.length === 0) {
+  function render(response) {
+    var data = response && response.data;
+    if (!data || !data.categories || data.categories.length === 0) {
       results.innerHTML =
         '<div class="search-dropdown-empty">Nessun risultato</div>';
       footer.style.display = "none";
@@ -35,26 +36,41 @@
       return;
     }
     var html = "";
-    for (var i = 0; i < data.results.length; i++) {
-      var r = data.results[i];
+    for (var ci = 0; ci < data.categories.length; ci++) {
+      var cat = data.categories[ci];
       html +=
-        '<a href="' +
-        escHtml(r.url) +
-        '" class="search-dropdown-item">' +
-        '<div class="search-dropdown-item-icon"><i class="bi ' +
-        escHtml(r.icon) +
-        '"></i></div>' +
-        '<div class="search-dropdown-item-body">' +
-        '<div class="search-dropdown-item-title">' +
-        escHtml(r.label) +
+        '<div class="search-dropdown-category">' +
+        '<div class="search-dropdown-category-header">' +
+        '<i class="bi ' + escHtml(cat.icon) + '"></i>' +
+        "<span>" + escHtml(cat.label) + "</span>" +
+        '<span class="search-dropdown-category-count">' +
+        cat.results.length +
+        "</span>" +
         "</div>";
-      if (r.subtitle) {
+      for (var ri = 0; ri < cat.results.length; ri++) {
+        var r = cat.results[ri];
         html +=
-          '<div class="search-dropdown-item-subtitle">' +
-          escHtml(r.subtitle) +
+          '<a href="' +
+          escHtml(r.url) +
+          '" class="search-dropdown-item">' +
+          '<div class="search-dropdown-item-icon"><i class="bi ' +
+          escHtml(r.icon || cat.icon) +
+          '"></i></div>' +
+          '<div class="search-dropdown-item-body">' +
+          '<div class="search-dropdown-item-title">' +
+          escHtml(r.label) +
           "</div>";
+        if (r.subtitle) {
+          html +=
+            '<div class="search-dropdown-item-subtitle">' +
+            escHtml(r.subtitle) +
+            "</div>";
+        }
+        html += "</div>";
+        html += '<span class="search-dropdown-item-badge">' + escHtml(cat.label) + "</span>";
+        html += "</a>";
       }
-      html += "</div></a>";
+      html += "</div>";
     }
     results.innerHTML = html;
     footer.href = "/search?q=" + encodeURIComponent(input.value);

@@ -1652,7 +1652,7 @@ body.loaded {
   box-shadow: inset 0 0 0 2px rgba(32, 227, 127, 0.25);
 }
 
-.editorial-day-today .fw-bold {
+.editorial-day-today .editorial-day-number {
   color: #111 !important;
   background: var(--app-primary);
   border-radius: 999px;

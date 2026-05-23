@@ -76,7 +76,7 @@
     </div>
 </div>
 {% else %}
-<div class="kanban-wrapper mt-3">
+<div class="kanban-wrapper mt-3{% if can_mutate %} kanban-draggable{% endif %}" data-can-drag="{{ 'true' if can_mutate else 'false' }}">
     <div class="kanban-board">
         {% for column in board %}
         <div class="kanban-column" data-status="{{ column.status }}">
@@ -90,42 +90,49 @@
                 {% if column.tasks %}
                 {% for task in column.tasks %}
                 <div class="kanban-card" data-task-id="{{ task.id }}">
-                    <div class="kanban-card-top">
-                        {% if task.priority %}
-                        <span class="priority-indicator priority-{{ task.priority }}">
-                            <span class="priority-dot"></span>
-                            <span class="priority-label">{{ task.priority | labelize }}</span>
-                        </span>
-                        {% endif %}
-                        {% if task.due_date %}
-                        <span class="kanban-card-date">
-                            <i class="bi bi-calendar3"></i>&nbsp;{{ task.due_date | date_it }}
-                        </span>
-                        {% endif %}
+                    {% if can_mutate %}
+                    <div class="kanban-drag-handle" title="Trascina per spostare">
+                        <i class="bi bi-grip-vertical"></i>
                     </div>
-                    <div class="kanban-card-title">
-                        {% if can_mutate %}
-                        <a href="{{ url_for('tasks.task_edit', task_id=task.id) }}" title="{{ task.name }}">{{ task.name }}</a>
-                        {% else %}
-                        <span class="text-dark" title="{{ task.name }}">{{ task.name }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="kanban-card-meta">
-                        {% if task.category %}
-                        <span class="kanban-card-pill">{{ task.category | labelize }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="kanban-card-footer">
-                        {% if task.cliente %}
-                        <span class="kanban-card-ref" title="{{ task.cliente.name }}">
-                            <i class="bi bi-person"></i>&nbsp;{{ task.cliente.name }}
-                        </span>
-                        {% endif %}
-                        {% if task.lavoro %}
-                        <span class="kanban-card-ref" title="{{ task.lavoro.descrizione }}">
-                            <i class="bi bi-briefcase"></i>&nbsp;{{ task.lavoro.descrizione | truncate(30) }}
-                        </span>
-                        {% endif %}
+                    {% endif %}
+                    <div class="kanban-card-body">
+                        <div class="kanban-card-top">
+                            {% if task.priority %}
+                            <span class="priority-indicator priority-{{ task.priority }}">
+                                <span class="priority-dot"></span>
+                                <span class="priority-label">{{ task.priority | labelize }}</span>
+                            </span>
+                            {% endif %}
+                            {% if task.due_date %}
+                            <span class="kanban-card-date">
+                                <i class="bi bi-calendar3"></i>&nbsp;{{ task.due_date | date_it }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div class="kanban-card-title">
+                            {% if can_mutate %}
+                            <a href="{{ url_for('tasks.task_edit', task_id=task.id) }}" title="{{ task.name }}">{{ task.name }}</a>
+                            {% else %}
+                            <span class="text-dark" title="{{ task.name }}">{{ task.name }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="kanban-card-meta">
+                            {% if task.category %}
+                            <span class="kanban-card-pill">{{ task.category | labelize }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="kanban-card-footer">
+                            {% if task.cliente %}
+                            <span class="kanban-card-ref" title="{{ task.cliente.name }}">
+                                <i class="bi bi-person"></i>&nbsp;{{ task.cliente.name }}
+                            </span>
+                            {% endif %}
+                            {% if task.lavoro %}
+                            <span class="kanban-card-ref" title="{{ task.lavoro.descrizione }}">
+                                <i class="bi bi-briefcase"></i>&nbsp;{{ task.lavoro.descrizione | truncate(30) }}
+                            </span>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
@@ -138,4 +145,10 @@
     </div>
 </div>
 {% endif %}
+{% block scripts %}
+{% if current_user and current_user.role in ("admin", "operatore") %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script src="{{ url_for('static', filename='js/kanban-board.js') }}"></script>
+{% endif %}
+{% endblock %}
 {% endblock %}

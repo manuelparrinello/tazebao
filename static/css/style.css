@@ -3631,6 +3631,79 @@ body.loaded {
   color: #0d6efd;
 }
 
+/* =========================
+   SITUAZIONE OPERATIVA (cliente / lavoro)
+   ========================= */
+
+.situ-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.situ-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  min-width: 90px;
+  padding: 0.7rem 0.6rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 10px;
+  background: #fff;
+  text-decoration: none !important;
+  color: inherit;
+  transition: box-shadow 0.12s ease, transform 0.12s ease;
+}
+
+.situ-item:hover {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+
+.situ-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.situ-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--sidebar-muted);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.situ-item-danger  { border-left: 3px solid #dc3545; }
+.situ-item-danger .situ-value { color: #dc3545; }
+
+.situ-item-warning { border-left: 3px solid #ffc107; }
+.situ-item-warning .situ-value { color: #b8860b; }
+
+.situ-item-info    { border-left: 3px solid #0d6efd; }
+.situ-item-info .situ-value { color: #0d6efd; }
+
+.situ-item-neutral { border-left: 3px solid var(--sidebar-muted); }
+.situ-item-neutral .situ-value { color: var(--sidebar-muted); }
+
+.situ-item-ok      { border-left: 3px solid #198754; }
+.situ-item-ok .situ-value { color: #198754; font-size: 1.1rem; }
+
+@media (max-width: 575.98px) {
+  .situ-item {
+    min-width: 72px;
+    padding: 0.5rem 0.4rem;
+  }
+  .situ-value {
+    font-size: 1.1rem;
+  }
+  .situ-label {
+    font-size: 0.62rem;
+  }
+}
+
 .dashboard-today-da_approvare {
   background: #fff3cd;
   color: #b8860b;

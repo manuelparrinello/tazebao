@@ -1,6 +1,6 @@
 import os
 import shutil
-from datetime import datetime
+from datetime import date, datetime
 
 from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, send_file, url_for
 from werkzeug.utils import secure_filename
@@ -204,6 +204,28 @@ def lavoro_page(lavoro_id):
         .all()
     )
 
+    today = date.today()
+    situazione = {
+        "task_aperte": Task.query.filter(
+            Task.lavoro_id == lavoro_id,
+            Task.status.in_(["da_fare", "in_corso", "in_revisione"]),
+        ).count(),
+        "task_scadute": Task.query.filter(
+            Task.lavoro_id == lavoro_id,
+            Task.due_date.isnot(None),
+            Task.due_date < today,
+            ~Task.status.in_(["completata", "annullata"]),
+        ).count(),
+        "preventivi_collegati": Preventivo.query.filter(
+            Preventivo.lavoro_id == lavoro_id,
+        ).count(),
+        "movimenti_collegati": FinancialMovement.query.filter(
+            FinancialMovement.lavoro_id == lavoro_id,
+        ).count(),
+        "ha_cartella": bool(lavoro.folder_path),
+        "ha_pdf_preventivo": bool(lavoro.preventivo_pdf_path),
+    }
+
     quick_params = {"lavoro_id": lavoro.id}
     if lavoro.cliente_id:
         quick_params["cliente_id"] = lavoro.cliente_id
@@ -230,6 +252,7 @@ def lavoro_page(lavoro_id):
         movimenti=movimenti,
         quick_actions=quick_actions,
         marg=lavoro_marginality(lavoro_id),
+        situazione=situazione,
     )
 
 

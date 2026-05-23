@@ -158,6 +158,33 @@ def cliente_page(cliente_id):
         .all()
     )
 
+    today = date.today()
+    situazione = {
+        "task_aperte": Task.query.filter(
+            Task.cliente_id == cliente_id,
+            Task.status.in_(["da_fare", "in_corso", "in_revisione"]),
+        ).count(),
+        "task_scadute": Task.query.filter(
+            Task.cliente_id == cliente_id,
+            Task.due_date.isnot(None),
+            Task.due_date < today,
+            ~Task.status.in_(["completata", "annullata"]),
+        ).count(),
+        "preventivi_aperti": Preventivo.query.filter(
+            Preventivo.cliente_id == cliente_id,
+            Preventivo.stato.in_(["bozza", "inviato", "in_attesa"]),
+        ).count(),
+        "lavori_attivi": Lavoro.query.filter(
+            Lavoro.cliente_id == cliente_id,
+            Lavoro.stato != "Completato",
+        ).count(),
+        "prossime_pubblicazioni": EditorialPublication.query.filter(
+            EditorialPublication.cliente_id == cliente_id,
+            EditorialPublication.publication_date >= today,
+            ~EditorialPublication.status.in_(["pubblicato", "annullato"]),
+        ).count(),
+    }
+
     quick_actions = {
         "nuovo_lavoro": url_for("nuovo_lavoro", cliente_id=cliente.id),
         "nuovo_task": url_for("tasks.task_new", cliente_id=cliente.id),
@@ -187,6 +214,7 @@ def cliente_page(cliente_id):
         mail_messages=mail_messages,
         quick_actions=quick_actions,
         marg=cliente_marginality(cliente_id),
+        situazione=situazione,
     )
 
 

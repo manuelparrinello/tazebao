@@ -110,20 +110,32 @@ STATUS_LABELS = {
     "annullata": "Annullata",
 }
 
+KNOWN_STATUSES = set(TASK_STATUSES)
+
 
 @bp.get("/tasks/board")
 @login_required
 def tasks_board():
     tasks = Task.query.order_by(Task.updated_at.desc()).all()
     columns = defaultdict(list)
+    unknown_tasks = []
     for task in tasks:
-        columns[task.status].append(task)
+        if task.status in KNOWN_STATUSES:
+            columns[task.status].append(task)
+        else:
+            unknown_tasks.append(task)
     board = []
     for status in TASK_STATUSES:
         board.append({
             "status": status,
             "label": STATUS_LABELS.get(status, status),
             "tasks": columns.get(status, []),
+        })
+    if unknown_tasks:
+        board.append({
+            "status": "altro",
+            "label": "Altro",
+            "tasks": unknown_tasks,
         })
     has_tasks = any(col["tasks"] for col in board)
     return render_template(

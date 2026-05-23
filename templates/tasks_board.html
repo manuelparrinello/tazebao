@@ -2,6 +2,27 @@
 
 {% block title %}Board task{% endblock %}
 
+{% block head %}
+<style>
+.kanban-scroll-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--sidebar-muted);
+  padding: 0.35rem 0;
+  animation: kanban-fade 3s ease-in-out infinite;
+}
+@keyframes kanban-fade {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+@media (min-width: 1200px) {
+  .kanban-scroll-hint { display: none; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
 {% set can_mutate = current_user is defined and current_user is not none and current_user.role in ("admin", "operatore") %}
 
@@ -29,6 +50,13 @@
     </div>
 </div>
 <hr>
+
+{% if has_tasks %}
+<div class="kanban-scroll-hint">
+    <i class="bi bi-arrow-left-right"></i>
+    <span>Scorri orizzontalmente per vedere tutte le colonne</span>
+</div>
+{% endif %}
 
 {% if not has_tasks %}
 <div class="mt-4">
@@ -77,9 +105,9 @@
                     </div>
                     <div class="kanban-card-title">
                         {% if can_mutate %}
-                        <a href="{{ url_for('tasks.task_edit', task_id=task.id) }}">{{ task.name }}</a>
+                        <a href="{{ url_for('tasks.task_edit', task_id=task.id) }}" title="{{ task.name }}">{{ task.name }}</a>
                         {% else %}
-                        <span class="text-dark">{{ task.name }}</span>
+                        <span class="text-dark" title="{{ task.name }}">{{ task.name }}</span>
                         {% endif %}
                     </div>
                     <div class="kanban-card-meta">

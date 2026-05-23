@@ -115,23 +115,22 @@
                     </div>
                     <div class="small text-secondary d-flex flex-wrap gap-2">
                         <span><i class="bi bi-calendar3 me-1"></i>{{ fattura.data_emissione|date_it }}</span>
-                        <span><i class="bi bi-percent me-1"></i>IVA {{ fattura.aliquota_iva or 22 }}%</span>
                         {% if fattura.lavoro %}
                         <span><i class="bi bi-briefcase me-1"></i>{{ fattura.lavoro.descrizione }}</span>
                         {% endif %}
+                    </div>
+                    <div class="mt-2 d-flex gap-2">
                         {% if fattura.pdf_path %}
-                        <a href="{{ url_for('invoices.invoice_pdf', invoice_id=fattura.id) }}" class="btn btn-sm btn-outline-secondary erp-icon-btn" target="_blank">
-                            <i class="bi bi-file-earmark-pdf"></i>
+                        <a href="{{ url_for('invoices.invoice_pdf', invoice_id=fattura.id) }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                            <i class="bi bi-file-earmark-pdf me-1"></i>Scarica
                         </a>
                         {% endif %}
-                    </div>
-                    {% if _can_mutate %}
-                    <div class="mt-2">
+                        {% if _can_mutate %}
                         <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('invoices.invoice_edit', invoice_id=fattura.id) }}">
                             <i class="bi bi-pencil me-1"></i>Modifica
                         </a>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
                 {% endfor %}
             </div>

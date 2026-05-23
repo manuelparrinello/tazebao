@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from datetime import date, timedelta
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
@@ -97,6 +99,40 @@ def tasks():
         statuses=TASK_STATUSES,
         priorities=TASK_PRIORITIES,
         active_filter=filter_name,
+    )
+
+
+STATUS_LABELS = {
+    "da_fare": "Da fare",
+    "in_corso": "In corso",
+    "in_revisione": "In revisione",
+    "completata": "Completata",
+    "annullata": "Annullata",
+}
+
+
+@bp.get("/tasks/board")
+@login_required
+def tasks_board():
+    tasks = Task.query.order_by(Task.updated_at.desc()).all()
+    columns = defaultdict(list)
+    for task in tasks:
+        columns[task.status].append(task)
+    board = []
+    for status in TASK_STATUSES:
+        board.append({
+            "status": status,
+            "label": STATUS_LABELS.get(status, status),
+            "tasks": columns.get(status, []),
+        })
+    has_tasks = any(col["tasks"] for col in board)
+    return render_template(
+        "tasks_board.html",
+        board=board,
+        has_tasks=has_tasks,
+        categories=TASK_CATEGORIES,
+        statuses=TASK_STATUSES,
+        priorities=TASK_PRIORITIES,
     )
 
 

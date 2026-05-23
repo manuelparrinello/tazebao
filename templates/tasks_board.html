@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Board task{% endblock %}
+
+{% block content %}
+{% set can_mutate = current_user is defined and current_user is not none and current_user.role in ("admin", "operatore") %}
+
+<div class="row mx-auto w-100 align-items-start g-3">
+    <div class="col-12 col-xl-7 px-0">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-kanban text-primary fs-3"></i>
+            <div>
+                <h3 class="fw-bolder mb-0">Board task</h3>
+                <p class="text-secondary mb-0 small">Organizzazione visiva delle task ERP per stato.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-5 px-0">
+        <div class="erp-action-bar justify-content-xl-end">
+            <a class="btn btn-outline-secondary erp-action-secondary" href="{{ url_for('tasks.tasks') }}">
+                <i class="bi bi-table me-1"></i>&nbsp;Vista tabella
+            </a>
+            {% if can_mutate %}
+            <a class="btn btn-primary erp-action-primary" href="{{ url_for('tasks.task_new') }}">
+                <i class="bi bi-plus-lg"></i>&nbsp;Nuovo task
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<hr>
+
+{% if not has_tasks %}
+<div class="mt-4">
+    <div class="card rounded-3 border border-light-subtle">
+        <div class="card-body p-4">
+            <div class="text-center py-4">
+                <i class="bi bi-inbox fs-1 text-secondary"></i>
+                <h6 class="fw-bolder mt-3 mb-1">Nessun task trovato</h6>
+                <p class="text-secondary small mb-3">Non ci sono task ERP presenti. Creane uno nuovo per iniziare.</p>
+                {% if can_mutate %}
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('tasks.task_new') }}">
+                    <i class="bi bi-plus-lg me-1"></i>Nuovo task
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="kanban-wrapper mt-3">
+    <div class="kanban-board">
+        {% for column in board %}
+        <div class="kanban-column" data-status="{{ column.status }}">
+            <div class="kanban-column-header kanban-col-{{ column.status }}">
+                <div class="kanban-col-title">
+                    <span>{{ column.label }}</span>
+                    <span class="kanban-col-count">{{ column.tasks | length }}</span>
+                </div>
+            </div>
+            <div class="kanban-cards">
+                {% if column.tasks %}
+                {% for task in column.tasks %}
+                <div class="kanban-card" data-task-id="{{ task.id }}">
+                    <div class="kanban-card-top">
+                        {% if task.priority %}
+                        <span class="priority-indicator priority-{{ task.priority }}">
+                            <span class="priority-dot"></span>
+                            <span class="priority-label">{{ task.priority | labelize }}</span>
+                        </span>
+                        {% endif %}
+                        {% if task.due_date %}
+                        <span class="kanban-card-date">
+                            <i class="bi bi-calendar3"></i>&nbsp;{{ task.due_date | date_it }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="kanban-card-title">
+                        {% if can_mutate %}
+                        <a href="{{ url_for('tasks.task_edit', task_id=task.id) }}">{{ task.name }}</a>
+                        {% else %}
+                        <span class="text-dark">{{ task.name }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="kanban-card-meta">
+                        {% if task.category %}
+                        <span class="kanban-card-pill">{{ task.category | labelize }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="kanban-card-footer">
+                        {% if task.cliente %}
+                        <span class="kanban-card-ref" title="{{ task.cliente.name }}">
+                            <i class="bi bi-person"></i>&nbsp;{{ task.cliente.name }}
+                        </span>
+                        {% endif %}
+                        {% if task.lavoro %}
+                        <span class="kanban-card-ref" title="{{ task.lavoro.descrizione }}">
+                            <i class="bi bi-briefcase"></i>&nbsp;{{ task.lavoro.descrizione | truncate(30) }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="kanban-empty">Nessun task</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

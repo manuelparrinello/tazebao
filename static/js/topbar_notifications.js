@@ -9,7 +9,7 @@
       .then(function (r) {
         var ct = r.headers.get("content-type") || "";
         if (!ct.includes("application/json")) {
-          renderNotifications([]);
+          renderNotifications([], 0);
           return null;
         }
         return r.json();
@@ -17,13 +17,16 @@
       .then(function (payload) {
         if (!payload) return;
         if (!payload.success) return;
-        renderNotifications(payload.data.notifications || []);
+        renderNotifications(
+          payload.data.notifications || [],
+          payload.data.unread_notifications_count
+        );
       })
       .catch(function () {});
   }
 
-  function renderNotifications(notifs) {
-    var count = notifs.length;
+  function renderNotifications(notifs, unreadCount) {
+    var count = unreadCount !== undefined ? unreadCount : notifs.length;
     var badge = document.getElementById("notif-badge");
     var list = document.getElementById("notif-list");
     if (badge) {
@@ -31,7 +34,7 @@
       badge.style.display = count > 0 ? "inline-flex" : "none";
     }
     if (!list) return;
-    if (count === 0) {
+    if (!notifs.length) {
       list.innerHTML =
         '<span class="text-muted small">Nessuna notifica</span>';
       return;
@@ -60,6 +63,20 @@
     var d = document.createElement("div");
     d.appendChild(document.createTextNode(s));
     return d.innerHTML;
+  }
+
+  function markRead() {
+    var badge = document.getElementById("notif-badge");
+    if (!badge || badge.style.display === "none") return;
+    var headers = typeof csrfHeaders === "function" ? csrfHeaders() : {};
+    fetch("/api/notifications/read", { method: "PATCH", headers: headers }).catch(function () {});
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
+
+  var bellBtn = container.querySelector(".topbar-notif-btn");
+  if (bellBtn) {
+    bellBtn.addEventListener("shown.bs.dropdown", markRead);
   }
 
   if (document.readyState === "loading") {

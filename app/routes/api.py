@@ -26,6 +26,7 @@ from ..models import (
     TASK_PRIORITIES,
     TASK_STATUSES,
     Task,
+    User,
 )
 from ..utils.api import api_response
 from ..utils.parsing import parse_optional_date, parse_optional_datetime, parse_optional_id
@@ -248,7 +249,7 @@ def get_notifications():
         Task.query.filter(Task.due_date < today)
         .filter(~Task.status.in_(closed_statuses))
         .order_by(Task.due_date.asc())
-        .limit(10)
+        .limit(15)
         .all()
     )
     for t in overdue:
@@ -259,6 +260,7 @@ def get_notifications():
                 "title": f"Task scaduta: {t.name}",
                 "description": f"Scaduta il {t.due_date.strftime('%d/%m/%Y')}",
                 "url": url_for("tasks.task_edit", task_id=t.id),
+                "_obj": t,
             }
         )
 
@@ -267,7 +269,7 @@ def get_notifications():
         .filter(Task.due_date <= three_days)
         .filter(~Task.status.in_(closed_statuses))
         .order_by(Task.due_date.asc())
-        .limit(10)
+        .limit(15)
         .all()
     )
     for t in due_soon:
@@ -278,6 +280,7 @@ def get_notifications():
                 "title": f"Task in scadenza: {t.name}",
                 "description": f"Scade il {t.due_date.strftime('%d/%m/%Y')}",
                 "url": url_for("tasks.task_edit", task_id=t.id),
+                "_obj": t,
             }
         )
 
@@ -288,7 +291,7 @@ def get_notifications():
             EditorialPublication.status.in_(["programmato", "approvato"]),
         )
         .order_by(EditorialPublication.publication_date.asc())
-        .limit(10)
+        .limit(15)
         .all()
     )
     for p in upcoming_pub:
@@ -302,6 +305,7 @@ def get_notifications():
                 "url": url_for(
                     "editorial_calendar.editorial_edit", publication_id=p.id
                 ),
+                "_obj": p,
             }
         )
 
@@ -311,7 +315,7 @@ def get_notifications():
             db.func.lower(Preventivo.stato).in_(draft_statuses)
         )
         .order_by(Preventivo.data_creazione.desc())
-        .limit(10)
+        .limit(15)
         .all()
     )
     for q in pending_quotes:
@@ -322,13 +326,14 @@ def get_notifications():
                 "title": f"Preventivo da completare: {q.descrizione}",
                 "description": q.cliente.name if q.cliente else "",
                 "url": url_for("preventivi.visualizza_preventivo", id=q.id),
+                "_obj": q,
             }
         )
 
     pending_finance = (
         FinancialMovement.query.filter_by(movement_status="prevista")
         .order_by(FinancialMovement.movement_date.asc())
-        .limit(10)
+        .limit(15)
         .all()
     )
     for m in pending_finance:
@@ -340,10 +345,37 @@ def get_notifications():
                 "title": f"{m.title} ({segno})",
                 "description": f"Previsto il {m.movement_date.strftime('%d/%m/%Y')} - \u20ac{float(m.amount):.2f}",
                 "url": url_for("finance.finance_index"),
+                "_obj": m,
             }
         )
 
-    return notifs[:30]
+    return notifs
+
+_NOTIF_FALLBACK = datetime(2000, 1, 1)
+
+def _notif_sort_key(n):
+    obj = n["_obj"]
+    if isinstance(obj, Preventivo):
+        return obj.data_creazione or _NOTIF_FALLBACK
+    return getattr(obj, "updated_at", None) or _NOTIF_FALLBACK
+
+def _process_notifications(notifs, read_at):
+    unread_count = 0
+    for n in notifs:
+        ts = _notif_sort_key(n)
+        is_unread = read_at is None or ts > read_at
+        if is_unread:
+            unread_count += 1
+        n["_is_unread"] = is_unread
+
+    notifs.sort(key=lambda n: (0 if n["_is_unread"] else 1, -_notif_sort_key(n).timestamp()))
+
+    display = []
+    for n in notifs[:10]:
+        cleaned = {k: v for k, v in n.items() if k not in ("_obj", "_is_unread")}
+        display.append(cleaned)
+
+    return display, unread_count
 
 
 def serialize_dashboard_publication(p):
@@ -469,7 +501,10 @@ def get_dashboard_summary():
             EmailMessage.is_read.is_(False),
         ).count()
 
-        notifications = get_notifications()
+        notifications_raw = get_notifications()
+        current_user_obj = db.session.get(User, g.current_user.id)
+        read_at = current_user_obj.notifications_read_at if current_user_obj else None
+        notifications, unread_notifications_count = _process_notifications(notifications_raw, read_at)
 
         tomorrow = today + timedelta(days=1)
         upcoming_publications = (
@@ -538,6 +573,7 @@ def get_dashboard_summary():
 
         data = {
             "notifications": notifications,
+            "unread_notifications_count": unread_notifications_count,
             "open_task_count": task_open_count,
             "task_due_soon_count": task_due_soon_count,
             "overdue_task_count": overdue_task_count,
@@ -587,6 +623,16 @@ def get_dashboard_summary():
         return api_response(data=data)
     except Exception as e:
         return api_response(False, None, str(e), 500)
+
+
+@bp.patch("/api/notifications/read")
+@login_required
+def mark_notifications_read():
+    user = db.session.get(User, g.current_user.id)
+    if user:
+        user.notifications_read_at = datetime.utcnow()
+        db.session.commit()
+    return api_response(data={"read_at": user.notifications_read_at.isoformat() if user and user.notifications_read_at else None})
 
 
 @bp.get("/api/finance")

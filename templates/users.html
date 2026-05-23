@@ -72,9 +72,8 @@
                             {% endif %}
                             <form action="{{ url_for('users.users_destroy', user_id=user.id) }}" method="post" class="d-inline" data-confirm-title="Elimina utente" data-confirm-danger-label="Elimina definitivamente" data-confirm-message="Questa azione è irreversibile. Eliminare definitivamente l'utente?">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-sm btn-outline-danger users-destroy-btn" {% if current_user and current_user.id == user.id %}disabled title="Non puoi eliminare definitivamente il tuo account"{% endif %} aria-label="Elimina definitivamente">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" {% if current_user and current_user.id == user.id %}disabled title="Non puoi eliminare definitivamente il tuo account"{% endif %} aria-label="Elimina definitivamente">
                                     <i class="bi bi-trash3"></i>
-                                    <span class="users-destroy-label">Elimina definitivamente</span>
                                 </button>
                             </form>
                         </div>

@@ -76,6 +76,11 @@
             </a>
         </div>
         {% endif %}
+        <div class="mt-2 text-end">
+            <a href="{{ url_for('tasks.tasks_board', lavoro_id=lavoro.id) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-kanban me-1"></i>Board task lavoro
+            </a>
+        </div>
     </div>
 </div>
 <hr>

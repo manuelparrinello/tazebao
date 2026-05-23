@@ -125,7 +125,33 @@ KNOWN_STATUSES = set(TASK_STATUSES)
 @bp.get("/tasks/board")
 @login_required
 def tasks_board():
-    tasks = Task.query.order_by(Task.updated_at.desc()).all()
+    cliente_id = parse_optional_id(request.args.get("cliente_id"))
+    lavoro_id = parse_optional_id(request.args.get("lavoro_id"))
+
+    filter_cliente = None
+    filter_lavoro = None
+
+    if lavoro_id is not None:
+        filter_lavoro = db.session.get(Lavoro, lavoro_id)
+        if filter_lavoro is None:
+            lavoro_id = None
+
+    if cliente_id is not None:
+        filter_cliente = db.session.get(Cliente, cliente_id)
+        if filter_cliente is None:
+            cliente_id = None
+
+    if cliente_id and filter_lavoro and filter_lavoro.cliente_id != cliente_id:
+        lavoro_id = None
+        filter_lavoro = None
+
+    query = Task.query.order_by(Task.updated_at.desc())
+    if lavoro_id is not None:
+        query = query.filter_by(lavoro_id=lavoro_id)
+    elif cliente_id is not None:
+        query = query.filter_by(cliente_id=cliente_id)
+
+    tasks = query.all()
     columns = defaultdict(list)
     unknown_tasks = []
     for task in tasks:
@@ -154,6 +180,10 @@ def tasks_board():
         categories=TASK_CATEGORIES,
         statuses=TASK_STATUSES,
         priorities=TASK_PRIORITIES,
+        filter_cliente=filter_cliente,
+        filter_lavoro=filter_lavoro,
+        clienti=Cliente.query.order_by(Cliente.name.asc()).all(),
+        lavori=Lavoro.query.order_by(Lavoro.descrizione.asc()).all(),
     )
 
 

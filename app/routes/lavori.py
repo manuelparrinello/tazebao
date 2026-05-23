@@ -224,6 +224,10 @@ def lavoro_page(lavoro_id):
         ).count(),
         "ha_cartella": bool(lavoro.folder_path),
         "ha_pdf_preventivo": bool(lavoro.preventivo_pdf_path),
+        "preventivi_accettati": Preventivo.query.filter(
+            Preventivo.lavoro_id == lavoro_id,
+            Preventivo.stato == "accettato",
+        ).count(),
     }
 
     quick_params = {"lavoro_id": lavoro.id}

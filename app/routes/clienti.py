@@ -183,6 +183,10 @@ def cliente_page(cliente_id):
             EditorialPublication.publication_date >= today,
             ~EditorialPublication.status.in_(["pubblicato", "annullato"]),
         ).count(),
+        "preventivi_accettati": Preventivo.query.filter(
+            Preventivo.cliente_id == cliente_id,
+            Preventivo.stato == "accettato",
+        ).count(),
     }
 
     quick_actions = {

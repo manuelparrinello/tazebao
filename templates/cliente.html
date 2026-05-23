@@ -171,6 +171,61 @@
 </section>
 
 {% set sit = situazione %}
+
+{% set prev_accettati = sit.preventivi_accettati %}
+{% set has_report = tasks or lavori or preventivi or preventivi_esterni or editorial_publications or movimenti %}
+<section class="mt-4">
+    <div class="card rounded-3 border border-light-subtle">
+        <div class="card-body p-3 p-md-4">
+            <h5 class="fw-bolder mb-0"><i class="bi bi-bar-chart-steps me-2 text-primary"></i>Report operativo</h5>
+            {% if has_report %}
+            <div class="report-list mt-3">
+                {% if sit.task_aperte > 0 or sit.task_scadute > 0 %}
+                <div class="report-item">
+                    <i class="bi bi-list-check report-icon text-primary"></i>
+                    <span class="report-text">Task: <strong>{{ sit.task_aperte }}</strong> aperte, <strong>{{ sit.task_scadute }}</strong> scadute</span>
+                    <a href="{{ url_for('tasks.tasks') }}" class="report-link">Vedi task</a>
+                </div>
+                {% endif %}
+                {% if sit.preventivi_aperti > 0 or prev_accettati > 0 %}
+                <div class="report-item">
+                    <i class="bi bi-receipt report-icon text-primary"></i>
+                    <span class="report-text">Preventivi: <strong>{{ sit.preventivi_aperti }}</strong> aperti, <strong>{{ prev_accettati }}</strong> accettati</span>
+                    <a href="{{ url_for('preventivi') }}" class="report-link">Vedi preventivi</a>
+                </div>
+                {% endif %}
+                {% if editorial_publications %}
+                <div class="report-item">
+                    <i class="bi bi-calendar2-week report-icon text-primary"></i>
+                    <span class="report-text">Prossime pubblicazioni: <strong>{{ editorial_publications|length }}</strong> in programma</span>
+                    <a href="{{ url_for('editorial_calendar.client_calendar', cliente_id=cliente.id) }}" class="report-link">Calendario</a>
+                </div>
+                {% endif %}
+                {% set lavori_attivi = lavori | rejectattr("stato", "equalto", "Completato") | list %}
+                {% if lavori_attivi %}
+                <div class="report-item">
+                    <i class="bi bi-briefcase report-icon text-primary"></i>
+                    <span class="report-text">Lavori attivi: <strong>{{ lavori_attivi|length }}</strong> in corso</span>
+                    <a href="{{ url_for('lavori') }}" class="report-link">Vedi lavori</a>
+                </div>
+                {% endif %}
+                {% set mov_entrate = movimenti | selectattr("movement_type", "equalto", "entrata") | list %}
+                {% set mov_uscite = movimenti | rejectattr("movement_type", "equalto", "entrata") | list %}
+                {% if movimenti %}
+                <div class="report-item">
+                    <i class="bi bi-wallet2 report-icon text-primary"></i>
+                    <span class="report-text">Movimenti: <strong>{{ mov_entrate|length }}</strong> entrate, <strong>{{ mov_uscite|length }}</strong> uscite</span>
+                    <a href="{{ url_for('finance.finance_index') }}" class="report-link">Vedi finanze</a>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="text-secondary small mt-2"><i class="bi bi-info-circle me-1"></i>Nessuna attività recente per questo cliente.</div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
 {% set has_critical = sit.task_aperte > 0 or sit.task_scadute > 0 or sit.preventivi_aperti > 0 or sit.lavori_attivi > 0 or sit.prossime_pubblicazioni > 0 %}
 <section class="mt-4">
     <div class="card rounded-3 border border-light-subtle">

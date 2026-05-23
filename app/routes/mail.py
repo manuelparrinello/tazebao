@@ -341,6 +341,23 @@ def mail_account_edit(account_id):
     )
 
 
+@bp.post("/mail/accounts/<int:account_id>/delete")
+@role_required("admin")
+def mail_account_delete(account_id):
+    account = EmailAccount.query.get_or_404(account_id)
+    try:
+        messages = EmailMessage.query.filter_by(account_id=account.id).all()
+        for msg in messages:
+            db.session.delete(msg)
+        db.session.delete(account)
+        db.session.commit()
+        flash("Account email eliminato con successo.", "success")
+    except Exception:
+        db.session.rollback()
+        flash("Impossibile eliminare l'account. Operazione annullata.", "danger")
+    return redirect(url_for("mail.mail_accounts"))
+
+
 @bp.post("/mail/accounts/<int:account_id>/sync")
 @role_required("admin")
 def mail_account_sync(account_id):

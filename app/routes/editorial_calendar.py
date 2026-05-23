@@ -245,6 +245,8 @@ def current_filter_context(default_cliente_id=None, default_year=None, default_m
         if key not in ("cliente_id", "view")
     }
 
+    month_filter_params = {k: v for k, v in list_query_params.items() if k != "view"}
+
     return {
         "active_cliente_id": active_cliente_id,
         "active_platform": active_platform,
@@ -253,6 +255,7 @@ def current_filter_context(default_cliente_id=None, default_year=None, default_m
         "active_client_approval_status": active_client_approval_status,
         "list_filter_params": list_query_params,
         "calendar_filter_params": calendar_query_params,
+        "month_filter_params": month_filter_params,
     }
 
 
@@ -266,14 +269,7 @@ def editorial_index():
         selected_year = today.year
         selected_month = today.month
 
-    cliente_id = request.args.get("cliente_id", type=int)
-    if cliente_id and request.args.get("view") != "list":
-        return redirect(url_for(
-            "editorial_calendar.client_calendar",
-            cliente_id=cliente_id,
-            year=selected_year,
-            month=selected_month,
-        ))
+    view = request.args.get("view", "month")
 
     publications = (
         apply_publication_filters(EditorialPublication.query)
@@ -285,18 +281,50 @@ def editorial_index():
         default_month=selected_month,
     )
 
-    return render_template(
-        "editorial_calendar.html",
-        view_mode="list",
-        publications=publications,
-        grouped_publications=group_publications_by_day(publications),
-        current_year=selected_year,
-        current_month=selected_month,
-        month_name=MONTH_NAMES[selected_month],
-        months=enumerate(MONTH_NAMES),
+    template_vars = {
+        "view_mode": view,
+        "publications": publications,
+        "grouped_publications": group_publications_by_day(publications),
+        "current_year": selected_year,
+        "current_month": selected_month,
+        "month_name": MONTH_NAMES[selected_month],
+        "months": enumerate(MONTH_NAMES),
+        "cliente": None,
+        "weeks": None,
+        "prev_month_url": None,
+        "next_month_url": None,
         **filter_context,
         **editorial_form_choices(),
-    )
+    }
+
+    if view == "month":
+        cliente_id = filter_context.get("active_cliente_id")
+        grid_start, grid_end = adjacent_month_padding(selected_year, selected_month)
+
+        month_query = EditorialPublication.query
+        if cliente_id:
+            month_query = month_query.filter(EditorialPublication.cliente_id == cliente_id)
+        month_pubs = (
+            month_query
+            .filter(EditorialPublication.publication_date >= grid_start)
+            .filter(EditorialPublication.publication_date <= grid_end)
+            .order_by(EditorialPublication.publication_date.asc(), EditorialPublication.id.asc())
+            .all()
+        )
+        template_vars["weeks"] = build_month_weeks(selected_year, selected_month, month_pubs)
+
+        prev_year, prev_month, next_year, next_month = month_navigation(selected_year, selected_month)
+        nav_params = {}
+        if cliente_id:
+            nav_params["cliente_id"] = cliente_id
+        template_vars["prev_month_url"] = url_for(
+            "editorial_calendar.editorial_index", year=prev_year, month=prev_month, **nav_params
+        )
+        template_vars["next_month_url"] = url_for(
+            "editorial_calendar.editorial_index", year=next_year, month=next_month, **nav_params
+        )
+
+    return render_template("editorial_calendar.html", **template_vars)
 
 
 def adjacent_month_padding(year, month):

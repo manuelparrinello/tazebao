@@ -90,23 +90,23 @@
             </h3>
             {% if view_mode == "calendar" and cliente %}
             <p class="text-secondary mb-0">Piano editoriale mensile per <strong>{{ cliente.name }}</strong>.</p>
+            {% elif view_mode == "month" %}
+            <p class="text-secondary mb-0">Calendario mensile di tutte le pubblicazioni social. Seleziona un cliente per filtrare.</p>
             {% else %}
-            <p class="text-secondary mb-0">Gestisci tutte le pubblicazioni social. Seleziona un cliente per navigare per mese, oppure usa la vista lista con i filtri.</p>
+            <p class="text-secondary mb-0">Gestisci tutte le pubblicazioni social con la vista lista. Seleziona un cliente per filtrare.</p>
             {% endif %}
         </div>
     </div>
     <div class="col-12 col-xl-5 px-0">
         <div class="erp-action-bar justify-content-xl-end">
-            {% if view_mode == "calendar" and cliente %}
+            {% if view_mode == "month" %}
             <a class="btn btn-outline-secondary erp-action-secondary" href="{{ url_for('editorial_calendar.editorial_index', **list_filter_params) }}">
                 <i class="bi bi-list-ul"></i>&nbsp;Vista lista
             </a>
-            {% else %}
-            {% if active_cliente_id %}
-            <a class="btn btn-outline-secondary erp-action-secondary" href="{{ url_for('editorial_calendar.client_calendar', cliente_id=active_cliente_id, **calendar_filter_params) }}">
+            {% elif view_mode == "list" %}
+            <a class="btn btn-outline-secondary erp-action-secondary" href="{{ url_for('editorial_calendar.editorial_index', **month_filter_params) }}">
                 <i class="bi bi-calendar3"></i>&nbsp;Vista mese
             </a>
-            {% endif %}
             {% endif %}
             {% if can_mutate %}
             <a class="btn btn-primary erp-action-primary" href="{{ url_for('editorial_calendar.editorial_new', cliente_id=active_cliente_id) if active_cliente_id else url_for('editorial_calendar.editorial_new') }}">
@@ -118,7 +118,7 @@
 </div>
 <hr>
 
-{% if not active_cliente_id %}
+{% if view_mode == "list" and not active_cliente_id %}
 <section class="mt-4">
     <div class="editorial-no-cliente-card">
         <div class="editorial-no-cliente-icon">
@@ -137,11 +137,11 @@
 </section>
 {% endif %}
 
-{% if view_mode == "calendar" and cliente %}
+{% if view_mode == "month" or (view_mode == "calendar" and cliente) %}
 <section class="mt-4">
     <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-3">
         <div>
-            <h4 class="fw-bolder mb-1">{{ month_name }} {{ current_year }} &middot; {{ cliente.name }}</h4>
+            <h4 class="fw-bolder mb-1">{{ month_name }} {{ current_year }}{% if cliente %} &middot; {{ cliente.name }}{% endif %}</h4>
             <div class="small text-secondary">{{ publications|length }} pubblicazioni nel mese.</div>
         </div>
         <div class="d-inline-flex gap-2">
@@ -261,7 +261,7 @@
                     <div class="small text-secondary">Filtra per cliente, periodo, piattaforma, tipo, stato e approvazione.</div>
                 </div>
                 {% if active_cliente_id %}
-                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('editorial_calendar.client_calendar', cliente_id=active_cliente_id, **calendar_filter_params) }}">
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('editorial_calendar.editorial_index', **month_filter_params) }}">
                     <i class="bi bi-calendar3 me-1"></i>Vista mese
                 </a>
                 {% endif %}

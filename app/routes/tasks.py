@@ -110,6 +110,15 @@ STATUS_LABELS = {
     "annullata": "Annullata",
 }
 
+PRIORITY_SORT = {"urgente": 4, "alta": 3, "media": 2, "bassa": 1}
+
+
+def _priority_sort_key(task):
+    prio = PRIORITY_SORT.get(task.priority, 0)
+    due = task.due_date if task.due_date else date.max
+    return (-prio, due)
+
+
 KNOWN_STATUSES = set(TASK_STATUSES)
 
 
@@ -129,7 +138,7 @@ def tasks_board():
         board.append({
             "status": status,
             "label": STATUS_LABELS.get(status, status),
-            "tasks": columns.get(status, []),
+            "tasks": sorted(columns.get(status, []), key=_priority_sort_key),
         })
     if unknown_tasks:
         board.append({

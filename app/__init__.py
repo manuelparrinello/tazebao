@@ -1,5 +1,6 @@
 import locale
 import os
+import re
 from datetime import date as date_cls, datetime as datetime_cls
 
 from flask import Flask, flash, redirect, request, url_for
@@ -187,6 +188,12 @@ def register_template_filters(app):
         if text:
             return text.replace("\n", "<br>\n")
         return ""
+
+    @app.template_filter("valid_hex_color")
+    def valid_hex_color_filter(value):
+        if value and isinstance(value, str) and re.match(r"^#([0-9a-fA-F]{3}){1,2}$", value):
+            return value
+        return "#cccccc"
 
     def _normalize_badge_key(value):
         if value is None:

@@ -49,17 +49,36 @@
 {% set can_mutate = current_user and current_user.role != "readonly" %}
 {% set publication_platforms = publication.get_platforms() %}
 {% set pill_class = "editorial-mobile-month-pill-multi" if publication_platforms|length > 1 else "editorial-mobile-month-pill-instagram" if "instagram" in publication_platforms else "editorial-mobile-month-pill-facebook" if "facebook" in publication_platforms else "editorial-mobile-month-pill-generic" %}
+{% if publication.cliente %}
+{% set client_color = publication.cliente.colore|valid_hex_color %}
+{% else %}
+{% set client_color = "#cccccc" %}
+{% endif %}
 <a class="editorial-mobile-month-pill {{ pill_class }}" href="{{ url_for('editorial_calendar.editorial_edit', publication_id=publication.id) if can_mutate else '#' }}">
+    <span class="editorial-color-dot editorial-color-dot-sm" style="background-color: {{ client_color }}"></span>
     <span class="editorial-mobile-month-pill-title">{{ publication.title }}</span>
 </a>
 {%- endmacro %}
 
-{% macro publication_card(publication, detailed=false) -%}
+{% macro publication_card(publication, detailed=false, show_client=false) -%}
 {% set can_mutate = current_user and current_user.role != "readonly" %}
 <a class="editorial-calendar-item" href="{{ url_for('editorial_calendar.editorial_edit', publication_id=publication.id) if can_mutate else '#' }}">
     {{ publication_thumb(publication) }}
     <div class="min-w-0 flex-grow-1">
         <div class="fw-bold text-truncate">{{ publication.title }}</div>
+        {% if show_client or detailed %}
+        <div class="editorial-calendar-meta mt-1">
+            <span class="editorial-client-marker">
+                {% if publication.cliente %}
+                <span class="editorial-color-dot" style="background-color: {{ publication.cliente.colore|valid_hex_color }}"></span>
+                <span>{{ publication.cliente.name }}</span>
+                {% else %}
+                <span class="editorial-color-dot" style="background-color: #cccccc"></span>
+                <span class="text-secondary">Senza cliente</span>
+                {% endif %}
+            </span>
+        </div>
+        {% endif %}
         <div class="editorial-calendar-meta mt-1">
             {{ platform_pills(publication) }}
             {{ erp_badge("editorial_content_type", publication.content_type) }}
@@ -70,11 +89,6 @@
             {{ erp_badge("editorial_client_approval", publication.client_approval_status) }}
             {% endif %}
         </div>
-        {% if detailed %}
-        <div class="editorial-calendar-meta mt-1">
-            {% if publication.cliente %}<span class="text-secondary">{{ publication.cliente.name }}</span>{% endif %}
-        </div>
-        {% endif %}
     </div>
 </a>
 {%- endmacro %}
@@ -176,7 +190,7 @@
                         </div>
                         <div class="d-flex flex-column gap-2">
                             {% for publication in day.publications %}
-                            {{ publication_card(publication) }}
+                            {{ publication_card(publication, show_client=true) }}
                             {% endfor %}
                         </div>
                     </div>
@@ -371,7 +385,16 @@
                             <td class="text-center">{{ erp_badge("editorial_content_type", publication.content_type) }}</td>
                             <td class="text-center">{{ erp_badge("editorial_status", publication.status) }}</td>
                             <td class="text-center">{{ erp_badge("editorial_client_approval", publication.client_approval_status) }}</td>
-                            <td class="editorial-td-cliente text-center">{{ publication.cliente.name if publication.cliente else "-" }}</td>
+                            <td class="editorial-td-cliente text-center">
+                                {% if publication.cliente %}
+                                <span class="editorial-client-marker editorial-client-marker-inline">
+                                    <span class="editorial-color-dot" style="background-color: {{ publication.cliente.colore|valid_hex_color }}"></span>
+                                    <span>{{ publication.cliente.name }}</span>
+                                </span>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
                             <td class="text-end">
                                 <div class="erp-actions">
                                     <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('editorial_calendar.editorial_edit', publication_id=publication.id) if can_mutate else '#' }}" aria-label="Modifica">

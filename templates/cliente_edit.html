@@ -50,16 +50,36 @@
                 <section class="erp-form-section">
                     <div class="erp-form-section-heading">
                         <h5>Dati cliente</h5>
-                        <p>Nominativo e preferenze principali.</p>
+                        <p>Nominativo, ragione sociale e indirizzo principale.</p>
                     </div>
                     <div class="row g-3">
-                        <div class="col-12 col-md-6">
-                            <label class="form-label fw-bold" for="nomeCliente">Nominativo</label>
-                            <input name="nomeCliente" type="text" v-model="cliente.nome" class="form-control">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-bold" for="nomeCliente">Nome</label>
+                            <input name="nomeCliente" type="text" v-model="cliente.nome" value="{{ cliente.name }}" class="form-control">
                         </div>
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-bold" for="ragsoc">Ragione Sociale/Intestazione</label>
+                            <input name="ragsoc" type="text" v-model="cliente.ragsoc" value="{{ cliente.ragsoc }}" class="form-control">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-bold" for="indirizzo">Indirizzo</label>
+                            <input name="indirizzo" type="text" v-model="cliente.indirizzo" value="{{ cliente.indirizzo or '' }}" class="form-control">
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-2">
+                            <label class="form-label fw-bold" for="cap">CAP</label>
+                            <input maxlength="5" name="cap" type="text" v-model="cliente.cap" value="{{ cliente.cap or '' }}" class="form-control">
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <label class="form-label fw-bold" for="citta">Città</label>
+                            <input name="citta" type="text" v-model="cliente.citta" value="{{ cliente.citta or '' }}" class="form-control">
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-2">
+                            <label class="form-label fw-bold" for="provincia">Provincia</label>
+                            <input name="provincia" type="text" v-model="cliente.provincia" maxlength="2" value="{{ cliente.provincia or '' }}" class="form-control">
+                        </div>
+                        <div class="col-12 col-md-4">
                             <label class="form-label fw-bold" for="colore">Colore</label>
-                            <input name="colore" type="color" v-model="cliente.colore" class="form-control form-control-color w-100" title="Scegli il colore">
+                            <input name="colore" type="color" v-model="cliente.colore" value="{{ cliente.colore or '#cccccc' }}" class="form-control form-control-color w-100" title="Scegli il colore">
                         </div>
                     </div>
                 </section>
@@ -67,27 +87,48 @@
                 <section class="erp-form-section">
                     <div class="erp-form-section-heading">
                         <h5>Contatti</h5>
-                        <p>Email e telefono di riferimento.</p>
+                        <p>Email, telefono e canali amministrativi.</p>
                     </div>
                     <div class="row g-3">
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-sm-6 col-md-5">
                             <label class="form-label fw-bold" for="email">Email</label>
-                            <input name="email" type="email" v-model="cliente.email" class="form-control">
+                            <input name="email" type="email" v-model="cliente.email" value="{{ cliente.email }}" class="form-control">
                         </div>
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-sm-6 col-md-3">
                             <label class="form-label fw-bold" for="telefono">Telefono</label>
-                            <input name="telefono" type="tel" v-model="cliente.telefono" class="form-control">
+                            <input name="telefono" type="tel" v-model="cliente.telefono" value="{{ cliente.telefono }}" class="form-control">
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <label class="form-label fw-bold" for="pec">PEC</label>
+                            <input name="pec" type="email" v-model="cliente.pec" value="{{ cliente.pec or '' }}" class="form-control">
                         </div>
                     </div>
                 </section>
 
                 <section class="erp-form-section">
                     <div class="erp-form-section-heading">
-                        <h5>Note</h5>
+                        <h5>Dati fiscali</h5>
+                        <p>Informazioni utili a fatturazione e documenti.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <label class="form-label fw-bold" for="p_iva">P.IVA/C.F</label>
+                            <input name="p_iva" type="text" v-model="cliente.p_iva" value="{{ cliente.p_iva or '' }}" class="form-control">
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-2">
+                            <label class="form-label fw-bold" for="sdi">SDI</label>
+                            <input maxlength="7" name="sdi" type="text" v-model="cliente.sdi" value="{{ cliente.sdi or '' }}" class="form-control">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Note e preferenze</h5>
                         <p>Informazioni operative interne sul cliente.</p>
                     </div>
-                    <label class="form-label fw-bold" for="cliente.telefono">Note</label>
-                    <textarea name="note" v-model="cliente.note" class="form-control" rows="5"></textarea>
+                    <label class="form-label fw-bold" for="note">Note</label>
+                    <textarea name="note" v-model="cliente.note" class="form-control" rows="5">{{ cliente.note or '' }}</textarea>
                 </section>
 
                 <div class="erp-form-footer-actions">

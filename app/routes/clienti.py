@@ -283,11 +283,33 @@ def cliente_edit(cliente_id):
         dataFromJS = request.get_json()
         if not dataFromJS:
             return jsonify({"messaggio": "Nessun dato ricevuto"}), 400
-        cliente.name = dataFromJS.get("nomeCliente", cliente.name)
-        cliente.email = dataFromJS.get("email", cliente.email)
-        cliente.telefono = dataFromJS.get("telefono", cliente.telefono)
-        cliente.note = dataFromJS.get("note", cliente.note)
-        cliente.colore = dataFromJS.get("colore", cliente.colore)
+
+        def _strip_invalid(value):
+            if value is None:
+                return ""
+            s = str(value).strip()
+            if s.lower() in ("undefined", "null", "none"):
+                return ""
+            return s
+
+        nomeCliente = _strip_invalid(dataFromJS.get("nomeCliente", ""))
+        if not nomeCliente:
+            return jsonify({"messaggio": "Il nome del cliente non può essere vuoto."}), 400
+
+        cliente.name = nomeCliente
+        cliente.ragsoc = _strip_invalid(dataFromJS.get("ragsoc", cliente.ragsoc)) or cliente.name
+        cliente.email = _strip_invalid(dataFromJS.get("email", cliente.email))
+        cliente.telefono = _strip_invalid(dataFromJS.get("telefono", cliente.telefono))
+        cliente.indirizzo = _strip_invalid(dataFromJS.get("indirizzo", cliente.indirizzo)) or None
+        cliente.cap = _strip_invalid(dataFromJS.get("cap", cliente.cap)) or None
+        cliente.citta = _strip_invalid(dataFromJS.get("citta", cliente.citta)) or None
+        cliente.provincia = _strip_invalid(dataFromJS.get("provincia", cliente.provincia)) or None
+        cliente.p_iva = _strip_invalid(dataFromJS.get("p_iva", cliente.p_iva)) or None
+        cliente.sdi = _strip_invalid(dataFromJS.get("sdi", cliente.sdi)) or None
+        cliente.pec = _strip_invalid(dataFromJS.get("pec", cliente.pec)) or None
+        cliente.note = _strip_invalid(dataFromJS.get("note", cliente.note)) or None
+        colore = _strip_invalid(dataFromJS.get("colore", cliente.colore))
+        cliente.colore = colore if colore else None
         try:
             db.session.commit()
             return (

@@ -21,7 +21,8 @@ const getSingleCliente = Vue.createApp({
         if (!response.ok) {
           throw new Error(`Errore richiesta! (HTTP ${response.status})`);
         }
-        this.cliente = await response.json();
+        const resp = await response.json();
+        this.cliente = resp.data || {};
         console.log(this.cliente.count_lavori);
       } catch (error) {
         this.error = error.message || "Errore imprevisto";
@@ -57,11 +58,23 @@ const getSingleCliente = Vue.createApp({
       e.preventDefault();
       const form = document.querySelector("#editClienteForm");
       const formData = new FormData(form);
-      formData.append("nomeCliente", this.cliente.nome);
-      formData.append("telefono", this.cliente.telefono);
-      formData.append("email", this.cliente.email);
-      formData.append("note", this.cliente.note);
-      formData.append("colore", this.cliente.colore);
+      function safeVal(v) {
+        if (v === undefined || v === null || v === "undefined" || v === "null") return "";
+        return v;
+      }
+      formData.set("nomeCliente", safeVal(this.cliente.nome));
+      formData.set("ragsoc", safeVal(this.cliente.ragsoc));
+      formData.set("telefono", safeVal(this.cliente.telefono));
+      formData.set("email", safeVal(this.cliente.email));
+      formData.set("indirizzo", safeVal(this.cliente.indirizzo));
+      formData.set("cap", safeVal(this.cliente.cap));
+      formData.set("citta", safeVal(this.cliente.citta));
+      formData.set("provincia", safeVal(this.cliente.provincia));
+      formData.set("p_iva", safeVal(this.cliente.p_iva));
+      formData.set("sdi", safeVal(this.cliente.sdi));
+      formData.set("pec", safeVal(this.cliente.pec));
+      formData.set("note", safeVal(this.cliente.note));
+      formData.set("colore", safeVal(this.cliente.colore));
 
       const formDataJSON = {};
       formData.forEach(function (value, key) {

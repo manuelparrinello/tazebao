@@ -15,6 +15,7 @@ bp = Blueprint("invoices", __name__)
 
 INVOICE_STORAGE = "uploads/invoices"
 ALLOWED_EXTENSIONS = {"pdf"}
+PER_PAGE = 10
 
 
 def invoice_form_choices():
@@ -58,21 +59,34 @@ def delete_invoice_pdf(pdf_path):
 
 
 def apply_invoice_form(fattura):
+    fattura.invoice_type = (request.form.get("invoice_type") or "sent")
     fattura.numero = (request.form.get("numero") or "").strip()
-    fattura.cliente_id = parse_optional_id(request.form.get("cliente_id"))
-    fattura.lavoro_id = parse_optional_id(request.form.get("lavoro_id"))
     fattura.data_emissione = parse_optional_date(request.form.get("data_emissione"))
     fattura.data_scadenza = parse_optional_date(request.form.get("data_scadenza"))
     fattura.importo = float(request.form.get("importo") or 0)
     fattura.aliquota_iva = int(request.form.get("aliquota_iva") or 22)
-    fattura.pagato = request.form.get("pagato") == "on"
     fattura.data_pagamento = parse_optional_date(request.form.get("data_pagamento"))
     fattura.note = (request.form.get("note") or "").strip() or None
 
+    if fattura.invoice_type == "sent":
+        fattura.cliente_id = parse_optional_id(request.form.get("cliente_id"))
+        fattura.lavoro_id = parse_optional_id(request.form.get("lavoro_id"))
+        fattura.pagato = request.form.get("pagato") == "on"
+        fattura.fornitore = None
+        fattura.stato_pagamento = None
+    else:
+        fattura.cliente_id = None
+        fattura.lavoro_id = None
+        fattura.pagato = False
+        fattura.fornitore = (request.form.get("fornitore") or "").strip() or None
+        fattura.stato_pagamento = (request.form.get("stato_pagamento") or "da_pagare")
+
     if not fattura.numero:
         raise ValueError("Il numero fattura e obbligatorio.")
-    if not fattura.cliente_id:
+    if fattura.invoice_type == "sent" and not fattura.cliente_id:
         raise ValueError("Il cliente e obbligatorio.")
+    if fattura.invoice_type == "received" and not fattura.fornitore:
+        raise ValueError("Il fornitore e obbligatorio.")
     if not fattura.data_emissione:
         raise ValueError("La data emissione e obbligatoria.")
     if fattura.importo <= 0:
@@ -82,15 +96,23 @@ def apply_invoice_form(fattura):
 @bp.get("/invoices")
 @login_required
 def invoices_index():
-    cliente_id = request.args.get("cliente_id", type=int)
-    query = Fattura.query
-    if cliente_id:
-        query = query.filter_by(cliente_id=cliente_id)
-    fatture = query.order_by(Fattura.data_emissione.desc(), Fattura.id.desc()).all()
+    sent_page = request.args.get("sent_page", 1, type=int)
+    received_page = request.args.get("received_page", 1, type=int)
+
+    sent_query = Fattura.query.filter_by(invoice_type="sent").order_by(
+        Fattura.data_emissione.desc(), Fattura.id.desc()
+    )
+    received_query = Fattura.query.filter_by(invoice_type="received").order_by(
+        Fattura.data_emissione.desc(), Fattura.id.desc()
+    )
+
+    sent_pagination = sent_query.paginate(page=sent_page, per_page=PER_PAGE, error_out=False)
+    received_pagination = received_query.paginate(page=received_page, per_page=PER_PAGE, error_out=False)
+
     return render_template(
         "invoices.html",
-        fatture=fatture,
-        cliente_id=cliente_id,
+        sent_pagination=sent_pagination,
+        received_pagination=received_pagination,
         **invoice_form_choices(),
     )
 
@@ -100,9 +122,11 @@ def invoices_index():
 def invoice_new():
     cliente_id = request.args.get("cliente_id", type=int)
     lavoro_id = request.args.get("lavoro_id", type=int)
+    invoice_type = request.args.get("type") or "sent"
     fattura = Fattura(
-        cliente_id=cliente_id,
-        lavoro_id=lavoro_id,
+        invoice_type=invoice_type,
+        cliente_id=cliente_id if invoice_type == "sent" else None,
+        lavoro_id=lavoro_id if invoice_type == "sent" else None,
         data_emissione=date.today(),
     )
     error = None

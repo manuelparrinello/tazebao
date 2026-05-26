@@ -3,6 +3,38 @@
 
 {% block title %}Fatture{% endblock %}
 
+{% macro pagination_nav(pagination, param_name) %}
+{% if pagination.pages > 1 %}
+<nav aria-label="Paginazione">
+    <ul class="pagination mb-0 justify-content-center">
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+            {% if pagination.has_prev %}
+            <a class="page-link" href="?{{ param_name }}={{ pagination.prev_num }}{% if request.args.get('sent_page') and param_name == 'received_page' %}&sent_page={{ request.args.sent_page }}{% endif %}{% if request.args.get('received_page') and param_name == 'sent_page' %}&received_page={{ request.args.received_page }}{% endif %}"><i class="bi bi-chevron-left"></i></a>
+            {% else %}
+            <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+            {% endif %}
+        </li>
+        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page_num %}
+            <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                <a class="page-link" href="?{{ param_name }}={{ page_num }}{% if request.args.get('sent_page') and param_name == 'received_page' %}&sent_page={{ request.args.sent_page }}{% endif %}{% if request.args.get('received_page') and param_name == 'sent_page' %}&received_page={{ request.args.received_page }}{% endif %}">{{ page_num }}</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+            {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+            {% if pagination.has_next %}
+            <a class="page-link" href="?{{ param_name }}={{ pagination.next_num }}{% if request.args.get('sent_page') and param_name == 'received_page' %}&sent_page={{ request.args.sent_page }}{% endif %}{% if request.args.get('received_page') and param_name == 'sent_page' %}&received_page={{ request.args.received_page }}{% endif %}"><i class="bi bi-chevron-right"></i></a>
+            {% else %}
+            <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+            {% endif %}
+        </li>
+    </ul>
+</nav>
+{% endif %}
+{% endmacro %}
+
 {% block content %}
 {% set _can_mutate = current_user and current_user.role != "readonly" %}
 <div class="row mx-auto w-100 align-items-start g-3">
@@ -11,7 +43,7 @@
             <h3 class="fw-bolder mb-1">
                 <i class="bi bi-receipt-cutoff me-2 text-primary"></i>Fatture
             </h3>
-            <p class="text-secondary mb-0">Archivio fatture clienti.</p>
+            <p class="text-secondary mb-0">Archivio fatture clienti e fornitori.</p>
         </div>
     </div>
     <div class="col-12 col-xl-5 px-0">
@@ -26,8 +58,18 @@
 </div>
 <hr>
 
-{% if fatture %}
+{# ============= FATTURE INVIATE ============= #}
 <div class="mt-5">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="fw-bolder mb-0"><i class="bi bi-arrow-up-right-circle me-2 text-primary"></i>Fatture inviate</h5>
+        {% if _can_mutate and sent_pagination.total > 0 %}
+        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('invoices.invoice_new') }}?type=sent">
+            <i class="bi bi-plus-lg"></i>&nbsp;Nuova
+        </a>
+        {% endif %}
+    </div>
+
+    {% if sent_pagination.items %}
     <div class="card rounded-3 border border-light-subtle" data-mobile-list-clean>
         <div class="card-body p-0 p-md-4">
             <div class="table-responsive d-none d-md-block">
@@ -47,7 +89,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for fattura in fatture %}
+                        {% for fattura in sent_pagination.items %}
                         <tr>
                             <td class="fw-bold text-center">{{ fattura.numero }}</td>
                             <td class="text-start"><span class="text-truncate d-block">{{ fattura.cliente.name if fattura.cliente else "-" }}</span></td>
@@ -97,7 +139,7 @@
             </div>
 
             <div class="d-md-none mobile-list">
-                {% for fattura in fatture %}
+                {% for fattura in sent_pagination.items %}
                 <div class="mobile-list-item">
                     <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                         <div class="min-w-0">
@@ -136,9 +178,14 @@
             </div>
         </div>
     </div>
-</div>
-{% else %}
-<div class="mt-5">
+
+    {% if sent_pagination.pages > 1 %}
+    <div class="d-flex justify-content-center mt-3">
+        {{ pagination_nav(sent_pagination, "sent_page") }}
+    </div>
+    {% endif %}
+
+    {% else %}
     <div class="card rounded-3 border border-light-subtle">
         <div class="card-body p-4">
             <div class="editorial-empty-state">
@@ -146,10 +193,10 @@
                     <i class="bi bi-receipt-cutoff"></i>
                 </div>
                 <div class="editorial-empty-body">
-                    <h6 class="fw-bolder mb-1">Nessuna fattura</h6>
-                    <p class="text-secondary mb-3 small">Non ci sono fatture registrate.</p>
+                    <h6 class="fw-bolder mb-1">Nessuna fattura inviata</h6>
+                    <p class="text-secondary mb-3 small">Non ci sono fatture emesse verso clienti.</p>
                     {% if _can_mutate %}
-                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('invoices.invoice_new') }}">
+                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('invoices.invoice_new') }}?type=sent">
                         <i class="bi bi-plus-lg me-1"></i>Nuova fattura
                     </a>
                     {% endif %}
@@ -157,6 +204,154 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
-{% endif %}
+
+{# ============= FATTURE RICEVUTE ============= #}
+<div class="mt-5">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="fw-bolder mb-0"><i class="bi bi-arrow-down-left-circle me-2 text-danger"></i>Fatture ricevute</h5>
+        {% if _can_mutate and received_pagination.total > 0 %}
+        <a class="btn btn-sm btn-outline-danger" href="{{ url_for('invoices.invoice_new') }}?type=received">
+            <i class="bi bi-plus-lg"></i>&nbsp;Nuova
+        </a>
+        {% endif %}
+    </div>
+
+    {% if received_pagination.items %}
+    <div class="card rounded-3 border border-light-subtle" data-mobile-list-clean>
+        <div class="card-body p-0 p-md-4">
+            <div class="table-responsive d-none d-md-block">
+                <table class="table table-hover my-0">
+                    <thead>
+                        <tr>
+                            <th class="fw-bold text-center" style="width:1%">#</th>
+                            <th class="fw-bold text-start">Fornitore</th>
+                            <th class="fw-bold text-center">Data emissione</th>
+                            <th class="fw-bold text-center">Scadenza</th>
+                            <th class="fw-bold text-end">Importo</th>
+                            <th class="fw-bold text-center">IVA</th>
+                            <th class="fw-bold text-center">Stato</th>
+                            <th class="fw-bold text-center">PDF</th>
+                            <th class="fw-bold text-end">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fattura in received_pagination.items %}
+                        <tr>
+                            <td class="fw-bold text-center">{{ fattura.numero }}</td>
+                            <td class="text-start"><span class="text-truncate d-block">{{ fattura.fornitore }}</span></td>
+                            <td class="text-center">{{ fattura.data_emissione|date_it }}</td>
+                            <td class="text-center">{{ fattura.data_scadenza|date_it if fattura.data_scadenza else "-" }}</td>
+                            <td class="text-end fw-semibold text-danger">{{ m.euro(fattura.importo|float) }}</td>
+                            <td class="text-center text-secondary">{{ fattura.aliquota_iva or 22 }}%</td>
+                            <td class="text-center">
+                                {% if fattura.stato_pagamento == "pagata" %}
+                                <span class="badge rounded-pill text-bg-success erp-badge"><i class="bi bi-check-circle me-1"></i>Pagata</span>
+                                {% elif fattura.stato_pagamento == "scaduta" %}
+                                <span class="badge rounded-pill text-bg-danger erp-badge"><i class="bi bi-exclamation-triangle me-1"></i>Scaduta</span>
+                                {% else %}
+                                <span class="badge rounded-pill text-bg-warning erp-badge"><i class="bi bi-hourglass me-1"></i>Da pagare</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if fattura.pdf_path %}
+                                <a href="{{ url_for('invoices.invoice_pdf', invoice_id=fattura.id) }}" class="btn btn-sm btn-outline-secondary erp-icon-btn" aria-label="Scarica PDF" target="_blank">
+                                    <i class="bi bi-file-earmark-pdf"></i>
+                                </a>
+                                {% else %}
+                                <span class="text-secondary">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="erp-actions justify-content-end">
+                                    {% if _can_mutate %}
+                                    <a class="btn btn-sm btn-outline-secondary erp-icon-btn" href="{{ url_for('invoices.invoice_edit', invoice_id=fattura.id) }}" aria-label="Modifica">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ url_for('invoices.invoice_delete', invoice_id=fattura.id) }}" method="post" class="d-inline" data-confirm-message="Eliminare questa fattura?">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger erp-icon-btn" aria-label="Elimina">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-md-none mobile-list">
+                {% for fattura in received_pagination.items %}
+                <div class="mobile-list-item">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                        <div class="min-w-0">
+                            <div class="fw-bold">{{ fattura.numero }}</div>
+                            <div class="small text-secondary">{{ fattura.fornitore }}</div>
+                        </div>
+                        <div class="text-end flex-shrink-0">
+                            <div class="fw-semibold text-danger">{{ m.euro(fattura.importo|float) }}</div>
+                            {% if fattura.stato_pagamento == "pagata" %}
+                            <span class="badge rounded-pill text-bg-success erp-badge">Pagata</span>
+                            {% elif fattura.stato_pagamento == "scaduta" %}
+                            <span class="badge rounded-pill text-bg-danger erp-badge">Scaduta</span>
+                            {% else %}
+                            <span class="badge rounded-pill text-bg-warning erp-badge">Da pagare</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="small text-secondary d-flex flex-wrap gap-2">
+                        <span><i class="bi bi-calendar3 me-1"></i>{{ fattura.data_emissione|date_it }}</span>
+                        {% if fattura.data_scadenza %}
+                        <span><i class="bi bi-alarm me-1"></i>{{ fattura.data_scadenza|date_it }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="mt-2 d-flex gap-2">
+                        {% if fattura.pdf_path %}
+                        <a href="{{ url_for('invoices.invoice_pdf', invoice_id=fattura.id) }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                            <i class="bi bi-file-earmark-pdf me-1"></i>Scarica
+                        </a>
+                        {% endif %}
+                        {% if _can_mutate %}
+                        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('invoices.invoice_edit', invoice_id=fattura.id) }}">
+                            <i class="bi bi-pencil me-1"></i>Modifica
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% if received_pagination.pages > 1 %}
+    <div class="d-flex justify-content-center mt-3">
+        {{ pagination_nav(received_pagination, "received_page") }}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="card rounded-3 border border-light-subtle">
+        <div class="card-body p-4">
+            <div class="editorial-empty-state">
+                <div class="editorial-empty-icon">
+                    <i class="bi bi-receipt"></i>
+                </div>
+                <div class="editorial-empty-body">
+                    <h6 class="fw-bolder mb-1">Nessuna fattura ricevuta</h6>
+                    <p class="text-secondary mb-3 small">Non ci sono fatture da fornitori registrate.</p>
+                    {% if _can_mutate %}
+                    <a class="btn btn-sm btn-outline-danger" href="{{ url_for('invoices.invoice_new') }}?type=received">
+                        <i class="bi bi-plus-lg me-1"></i>Nuova fattura
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

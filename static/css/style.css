@@ -5377,3 +5377,36 @@ body.loaded {
   .task-priority-dot-unknown { background-color: #adb5bd; }
 }
 
+/* =========================
+   PAGINATION (ERP)
+========================= */
+
+.page-link {
+  border-radius: 8px !important;
+  margin: 0 2px;
+  color: #111;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.page-link:hover {
+  color: var(--app-primary);
+  background-color: #f8f9fa;
+  border-color: var(--app-primary);
+}
+
+.page-item.active .page-link {
+  background-color: var(--app-primary);
+  border-color: var(--app-primary);
+  color: #111;
+}
+
+.page-item.disabled .page-link {
+  color: #adb5bd;
+  pointer-events: none;
+  background-color: #f8f9fa;
+  border-color: rgba(17, 17, 17, 0.08);
+}
+

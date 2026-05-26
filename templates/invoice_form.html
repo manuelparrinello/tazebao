@@ -4,12 +4,20 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
+{% set is_new = not fattura.id %}
+{% set invoice_type = fattura.invoice_type or request.args.get('type', 'sent') %}
 <div class="erp-form-page">
     <div class="erp-form-header">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2">
             <div>
                 <h3 class="fw-bolder erp-form-title">{{ page_title }}</h3>
-                <p class="erp-form-subtitle">Registra una fattura cliente con eventuale allegato PDF.</p>
+                <p class="erp-form-subtitle">
+                    {% if invoice_type == 'received' %}
+                    Registra una fattura ricevuta da un fornitore con eventuale allegato PDF.
+                    {% else %}
+                    Registra una fattura cliente con eventuale allegato PDF.
+                    {% endif %}
+                </p>
             </div>
             <a href="{{ url_for('invoices.invoices_index') }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i>&nbsp;Torna alle fatture
@@ -23,8 +31,32 @@
 
     <form action="{{ form_action }}" method="post" class="erp-boxed-form" data-submit-guard="true" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="invoice_type" value="{{ invoice_type }}">
         <div class="card erp-form-card">
             <div class="card-body p-3 p-md-4">
+                {% if is_new %}
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Tipo fattura</h5>
+                        <p>Seleziona se è una fattura inviata a un cliente o ricevuta da un fornitore.</p>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="invoice_type_selector" id="type_sent" value="sent" {{ 'checked' if invoice_type == 'sent' }}>
+                            <label class="form-check-label fw-bold" for="type_sent">
+                                <i class="bi bi-arrow-up-right-circle text-primary me-1"></i>Fattura inviata (cliente)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="invoice_type_selector" id="type_received" value="received" {{ 'checked' if invoice_type == 'received' }}>
+                            <label class="form-check-label fw-bold" for="type_received">
+                                <i class="bi bi-arrow-down-left-circle text-danger me-1"></i>Fattura ricevuta (fornitore)
+                            </label>
+                        </div>
+                    </div>
+                </section>
+                {% endif %}
+
                 <section class="erp-form-section">
                     <div class="erp-form-section-heading">
                         <h5>Dati fattura</h5>
@@ -57,6 +89,7 @@
                                 <span class="input-group-text">%</span>
                             </div>
                         </div>
+                        {% if invoice_type == 'sent' %}
                         <div class="col-12 col-md-2">
                             <div class="form-check mt-39">
                                 <input class="form-check-input" type="checkbox" id="pagato" name="pagato" {% if fattura.pagato %}checked{% endif %}>
@@ -67,9 +100,38 @@
                             <label for="data_pagamento" class="form-label fw-bold">Data pagamento</label>
                             <input type="date" class="form-control" id="data_pagamento" name="data_pagamento" value="{{ fattura.data_pagamento.isoformat() if fattura.data_pagamento else '' }}">
                         </div>
+                        {% endif %}
                     </div>
                 </section>
 
+                {% if invoice_type == 'received' %}
+                <section class="erp-form-section">
+                    <div class="erp-form-section-heading">
+                        <h5>Fornitore e stato</h5>
+                        <p>Dati del fornitore e stato pagamento della fattura ricevuta.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label for="fornitore" class="form-label fw-bold">Fornitore / Emittente</label>
+                            <input type="text" class="form-control" id="fornitore" name="fornitore" value="{{ fattura.fornitore or '' }}" required>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label for="stato_pagamento" class="form-label fw-bold">Stato pagamento</label>
+                            <select class="form-control form-select" id="stato_pagamento" name="stato_pagamento">
+                                <option value="da_pagare" {{ m.selected(fattura.stato_pagamento or 'da_pagare', 'da_pagare') }}>Da pagare</option>
+                                <option value="pagata" {{ m.selected(fattura.stato_pagamento, 'pagata') }}>Pagata</option>
+                                <option value="scaduta" {{ m.selected(fattura.stato_pagamento, 'scaduta') }}>Scaduta</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label for="data_pagamento" class="form-label fw-bold">Data pagamento</label>
+                            <input type="date" class="form-control" id="data_pagamento" name="data_pagamento" value="{{ fattura.data_pagamento.isoformat() if fattura.data_pagamento else '' }}">
+                        </div>
+                    </div>
+                </section>
+                {% endif %}
+
+                {% if invoice_type == 'sent' %}
                 <section class="erp-form-section">
                     <div class="erp-form-section-heading">
                         <h5>Collegamenti</h5>
@@ -96,11 +158,12 @@
                         </div>
                     </div>
                 </section>
+                {% endif %}
 
                 <section class="erp-form-section">
                     <div class="erp-form-section-heading">
                         <h5>Allegato PDF</h5>
-                        <p>Carica il file PDF della fattura ricevuta.</p>
+                        <p>Carica il file PDF della fattura.</p>
                     </div>
                     <div class="col-12 px-0">
                         <label for="pdf" class="form-label fw-bold">File PDF</label>
@@ -142,28 +205,38 @@
 document.addEventListener('DOMContentLoaded', function () {
     var clienteSelect = document.getElementById('cliente_id');
     var lavoroSelect = document.getElementById('lavoro_id');
-    if (!clienteSelect || !lavoroSelect) return;
+    if (clienteSelect && lavoroSelect) {
+        var lavoroOptions = Array.from(lavoroSelect.options).slice(1);
 
-    var lavoroOptions = Array.from(lavoroSelect.options).slice(1);
+        function filterLavori() {
+            var clienteId = clienteSelect.value;
+            var currentValue = lavoroSelect.value;
+            var hasVisibleOption = false;
 
-    function filterLavori() {
-        var clienteId = clienteSelect.value;
-        var currentValue = lavoroSelect.value;
-        var hasVisibleOption = false;
+            lavoroOptions.forEach(function (opt) {
+                var match = !clienteId || opt.getAttribute('data-cliente-id') === clienteId;
+                opt.style.display = match ? '' : 'none';
+                if (match && opt.value === currentValue) hasVisibleOption = true;
+            });
 
-        lavoroOptions.forEach(function (opt) {
-            var match = !clienteId || opt.getAttribute('data-cliente-id') === clienteId;
-            opt.style.display = match ? '' : 'none';
-            if (match && opt.value === currentValue) hasVisibleOption = true;
-        });
-
-        if (currentValue && !hasVisibleOption) {
-            lavoroSelect.value = '';
+            if (currentValue && !hasVisibleOption) {
+                lavoroSelect.value = '';
+            }
         }
+
+        clienteSelect.addEventListener('change', filterLavori);
+        filterLavori();
     }
 
-    clienteSelect.addEventListener('change', filterLavori);
-    filterLavori();
+    var typeRadios = document.querySelectorAll('input[name="invoice_type_selector"]');
+    if (typeRadios.length) {
+        typeRadios.forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                var baseUrl = '{{ url_for("invoices.invoice_new") }}';
+                window.location.href = baseUrl + '?type=' + this.value;
+            });
+        });
+    }
 });
 </script>
 {% endblock %}

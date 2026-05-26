@@ -415,6 +415,8 @@ class FinancialMovement(db.Model):
     year = db.Column(db.Integer, nullable=False)
     cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=True)
     lavoro_id = db.Column(db.Integer, db.ForeignKey("lavori.id"), nullable=True)
+    source_type = db.Column(db.String(30), nullable=True)
+    source_id = db.Column(db.Integer, nullable=True)
     created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(
@@ -455,6 +457,8 @@ class FinancialMovement(db.Model):
                 if self.lavoro
                 else None
             ),
+            "source_type": self.source_type,
+            "source_id": self.source_id,
             "created_by": self.created_by,
             "creator": (
                 {"id": self.creator.id, "name": self.creator.name, "email": self.creator.email}

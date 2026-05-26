@@ -156,6 +156,72 @@ def delete_financial_movement(movement):
     db.session.delete(movement)
 
 
+def sync_movement_from_received_invoice(invoice):
+    """Create, update, or remove FinancialMovement linked to a received invoice.
+
+    Called after invoice save/update when invoice_type == 'received'.
+    Handles all three cases:
+    - invoice paid (stato_pagamento == 'pagata') → create or update movement
+    - invoice not paid → remove linked movement if auto-generated
+    """
+    from datetime import date as dt_date
+
+    if invoice.invoice_type != "received":
+        return
+
+    existing = FinancialMovement.query.filter_by(
+        source_type="received_invoice",
+        source_id=invoice.id,
+    ).first()
+
+    if invoice.stato_pagamento == "pagata":
+        if existing:
+            _update_movement_from_invoice(existing, invoice)
+        else:
+            _create_movement_from_invoice(invoice)
+    else:
+        if existing:
+            db.session.delete(existing)
+
+
+def _create_movement_from_invoice(invoice):
+    movement_date = invoice.data_pagamento or invoice.data_emissione
+    movement = FinancialMovement(
+        title=f"Pagamento fattura {invoice.numero} - {invoice.fornitore}",
+        description=(
+            f"Pagamento fattura ricevuta n. {invoice.numero} "
+            f"da {invoice.fornitore} "
+            f"- {invoice.note or ''}"
+        ).strip("- ").strip(),
+        movement_type="uscita",
+        movement_status="effettiva",
+        expense_type="variabile",
+        category="fornitore",
+        amount=float(invoice.importo),
+        movement_date=movement_date,
+        month=movement_date.month,
+        year=movement_date.year,
+        source_type="received_invoice",
+        source_id=invoice.id,
+    )
+    db.session.add(movement)
+
+
+def _update_movement_from_invoice(movement, invoice):
+    movement.title = f"Pagamento fattura {invoice.numero} - {invoice.fornitore}"
+    movement.description = (
+        f"Pagamento fattura ricevuta n. {invoice.numero} "
+        f"da {invoice.fornitore} "
+        f"- {invoice.note or ''}"
+    ).strip("- ").strip()
+    movement.amount = float(invoice.importo)
+    movement.movement_date = invoice.data_pagamento or invoice.data_emissione
+    movement.month = movement.movement_date.month
+    movement.year = movement.movement_date.year
+    movement.category = "fornitore"
+    movement.expense_type = "variabile"
+
+
 def cliente_marginality(cliente_id):
     income = (
         db.session.query(func.coalesce(func.sum(FinancialMovement.amount), 0))

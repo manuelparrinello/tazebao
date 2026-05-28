@@ -66,6 +66,8 @@ def apply_invoice_form(fattura):
     fattura.data_scadenza = parse_optional_date(request.form.get("data_scadenza"))
     fattura.importo = float(request.form.get("importo") or 0)
     fattura.aliquota_iva = int(request.form.get("aliquota_iva") or 22)
+    raw_eff = request.form.get("importo_effettivo")
+    fattura.importo_effettivo = float(raw_eff) if raw_eff and raw_eff.strip() else None
     fattura.data_pagamento = parse_optional_date(request.form.get("data_pagamento"))
     fattura.note = (request.form.get("note") or "").strip() or None
 

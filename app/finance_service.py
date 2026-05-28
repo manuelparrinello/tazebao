@@ -156,15 +156,20 @@ def delete_financial_movement(movement):
     db.session.delete(movement)
 
 
-def invoice_gross_amount(invoice):
-    """Calcola il totale lordo IVA inclusa di una fattura.
+def invoice_effective_amount(invoice):
+    """Importo effettivamente incassato/pagato per una fattura.
 
-    Fattura.importo e' l'imponibile (IVA esclusa) inserito dall'utente.
-    Il lordo e' usato per i movimenti finance per rappresentare
-    il cash flow reale dell'azienda.
+    Usato per i movimenti finance per rappresentare il cash flow reale.
 
-    Formula: importo * (1 + aliquota_iva / 100)
+    - Se importo_effettivo e' impostato, ritorna quello (gestisce
+      ritenute, acconti, pagamenti parziali, note credito).
+    - Altrimenti calcola il totale lordo IVA inclusa:
+      importo * (1 + aliquota_iva / 100)
+
+    Fattura.importo e' l'imponibile (IVA esclusa).
     """
+    if invoice.importo_effettivo is not None:
+        return Decimal(str(invoice.importo_effettivo)).quantize(Decimal("0.01"))
     net = Decimal(str(invoice.importo or 0))
     iva = Decimal(str(invoice.aliquota_iva or 0))
     return (net * (Decimal(1) + iva / Decimal(100))).quantize(Decimal("0.01"))
@@ -211,7 +216,7 @@ def _create_movement_from_invoice(invoice):
         movement_status="effettiva",
         expense_type="variabile",
         category="fornitore",
-        amount=float(invoice_gross_amount(invoice)),
+        amount=float(invoice_effective_amount(invoice)),
         movement_date=movement_date,
         month=movement_date.month,
         year=movement_date.year,
@@ -228,7 +233,7 @@ def _update_movement_from_invoice(movement, invoice):
         f"da {invoice.fornitore} "
         f"- {invoice.note or ''}"
     ).strip("- ").strip()
-    movement.amount = float(invoice_gross_amount(invoice))
+    movement.amount = float(invoice_effective_amount(invoice))
     movement.movement_date = invoice.data_pagamento or invoice.data_emissione
     movement.month = movement.movement_date.month
     movement.year = movement.movement_date.year
@@ -275,7 +280,7 @@ def _create_movement_from_sent_invoice(invoice):
         movement_type="entrata",
         movement_status="effettiva",
         category="pagamento_cliente",
-        amount=float(invoice_gross_amount(invoice)),
+        amount=float(invoice_effective_amount(invoice)),
         movement_date=movement_date,
         month=movement_date.month,
         year=movement_date.year,
@@ -295,7 +300,7 @@ def _update_movement_from_sent_invoice(movement, invoice):
         f"- {cliente_name} "
         f"- {invoice.note or ''}"
     ).strip("- ").strip()
-    movement.amount = float(invoice_gross_amount(invoice))
+    movement.amount = float(invoice_effective_amount(invoice))
     movement.movement_date = invoice.data_pagamento or invoice.data_emissione
     movement.month = movement.movement_date.month
     movement.year = movement.movement_date.year

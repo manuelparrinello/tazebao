@@ -716,6 +716,7 @@ class Fattura(db.Model):
     data_scadenza = db.Column(db.Date, nullable=True)
     importo = db.Column(db.Numeric(12, 2), nullable=False)
     aliquota_iva = db.Column(db.Integer, nullable=False, default=22)
+    importo_effettivo = db.Column(db.Numeric(12, 2), nullable=True)
     pagato = db.Column(db.Boolean, nullable=False, default=False)
     stato_pagamento = db.Column(db.String(20), nullable=True)
     data_pagamento = db.Column(db.Date, nullable=True)
@@ -731,6 +732,12 @@ class Fattura(db.Model):
 
     cliente = db.relationship("Cliente", backref="fatture")
     lavoro = db.relationship("Lavoro", backref="fatture")
+
+    @property
+    def effective_amount(self):
+        if self.importo_effettivo is not None:
+            return float(self.importo_effettivo)
+        return float(self.importo) * (1 + (self.aliquota_iva or 0) / 100)
 
 
 class MoodboardImage(db.Model):

@@ -91,7 +91,6 @@
                     </thead>
                     <tbody>
                         {% for fattura in sent_pagination.items %}
-                        {% set totale_sent = (fattura.importo|float * (1 + (fattura.aliquota_iva or 22) / 100)) | round(2) %}
                         <tr>
                             <td class="fw-bold text-center">{{ fattura.numero }}</td>
                             <td class="text-start"><span class="text-truncate d-block">{{ fattura.cliente.name if fattura.cliente else "-" }}</span></td>
@@ -100,7 +99,7 @@
                             <td class="text-center">{{ fattura.data_scadenza|date_it if fattura.data_scadenza else "-" }}</td>
                             <td class="text-end fw-semibold">{{ m.euro(fattura.importo|float) }}</td>
                             <td class="text-center text-secondary">{{ fattura.aliquota_iva or 22 }}%</td>
-                            <td class="text-end fw-semibold {% if fattura.pagato %}text-success{% else %}text-danger{% endif %}">{{ m.euro(totale_sent) }}</td>
+                            <td class="text-end fw-semibold {% if fattura.pagato %}text-success{% else %}text-danger{% endif %}">{{ m.euro(fattura.effective_amount) }}</td>
                             <td class="text-center text-secondary">{{ fattura.aliquota_iva or 22 }}%</td>
                             <td class="text-center">
                                 {% if fattura.pagato %}
@@ -149,7 +148,6 @@
 
             <div class="d-md-none mobile-list">
                 {% for fattura in sent_pagination.items %}
-                {% set totale_sent = (fattura.importo|float * (1 + (fattura.aliquota_iva or 22) / 100)) | round(2) %}
                 <div class="mobile-list-item">
                     <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                         <div class="min-w-0">
@@ -158,7 +156,7 @@
                         </div>
                         <div class="text-end flex-shrink-0">
                             <div class="small text-secondary">Imponibile {{ m.euro(fattura.importo|float) }}</div>
-                            <div class="fw-semibold {% if fattura.pagato %}text-success{% else %}text-danger{% endif %}">{{ m.euro(totale_sent) }}</div>
+                            <div class="fw-semibold {% if fattura.pagato %}text-success{% else %}text-danger{% endif %}">{{ m.euro(fattura.effective_amount) }}</div>
                             {% if fattura.pagato %}
                             <span class="badge rounded-pill text-bg-success erp-badge">Pagata</span>
                             {% else %}
@@ -253,7 +251,6 @@
                     </thead>
                     <tbody>
                         {% for fattura in received_pagination.items %}
-                        {% set totale_recv = (fattura.importo|float * (1 + (fattura.aliquota_iva or 22) / 100)) | round(2) %}
                         <tr>
                             <td class="fw-bold text-center">{{ fattura.numero }}</td>
                             <td class="text-start"><span class="text-truncate d-block">{{ fattura.fornitore }}</span></td>
@@ -261,7 +258,7 @@
                             <td class="text-center">{{ fattura.data_scadenza|date_it if fattura.data_scadenza else "-" }}</td>
                             <td class="text-end fw-semibold">{{ m.euro(fattura.importo|float) }}</td>
                             <td class="text-center text-secondary">{{ fattura.aliquota_iva or 22 }}%</td>
-                            <td class="text-end fw-semibold text-danger">{{ m.euro(totale_recv) }}</td>
+                            <td class="text-end fw-semibold text-danger">{{ m.euro(fattura.effective_amount) }}</td>
                             <td class="text-center text-secondary">{{ fattura.aliquota_iva or 22 }}%</td>
                             <td class="text-center">
                                 {% if fattura.stato_pagamento == "pagata" %}
@@ -304,7 +301,6 @@
 
             <div class="d-md-none mobile-list">
                 {% for fattura in received_pagination.items %}
-                {% set totale_recv = (fattura.importo|float * (1 + (fattura.aliquota_iva or 22) / 100)) | round(2) %}
                 <div class="mobile-list-item">
                     <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                         <div class="min-w-0">
@@ -313,7 +309,7 @@
                         </div>
                         <div class="text-end flex-shrink-0">
                             <div class="small text-secondary">Imponibile {{ m.euro(fattura.importo|float) }}</div>
-                            <div class="fw-semibold text-danger">{{ m.euro(totale_recv) }}</div>
+                            <div class="fw-semibold text-danger">{{ m.euro(fattura.effective_amount) }}</div>
                             {% if fattura.stato_pagamento == "pagata" %}
                             <span class="badge rounded-pill text-bg-success erp-badge">Pagata</span>
                             {% elif fattura.stato_pagamento == "scaduta" %}

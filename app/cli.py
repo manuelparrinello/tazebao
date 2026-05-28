@@ -36,7 +36,7 @@ def register_cli(app):
     def migrate_finance_gross():
         """Aggiorna i movimenti finance auto-generati da fatture all'importo
         lordo IVA inclusa. Non modifica movimenti manuali."""
-        from .finance_service import invoice_gross_amount
+        from .finance_service import invoice_effective_amount
 
         source_types = ("sent_invoice", "received_invoice")
         movements = FinancialMovement.query.filter(
@@ -56,10 +56,10 @@ def register_cli(app):
                 skipped += 1
                 continue
             try:
-                gross = invoice_gross_amount(fattura)
-                if mov.amount != gross:
+                effective = invoice_effective_amount(fattura)
+                if mov.amount != effective:
                     old = mov.amount
-                    mov.amount = gross
+                    mov.amount = effective
                     click.echo(
                         f"  AGGIORNATO movimento {mov.id} "
                         f"({mov.source_type} fattura {fattura.id}): "

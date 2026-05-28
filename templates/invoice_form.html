@@ -75,19 +75,27 @@
                             <label for="data_scadenza" class="form-label fw-bold">Data scadenza</label>
                             <input type="date" class="form-control" id="data_scadenza" name="data_scadenza" value="{{ fattura.data_scadenza.isoformat() if fattura.data_scadenza else '' }}">
                         </div>
-                        <div class="col-12 col-md-4">
-                            <label for="importo" class="form-label fw-bold">Importo IVA esclusa</label>
+                        <div class="col-12 col-md-3">
+                            <label for="importo" class="form-label fw-bold">Imponibile</label>
                             <div class="input-group">
                                 <input type="number" min="0.01" step="0.01" class="form-control" id="importo" name="importo" value="{{ fattura.importo or '' }}" required>
                                 <span class="input-group-text">&euro;</span>
                             </div>
                         </div>
                         <div class="col-12 col-md-2">
-                            <label for="aliquota_iva" class="form-label fw-bold">Aliquota IVA</label>
+                            <label for="aliquota_iva" class="form-label fw-bold">IVA</label>
                             <div class="input-group">
                                 <input type="number" min="0" max="100" class="form-control" id="aliquota_iva" name="aliquota_iva" value="{{ fattura.aliquota_iva or 22 }}">
                                 <span class="input-group-text">%</span>
                             </div>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label for="importo_effettivo" class="form-label fw-bold">Importo effettivo <span class="text-secondary fw-normal">(opzionale)</span></label>
+                            <div class="input-group">
+                                <input type="number" min="0" step="0.01" class="form-control" id="importo_effettivo" name="importo_effettivo" value="{{ fattura.importo_effettivo or '' }}" placeholder="Lordo se vuoto">
+                                <span class="input-group-text">&euro;</span>
+                            </div>
+                            <div class="form-text">Se vuoto, viene usato il totale lordo IVA inclusa.</div>
                         </div>
                         {% if invoice_type == 'sent' %}
                         <div class="col-12 col-md-2">

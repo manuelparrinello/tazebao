@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 
 from ..auth import login_required, role_required
 from ..extensions import db
-from ..finance_service import sync_movement_from_received_invoice
+from ..finance_service import sync_movement_from_received_invoice, sync_movement_from_sent_invoice
 from ..models import Cliente, Fattura, FinancialMovement, Lavoro
 from ..utils.parsing import parse_optional_date, parse_optional_id
 
@@ -111,6 +111,7 @@ def invoices_index():
     received_pagination = received_query.paginate(page=received_page, per_page=PER_PAGE, error_out=False)
 
     received_ids = [f.id for f in received_pagination.items]
+    sent_ids = [f.id for f in sent_pagination.items]
     linked_movement_ids = set()
     if received_ids:
         rows = FinancialMovement.query.with_entities(
@@ -119,7 +120,15 @@ def invoices_index():
             FinancialMovement.source_type == "received_invoice",
             FinancialMovement.source_id.in_(received_ids),
         ).all()
-        linked_movement_ids = {r[0] for r in rows}
+        linked_movement_ids.update(r[0] for r in rows)
+    if sent_ids:
+        rows = FinancialMovement.query.with_entities(
+            FinancialMovement.source_id
+        ).filter(
+            FinancialMovement.source_type == "sent_invoice",
+            FinancialMovement.source_id.in_(sent_ids),
+        ).all()
+        linked_movement_ids.update(r[0] for r in rows)
 
     return render_template(
         "invoices.html",
@@ -154,6 +163,8 @@ def invoice_new():
             db.session.flush()
             if fattura.invoice_type == "received":
                 sync_movement_from_received_invoice(fattura)
+            elif fattura.invoice_type == "sent":
+                sync_movement_from_sent_invoice(fattura)
             db.session.commit()
             flash("Fattura creata con successo.", "success")
             return redirect(url_for("invoices.invoices_index"))
@@ -190,6 +201,8 @@ def invoice_edit(invoice_id):
             db.session.flush()
             if fattura.invoice_type == "received":
                 sync_movement_from_received_invoice(fattura)
+            elif fattura.invoice_type == "sent":
+                sync_movement_from_sent_invoice(fattura)
             db.session.commit()
             flash("Fattura aggiornata con successo.", "success")
             return redirect(url_for("invoices.invoices_index"))
@@ -213,9 +226,9 @@ def invoice_edit(invoice_id):
 def invoice_delete(invoice_id):
     fattura = Fattura.query.get_or_404(invoice_id)
     try:
-        linked = FinancialMovement.query.filter_by(
-            source_type="received_invoice",
-            source_id=fattura.id,
+        linked = FinancialMovement.query.filter(
+            FinancialMovement.source_id == fattura.id,
+            FinancialMovement.source_type.in_(["received_invoice", "sent_invoice"]),
         ).first()
         if linked:
             db.session.delete(linked)

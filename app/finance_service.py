@@ -156,6 +156,20 @@ def delete_financial_movement(movement):
     db.session.delete(movement)
 
 
+def invoice_gross_amount(invoice):
+    """Calcola il totale lordo IVA inclusa di una fattura.
+
+    Fattura.importo e' l'imponibile (IVA esclusa) inserito dall'utente.
+    Il lordo e' usato per i movimenti finance per rappresentare
+    il cash flow reale dell'azienda.
+
+    Formula: importo * (1 + aliquota_iva / 100)
+    """
+    net = Decimal(str(invoice.importo or 0))
+    iva = Decimal(str(invoice.aliquota_iva or 0))
+    return (net * (Decimal(1) + iva / Decimal(100))).quantize(Decimal("0.01"))
+
+
 def sync_movement_from_received_invoice(invoice):
     """Create, update, or remove FinancialMovement linked to a received invoice.
 
@@ -197,7 +211,7 @@ def _create_movement_from_invoice(invoice):
         movement_status="effettiva",
         expense_type="variabile",
         category="fornitore",
-        amount=float(invoice.importo),
+        amount=float(invoice_gross_amount(invoice)),
         movement_date=movement_date,
         month=movement_date.month,
         year=movement_date.year,
@@ -214,12 +228,88 @@ def _update_movement_from_invoice(movement, invoice):
         f"da {invoice.fornitore} "
         f"- {invoice.note or ''}"
     ).strip("- ").strip()
-    movement.amount = float(invoice.importo)
+    movement.amount = float(invoice_gross_amount(invoice))
     movement.movement_date = invoice.data_pagamento or invoice.data_emissione
     movement.month = movement.movement_date.month
     movement.year = movement.movement_date.year
     movement.category = "fornitore"
     movement.expense_type = "variabile"
+
+
+def sync_movement_from_sent_invoice(invoice):
+    """Create, update, or remove FinancialMovement linked to a sent invoice.
+
+    Called after invoice save/update when invoice_type == 'sent'.
+    Handles all three cases:
+    - invoice paid (pagato == True) -> create or update movement
+    - invoice not paid -> remove linked movement if auto-generated
+    """
+    if invoice.invoice_type != "sent":
+        return
+
+    existing = FinancialMovement.query.filter_by(
+        source_type="sent_invoice",
+        source_id=invoice.id,
+    ).first()
+
+    if invoice.pagato:
+        if existing:
+            _update_movement_from_sent_invoice(existing, invoice)
+        else:
+            _create_movement_from_sent_invoice(invoice)
+    else:
+        if existing:
+            db.session.delete(existing)
+
+
+def _create_movement_from_sent_invoice(invoice):
+    movement_date = invoice.data_pagamento or invoice.data_emissione
+    cliente_name = invoice.cliente.name if invoice.cliente else ""
+    movement = FinancialMovement(
+        title=f"Pagamento fattura cliente n. {invoice.numero} - {cliente_name}",
+        description=(
+            f"Pagamento fattura cliente n. {invoice.numero} "
+            f"- {cliente_name} "
+            f"- {invoice.note or ''}"
+        ).strip("- ").strip(),
+        movement_type="entrata",
+        movement_status="effettiva",
+        category="pagamento_cliente",
+        amount=float(invoice_gross_amount(invoice)),
+        movement_date=movement_date,
+        month=movement_date.month,
+        year=movement_date.year,
+        cliente_id=invoice.cliente_id,
+        lavoro_id=invoice.lavoro_id,
+        source_type="sent_invoice",
+        source_id=invoice.id,
+    )
+    db.session.add(movement)
+
+
+def _update_movement_from_sent_invoice(movement, invoice):
+    cliente_name = invoice.cliente.name if invoice.cliente else ""
+    movement.title = f"Pagamento fattura cliente n. {invoice.numero} - {cliente_name}"
+    movement.description = (
+        f"Pagamento fattura cliente n. {invoice.numero} "
+        f"- {cliente_name} "
+        f"- {invoice.note or ''}"
+    ).strip("- ").strip()
+    movement.amount = float(invoice_gross_amount(invoice))
+    movement.movement_date = invoice.data_pagamento or invoice.data_emissione
+    movement.month = movement.movement_date.month
+    movement.year = movement.movement_date.year
+    movement.cliente_id = invoice.cliente_id
+    movement.lavoro_id = invoice.lavoro_id
+    movement.category = "pagamento_cliente"
+
+
+# I movimenti finance utilizzano importi IVA inclusa (lordi) per
+# rappresentare il cash flow reale. Le funzioni di marginalita' che seguono
+# leggono anch'esse da FinancialMovement.amount pertanto riflettono i valori
+# lordi. L'IVA non rappresenta un ricavo o un costo aziendale ma un flusso
+# fiscale separato; nel contesto della marginalita' i valori lordi sono
+# accettati perche' il sistema e' orientato al cash flow reale.
 
 
 def cliente_marginality(cliente_id):

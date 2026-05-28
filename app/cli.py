@@ -2,7 +2,7 @@ import click
 from flask.cli import with_appcontext
 
 from .extensions import db
-from .models import User
+from .models import Fattura, FinancialMovement, User
 
 
 def register_cli(app):
@@ -30,3 +30,50 @@ def register_cli(app):
         db.session.add(user)
         db.session.commit()
         click.echo(f"Admin creato: {email}")
+
+    @app.cli.command("migrate-finance-gross")
+    @with_appcontext
+    def migrate_finance_gross():
+        """Aggiorna i movimenti finance auto-generati da fatture all'importo
+        lordo IVA inclusa. Non modifica movimenti manuali."""
+        from .finance_service import invoice_gross_amount
+
+        source_types = ("sent_invoice", "received_invoice")
+        movements = FinancialMovement.query.filter(
+            FinancialMovement.source_type.in_(source_types)
+        ).all()
+
+        updated = 0
+        skipped = 0
+        errors = 0
+
+        for mov in movements:
+            fattura = Fattura.query.get(mov.source_id)
+            if not fattura:
+                click.echo(
+                    f"  SKIP movimento {mov.id}: fattura {mov.source_id} non trovata"
+                )
+                skipped += 1
+                continue
+            try:
+                gross = invoice_gross_amount(fattura)
+                if mov.amount != gross:
+                    old = mov.amount
+                    mov.amount = gross
+                    click.echo(
+                        f"  AGGIORNATO movimento {mov.id} "
+                        f"({mov.source_type} fattura {fattura.id}): "
+                        f"{old} -> {gross}"
+                    )
+                    updated += 1
+                else:
+                    skipped += 1
+            except Exception as e:
+                click.echo(f"  ERRORE movimento {mov.id}: {e}")
+                errors += 1
+
+        db.session.commit()
+        click.echo(
+            f"\nFatto: {updated} aggiornati, "
+            f"{skipped} invariati, {errors} errori"
+        )

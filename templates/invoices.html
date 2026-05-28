@@ -81,8 +81,9 @@
                             <th class="fw-bold text-start">Lavoro</th>
                             <th class="fw-bold text-center">Data emissione</th>
                             <th class="fw-bold text-center">Scadenza</th>
-                            <th class="fw-bold text-end">Importo</th>
+                            <th class="fw-bold text-end">Imponibile</th>
                             <th class="fw-bold text-center">IVA</th>
+                            <th class="fw-bold text-end">Totale</th>
                             <th class="fw-bold text-center">Stato</th>
                             <th class="fw-bold text-center">PDF</th>
                             <th class="fw-bold text-end">Azioni</th>
@@ -90,13 +91,16 @@
                     </thead>
                     <tbody>
                         {% for fattura in sent_pagination.items %}
+                        {% set totale_sent = (fattura.importo|float * (1 + (fattura.aliquota_iva or 22) / 100)) | round(2) %}
                         <tr>
                             <td class="fw-bold text-center">{{ fattura.numero }}</td>
                             <td class="text-start"><span class="text-truncate d-block">{{ fattura.cliente.name if fattura.cliente else "-" }}</span></td>
                             <td class="text-start"><span class="text-truncate d-block">{{ fattura.lavoro.descrizione if fattura.lavoro else "-" }}</span></td>
                             <td class="text-center">{{ fattura.data_emissione|date_it }}</td>
                             <td class="text-center">{{ fattura.data_scadenza|date_it if fattura.data_scadenza else "-" }}</td>
-                            <td class="text-end fw-semibold {% if fattura.pagato %}text-success{% else %}text-danger{% endif %}">{{ m.euro(fattura.importo|float) }}</td>
+                            <td class="text-end fw-semibold">{{ m.euro(fattura.importo|float) }}</td>
+                            <td class="text-center text-secondary">{{ fattura.aliquota_iva or 22 }}%</td>
+                            <td class="text-end fw-semibold {% if fattura.pagato %}text-success{% else %}text-danger{% endif %}">{{ m.euro(totale_sent) }}</td>
                             <td class="text-center text-secondary">{{ fattura.aliquota_iva or 22 }}%</td>
                             <td class="text-center">
                                 {% if fattura.pagato %}
@@ -106,6 +110,11 @@
                                 {% endif %}
                                 {% if fattura.data_pagamento %}
                                 <div class="small text-secondary mt-1">{{ fattura.data_pagamento|date_it }}</div>
+                                {% endif %}
+                                {% if fattura.id in linked_movement_ids %}
+                                <div class="mt-1">
+                                    <a href="{{ url_for('finance.finance_index', year=fattura.data_pagamento.year if fattura.data_pagamento else fattura.data_emissione.year, month=fattura.data_pagamento.month if fattura.data_pagamento else fattura.data_emissione.month) }}" class="badge rounded-pill text-bg-info erp-badge text-decoration-none"><i class="bi bi-cash-coin me-1"></i>Incasso registrato</a>
+                                </div>
                                 {% endif %}
                             </td>
                             <td class="text-center">
@@ -140,6 +149,7 @@
 
             <div class="d-md-none mobile-list">
                 {% for fattura in sent_pagination.items %}
+                {% set totale_sent = (fattura.importo|float * (1 + (fattura.aliquota_iva or 22) / 100)) | round(2) %}
                 <div class="mobile-list-item">
                     <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                         <div class="min-w-0">
@@ -147,11 +157,15 @@
                             <div class="small text-secondary">{{ fattura.cliente.name if fattura.cliente else "-" }}</div>
                         </div>
                         <div class="text-end flex-shrink-0">
-                            <div class="fw-semibold {% if fattura.pagato %}text-success{% else %}text-danger{% endif %}">{{ m.euro(fattura.importo|float) }}</div>
+                            <div class="small text-secondary">Imponibile {{ m.euro(fattura.importo|float) }}</div>
+                            <div class="fw-semibold {% if fattura.pagato %}text-success{% else %}text-danger{% endif %}">{{ m.euro(totale_sent) }}</div>
                             {% if fattura.pagato %}
                             <span class="badge rounded-pill text-bg-success erp-badge">Pagata</span>
                             {% else %}
                             <span class="badge rounded-pill text-bg-warning erp-badge">Da pagare</span>
+                            {% endif %}
+                            {% if fattura.id in linked_movement_ids %}
+                            <div><a href="{{ url_for('finance.finance_index', year=fattura.data_pagamento.year if fattura.data_pagamento else fattura.data_emissione.year, month=fattura.data_pagamento.month if fattura.data_pagamento else fattura.data_emissione.month) }}" class="badge rounded-pill text-bg-info erp-badge text-decoration-none"><i class="bi bi-cash-coin me-1"></i>Incasso registrato</a></div>
                             {% endif %}
                         </div>
                     </div>
@@ -229,8 +243,9 @@
                             <th class="fw-bold text-start">Fornitore</th>
                             <th class="fw-bold text-center">Data emissione</th>
                             <th class="fw-bold text-center">Scadenza</th>
-                            <th class="fw-bold text-end">Importo</th>
+                            <th class="fw-bold text-end">Imponibile</th>
                             <th class="fw-bold text-center">IVA</th>
+                            <th class="fw-bold text-end">Totale</th>
                             <th class="fw-bold text-center">Stato</th>
                             <th class="fw-bold text-center">PDF</th>
                             <th class="fw-bold text-end">Azioni</th>
@@ -238,12 +253,15 @@
                     </thead>
                     <tbody>
                         {% for fattura in received_pagination.items %}
+                        {% set totale_recv = (fattura.importo|float * (1 + (fattura.aliquota_iva or 22) / 100)) | round(2) %}
                         <tr>
                             <td class="fw-bold text-center">{{ fattura.numero }}</td>
                             <td class="text-start"><span class="text-truncate d-block">{{ fattura.fornitore }}</span></td>
                             <td class="text-center">{{ fattura.data_emissione|date_it }}</td>
                             <td class="text-center">{{ fattura.data_scadenza|date_it if fattura.data_scadenza else "-" }}</td>
-                            <td class="text-end fw-semibold text-danger">{{ m.euro(fattura.importo|float) }}</td>
+                            <td class="text-end fw-semibold">{{ m.euro(fattura.importo|float) }}</td>
+                            <td class="text-center text-secondary">{{ fattura.aliquota_iva or 22 }}%</td>
+                            <td class="text-end fw-semibold text-danger">{{ m.euro(totale_recv) }}</td>
                             <td class="text-center text-secondary">{{ fattura.aliquota_iva or 22 }}%</td>
                             <td class="text-center">
                                 {% if fattura.stato_pagamento == "pagata" %}
@@ -286,6 +304,7 @@
 
             <div class="d-md-none mobile-list">
                 {% for fattura in received_pagination.items %}
+                {% set totale_recv = (fattura.importo|float * (1 + (fattura.aliquota_iva or 22) / 100)) | round(2) %}
                 <div class="mobile-list-item">
                     <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                         <div class="min-w-0">
@@ -293,7 +312,8 @@
                             <div class="small text-secondary">{{ fattura.fornitore }}</div>
                         </div>
                         <div class="text-end flex-shrink-0">
-                            <div class="fw-semibold text-danger">{{ m.euro(fattura.importo|float) }}</div>
+                            <div class="small text-secondary">Imponibile {{ m.euro(fattura.importo|float) }}</div>
+                            <div class="fw-semibold text-danger">{{ m.euro(totale_recv) }}</div>
                             {% if fattura.stato_pagamento == "pagata" %}
                             <span class="badge rounded-pill text-bg-success erp-badge">Pagata</span>
                             {% elif fattura.stato_pagamento == "scaduta" %}

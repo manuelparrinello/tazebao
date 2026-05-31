@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block title %}Modifica preventivo {{ preventivo.id }}{% endblock %}
-
 {% macro euro_value(value) -%}
 {{ "%.2f"|format(value|default(0)|float)|replace(".", ",") }}
 {%- endmacro %}

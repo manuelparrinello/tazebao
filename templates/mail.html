@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block title %}Client email{% endblock %}
-
 {% block content %}
 {% set can_mutate = current_user and current_user.role != "readonly" %}
 {% set can_admin = current_user and current_user.role == "admin" %}

@@ -580,3 +580,18 @@ if (document.getElementById("app")) {
   erpDashboardApp.mount("#app");
 }
 
+/*===========================
+  Sidebar — mobile offcanvas close on link click
+===========================*/
+document.addEventListener("DOMContentLoaded", () => {
+  document
+    .querySelectorAll(".app-sidebar-mobile .nav-link")
+    .forEach((link) => {
+      link.addEventListener("click", () => {
+        const offcanvas = document.getElementById("sidebarMobile");
+        const instance = bootstrap.Offcanvas.getInstance(offcanvas);
+        if (instance) instance.hide();
+      });
+    });
+});
+

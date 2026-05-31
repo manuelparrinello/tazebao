@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block title %}{{ moodboard.title }} - Moodboard{% endblock %}
-
 {% block content %}
 {% set can_mutate = current_user is defined and current_user is not none and current_user.role in ("admin", "operatore") %}
 

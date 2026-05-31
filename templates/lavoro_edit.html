@@ -2,7 +2,6 @@
 {% import "_macros.html" as m %}
 
 {% block title %}{{ page_title }}{% endblock %}
-
 {% macro date_value(value) -%}
 {{ value.isoformat() if value else "" }}
 {%- endmacro %}

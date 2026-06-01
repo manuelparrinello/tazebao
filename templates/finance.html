@@ -17,55 +17,57 @@
 {% set _can_mutate = current_user and current_user.role != "readonly" %}
 {% if movements %}
 <div class="d-none d-md-block">
-    <table class="table table-hover my-0 sortable finance-table">
+    <table class="table erp-table finance-list-table my-0">
         <thead>
             <tr>
-                <th class="fw-bold text-start">Titolo</th>
-                <th class="fw-bold text-center finance-col-type">Tipo</th>
-                <th class="fw-bold text-center finance-col-amount">Importo</th>
-                <th class="fw-bold text-end finance-col-actions sorttable_nosort">Azioni</th>
+                <th class="fw-bold col-movimento" scope="col">Movimento</th>
+                <th class="fw-bold col-importo text-end" scope="col">Importo</th>
+                <th class="fw-bold col-tipo text-center" scope="col">Tipo</th>
+                <th class="fw-bold col-stato text-center" scope="col">Stato</th>
+                <th class="fw-bold col-data text-center" scope="col">Data</th>
+                <th class="fw-bold col-azioni text-end" scope="col"></th>
             </tr>
         </thead>
         <tbody>
             {% for movement in movements %}
             <tr>
                 <td>
-                    <a class="fw-bold a-no-color" href="{{ url_for('finance.finance_edit', movement_id=movement.id) if _can_mutate else '#' }}">{{ movement.title }}</a>
-                    {% if movement.description %}
-                    <div class="small text-secondary">{{ movement.description }}</div>
-                    {% endif %}
-                    <div class="d-flex flex-wrap gap-2 small text-secondary mt-1">
-                        {% if movement.cliente %}
-                        <span><i class="bi bi-person me-1"></i>{{ movement.cliente.name }}</span>
+                    <a class="text-decoration-none" href="{{ url_for('finance.finance_edit', movement_id=movement.id) if _can_mutate else '#' }}">
+                        <span class="fr-row-main">{{ movement.title }}</span>
+                        {% if movement.description %}
+                        <span class="fr-row-sub">{{ movement.description }}</span>
                         {% endif %}
-                        {% if movement.lavoro %}
-                        <span><i class="bi bi-briefcase me-1"></i>{{ movement.lavoro.descrizione }}</span>
-                        {% endif %}
-                    </div>
+                    </a>
                 </td>
-                <td>
-                    <div class="d-flex align-items-center gap-1">
-                        {% if kind == "entrata" %}
-                            {% if movement.movement_status == "effettiva" %}
-                            <span class="fin-status-pill fin-status-effective" title="Effettiva"><span class="fin-status-dot"></span>E</span>
-                            {% else %}
-                            <span class="fin-status-pill fin-status-expected" title="Prevista"><span class="fin-status-dot"></span>P</span>
-                            {% endif %}
-                        {% else %}
-                            {% if movement.expense_type == "fissa" %}
-                            <span class="fin-status-pill fin-status-fixed" title="Fissa"><span class="fin-status-dot"></span>F</span>
-                            {% else %}
-                            <span class="fin-status-pill fin-status-variable" title="Variabile"><span class="fin-status-dot"></span>V</span>
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                </td>
-                <td class="text-center fw-bold fs-6 {% if kind == 'entrata' %}text-success{% else %}text-danger{% endif %}">
+                <td class="text-end fr-row-importo {% if kind == 'entrata' %}text-success{% else %}text-danger{% endif %}">
                     {{ m.euro(movement.amount|float) }}
                 </td>
+                <td class="text-center">
+                    {% if kind == "entrata" %}
+                    <span class="badge rounded-pill text-bg-success erp-badge"><i class="bi bi-arrow-down-left me-1"></i>Entrata</span>
+                    {% else %}
+                    <span class="badge rounded-pill text-bg-danger erp-badge"><i class="bi bi-arrow-up-right me-1"></i>Uscita</span>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if kind == "entrata" %}
+                        {% if movement.movement_status == "effettiva" %}
+                        <span class="badge rounded-pill text-bg-info erp-badge">Effettiva</span>
+                        {% else %}
+                        <span class="badge rounded-pill text-bg-secondary erp-badge">Prevista</span>
+                        {% endif %}
+                    {% else %}
+                        {% if movement.expense_type == "fissa" %}
+                        <span class="badge rounded-pill text-bg-info erp-badge">Fissa</span>
+                        {% else %}
+                        <span class="badge rounded-pill text-bg-secondary erp-badge">Variabile</span>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td class="text-center text-secondary">{{ movement.movement_date|date_it }}</td>
                 <td class="text-end">
                     {% if _can_mutate %}
-                    <div class="erp-actions">
+                    <div class="fr-row-azioni">
                         <a class="btn btn-sm btn-outline-primary erp-icon-btn" href="{{ url_for('finance.finance_edit', movement_id=movement.id) }}" aria-label="Modifica">
                             <i class="bi bi-pencil"></i>
                         </a>
@@ -86,55 +88,35 @@
 
 <div class="d-md-none">
     {% for movement in movements %}
-    <div class="rounded-3 border border-light-subtle bg-white p-3 mb-3">
-        <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
-            <div class="min-w-0">
-                <a class="fw-bold a-no-color" href="{{ url_for('finance.finance_edit', movement_id=movement.id) if _can_mutate else '#' }}">{{ movement.title }}</a>
+    <a class="fr-mobile-row" href="{{ url_for('finance.finance_edit', movement_id=movement.id) if _can_mutate else '#' }}">
+        <div class="d-flex align-items-start justify-content-between gap-2">
+            <div class="min-w-0 flex-grow-1">
+                <div class="fr-mobile-title">{{ movement.title }}</div>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                    <span class="fr-mobile-importo {% if kind == 'entrata' %}text-success{% else %}text-danger{% endif %}">
+                        {% if kind == 'entrata' %}+{% endif %}{{ m.euro(movement.amount|float) }}
+                    </span>
+                    {% if kind == "entrata" %}
+                        {% if movement.movement_status == "effettiva" %}
+                        <span class="badge rounded-pill text-bg-info erp-badge">Effettiva</span>
+                        {% else %}
+                        <span class="badge rounded-pill text-bg-secondary erp-badge">Prevista</span>
+                        {% endif %}
+                    {% else %}
+                        {% if movement.expense_type == "fissa" %}
+                        <span class="badge rounded-pill text-bg-info erp-badge">Fissa</span>
+                        {% else %}
+                        <span class="badge rounded-pill text-bg-secondary erp-badge">Variabile</span>
+                        {% endif %}
+                    {% endif %}
+                    <span class="small text-secondary">{{ movement.movement_date|date_it }}</span>
+                </div>
             </div>
-            <div class="d-flex gap-1 flex-shrink-0">
-                {% if _can_mutate %}
-                <a class="btn btn-sm btn-outline-primary erp-icon-btn" href="{{ url_for('finance.finance_edit', movement_id=movement.id) }}" aria-label="Modifica">
-                    <i class="bi bi-pencil"></i>
-                </a>
-                <form action="{{ url_for('finance.finance_delete', movement_id=movement.id) }}" method="post" class="d-inline" data-confirm-message="Eliminare questo movimento?">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-sm btn-outline-danger erp-icon-btn" aria-label="Elimina">
-                        <i class="bi bi-trash3"></i>
-                    </button>
-                </form>
-                {% endif %}
+            <div class="fr-mobile-actions">
+                <i class="bi bi-chevron-right text-secondary"></i>
             </div>
         </div>
-        <div class="fw-bold fs-5 mb-2 {% if kind == 'entrata' %}text-success{% else %}text-danger{% endif %}">
-            {{ m.euro(movement.amount|float) }}
-        </div>
-        <div class="d-flex align-items-center gap-2 mb-2">
-            {% if kind == "entrata" %}
-            <span class="fin-type-badge fin-type-entrata"><i class="bi bi-arrow-down-left me-1"></i>Entrata</span>
-            {% if movement.movement_status == "effettiva" %}
-            <span class="fin-status-pill fin-status-effective" title="Effettiva"><span class="fin-status-dot"></span>E</span>
-            {% else %}
-            <span class="fin-status-pill fin-status-expected" title="Prevista"><span class="fin-status-dot"></span>P</span>
-            {% endif %}
-            {% else %}
-            <span class="fin-type-badge fin-type-uscita"><i class="bi bi-arrow-up-right me-1"></i>Uscita</span>
-            {% if movement.expense_type == "fissa" %}
-            <span class="fin-status-pill fin-status-fixed" title="Fissa"><span class="fin-status-dot"></span>F</span>
-            {% else %}
-            <span class="fin-status-pill fin-status-variable" title="Variabile"><span class="fin-status-dot"></span>V</span>
-            {% endif %}
-            {% endif %}
-        </div>
-        <div class="small text-secondary d-flex flex-wrap gap-2">
-            <span><i class="bi bi-calendar3 me-1"></i>{{ movement.movement_date|date_it }}</span>
-            {% if movement.cliente %}
-            <span><i class="bi bi-person me-1"></i>{{ movement.cliente.name }}</span>
-            {% endif %}
-            {% if movement.lavoro %}
-            <span><i class="bi bi-briefcase me-1"></i>{{ movement.lavoro.descrizione }}</span>
-            {% endif %}
-        </div>
-    </div>
+    </a>
     {% endfor %}
 </div>
 {% else %}

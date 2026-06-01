@@ -42,14 +42,14 @@
     <div v-if="filteredPreventivi.length > 0">
         <div class="card rounded-3 border border-light-subtle" data-mobile-list-clean>
             <div class="card-body p-0 p-md-4">
-                <table class="table my-0 sortable table-hover rounded-3 no-last-border preventivi-table d-none d-md-table">
+                <table class="table erp-table my-0 d-none d-md-table">
                     <thead>
                         <tr>
                             <th class="fw-bold pointer col-descrizione text-start" scope="col">Descrizione</th>
                             <th class="fw-bold pointer col-cliente text-start" scope="col">Cliente</th>
                             <th class="fw-bold pointer col-data text-center" scope="col">Data</th>
                             <th class="fw-bold pointer col-stato text-center" scope="col">Stato</th>
-                            <th class="fw-bold pointer col-totale text-center" scope="col">Totale</th>
+                            <th class="fw-bold pointer col-totale text-end" scope="col">Totale</th>
                             {% if can_mutate %}<th class="fw-bold col-actions text-end sorttable_nosort" scope="col">Azioni</th>{% endif %}
                         </tr>
                     </thead>
@@ -62,8 +62,8 @@
                                 </a>
                             </td>
                             <td class="col-cliente-cell text-truncate">[[ preventivo.cliente ]]</td>
-                            <td class="col-data-cell">[[ formatDate(preventivo.data_creazione) ]]</td>
-                            <td class="col-stato-cell" v-html="statoBadgeHtml(preventivo.stato)"></td>
+                            <td class="col-data-cell text-center">[[ formatDate(preventivo.data_creazione) ]]</td>
+                            <td class="col-stato-cell text-center" v-html="statoBadgeHtml(preventivo.stato)"></td>
                             <td class="col-totale-cell text-end fw-bold preventivo-importo" v-html="formatEuro(preventivo.totale_preventivo)"></td>
                             {% if can_mutate %}
                             <td class="col-actions text-end" @click.stop>

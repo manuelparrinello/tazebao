@@ -15,16 +15,6 @@
 </div>
 <hr>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-<div class="mt-4">
-    {% for category, message in messages %}
-    <div class="alert alert-{{ category }}">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
-{% endwith %}
-
 <div class="card border-0 shadow-sm mt-4" data-mobile-list-clean>
     <div class="table-responsive d-none d-md-block">
         <table class="table align-middle mb-0 sortable erp-table">
@@ -80,28 +70,28 @@
             {% for account in accounts %}
             <div class="mobile-list-item">
                 <div class="d-flex align-items-start justify-content-between gap-3">
-                    <div class="min-w-0">
+                    <div class="min-w-0 flex-grow-1">
                         <div class="fw-bold mobile-row-title">{{ account.label }}</div>
                         <div class="mobile-row-muted text-truncate">{{ account.email_address }}</div>
-                        <div class="mobile-row-meta mobile-row-muted mt-1">
-                            <span>{{ account.imap_host }}:{{ account.imap_port }}</span>
-                            <span>{{ account.smtp_host }}:{{ account.smtp_port }}</span>
-                            <span>{{ account.last_sync_at|datetime_it if account.last_sync_at else "Mai" }}</span>
+                        <div class="mobile-row-meta mt-1">
+                            <span class="mobile-row-muted">{{ account.imap_host }}:{{ account.imap_port }}</span>
+                            <span class="mobile-row-muted ms-2">{{ account.smtp_host }}:{{ account.smtp_port }}</span>
+                            <span class="mobile-row-muted ms-2">{{ account.last_sync_at|datetime_it if account.last_sync_at else "Mai" }}</span>
                         </div>
                     </div>
-                    <div class="d-flex flex-column gap-2 flex-shrink-0">
+                    <div class="d-flex gap-2 flex-shrink-0">
                         <form action="{{ url_for('mail.mail_account_sync', account_id=account.id) }}" method="post">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-sm btn-outline-primary w-100">
+                            <button type="submit" class="btn btn-sm btn-outline-primary" aria-label="Sync">
                                 <i class="bi bi-arrow-repeat"></i>
                             </button>
                         </form>
-                        <a href="{{ url_for('mail.mail_account_edit', account_id=account.id) }}" class="btn btn-sm btn-outline-secondary w-100">
+                        <a href="{{ url_for('mail.mail_account_edit', account_id=account.id) }}" class="btn btn-sm btn-outline-secondary" aria-label="Modifica">
                             <i class="bi bi-pencil"></i>
                         </a>
                         <form action="{{ url_for('mail.mail_account_delete', account_id=account.id) }}" method="post" onsubmit="return confirm('Eliminare definitivamente l\'account «{{ account.label }}»? Tutte le email associate verranno cancellate.')">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Elimina">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>

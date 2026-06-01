@@ -130,16 +130,16 @@
                                         <td>
                                             <textarea class="form-control row-description-input" rows="2" name="riga_descrizione[]" required>{{ riga.descrizione }}</textarea>
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             <div class="input-group">
                                                 <input type="number" min="0" step="0.01" class="form-control row-price-input" name="prezzo_ie[]" value="{{ riga.prezzo_ie }}" required>
                                                 <span class="input-group-text">&euro;</span>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             <div class="form-control bg-light text-secondary" data-role="row-iva">{{ euro_value(riga.prezzo_ie|float * 1.22) }} &euro;</div>
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             <div class="form-control bg-light fw-bold" data-role="row-total">{{ euro_value(riga.totale_riga) }} &euro;</div>
                                         </td>
                                         <td class="text-end">

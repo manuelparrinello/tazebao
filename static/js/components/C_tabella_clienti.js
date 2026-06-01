@@ -1,34 +1,34 @@
 const TabellaClienti = {
   props: ["clienti_data"],
   template: `
-    <table class="table my-0 sortable table-hover rounded-3 no-last-border clienti-table d-none d-md-table">
+    <table class="table erp-table my-0 d-none d-md-table">
       <thead>
         <tr>
           <th class="fw-bold pointer col-nominativo" scope="col">Nominativo</th>
-          <th class="fw-bold pointer col-contatti" scope="col">Contatti</th>
-          <th class="fw-bold pointer col-citta" scope="col">Citt&agrave;</th>
-          <th class="fw-bold pointer col-piva" scope="col">P.IVA</th>
-          <th class="fw-bold pointer col-pec-sdi" scope="col">PEC / SDI</th>
+          <th class="fw-bold pointer col-email" scope="col">Contatti</th>
+          <th class="fw-bold pointer col-date" scope="col">Citt&agrave;</th>
+          <th class="fw-bold pointer col-status" scope="col">P.IVA</th>
+          <th class="fw-bold pointer col-payment" scope="col">PEC / SDI</th>
           <th class="fw-bold pointer text-center col-note" scope="col">Note</th>
         </tr>
       </thead>
       <tbody>
         <template v-if="clienti_data.length > 0">
           <tr v-for="cliente in clienti_data">
-            <td class="col-nominativo-cell">
+            <td>
               <a class="fw-bold text-decoration-none d-flex align-items-center gap-2" :href="'/clienti/' + cliente.id" :title="cliente.nome">
                 <i :style="{ color: cliente.colore }" class="bi bi-person-circle flex-shrink-0"></i>
                 <span class="text-truncate">[[ cliente.nome ]]</span>
               </a>
             </td>
-            <td class="col-contatti-cell">
+            <td>
               <div v-if="cliente.email" class="text-truncate">[[ cliente.email ]]</div>
               <small v-if="cliente.telefono" class="text-secondary d-block text-truncate">[[ cliente.telefono ]]</small>
               <span v-if="!cliente.email && !cliente.telefono" class="text-secondary">-</span>
             </td>
-            <td class="col-citta-cell">[[ cliente.citta || '-' ]]</td>
-            <td class="col-piva-cell">[[ cliente.p_iva || '-' ]]</td>
-            <td class="col-pec-sdi-cell">
+            <td>[[ cliente.citta || '-' ]]</td>
+            <td>[[ cliente.p_iva || '-' ]]</td>
+            <td>
               <template v-if="cliente.pec || cliente.sdi">
                 <div v-if="cliente.pec" class="text-truncate">[[ cliente.pec ]]</div>
                 <small v-if="cliente.sdi" class="text-secondary d-block text-truncate">SDI: [[ cliente.sdi ]]</small>

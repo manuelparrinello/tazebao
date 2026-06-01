@@ -25,7 +25,7 @@
 <div class="card rounded-3 border border-light-subtle mt-4" data-mobile-list-clean>
     <div class="card-body p-0 p-md-4">
 
-        <table class="table table-hover my-0 sortable users-table d-none d-md-table">
+        <table class="table erp-table my-0 d-none d-md-table">
             <thead>
                 <tr>
                     <th class="fw-bold pointer col-user text-start" scope="col">Utente</th>
@@ -45,8 +45,8 @@
                     <td class="col-email mobile-hide">
                         <div class="text-truncate" title="{{ user.email }}">{{ user.email }}</div>
                     </td>
-                    <td class="col-status">{{ erp_badge("user_role", user.role) }}</td>
-                    <td class="col-status">{{ erp_badge("user_state", "active" if user.is_active else "inactive") }}</td>
+                    <td class="col-status text-center">{{ erp_badge("user_role", user.role) }}</td>
+                    <td class="col-status text-center">{{ erp_badge("user_state", "active" if user.is_active else "inactive") }}</td>
                     <td class="col-actions text-end">
                         <div class="erp-actions">
                             <a class="btn btn-sm btn-outline-primary" href="{{ url_for('users.users_edit', user_id=user.id) }}" aria-label="Modifica">
@@ -89,11 +89,11 @@
 
         <div class="d-md-none mobile-list">
             {% for user in users %}
-            <div class="mobile-list-item users-mobile-card">
+            <div class="mobile-list-item">
                 <div class="d-flex align-items-start justify-content-between gap-3">
                     <div class="min-w-0 flex-grow-1">
                         <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="fw-bold mobile-row-title flex-grow-1 min-w-0 text-truncate">{{ user.name or "-" }}</span>
+                            <span class="fw-bold mobile-row-title flex-grow-1">{{ user.name or "-" }}</span>
                             {{ erp_badge("user_role", user.role) }}
                             {{ erp_badge("user_state", "active" if user.is_active else "inactive") }}
                         </div>
@@ -105,7 +105,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="users-mobile-actions mt-2 pt-2 border-top">
+                <div class="d-flex gap-2 mt-2 pt-2 border-top flex-wrap">
                     <a class="btn btn-sm btn-outline-primary" href="{{ url_for('users.users_edit', user_id=user.id) }}" aria-label="Modifica">
                         <i class="bi bi-pencil"></i>
                     </a>
@@ -129,7 +129,7 @@
                     {% endif %}
                     <form action="{{ url_for('users.users_destroy', user_id=user.id) }}" method="post" class="d-inline" data-confirm-title="Elimina utente" data-confirm-danger-label="Elimina definitivamente" data-confirm-message="Questa azione è irreversibile. Eliminare definitivamente l'utente?">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-sm btn-outline-danger users-destroy-btn" {% if current_user and current_user.id == user.id %}disabled title="Non puoi eliminare definitivamente il tuo account"{% endif %} aria-label="Elimina definitivamente">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" {% if current_user and current_user.id == user.id %}disabled title="Non puoi eliminare definitivamente il tuo account"{% endif %} aria-label="Elimina definitivamente">
                             <i class="bi bi-trash3"></i>
                         </button>
                     </form>

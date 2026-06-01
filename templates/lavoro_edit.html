@@ -14,14 +14,9 @@
                 <h3 class="fw-bolder erp-form-title">Modifica lavoro</h3>
                 <p class="erp-form-subtitle">Aggiorna i dati del lavoro e mantieni allineati cliente, date e note.</p>
             </div>
-            <div class="erp-form-actions">
-                <a href="{{ url_for('lavori.lavoro_page', lavoro_id=lavoro.id) }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i>&nbsp;Torna alla scheda
-                </a>
-                <button type="submit" form="lavoroEditForm" class="btn btn-primary">
-                    <i class="bi bi-floppy"></i>&nbsp;Salva modifiche
-                </button>
-            </div>
+            <a href="{{ url_for('lavori.lavoro_page', lavoro_id=lavoro.id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i>&nbsp;Torna alla scheda
+            </a>
         </div>
         <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
             {{ erp_badge("work_status", lavoro.stato) }}

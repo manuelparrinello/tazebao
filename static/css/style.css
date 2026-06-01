@@ -497,20 +497,19 @@
 ========================= */
 
 .app-content {
-  /* min-height: 100vh; */
   transition: margin-left 0.2s ease;
-  padding: 60px 80px 80px !important;
+  padding: calc(64px + 1.5rem) 80px 80px !important;
 }
 
 @media (max-width: 991.98px) {
   .app-content {
-    padding: 4.5rem 1rem 1.25rem 1rem !important;
+    padding: calc(64px + 1rem) 1.25rem 1.25rem !important;
   }
 }
 
 @media (max-width: 575.98px) {
   .app-content {
-    padding: 1em 1em 1.25rem 1em !important;
+    padding: calc(64px + 0.75rem) 1rem 1.25rem !important;
   }
 
   .display-6 {
@@ -2154,34 +2153,28 @@ body.loaded {
   max-width: 1180px;
 }
 
-.erp-form-section,
 .editorial-form-section {
   padding: 1.1rem 0;
   border-bottom: 1px solid var(--bs-border-color);
 }
 
-.erp-form-section:first-child,
 .editorial-form-section:first-child {
   padding-top: 0;
 }
 
-.erp-form-section:last-of-type,
 .editorial-form-section:last-of-type {
   border-bottom: 0;
 }
 
-.erp-form-section-heading,
 .editorial-form-section-heading {
   margin-bottom: 1rem;
 }
 
-.erp-form-section-heading h5,
 .editorial-form-section-heading h5 {
   margin-bottom: 0.2rem;
   font-weight: 800;
 }
 
-.erp-form-section-heading p,
 .editorial-form-section-heading p {
   margin-bottom: 0;
   color: var(--sidebar-muted);
@@ -3148,16 +3141,18 @@ body.loaded {
 }
 
 .erp-form-header {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .erp-form-header .erp-form-title {
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.3rem;
+  font-weight: 700;
 }
 
 .erp-form-header .erp-form-subtitle {
   margin-bottom: 0;
   color: var(--bs-secondary-color);
+  font-size: 0.95rem;
 }
 
 .erp-form-card {
@@ -3166,8 +3161,42 @@ body.loaded {
   box-shadow: var(--bs-box-shadow-sm);
 }
 
+.erp-form-card .card-body {
+  padding: 1.5rem;
+}
+
 .erp-form-loading {
   min-height: 320px;
+}
+
+.erp-form-section {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.erp-form-section:first-child {
+  padding-top: 0;
+}
+
+.erp-form-section:last-of-type {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.erp-form-section-heading {
+  margin-bottom: 1rem;
+}
+
+.erp-form-section-heading h5 {
+  margin-bottom: 0.2rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.erp-form-section-heading p {
+  margin-bottom: 0;
+  color: var(--bs-secondary-color);
+  font-size: 0.85rem;
 }
 
 .erp-boxed-form {
@@ -3189,7 +3218,8 @@ body.loaded {
   display: flex;
   justify-content: flex-end;
   gap: 0.6rem;
-  padding-top: 1rem;
+  padding-top: 1.25rem;
+  margin-top: 0.25rem;
   border-top: 1px solid var(--bs-border-color);
 }
 
@@ -3205,7 +3235,17 @@ body.loaded {
   text-transform: uppercase;
 }
 
+.erp-form-page .form-label {
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
 @media (max-width: 767.98px) {
+  .erp-form-card .card-body {
+    padding: 1rem;
+  }
+
   .erp-form-actions {
     flex-direction: column;
   }

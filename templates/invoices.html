@@ -131,17 +131,17 @@
                 </table>
             </div>
 
-            <div class="d-md-none">
+            <div class="mobile-list d-md-none">
                 {% for fattura in sent_pagination.items %}
-                <a class="invoice-mobile-row" href="{{ url_for('invoices.invoice_edit', invoice_id=fattura.id) if _can_mutate else '#' }}">
-                    <div class="d-flex align-items-start justify-content-between gap-2">
+                <a class="mobile-list-item mobile-row-link" href="{{ url_for('invoices.invoice_edit', invoice_id=fattura.id) if _can_mutate else '#' }}">
+                    <div class="d-flex align-items-start justify-content-between gap-3">
                         <div class="min-w-0 flex-grow-1">
-                            <div class="invoice-mobile-title">#{{ fattura.numero }} {{ fattura.cliente.name if fattura.cliente else "-" }}</div>
+                            <div class="fw-bold mobile-row-title mb-1">#{{ fattura.numero }} {{ fattura.cliente.name if fattura.cliente else "-" }}</div>
                             {% if fattura.lavoro %}
-                            <div class="invoice-mobile-sub">{{ fattura.lavoro.descrizione }}</div>
+                            <div class="mobile-row-muted mb-1">{{ fattura.lavoro.descrizione }}</div>
                             {% endif %}
-                            <div class="d-flex align-items-center gap-2 mt-1">
-                                <span class="invoice-mobile-totale {% if fattura.pagato %}text-success{% else %}text-danger{% endif %}">{{ m.euro(fattura.effective_amount) }}</span>
+                            <div class="mobile-row-meta">
+                                <span class="mobile-row-value {% if fattura.pagato %}text-success{% else %}text-danger{% endif %}">{{ m.euro(fattura.effective_amount) }}</span>
                                 {% if fattura.pagato %}
                                 <span class="badge rounded-pill text-bg-success erp-badge">Pagata</span>
                                 {% else %}
@@ -149,7 +149,7 @@
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="invoice-mobile-actions">
+                        <div class="d-flex align-items-center gap-2 flex-shrink-0 mt-1">
                             {% if fattura.pdf_path %}
                             <a href="{{ url_for('invoices.invoice_pdf', invoice_id=fattura.id) }}" class="btn btn-sm btn-outline-secondary erp-icon-btn" target="_blank" aria-label="Scarica PDF" onclick="event.stopPropagation()">
                                 <i class="bi bi-file-earmark-pdf"></i>
@@ -264,14 +264,14 @@
                 </table>
             </div>
 
-            <div class="d-md-none">
+            <div class="mobile-list d-md-none">
                 {% for fattura in received_pagination.items %}
-                <a class="invoice-mobile-row" href="{{ url_for('invoices.invoice_edit', invoice_id=fattura.id) if _can_mutate else '#' }}">
-                    <div class="d-flex align-items-start justify-content-between gap-2">
+                <a class="mobile-list-item mobile-row-link" href="{{ url_for('invoices.invoice_edit', invoice_id=fattura.id) if _can_mutate else '#' }}">
+                    <div class="d-flex align-items-start justify-content-between gap-3">
                         <div class="min-w-0 flex-grow-1">
-                            <div class="invoice-mobile-title">#{{ fattura.numero }} {{ fattura.fornitore }}</div>
-                            <div class="d-flex align-items-center gap-2 mt-1">
-                                <span class="invoice-mobile-totale text-danger">{{ m.euro(fattura.effective_amount) }}</span>
+                            <div class="fw-bold mobile-row-title mb-1">#{{ fattura.numero }} {{ fattura.fornitore }}</div>
+                            <div class="mobile-row-meta">
+                                <span class="mobile-row-value text-danger">{{ m.euro(fattura.effective_amount) }}</span>
                                 {% if fattura.stato_pagamento == "pagata" %}
                                 <span class="badge rounded-pill text-bg-success erp-badge">Pagata</span>
                                 {% elif fattura.stato_pagamento == "scaduta" %}
@@ -281,7 +281,7 @@
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="invoice-mobile-actions">
+                        <div class="d-flex align-items-center gap-2 flex-shrink-0 mt-1">
                             {% if fattura.pdf_path %}
                             <a href="{{ url_for('invoices.invoice_pdf', invoice_id=fattura.id) }}" class="btn btn-sm btn-outline-secondary erp-icon-btn" target="_blank" aria-label="Scarica PDF" onclick="event.stopPropagation()">
                                 <i class="bi bi-file-earmark-pdf"></i>

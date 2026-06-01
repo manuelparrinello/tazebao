@@ -432,49 +432,6 @@ body {
 }
 
 @media (max-width: 575.98px) {
-  [data-mobile-list-clean] {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    margin-top: 0 !important;
-  }
-
-  [data-mobile-list-clean] > .card-body {
-    padding: 0 !important;
-  }
-
-  [data-mobile-list-clean] .mobile-list {
-    padding: 0 !important;
-  }
-
-  [data-mobile-list-clean] .mobile-list > * {
-    width: 100%;
-    border: none !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    padding: 0.7rem 0 !important;
-    box-shadow: none !important;
-  }
-
-  [data-mobile-list-clean] .mobile-list > * + * {
-    border-top: 1px solid var(--app-border) !important;
-  }
-
-  [data-mobile-list-clean] .admin-export-mobile-card {
-    width: 100%;
-    border: none !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    padding: 0.5rem 0 !important;
-    box-shadow: none !important;
-  }
-
-  [data-mobile-list-clean] .admin-export-mobile-card + .admin-export-mobile-card {
-    margin-top: 0.5rem;
-    border-top: 1px solid var(--app-border) !important;
-    padding-top: 1rem !important;
-  }
-
   .app-topbar {
     height: 56px;
   }
@@ -1191,63 +1148,6 @@ body {
   font-size: 0.72rem;
 }
 
-/* Mobile compact invoice list */
-.invoice-mobile-row {
-  display: block;
-  width: 100%;
-  padding: 0.6rem 0;
-  color: inherit;
-  text-decoration: none !important;
-}
-
-.invoice-mobile-row + .invoice-mobile-row {
-  border-top: 1px solid var(--app-border);
-}
-
-.invoice-mobile-row:hover {
-  background: var(--sidebar-hover);
-  margin: 0 -1rem;
-  padding: 0.6rem 1rem;
-  width: calc(100% + 2rem);
-}
-
-.invoice-mobile-title {
-  font-weight: 700;
-  font-size: 0.85rem;
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.invoice-mobile-sub {
-  font-size: 0.75rem;
-  color: var(--app-text-muted);
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.invoice-mobile-totale {
-  font-weight: 700;
-  font-size: 0.9rem;
-  white-space: nowrap;
-}
-
-.invoice-mobile-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  flex-shrink: 0;
-}
-
-.invoice-mobile-actions .btn {
-  min-height: 24px;
-  min-width: 24px;
-  font-size: 0.7rem;
-}
-
 /* Finance list — compact rows, 6 columns */
 .finance-list-table.erp-table {
   min-width: 550px;
@@ -1314,54 +1214,6 @@ body {
   font-size: 0.72rem;
 }
 
-/* Mobile compact finance list */
-.fr-mobile-row {
-  display: block;
-  width: 100%;
-  padding: 0.6rem 0;
-  color: inherit;
-  text-decoration: none !important;
-}
-
-.fr-mobile-row + .fr-mobile-row {
-  border-top: 1px solid var(--app-border);
-}
-
-.fr-mobile-row:hover {
-  background: var(--sidebar-hover);
-  margin: 0 -1rem;
-  padding: 0.6rem 1rem;
-  width: calc(100% + 2rem);
-}
-
-.fr-mobile-title {
-  font-weight: 700;
-  font-size: 0.85rem;
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.fr-mobile-importo {
-  font-weight: 700;
-  font-size: 0.9rem;
-  white-space: nowrap;
-}
-
-.fr-mobile-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  flex-shrink: 0;
-}
-
-.fr-mobile-actions .btn {
-  min-height: 24px;
-  min-width: 24px;
-  font-size: 0.7rem;
-}
-
 @media (max-width: 767.98px) {
   .app-content .card-body,
   .app-content .card-header {
@@ -1394,17 +1246,18 @@ body {
 .mobile-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
 }
 
 .mobile-list-item {
   display: block;
   width: 100%;
-  padding: 0.95rem 1rem;
-  border: 1px solid var(--app-border);
-  border-radius: 12px;
-  background: #fff;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--app-border);
   color: inherit;
+}
+
+.mobile-list-item:last-child {
+  border-bottom: none;
 }
 
 .mobile-list-item:hover {

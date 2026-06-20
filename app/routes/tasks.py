@@ -58,7 +58,7 @@ def apply_task_form(task):
         raise ValueError("Priorita task non valida.")
 
 
-TASK_FILTERS = {"aperte", "scadute", "in_scadenza", "urgenti"}
+TASK_FILTERS = {"tutte", "aperte", "scadute", "in_scadenza", "completate", "annullate"}
 CLOSED_STATUSES = ("completata", "annullata")
 
 
@@ -67,7 +67,7 @@ CLOSED_STATUSES = ("completata", "annullata")
 def tasks():
     filter_name = request.args.get("filter", "").strip().lower()
     if filter_name not in TASK_FILTERS:
-        filter_name = None
+        filter_name = "aperte"
 
     query = Task.query
     today = date.today()
@@ -85,20 +85,40 @@ def tasks():
             Task.due_date <= today + timedelta(days=3),
             ~Task.status.in_(CLOSED_STATUSES),
         )
-    elif filter_name == "urgenti":
-        query = query.filter(
-            Task.priority.in_(("alta", "urgente")),
-            ~Task.status.in_(CLOSED_STATUSES),
-        )
+    elif filter_name == "completate":
+        query = query.filter(Task.status == "completata")
+    elif filter_name == "annullate":
+        query = query.filter(Task.status == "annullata")
 
     tasks_list = query.order_by(Task.created_at.desc()).all()
+
+    tasks_by_client = defaultdict(list)
+    for task in tasks_list:
+        tasks_by_client[task.cliente].append(task)
+
+    client_groups = []
+    for cliente, group_tasks in tasks_by_client.items():
+        if cliente is None:
+            continue
+        client_groups.append({
+            "cliente": cliente,
+            "tasks": sorted(group_tasks, key=_priority_sort_key),
+            "count": len(group_tasks),
+        })
+    client_groups.sort(key=lambda g: g["cliente"].name.lower())
+
+    no_client_tasks = sorted(tasks_by_client.get(None, []), key=_priority_sort_key)
+
     return render_template(
         "tasks.html",
-        tasks=tasks_list,
+        client_groups=client_groups,
+        no_client_tasks=no_client_tasks,
         categories=TASK_CATEGORIES,
         statuses=TASK_STATUSES,
         priorities=TASK_PRIORITIES,
         active_filter=filter_name,
+        clienti=Cliente.query.order_by(Cliente.name.asc()).all(),
+        today=today,
     )
 
 

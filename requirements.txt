@@ -27,8 +27,6 @@ pillow==11.1.0
 platformdirs==4.3.6
 PyAutoGUI==0.9.54
 PyGetWindow==0.0.9
-pyinstaller==6.11.0
-pyinstaller-hooks-contrib==2024.9
 PyMsgBox==1.0.9
 PyMuPDF==1.24.13
 pyperclip==1.9.0

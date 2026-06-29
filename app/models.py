@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -758,3 +759,24 @@ class MoodboardImage(db.Model):
     note = db.Column(db.Text, nullable=True)
     sort_order = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+
+class EditorialShareLink(db.Model):
+    __tablename__ = "erp_editorial_share_links"
+
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(36), nullable=False, unique=True, index=True, default=lambda: str(uuid.uuid4()))
+    cliente_id = db.Column(db.Integer, db.ForeignKey("clienti.id"), nullable=False, index=True)
+    year = db.Column(db.Integer, nullable=False)
+    month = db.Column(db.Integer, nullable=False)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+    created_by_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    cliente = db.relationship("Cliente", backref="editorial_share_links")
+    created_by = db.relationship("User", backref="editorial_share_links")
+
+    def __init__(self, **kwargs):
+        if "token" not in kwargs:
+            kwargs["token"] = str(uuid.uuid4())
+        super().__init__(**kwargs)

@@ -10,6 +10,8 @@ PUBLIC_ENDPOINTS = {
     "static",
     "login",
     "auth.login",
+    "editorial_share.view_shared",
+    "editorial_share.publication_detail",
 }
 
 

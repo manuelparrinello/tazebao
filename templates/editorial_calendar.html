@@ -165,6 +165,11 @@
             <a class="btn btn-outline-primary" href="{{ next_month_url }}">
                 Mese successivo&nbsp;<i class="bi bi-chevron-right"></i>
             </a>
+            {% if can_mutate and cliente %}
+            <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#shareLinkModal">
+                <i class="bi bi-share"></i>&nbsp;Condividi
+            </button>
+            {% endif %}
         </div>
     </div>
 
@@ -440,6 +445,44 @@
     </div>
 </section>
 
+<div class="modal fade" id="shareLinkModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="bi bi-share me-2"></i>Condividi piano editoriale</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+            </div>
+            <form id="shareLinkForm">
+                <div class="modal-body">
+                    <p class="text-secondary mb-3">Genera un link pubblico per condividere il piano editoriale di <strong>{{ cliente.name if cliente else "" }}</strong> — {{ month_name }} {{ current_year }}.</p>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="cliente_id" value="{{ cliente.id if cliente else active_cliente_id }}">
+                    <input type="hidden" name="year" value="{{ current_year }}">
+                    <input type="hidden" name="month" value="{{ current_month }}">
+                    <div id="shareLinkResult" class="d-none">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="shareLinkUrl" readonly>
+                            <button class="btn btn-primary" type="button" id="copyShareLinkBtn">
+                                <i class="bi bi-clipboard"></i>&nbsp;Copia
+                            </button>
+                        </div>
+                        <div class="small text-secondary mt-2">
+                            <i class="bi bi-info-circle"></i> Il link è pubblico. Condividilo con il tuo cliente.
+                        </div>
+                    </div>
+                    <div id="shareLinkError" class="alert alert-danger d-none"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" class="btn btn-success" id="generateShareLinkBtn">
+                        <i class="bi bi-link-45deg"></i>&nbsp;Genera link
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="editorialLightboxModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered mw-100 mx-2 mx-lg-auto">
         <div class="modal-content bg-transparent border-0">
@@ -540,6 +583,55 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         lightboxModal.addEventListener('hidden.bs.modal', function () {
             document.removeEventListener('keydown', onEditorialKeydown);
+        });
+    }
+
+    var shareForm = document.getElementById('shareLinkForm');
+    if (shareForm) {
+        shareForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var btn = document.getElementById('generateShareLinkBtn');
+            var resultDiv = document.getElementById('shareLinkResult');
+            var errorDiv = document.getElementById('shareLinkError');
+            var urlInput = document.getElementById('shareLinkUrl');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>&nbsp;Generazione...';
+            resultDiv.classList.add('d-none');
+            errorDiv.classList.add('d-none');
+
+            fetch('/editorial-share/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(new FormData(shareForm))
+            })
+            .then(function (r) { return r.json().then(function (d) { return { status: r.status, data: d }; }); })
+            .then(function (res) {
+                if (res.status === 200 && res.data.url) {
+                    urlInput.value = res.data.url;
+                    resultDiv.classList.remove('d-none');
+                } else {
+                    errorDiv.textContent = res.data.error || 'Errore durante la generazione del link.';
+                    errorDiv.classList.remove('d-none');
+                }
+            })
+            .catch(function () {
+                errorDiv.textContent = 'Errore di rete. Riprova.';
+                errorDiv.classList.remove('d-none');
+            })
+            .finally(function () {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-link-45deg"></i>&nbsp;Genera link';
+            });
+        });
+
+        document.getElementById('copyShareLinkBtn').addEventListener('click', function () {
+            var input = document.getElementById('shareLinkUrl');
+            input.select();
+            navigator.clipboard.writeText(input.value);
+            var btn = this;
+            btn.innerHTML = '<i class="bi bi-check-lg"></i>&nbsp;Copiato!';
+            setTimeout(function () { btn.innerHTML = '<i class="bi bi-clipboard"></i>&nbsp;Copia'; }, 2000);
         });
     }
 });

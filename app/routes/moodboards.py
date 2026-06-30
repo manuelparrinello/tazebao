@@ -1,6 +1,8 @@
 import os
 from uuid import uuid4
 
+from PIL import Image
+
 from flask import Blueprint, current_app, flash, g, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
@@ -39,7 +41,27 @@ def save_upload(file_storage):
     os.makedirs(upload_root, exist_ok=True)
     safe_name = secure_filename(file_storage.filename)
     filename = f"{uuid4().hex}_{safe_name}"
-    file_storage.save(os.path.join(upload_root, filename))
+    file_path = os.path.join(upload_root, filename)
+
+    max_dim = current_app.config.get("MAX_IMAGE_DIMENSION", 1920)
+    quality = current_app.config.get("MAX_IMAGE_QUALITY", 85)
+
+    extension = filename.rsplit(".", 1)[1].lower()
+    fmt_map = {"jpg": "JPEG", "jpeg": "JPEG", "png": "PNG", "webp": "WEBP"}
+    save_kwargs = {"JPEG": {"quality": quality, "optimize": True}, "PNG": {"optimize": True}, "WEBP": {"quality": quality}}
+    fmt = fmt_map[extension]
+
+    file_storage.seek(0)
+    img = Image.open(file_storage)
+
+    if extension in ("jpg", "jpeg") and img.mode in ("RGBA", "P"):
+        img = img.convert("RGB")
+
+    if max(img.width, img.height) > max_dim:
+        ratio = max_dim / max(img.width, img.height)
+        img = img.resize((int(img.width * ratio), int(img.height * ratio)), Image.LANCZOS)
+
+    img.save(file_path, fmt, **save_kwargs.get(fmt, {}))
     return f"{UPLOAD_FOLDER}/{filename}"
 
 

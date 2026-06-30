@@ -63,6 +63,9 @@ def create_app():
     upload_max_mb = int(os.environ.get("ERP_MAX_UPLOAD_MB", "512"))
     app.config["MAX_CONTENT_LENGTH"] = upload_max_mb * 1024 * 1024
 
+    app.config["MAX_IMAGE_DIMENSION"] = int(os.environ.get("MAX_IMAGE_DIMENSION", "1920"))
+    app.config["MAX_IMAGE_QUALITY"] = int(os.environ.get("MAX_IMAGE_QUALITY", "85"))
+
     form_memory_mb = int(os.environ.get("ERP_MAX_FORM_MEMORY_MB", "5"))
     app.config["MAX_FORM_MEMORY_SIZE"] = form_memory_mb * 1024 * 1024
 

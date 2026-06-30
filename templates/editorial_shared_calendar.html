@@ -24,6 +24,7 @@
         <div>
             <h4 class="fw-bolder mb-1">{{ month_name }} {{ current_year }}</h4>
         </div>
+        {% if not single_month %}
         <div class="d-inline-flex gap-2">
             <a class="btn btn-outline-primary" href="{{ prev_month_url }}">
                 <i class="bi bi-chevron-left"></i>&nbsp;Mese precedente
@@ -32,6 +33,7 @@
                 Mese successivo&nbsp;<i class="bi bi-chevron-right"></i>
             </a>
         </div>
+        {% endif %}
     </div>
 
     <div class="card rounded-3 border border-light-subtle d-none d-md-block">

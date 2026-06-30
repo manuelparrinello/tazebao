@@ -58,10 +58,13 @@ def generate():
     if month < 1 or month > 12:
         return {"error": "Mese non valido"}, 400
 
+    single_month = request.form.get("single_month") == "1"
+
     link = EditorialShareLink(
         cliente_id=cliente_id,
         year=year,
         month=month,
+        single_month=single_month,
         created_by_id=g.current_user.id,
     )
     db.session.add(link)
@@ -114,6 +117,7 @@ def view_shared(token):
         prev_month_url=prev_month_url,
         next_month_url=next_month_url,
         token=token,
+        single_month=link.single_month,
     )
 
 

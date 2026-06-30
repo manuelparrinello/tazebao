@@ -459,6 +459,12 @@
                     <input type="hidden" name="cliente_id" value="{{ cliente.id if cliente else active_cliente_id }}">
                     <input type="hidden" name="year" value="{{ current_year }}">
                     <input type="hidden" name="month" value="{{ current_month }}">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="single_month" id="singleMonthCheck" value="1">
+                        <label class="form-check-label" for="singleMonthCheck">
+                            Solo questo mese <span class="text-secondary small">(il cliente non potrà sfogliare i mesi)</span>
+                        </label>
+                    </div>
                     <div id="shareLinkResult" class="d-none">
                         <div class="input-group">
                             <input type="text" class="form-control" id="shareLinkUrl" readonly>

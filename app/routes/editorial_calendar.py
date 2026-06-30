@@ -299,6 +299,8 @@ def editorial_index():
 
     if view == "month":
         cliente_id = filter_context.get("active_cliente_id")
+        if cliente_id:
+            template_vars["cliente"] = Cliente.query.get(cliente_id)
         grid_start, grid_end = adjacent_month_padding(selected_year, selected_month)
 
         month_query = EditorialPublication.query

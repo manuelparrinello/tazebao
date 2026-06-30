@@ -102,7 +102,7 @@
             <h3 class="fw-bolder mb-1">
                 <i class="bi bi-calendar2-week me-2 text-primary"></i>Calendario Editoriale
             </h3>
-            {% if view_mode == "calendar" and cliente %}
+            {% if cliente %}
             <p class="text-secondary mb-0">Piano editoriale mensile per <strong>{{ cliente.name }}</strong>.</p>
             {% elif view_mode == "month" %}
             <p class="text-secondary mb-0">Calendario mensile di tutte le pubblicazioni social. Seleziona un cliente per filtrare.</p>
